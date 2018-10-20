@@ -12,6 +12,8 @@ import lombok.Getter;
 @Getter
 public class ValenguardMain {
 
+    // This is a commit test from Joseph
+
     private static ValenguardMain instance = null;
     private MapManager mapManager;
     private CommandProcessor commandProcessor;
