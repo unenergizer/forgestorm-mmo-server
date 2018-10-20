@@ -1,22 +1,34 @@
 package com.valenguard.server.serverupdates;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.entity.Direction;
 import com.valenguard.server.entity.Player;
 import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
 import com.valenguard.server.maps.data.Tile;
 import com.valenguard.server.maps.data.Warp;
+import com.valenguard.server.network.shared.ServerConstants;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class UpdateMovements {
 
-    private Queue<Player> movingPlayers = new ConcurrentLinkedDeque<>();
 
-    private boolean hasStarted = false;
-    private long startTime = 0;
+    // todo : this number relates to how fast the client moves
+    // todo: this should be read in from the server so we will change this at a later date
+    private static final float MAX_TIME = .5f;
+
+
+    private class MovementInfo {
+        // todo: this should contain entities not players. silly idiot. fuck you
+        private Player player;
+        private float walkTime = 0;
+    }
+
+
+    private Queue<MovementInfo> movingPlayers = new ConcurrentLinkedDeque<>();
 
     /**
      * Process the list of moving players.
@@ -25,29 +37,33 @@ public class UpdateMovements {
 
         if (movingPlayers.isEmpty()) return;
 
+        // todo: we need to be able to remove the player if they have logged off the server
+        // todo: we need to do this because the list would still contain a reference to the player
+        //movingPlayers.removeIf(movementInfo -> movementInfo.player.loggedOff());
+
         // Loop through all players and process movement.
-        movingPlayers.forEach(player -> {
-            if (!hasStarted) {
-                startTime = System.currentTimeMillis();
-                hasStarted = true;
-            }
+        movingPlayers.forEach(this::updatePlayersPosition);
+    }
 
-            // Process the players movement.
-            if (player.getCountDownMovementTicks() == 0) {
+    private void updatePlayersPosition(MovementInfo movementInfo) {
 
-                long endTime = System.currentTimeMillis();
-                System.out.println("TIME FOR 20 TICKS: " + (endTime - startTime));
-                hasStarted = false;
+        // todo: get a delta nigga
+        movementInfo.walkTime += /*delta*/ 16.0f / 20.0f;
 
-                // If the entity has moved the required number of ticks, remove them.
-                removePlayer(player);
-            } else {
+        int currentX = movementInfo.player.getLocation().getX();
+        int currentY = movementInfo.player.getLocation().getY();
 
-                //System.out.println("SPAM: Processing player movement");
-                // Process number of ticks left to move
-                player.processMovement();
-            }
-        });
+        int futureX = movementInfo.player.getFutureLocation().getX();
+        int futureY = movementInfo.player.getFutureLocation().getY();
+
+        // this clearly works ;)
+        movementInfo.player.setRealX(linearInterpolate(currentX, futureX, movementInfo.walkTime / MAX_TIME) * ServerConstants.TILE_SIZE);
+        movementInfo.player.setRealY(linearInterpolate(currentY, futureY, movementInfo.walkTime / MAX_TIME) * ServerConstants.TILE_SIZE);
+    }
+
+    // todo: tomorrow when andrew is not sleeping on his keyboard we will fix this.
+    public float linearInterpolate(float start, float end, float a) {
+        return start + (end - start) /*   * apply(a)    */;
     }
 
     /**
@@ -55,101 +71,94 @@ public class UpdateMovements {
      *
      * @param player The entity ot add.
      */
-    public void addPlayer(Player player, String mapName, int x, int y) {
+    public void addPlayer(Player player, String mapName, Direction direction) {
 
-        // TODO: REMOVE ALL THIS GARBAGE
-
-
-        // Prevent the entity from being able to move while their movement is still processing.
-        if (player.isMoving()) return;
-
-        Location currentLocation = player.getLocation();
-        Location futureLocation = new Location(mapName, currentLocation.getX() + x, currentLocation.getY() + y);
-
-        System.out.println("Player trying to move to-> X: " + futureLocation.getX() + ", Y: " + futureLocation.getY());
-
-        // Check for out of bounds.
-        if (futureLocation.isOutOfBounds()) {
-            System.out.println("Player attempted to move out of bounds.");
-
-            // Grabbing the tile the player is currently standing on
-            TmxMap tmxMap = player.getMapData();
-            Tile currentTile = tmxMap.getTileByLocation(currentLocation);
-
-            // TODO: PERFORM THIS AFTER THE PLAYER HAS FINISHED MOVING TOWARD THE EXIT OF
-            // TODO: THE MAP
-
-            // Check to see if the player needs to switch maps. Otherwise send a reply indicating
-            // to the player that they cannot move
-            if (currentTile.getWarp() != null) {
-                Warp warpData = currentTile.getWarp();
-                int warpX = warpData.getX();
-                int warpY = warpData.getY();
-                int newMapX = -1;
-                int newMapY = -1;
-                if (warpX != -1 && warpY != -1) {
-                    // Set the location to teleport to, to be equal
-                    // to the warp location
-                    newMapX = warpX;
-                    newMapY = warpY;
-                } else {
-                    // Determine the map location to teleport to by
-                    // the direction the player is moving and by their
-                    // current location
-                    if (x == +1) newMapX = 0;                          // Left side of map
-                    if (x == -1) newMapX = tmxMap.getMapWidth() - 1;  // Right side of map
-                    if (x == +0) newMapX = currentLocation.getX();     // Current position X
-                    if (y == +1) newMapY = 0;                          // Bottom of map
-                    if (y == -1) newMapY = tmxMap.getMapHeight() - 1; // Top of map
-                    if (y == +0) newMapY = currentLocation.getY();     // Current position Y
-                }
-
-                // Tell the client to switch maps
-                Location teleportLocation = new Location(warpData.getMapName(), newMapX, newMapY);
-                PlayerManager.getInstance().playerSwitchMap(player, teleportLocation);
-            } else {
-                // Tell the client to not move.
-               // new MoveReply(player, false, currentLocation).sendPacket();
-            }
-
+        // Since they player is already moving they must be predicting movement.
+        if (player.isMoving()) {
+            predictMovement(player, mapName, direction);
             return;
         }
 
-        // Check for collision. If the entity is colliding, then don't continue.
-        if (!futureLocation.isTraversable()) {
-            System.out.println("Player attempted to walk into a wall/object.");
+        newPlayerMove(player, mapName, direction);
+    }
 
-            // Tell the client to not move.
-            //new MoveReply(player, false, currentLocation).sendPacket();
+    private void predictMovement(Player player, String mapName, Direction direction) {
+        int[] x = new int[1];
+        int[] y = new int[1];
+        getMovementAmounts(x, y, direction);
+
+        // No reason to update their predicted direction since we already predict
+        // this current direction.
+        if (player.getPredictedDirection() == direction) return;
+
+        // todo: map warming checks
+
+        // The player is attempting to move somewhere in the future that the map doesn't allow.
+        if (isMovable(mapName, player.getLocation().getX() + x[0], player.getLocation().getY() + y[0])) {
             return;
         }
 
-        // Setup movement before the action happens.
-        player.setupMovement(futureLocation);
-
-        // Add the entity to the list of moving entities to be processed.
-        movingPlayers.add(player);
-
-        // Send all players on this map that this player has moved.
-        System.out.println("Sending all players a movement update.");
-        ValenguardMain.getInstance().getMapManager().sendAllMapPlayersEntityMoveUpdate(player);
-
-        // Tell the client to move to the requested tile.
-        //new MoveReply(player, true, futureLocation).sendPacket();
+        player.setPredictedDirection(direction);
+        // todo: tell everyone except the player that sent the information
+        // todo: that they plan on changing directions
     }
 
-    /**
-     * Removes a entity from the list of entities that need to be processed.
-     * Then resets their movement and sends an update to all players of their
-     * current location.
-     *
-     * @param player The entity to remove.
-     */
-    private void removePlayer(Player player) {
-        // Remove from list so entity will not be updated.
-        movingPlayers.remove(player);
+    private void newPlayerMove(Player player, String mapName, Direction direction) {
+        int[] x = new int[1];
+        int[] y = new int[1];
+        getMovementAmounts(x, y, direction);
 
-        // Reset defaults
-        player.resetMovement();
+        // todo: map warming checks
+
+        // The player is attempting to move somewhere that the map doesn't allow.
+        if (isMovable(mapName, player.getLocation().getX() + x[0], player.getLocation().getY() + y[0])) {
+            return;
+        }
+
+        // todo: setup new movement for the player
+
     }
+
+    // todo exchange arrays for some type of object pair
+    private void getMovementAmounts(int x[], int y[], Direction direction) {
+        x[0] = 0;
+        y[0] = 0;
+        if (direction == Direction.DOWN) y[0] = -1;
+        if (direction == Direction.UP) y[0] = 1;
+        if (direction == Direction.LEFT) x[0] = -1;
+        if (direction == Direction.RIGHT) x[0] = 1;
+    }
+
+    private boolean isMovable(String mapName, int x, int y) {
+
+        TmxMap tmxMap = ValenguardMain.getInstance().getMapManager().getMapData(mapName);
+
+        if (!tmxMap.isTraversable(x, y)) {
+            // Play sound or something
+            return false;
+        }
+
+        if (tmxMap.isOutOfBounds(x, y)) {
+            // Play sound or something
+            return false;
+        }
+
+        return true;
+    }
+
+    // todo: add this later if needed
+//    /**
+//     * Removes a entity from the list of entities that need to be processed.
+//     * Then resets their movement and sends an update to all players of their
+//     * current location.
+//     *
+//     * @param player The entity to remove.
+//     */
+//    private void removePlayer(Player player) {
+//        // Remove from list so entity will not be updated.
+//        movingPlayers.remove(player);
+//
+//        // Reset defaults
+//        player.resetMovement();
+//    }
 }

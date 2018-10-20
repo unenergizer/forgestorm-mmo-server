@@ -10,7 +10,14 @@ import lombok.Setter;
 @Setter
 public class Entity {
 
-    private int entityID;
+    /**
+     * Represents a unique server ID for a given
+     * entity.
+     */
+    private short serverEntityId;
+
+    private short entityType;
+
     private int health;
     private String name = "";
     private int level;
@@ -22,11 +29,24 @@ public class Entity {
 
     boolean isMoving = false;
 
-    public Entity(int entityID, Location location, float moveSpeed) {
-        this.entityID = entityID;
-        this.location = location;
-        this.moveSpeed = moveSpeed;
-    }
+    private float realX;
+    private float realY;
+
+    /**
+     * The current direction the entity is moving in.
+     */
+    private Direction moveDirection;
+
+    /**
+     * The direction the entity intends to move in the future.
+     */
+    private Direction predictedDirection;
+
+    /**
+     * The direction the entity is facing. Is not always the same direction
+     * as they are moving because the move direction can be STOP.
+     */
+    private Direction facingDirection;
 
     public void setupMovement(Location futureLocation) {
         this.futureLocation = futureLocation;

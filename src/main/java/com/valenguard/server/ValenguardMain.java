@@ -4,7 +4,7 @@ import com.valenguard.server.commands.CommandProcessor;
 import com.valenguard.server.commands.ConsoleCommandManager;
 import com.valenguard.server.maps.MapManager;
 import com.valenguard.server.network.ServerConnection;
-import com.valenguard.server.network.packet.in.MoveRequest;
+import com.valenguard.server.network.packet.in.PlayerMove;
 import com.valenguard.server.network.packet.in.PingIn;
 import com.valenguard.server.util.ConsoleLogger;
 import lombok.Getter;
@@ -71,7 +71,7 @@ public class ValenguardMain {
     private void initializeNetwork() {
         System.out.println(ConsoleLogger.NETWORK.toString() + "Initializing network...");
         ServerConnection.getInstance().openServer((eventBus) -> {
-            eventBus.registerListener(new MoveRequest());
+            eventBus.registerListener(new PlayerMove());
             eventBus.registerListener(new PingIn());
         });
     }

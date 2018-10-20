@@ -12,31 +12,23 @@ public class EntityManager {
     @Getter
     private final static EntityManager instance = new EntityManager();
 
-    // EntityType -> EntityId -> Entity
-    private Map<Class<? extends Entity>, Map<Short, Entity>> entities = new ConcurrentHashMap<>();
+    //  EntityId -> Entity
+    private Map<Short, Entity> entities = new ConcurrentHashMap<>();
 
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> Map<Short, T> getEntitiesMap(Class<? extends Entity> entityType) {
-        Map<Short, T> entityOfType = (Map<Short, T>) entities.get(entityType);
-        if (entityOfType == null) entities.put(entityType, new ConcurrentHashMap<>());
-        return (Map<Short, T>) entities.get(entityType);
+
+    public void addEntity(short entityId, Entity entity) {
+        entities.put(entityId, entity);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> List<T> getEntities(Class<? extends Entity> entityType) {
-        return new ArrayList(getEntitiesMap(entityType).values());
+    public void removeEntity(Short entityId) {
+        entities.remove(entityId);
     }
 
-    public <T extends Entity> void addEntity(Class<? extends Entity> entityType, short entityId, T entity) {
-        getEntitiesMap(entityType).put(entityId, entity);
+    public Entity getEntity(short entity) {
+        return entities.get(entity);
     }
 
-    public void removeEntity(Class<? extends Entity> entityType, Integer entityId) {
-        getEntitiesMap(entityType).remove(entityId);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Entity> T getEntity(Class<? extends Entity> entityType, Integer entityId) {
-        return (T) getEntitiesMap(entityType).get(entityId);
+    public int entitiesLoaded() {
+        return entities.size();
     }
 }

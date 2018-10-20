@@ -3,6 +3,7 @@ package com.valenguard.server.entity;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
+import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
 import com.valenguard.server.network.packet.out.InitClientPacket;
 import com.valenguard.server.network.packet.out.PingOut;
@@ -13,11 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
 
-    private int lastFakeID = 0; //Temporary player ID. In the future this ID will come from the database.
+    private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
 
     private static PlayerManager instance;
 
-    private Map<ClientHandler, Integer> mappedPlayerIds = new ConcurrentHashMap<>();
+    private Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
 
     private PlayerManager() {
     }
@@ -51,20 +52,27 @@ public class PlayerManager {
                 NewPlayerConstants.STARTING_X_CORD,
                 tmxMap.getMapHeight() - NewPlayerConstants.STARTING_Y_CORD);
 
-        Player player = new Player(lastFakeID, location, 2, clientHandler);
+        Player player = new Player();
+        player.setServerEntityId(serverEntityID);
+        player.setLocation(location);
+        player.setMoveSpeed(2);
+        player.setClientHandler(clientHandler);
+
         // TODO SET THE FEST OF THE PLAYERS INFORMATION
 
-        EntityManager.getInstance().addEntity(Player.class, (short) lastFakeID, player);
-        mappedPlayerIds.put(clientHandler, lastFakeID);
+        player.setFacingDirection(Direction.DOWN);
+
+        EntityManager.getInstance().addEntity(serverEntityID, player);
+        mappedPlayerIds.put(clientHandler, serverEntityID);
 
         System.out.println("Writing out initialization information to the player.");
-        System.out.println("eID: " + lastFakeID + ", X: " + player.getLocation().getX() + ", Y: " + player.getLocation().getY());
+        System.out.println("eID: " + serverEntityID + ", X: " + player.getLocation().getX() + ", Y: " + player.getLocation().getY());
 
         // Sending out basic information about the client.
-        new InitClientPacket(player, true, lastFakeID, location).sendPacket();
+        new InitClientPacket(player, true, serverEntityID, location).sendPacket();
 
-        // Sending the player information about themselves.
-        new EntitySpawnPacket(player, player);
+        // Spawning the player for themselves.
+        new EntitySpawnPacket(player, player).sendPacket();
 
         // Start sending ping packets
         new PingOut(player).sendPacket();
@@ -78,7 +86,7 @@ public class PlayerManager {
         tmxMap.addPlayer(player);
 
         //TODO: This should be a ID from the database. Until then, increment the fake ID for the next client connection.
-        lastFakeID++;
+        serverEntityID++;
     }
 
     /**
@@ -91,7 +99,7 @@ public class PlayerManager {
 
         // Let's update everyone because a player has left the map.
         updateMapWithPlayerLeave(player);
-        EntityManager.getInstance().removeEntity(Player.class, mappedPlayerIds.get(clientHandler));
+        EntityManager.getInstance().removeEntity(mappedPlayerIds.get(clientHandler));
         mappedPlayerIds.remove(clientHandler);
     }
 
@@ -102,7 +110,7 @@ public class PlayerManager {
      * @return The entity associated with this client handle.
      */
     public Player getPlayer(ClientHandler clientHandler) {
-        Player player = EntityManager.getInstance().getEntity(Player.class, mappedPlayerIds.get(clientHandler));
+        Player player = (Player) EntityManager.getInstance().getEntity(mappedPlayerIds.get(clientHandler));
         if (player == null) {
             throw new RuntimeException("Player not found using this ClientHandler.");
         }
@@ -147,32 +155,31 @@ public class PlayerManager {
     private void updateMapWithNewPlayer(Player playerWhoJoined, TmxMap mapToUpdate) {
         mapToUpdate.getPlayerList().forEach(playerOnMap -> {
 
-            // TODO: COME BACK AND ADD THE SPAWN PACKETS FOR ENTITIES
+//             Send all players on the map info of the new player.
+            new EntitySpawnPacket(playerOnMap, playerWhoJoined).sendPacket();
 
-            // Send all players on the map info of the new player.
-            // new EntitySpawnPacket(playerOnMap, playerWhoJoined);
-
-            // Send the new player info about all players already on the map.
-            //  new EntitySpawnPacket(playerWhoJoined, playerOnMap).sendPacket();
+//             Send the new player info about all players already on the map.
+            new EntitySpawnPacket(playerWhoJoined, playerOnMap).sendPacket();
         });
     }
 
     /**
      * Sends out a packet to everyone indicating that the player has left the map.
      *
-     * @param player The player who left the map
+     * @param despawnTarget The player who left the map
      */
-    private void updateMapWithPlayerLeave(Player player) {
-        // TODO: ADD SOME METHOD TO REMOVE PLAYERS FROM MAPS. THIS WAS REMOVED ! D:<
+    private void updateMapWithPlayerLeave(Player despawnTarget) {
+        despawnTarget.getLocation().getMapData().getPlayerList().forEach(playerOnMap -> {
 
-        player.getLocation().getMapData().getPlayerList().forEach(playerOnMap -> {
-
-            if (player.equals(playerOnMap)) return;
+            if (despawnTarget.equals(playerOnMap)) {
+                System.out.println("TRIED SENDING THE DESPAWN TARGET A DESPAWN PACKET!");
+                return;
+            }
 
             // Let all the players on the map know about the exit
-            //new EntityExitMap(playerOnMap, player).sendPacket();
+            new EntityDespawnPacket(playerOnMap, despawnTarget).sendPacket();
         });
         // Remove the player from the map they are currently in.
-        player.getMapData().removePlayer(player);
+        despawnTarget.getMapData().removePlayer(despawnTarget);
     }
 }

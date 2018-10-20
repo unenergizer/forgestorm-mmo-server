@@ -73,6 +73,7 @@ public class TmxMap {
      * @return True if the tile/coordinate is walkable. False otherwise.
      */
     public boolean isTraversable(int x, int y) {
+        if (isOutOfBounds(x, y)) return false;
         return map[x][y].isTraversable();
     }
 

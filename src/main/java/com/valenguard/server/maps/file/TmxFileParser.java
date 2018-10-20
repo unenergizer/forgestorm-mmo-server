@@ -23,7 +23,7 @@ public class TmxFileParser {
     private static final int TILE_SIZE = 16;
     private static final boolean PRINT_MAP = false;
 
-    private static int entityCount = 1000;
+    private static short entityCount = 1000;
 
     /**
      * This takes in a TMX map and gets the collision elements from it and builds a collision
@@ -162,7 +162,8 @@ public class TmxFileParser {
 
                     System.out.println("[Entity] name: " + name + ", X: " + x + ", Y: " + y);
 
-                    entityList.add(new Entity(entityCount, new Location(fileName, x, y), 1));
+                    // todo abstract this out so that we only call new Entity in a single place
+                    //entityList.add(new Entity(entityCount, new Location(fileName, x, y), 1));
 
                     entityCount++;
                 }

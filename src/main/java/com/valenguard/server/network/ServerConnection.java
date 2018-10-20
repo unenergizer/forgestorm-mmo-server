@@ -1,7 +1,6 @@
 package com.valenguard.server.network;
 
 import com.valenguard.server.entity.EntityManager;
-import com.valenguard.server.entity.Player;
 import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
@@ -135,7 +134,7 @@ public class ServerConnection implements Runnable {
 
                 // Adding the client handle to a list of current client handles
                 PlayerManager.getInstance().onPlayerConnect(clientHandler);
-                System.out.println("Clients Online: " + EntityManager.getInstance().getEntitiesMap(Player.class).size());
+                System.out.println("Clients Online: " + EntityManager.getInstance().entitiesLoaded());
 
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
@@ -151,7 +150,7 @@ public class ServerConnection implements Runnable {
                         // The client has disconnected
                         System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
                         PlayerManager.getInstance().onPlayerDisconnect(clientHandler);
-                        System.out.println("Clients Online: " + EntityManager.getInstance().getEntitiesMap(Player.class).size());
+                        System.out.println("Clients Online: " + EntityManager.getInstance().entitiesLoaded());
                     }
                 } else {
                     e.printStackTrace();

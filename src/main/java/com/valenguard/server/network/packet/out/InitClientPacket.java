@@ -10,10 +10,10 @@ import java.io.ObjectOutputStream;
 public class InitClientPacket extends ServerOutPacket {
 
     private boolean loginSuccess;
-    private int clientPlayerId;
+    private short clientPlayerId;
     private Location location;
 
-    public InitClientPacket(Player player, boolean loginSuccess, int clientPlayerId, Location location) {
+    public InitClientPacket(Player player, boolean loginSuccess, short clientPlayerId, Location location) {
         super(Opcodes.INIT_PLAYER_CLIENT, player);
         this.loginSuccess = loginSuccess;
         this.clientPlayerId = clientPlayerId;
@@ -23,15 +23,11 @@ public class InitClientPacket extends ServerOutPacket {
     @Override
     protected void createPacket(ObjectOutputStream write) throws IOException {
         write.writeBoolean(loginSuccess);
-        write.writeInt(clientPlayerId);
+        write.writeShort(clientPlayerId);
         write.writeUTF(location.getMapName());
-        write.writeInt(location.getX());
-        write.writeInt(location.getY());
 
         System.out.println("[PACKET] loginSuccess: " + loginSuccess
                 + " , EntityID: " + clientPlayerId
-                + " , Map: " + location.getMapName()
-                + " , X: " + location.getX()
-                + " , Y: " + location.getY());
+                + " , Map: " + location.getMapName());
     }
 }
