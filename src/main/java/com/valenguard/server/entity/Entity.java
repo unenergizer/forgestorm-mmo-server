@@ -22,12 +22,13 @@ public class Entity {
     private String name = "";
     private int level;
 
-    private Location location;
-    private Location futureLocation;
+    private Location currentMapLocation;
+    private Location futureMapLocation;
     private float moveSpeed;
-    private int countDownMovementTicks;
 
-    boolean isMoving = false;
+    public boolean isMoving() {
+        return moveDirection != Direction.STOP;
+    }
 
     private float realX;
     private float realY;
@@ -35,12 +36,12 @@ public class Entity {
     /**
      * The current direction the entity is moving in.
      */
-    private Direction moveDirection;
+    private Direction moveDirection = Direction.STOP;
 
     /**
      * The direction the entity intends to move in the future.
      */
-    private Direction predictedDirection;
+    private Direction predictedDirection = Direction.STOP;
 
     /**
      * The direction the entity is facing. Is not always the same direction
@@ -48,30 +49,7 @@ public class Entity {
      */
     private Direction facingDirection;
 
-    public void setupMovement(Location futureLocation) {
-        this.futureLocation = futureLocation;
-        isMoving = true;
-        System.out.println("MOVE SPEED: " + moveSpeed);
-        moveSpeed = 1.0f;
-        countDownMovementTicks = (int) (ServerConstants.TICKS_PER_SECOND * (1.0f / moveSpeed));
-        System.out.println("TICK SETUP: " + countDownMovementTicks);
-    }
-
-    public void resetMovement() {
-        // Update with new location
-        location = futureLocation;
-
-        // Clear movement data
-        futureLocation = null;
-        isMoving = false;
-        countDownMovementTicks = -1;
-    }
-
-    public void processMovement() {
-        countDownMovementTicks--;
-    }
-
     public TmxMap getMapData() {
-        return location.getMapData();
+        return currentMapLocation.getMapData();
     }
 }

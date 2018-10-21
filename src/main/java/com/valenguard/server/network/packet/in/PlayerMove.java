@@ -33,11 +33,11 @@ public class PlayerMove implements PacketListener {
 
     @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
     public void onMoveRequest(ClientHandler clientHandler) {
+
         Direction direction = Direction.getDirection(clientHandler.readByte());
 
-
-
         Player player = PlayerManager.getInstance().getPlayer(clientHandler);
-        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, player.getMapData().getMapName(), direction);
+        // todo this is a terrible way to get the map name
+        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, player.getMapData().getMapName().replace(".tmx", ""), direction);
     }
 }

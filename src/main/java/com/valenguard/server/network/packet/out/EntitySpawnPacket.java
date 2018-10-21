@@ -19,17 +19,17 @@ public class EntitySpawnPacket extends ServerOutPacket {
     @Override
     protected void createPacket(ObjectOutputStream write) throws IOException {
         write.writeShort(entityToSpawn.getServerEntityId());
-        write.writeInt(entityToSpawn.getLocation().getX());
-        write.writeInt(entityToSpawn.getLocation().getY());
+        write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
+        write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
         write.writeUTF(entityToSpawn.getName());
         write.writeByte(entityToSpawn.getFacingDirection().getDirectionByte());
         write.writeShort(entityToSpawn.getEntityType());
 
-        System.out.println("[PACKET] " +
+        /*System.out.println("[PACKET] " +
                 "\nID -> " + entityToSpawn.getServerEntityId() +
-                "\nX -> " + entityToSpawn.getLocation().getX() +
-                "\nY -> " + entityToSpawn.getLocation().getY() +
+                "\nX -> " + entityToSpawn.getCurrentMapLocation().getX() +
+                "\nY -> " + entityToSpawn.getCurrentMapLocation().getY() +
                 "\nName -> " + entityToSpawn.getName() +
-                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());
+                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());*/
     }
 }

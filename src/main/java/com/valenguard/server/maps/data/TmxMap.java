@@ -89,11 +89,11 @@ public class TmxMap {
     }
 
     /**
-     * Retrieves a tile by the location passed in. It is assumed that the location
+     * Retrieves a tile by the currentMapLocation passed in. It is assumed that the currentMapLocation
      * is not out of bounds before being passed.
      *
-     * @param location the location on the map.
-     * @return The tile associated with the location.
+     * @param location the currentMapLocation on the map.
+     * @return The tile associated with the currentMapLocation.
      */
     public Tile getTileByLocation(Location location) {
         return map[location.getX()][location.getY()];

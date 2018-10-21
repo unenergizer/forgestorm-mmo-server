@@ -250,7 +250,7 @@ public class TmxFileParser {
                     boolean entityFound = false;
 
                     for (Entity entity : entityList) {
-                        Location location = entity.getLocation();
+                        Location location = entity.getCurrentMapLocation();
                         if (location.getX() == width && location.getY() == yOffset - height) {
                             System.out.print("e");
                             entityFound = true;

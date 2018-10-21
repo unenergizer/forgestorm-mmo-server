@@ -36,7 +36,7 @@ public class ServerLoop extends Thread {
     @Override
     public void run() {
         int updates = 0;
-        float timeStep = 1.0F / ServerConstants.TICKS_PER_SECOND;
+        //float timeStep = 1.0F / ServerConstants.TICKS_PER_SECOND;
         long time = 0;
         long nanoSecond = 1000000000; // 1 second -> 1000 ms -> 1000*1,000,000 ns
         long startTime, endTime;

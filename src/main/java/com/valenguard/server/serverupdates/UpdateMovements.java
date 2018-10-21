@@ -2,13 +2,13 @@ package com.valenguard.server.serverupdates;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.entity.Direction;
+import com.valenguard.server.entity.Entity;
 import com.valenguard.server.entity.Player;
-import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
-import com.valenguard.server.maps.data.Tile;
-import com.valenguard.server.maps.data.Warp;
+import com.valenguard.server.network.packet.out.MoveEntityPacket;
 import com.valenguard.server.network.shared.ServerConstants;
+import lombok.AllArgsConstructor;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -21,10 +21,11 @@ public class UpdateMovements {
     private static final float MAX_TIME = .5f;
 
 
+    @AllArgsConstructor
     private class MovementInfo {
         // todo: this should contain entities not players. silly idiot. fuck you
         private Player player;
-        private float walkTime = 0;
+        private float walkTime;
     }
 
 
@@ -48,22 +49,76 @@ public class UpdateMovements {
     private void updatePlayersPosition(MovementInfo movementInfo) {
 
         // todo: get a delta nigga
-        movementInfo.walkTime += /*delta*/ 16.0f / 20.0f;
 
-        int currentX = movementInfo.player.getLocation().getX();
-        int currentY = movementInfo.player.getLocation().getY();
+        movementInfo.walkTime += /*delta*/ 1.0f / 20.0f;
 
-        int futureX = movementInfo.player.getFutureLocation().getX();
-        int futureY = movementInfo.player.getFutureLocation().getY();
+        int currentX = movementInfo.player.getCurrentMapLocation().getX();
+        int currentY = movementInfo.player.getCurrentMapLocation().getY();
+
+        int futureX = movementInfo.player.getFutureMapLocation().getX();
+        int futureY = movementInfo.player.getFutureMapLocation().getY();
 
         // this clearly works ;)
         movementInfo.player.setRealX(linearInterpolate(currentX, futureX, movementInfo.walkTime / MAX_TIME) * ServerConstants.TILE_SIZE);
         movementInfo.player.setRealY(linearInterpolate(currentY, futureY, movementInfo.walkTime / MAX_TIME) * ServerConstants.TILE_SIZE);
+
+        if (movementInfo.walkTime <= MAX_TIME) return;
+
+        if (movementInfo.player.getPredictedDirection() == Direction.STOP) {
+            finishPlayerMove(movementInfo);
+        } else {
+            predictNextMovement(movementInfo);
+        }
+    }
+
+    private void finishPlayerMove(MovementInfo movementInfo) {
+
+        movementInfo.player.getCurrentMapLocation().set(movementInfo.player.getFutureMapLocation());
+
+        // Clamping the player
+        movementInfo.player.setRealX(movementInfo.player.getFutureMapLocation().getX() * ServerConstants.TILE_SIZE);
+        movementInfo.player.setRealY(movementInfo.player.getFutureMapLocation().getY() * ServerConstants.TILE_SIZE);
+
+        movementInfo.player.setMoveDirection(Direction.STOP);
+        movementInfo.player.setPredictedDirection(Direction.STOP);
+        movingPlayers.remove(movementInfo);
+
+        // todo should we send out packets confirming that they have arrived?
+    }
+
+    private void predictNextMovement(MovementInfo movementInfo) {
+
+        Entity entity = movementInfo.player;
+        Direction predictedDirection = movementInfo.player.getPredictedDirection();
+
+        // Change player directional information for continuing movement.
+        // todo on the client this logic caused it to mess up and we needed to call .set()
+        entity.getCurrentMapLocation().set(movementInfo.player.getCurrentMapLocation());
+        entity.setMoveDirection(movementInfo.player.getPredictedDirection());
+
+        if (predictedDirection == Direction.UP) entity.getFutureMapLocation().add(0, 1);
+        if (predictedDirection == Direction.DOWN) entity.getFutureMapLocation().add(0, -1);
+        if (predictedDirection == Direction.LEFT) entity.getFutureMapLocation().add(-1, 0);
+        if (predictedDirection == Direction.RIGHT) entity.getFutureMapLocation().add(1, 0);
+
+        int[] amountX = new int[1];
+        int[] amountY = new int[1];
+        getMovementAmounts(amountX, amountY, predictedDirection);
+
+        // todo this is a terrible way to get the map name
+        if (!isMovable(entity.getMapData().getMapName().replace(".tmx", ""),
+                entity.getFutureMapLocation().getX() + amountX[0], entity.getFutureMapLocation().getY() + amountY[0])) {
+            entity.setPredictedDirection(Direction.STOP);
+        }
+
+        movementInfo.walkTime = 0;
+
+        // todo send packets
     }
 
     // todo: tomorrow when andrew is not sleeping on his keyboard we will fix this.
     public float linearInterpolate(float start, float end, float a) {
-        return start + (end - start) /*   * apply(a)    */;
+        return start + (end - start) * a;
     }
 
     /**
@@ -75,6 +130,7 @@ public class UpdateMovements {
 
         // Since they player is already moving they must be predicting movement.
         if (player.isMoving()) {
+
             predictMovement(player, mapName, direction);
             return;
         }
@@ -94,13 +150,22 @@ public class UpdateMovements {
         // todo: map warming checks
 
         // The player is attempting to move somewhere in the future that the map doesn't allow.
-        if (isMovable(mapName, player.getLocation().getX() + x[0], player.getLocation().getY() + y[0])) {
+        if (!isMovable(mapName, player.getFutureMapLocation().getX() + x[0], player.getFutureMapLocation().getY() + y[0])) {
+
+            System.out.println("FOR PREDICTED MOVEMENT IT RETURNED AS NOT MOVABLE!");
+
             return;
         }
 
         player.setPredictedDirection(direction);
-        // todo: tell everyone except the player that sent the information
-        // todo: that they plan on changing directions
+
+        // tell everyone except the player that sent the information
+        // that they plan on changing directions
+        // todo some method to make it where sending all but to one player would be easier
+        player.getMapData().getPlayerList().forEach(playerToInform -> {
+            if (playerToInform.equals(player)) return;
+            new MoveEntityPacket(playerToInform, player, direction).sendPacket();
+        });
     }
 
     private void newPlayerMove(Player player, String mapName, Direction direction) {
@@ -108,15 +173,27 @@ public class UpdateMovements {
         int[] y = new int[1];
         getMovementAmounts(x, y, direction);
 
+        Location futureLocation = new Location(mapName,player.getCurrentMapLocation().getX() + x[0], player.getCurrentMapLocation().getY() + y[0]);
+
         // todo: map warming checks
 
         // The player is attempting to move somewhere that the map doesn't allow.
-        if (isMovable(mapName, player.getLocation().getX() + x[0], player.getLocation().getY() + y[0])) {
+        if (!isMovable(mapName, futureLocation.getX(), futureLocation.getY())) {
             return;
         }
 
-        // todo: setup new movement for the player
+        player.setMoveDirection(direction);
+        player.setPredictedDirection(Direction.STOP);
+        player.setFutureMapLocation(futureLocation);
+        movingPlayers.add(new MovementInfo(player, 0));
 
+        // Telling all players except the player that just moved
+        // that the player is starting to move.
+        // todo some method to make it where sending all but to one player would be easier
+        futureLocation.getMapData().getPlayerList().forEach(playerToInform -> {
+            if (playerToInform.equals(player)) return;
+            new MoveEntityPacket(playerToInform, player, direction).sendPacket();
+        });
     }
 
     // todo exchange arrays for some type of object pair
@@ -150,7 +227,7 @@ public class UpdateMovements {
 //    /**
 //     * Removes a entity from the list of entities that need to be processed.
 //     * Then resets their movement and sends an update to all players of their
-//     * current location.
+//     * current currentMapLocation.
 //     *
 //     * @param player The entity to remove.
 //     */

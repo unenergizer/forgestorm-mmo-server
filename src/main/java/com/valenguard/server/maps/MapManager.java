@@ -64,7 +64,7 @@ public class MapManager {
     }
 
     /**
-     * Sends a location update to all players of a entity that moved.
+     * Sends a currentMapLocation update to all players of a entity that moved.
      *
      * @param entityWhoMoved The entity that moved.
      */

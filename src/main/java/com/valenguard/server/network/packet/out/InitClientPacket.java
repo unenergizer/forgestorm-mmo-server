@@ -26,8 +26,8 @@ public class InitClientPacket extends ServerOutPacket {
         write.writeShort(clientPlayerId);
         write.writeUTF(location.getMapName());
 
-        System.out.println("[PACKET] loginSuccess: " + loginSuccess
+        /*System.out.println("[PACKET] loginSuccess: " + loginSuccess
                 + " , EntityID: " + clientPlayerId
-                + " , Map: " + location.getMapName());
+                + " , Map: " + location.getMapName());*/
     }
 }

@@ -42,7 +42,7 @@ public class PlayerManager {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         TmxMap tmxMap = ValenguardMain.getInstance().getMapManager().getMapData(NewPlayerConstants.STARTING_MAP);
 
-        // Below we create a starting location for a new player.
+        // Below we create a starting currentMapLocation for a new player.
         // The Y cord is subtracted from the height of the map.
         // The reason for this is because on the Tiled Editor
         // the Y cord is reversed.  This just makes our job
@@ -54,7 +54,8 @@ public class PlayerManager {
 
         Player player = new Player();
         player.setServerEntityId(serverEntityID);
-        player.setLocation(location);
+        player.setCurrentMapLocation(location);
+        player.setFutureMapLocation(location);
         player.setMoveSpeed(2);
         player.setClientHandler(clientHandler);
 
@@ -64,9 +65,6 @@ public class PlayerManager {
 
         EntityManager.getInstance().addEntity(serverEntityID, player);
         mappedPlayerIds.put(clientHandler, serverEntityID);
-
-        System.out.println("Writing out initialization information to the player.");
-        System.out.println("eID: " + serverEntityID + ", X: " + player.getLocation().getX() + ", Y: " + player.getLocation().getY());
 
         // Sending out basic information about the client.
         new InitClientPacket(player, true, serverEntityID, location).sendPacket();
@@ -122,7 +120,7 @@ public class PlayerManager {
      * the spawnLocation on the new map.
      *
      * @param player        The player who is switching maps.
-     * @param spawnLocation The new spawn location on the new map.
+     * @param spawnLocation The new spawn currentMapLocation on the new map.
      */
     public void playerSwitchMap(Player player, Location spawnLocation) {
 
@@ -140,8 +138,8 @@ public class PlayerManager {
         // Setting the new map for the player
         spawnLocation.getMapData().addPlayer(player);
 
-        // Setting the new location of the player the server.
-        player.setLocation(spawnLocation);
+        // Setting the new currentMapLocation of the player the server.
+        player.setCurrentMapLocation(spawnLocation);
     }
 
     /**
@@ -169,7 +167,7 @@ public class PlayerManager {
      * @param despawnTarget The player who left the map
      */
     private void updateMapWithPlayerLeave(Player despawnTarget) {
-        despawnTarget.getLocation().getMapData().getPlayerList().forEach(playerOnMap -> {
+        despawnTarget.getCurrentMapLocation().getMapData().getPlayerList().forEach(playerOnMap -> {
 
             if (despawnTarget.equals(playerOnMap)) {
                 System.out.println("TRIED SENDING THE DESPAWN TARGET A DESPAWN PACKET!");

@@ -11,6 +11,6 @@ public class PingIn implements PacketListener {
 
     @Opcode(getOpcode = Opcodes.PING)
     public void onPingIn(ClientHandler clientHandler) {
-        new PingOut(PlayerManager.getInstance().getPlayer(clientHandler)).sendPacket();
+        //new PingOut(PlayerManager.getInstance().getPlayer(clientHandler)).sendPacket();
     }
 }
