@@ -23,13 +23,15 @@ public class EntitySpawnPacket extends ServerOutPacket {
         write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
         write.writeUTF(entityToSpawn.getName());
         write.writeByte(entityToSpawn.getFacingDirection().getDirectionByte());
+        write.writeFloat(entityToSpawn.getMoveSpeed());
         write.writeShort(entityToSpawn.getEntityType());
 
-        /*System.out.println("[PACKET] " +
+        System.out.println("[PACKET] " +
                 "\nID -> " + entityToSpawn.getServerEntityId() +
                 "\nX -> " + entityToSpawn.getCurrentMapLocation().getX() +
                 "\nY -> " + entityToSpawn.getCurrentMapLocation().getY() +
                 "\nName -> " + entityToSpawn.getName() +
-                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());*/
+                "\nMoveSpeed -> " + entityToSpawn.getMoveSpeed() +
+                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());
     }
 }

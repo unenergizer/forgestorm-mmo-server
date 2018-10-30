@@ -1,6 +1,7 @@
 package com.valenguard.server.network;
 
 import com.valenguard.server.entity.EntityManager;
+import com.valenguard.server.entity.Player;
 import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
@@ -128,12 +129,13 @@ public class ServerConnection implements Runnable {
 
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving data
-                clientHandler = new ClientHandler(clientSocket, outStream, inStream);
+                Player player = new Player();
+                clientHandler = new ClientHandler(player, clientSocket, outStream, inStream);
 
                 System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
 
                 // Adding the client handle to a list of current client handles
-                PlayerManager.getInstance().onPlayerConnect(clientHandler);
+                PlayerManager.getInstance().onPlayerConnect(player, clientHandler);
                 System.out.println("Clients Online: " + EntityManager.getInstance().entitiesLoaded());
 
                 // Reading in a byte which represents an opcode that the client sent to the

@@ -5,11 +5,13 @@ import com.valenguard.server.network.shared.Write;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class Player extends Entity {
 
-    @Getter
-    @Setter
     private ClientHandler clientHandler;
+
+    private MoveDirection latestMoveRequest;
 
     public void sendPacket(byte opcode, Write writeCallback) {
         clientHandler.write(opcode, writeCallback);

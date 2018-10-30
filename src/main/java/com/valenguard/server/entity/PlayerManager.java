@@ -11,8 +11,11 @@ import com.valenguard.server.network.shared.ClientHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class PlayerManager {
+
+    private static final float DEFAULT_MOVE_SPEED = .5f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
 
     private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
 
@@ -38,7 +41,7 @@ public class PlayerManager {
      *
      * @param clientHandler The client handle of the player.
      */
-    public void onPlayerConnect(ClientHandler clientHandler) {
+    public void onPlayerConnect(Player player, ClientHandler clientHandler) {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         TmxMap tmxMap = ValenguardMain.getInstance().getMapManager().getMapData(NewPlayerConstants.STARTING_MAP);
 
@@ -52,16 +55,15 @@ public class PlayerManager {
                 NewPlayerConstants.STARTING_X_CORD,
                 tmxMap.getMapHeight() - NewPlayerConstants.STARTING_Y_CORD);
 
-        Player player = new Player();
         player.setServerEntityId(serverEntityID);
         player.setCurrentMapLocation(location);
         player.setFutureMapLocation(location);
-        player.setMoveSpeed(2);
+        player.setMoveSpeed(DEFAULT_MOVE_SPEED);
         player.setClientHandler(clientHandler);
 
         // TODO SET THE FEST OF THE PLAYERS INFORMATION
 
-        player.setFacingDirection(Direction.DOWN);
+        player.setFacingDirection(MoveDirection.DOWN);
 
         EntityManager.getInstance().addEntity(serverEntityID, player);
         mappedPlayerIds.put(clientHandler, serverEntityID);
@@ -179,5 +181,12 @@ public class PlayerManager {
         });
         // Remove the player from the map they are currently in.
         despawnTarget.getMapData().removePlayer(despawnTarget);
+    }
+
+    public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
+        mappedPlayerIds.forEach((clientHandler, playerId) -> {
+            if (player.getServerEntityId() == playerId) return;
+            callback.accept(clientHandler);
+        });
     }
 }

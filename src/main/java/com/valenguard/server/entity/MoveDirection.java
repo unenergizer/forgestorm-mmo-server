@@ -1,14 +1,14 @@
 package com.valenguard.server.entity;
 
-public enum Direction {
+public enum MoveDirection {
     UP,
     DOWN,
     LEFT,
     RIGHT,
-    STOP;
+    NONE;
 
-    public static Direction getDirection(byte directionByte) {
-        for (Direction direction : Direction.values()) {
+    public static MoveDirection getDirection(byte directionByte) {
+        for (MoveDirection direction : MoveDirection.values()) {
             if ((byte) direction.ordinal() == directionByte) {
                 return direction;
             }

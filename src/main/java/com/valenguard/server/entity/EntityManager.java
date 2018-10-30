@@ -15,7 +15,6 @@ public class EntityManager {
     //  EntityId -> Entity
     private Map<Short, Entity> entities = new ConcurrentHashMap<>();
 
-
     public void addEntity(short entityId, Entity entity) {
         entities.put(entityId, entity);
     }
@@ -30,5 +29,9 @@ public class EntityManager {
 
     public int entitiesLoaded() {
         return entities.size();
+    }
+
+    public Collection<Entity> getEntities() {
+        return entities.values();
     }
 }

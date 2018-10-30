@@ -1,7 +1,7 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.entity.Direction;
+import com.valenguard.server.entity.MoveDirection;
 import com.valenguard.server.entity.Player;
 import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.network.shared.ClientHandler;
@@ -34,10 +34,12 @@ public class PlayerMove implements PacketListener {
     @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
     public void onMoveRequest(ClientHandler clientHandler) {
 
-        Direction direction = Direction.getDirection(clientHandler.readByte());
+        MoveDirection direction = MoveDirection.getDirection(clientHandler.readByte());
+
+        System.out.println("REQUESTED DIRECTION : " + direction);
 
         Player player = PlayerManager.getInstance().getPlayer(clientHandler);
         // todo this is a terrible way to get the map name
-        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, player.getMapData().getMapName().replace(".tmx", ""), direction);
+        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, direction);
     }
 }

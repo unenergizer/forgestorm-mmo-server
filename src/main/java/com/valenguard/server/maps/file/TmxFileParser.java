@@ -274,6 +274,6 @@ public class TmxFileParser {
 
             System.out.println(); // Clear a line for next map
         }
-        return new TmxMap(fileName, mapWidth, mapHeight, map, entityList);
+        return new TmxMap(fileName.replace(".tmx", ""), mapWidth, mapHeight, map, entityList);
     }
 }

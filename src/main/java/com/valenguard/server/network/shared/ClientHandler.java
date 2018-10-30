@@ -1,5 +1,6 @@
 package com.valenguard.server.network.shared;
 
+import com.valenguard.server.entity.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ import java.net.Socket;
 @AllArgsConstructor
 @Getter
 public class ClientHandler {
+    private Player player;
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;

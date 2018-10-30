@@ -2,7 +2,6 @@ package com.valenguard.server.entity;
 
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
-import com.valenguard.server.network.shared.ServerConstants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,28 +25,16 @@ public class Entity {
     private Location futureMapLocation;
     private float moveSpeed;
 
-    public boolean isMoving() {
-        return moveDirection != Direction.STOP;
-    }
-
     private float realX;
     private float realY;
 
-    /**
-     * The current direction the entity is moving in.
-     */
-    private Direction moveDirection = Direction.STOP;
-
-    /**
-     * The direction the entity intends to move in the future.
-     */
-    private Direction predictedDirection = Direction.STOP;
+    private float walkTime = 0f;
 
     /**
      * The direction the entity is facing. Is not always the same direction
      * as they are moving because the move direction can be STOP.
      */
-    private Direction facingDirection;
+    private MoveDirection facingDirection;
 
     public TmxMap getMapData() {
         return currentMapLocation.getMapData();

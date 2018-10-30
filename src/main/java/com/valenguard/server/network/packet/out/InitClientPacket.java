@@ -12,6 +12,7 @@ public class InitClientPacket extends ServerOutPacket {
     private boolean loginSuccess;
     private short clientPlayerId;
     private Location location;
+    private float moveSpeed;
 
     public InitClientPacket(Player player, boolean loginSuccess, short clientPlayerId, Location location) {
         super(Opcodes.INIT_PLAYER_CLIENT, player);

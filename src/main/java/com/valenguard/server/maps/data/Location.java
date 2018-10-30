@@ -7,12 +7,23 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class Location {
 
     private String mapName;
     private int x;
     private int y;
+
+    public Location(String mapName, int x, int y) {
+        this.mapName = mapName;
+        this.x = x;
+        this.y = y;
+    }
+
+    public Location(Location location) {
+        this.mapName = location.mapName;
+        this.x = location.x;
+        this.y = location.y;
+    }
 
     /**
      * Helper method to quickly get the map data for this currentMapLocation object.
