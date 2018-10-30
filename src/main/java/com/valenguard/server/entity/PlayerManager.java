@@ -3,12 +3,16 @@ package com.valenguard.server.entity;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
+import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
 import com.valenguard.server.network.packet.out.InitClientPacket;
 import com.valenguard.server.network.packet.out.PingOut;
 import com.valenguard.server.network.shared.ClientHandler;
+import lombok.Getter;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -16,12 +20,11 @@ import java.util.function.Consumer;
 public class PlayerManager {
 
     private static final float DEFAULT_MOVE_SPEED = .5f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
-
     private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
-
     private static PlayerManager instance;
-
     private Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
+    @Getter
+    private PingManager pingManager = new PingManager();
 
     private PlayerManager() {
     }
@@ -34,6 +37,10 @@ public class PlayerManager {
     public static PlayerManager getInstance() {
         if (instance == null) instance = new PlayerManager();
         return instance;
+    }
+
+    public Collection<ClientHandler> getClientHandles() {
+        return mappedPlayerIds.keySet();
     }
 
     /**
@@ -75,6 +82,7 @@ public class PlayerManager {
         new EntitySpawnPacket(player, player).sendPacket();
 
         // Start sending ping packets
+        // TODO: Determine if we should start this here or wait until everyone else's ping happens
         new PingOut(player).sendPacket();
 
         // TODO CHANGE HOW THE MAPS ARE STORING INFORMATION ABOUT THE PLAYER AS FROM THE ENTITY MANAGER!!

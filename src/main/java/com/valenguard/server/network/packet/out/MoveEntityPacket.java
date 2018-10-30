@@ -28,6 +28,5 @@ public class MoveEntityPacket extends ServerOutPacket {
         write.writeInt(attemptLocation.getX());
         write.writeInt(attemptLocation.getY());
         write.writeInt(packetId++);
-        write.writeLong(System.currentTimeMillis());
     }
 }

@@ -1,5 +1,6 @@
 package com.valenguard.server;
 
+import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.network.shared.ServerConstants;
 import com.valenguard.server.serverupdates.UpdateMovements;
 import lombok.Getter;
@@ -50,6 +51,11 @@ public class ServerLoop extends Thread {
 
             // TODO: Create dynamic pulse event that all server operations listen to.
             updateMovements.updatePlayerMovement();
+
+            // Update ping every X ticks
+            if (updates % 10 == 0) {
+                PlayerManager.getInstance().getPingManager().tick();
+            }
 
             /************************
              * !! Update End !!
