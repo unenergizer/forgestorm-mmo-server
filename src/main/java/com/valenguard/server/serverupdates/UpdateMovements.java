@@ -100,7 +100,7 @@ public class UpdateMovements {
 
         System.out.println("Sending that data to the other clients");
         PlayerManager.getInstance().sendToAllButPlayer(player, clientHandler ->
-                new MoveEntityPacket(clientHandler.getPlayer(), player, direction).sendPacket());
+                new MoveEntityPacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 
     private boolean isMovable(TmxMap tmxMap, int x, int y) {
