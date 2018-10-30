@@ -13,16 +13,10 @@ public class UpdateMovements {
      * Process the list of moving players.
      */
     public void updatePlayerMovement() {
-
-        // Loop through all players and process movement.
         EntityManager.getInstance().getEntities().stream().filter(MoveUtil::isEntityMoving).forEach(this::updateEntitiesPosition);
     }
 
     private void updateEntitiesPosition(Entity entity) {
-
-//        System.out.println("Ticking...");
-
-        // todo: get a delta nigga
         float delta = 1.0f / 20.0f;
 
         entity.setWalkTime(entity.getWalkTime() + delta);
@@ -33,34 +27,27 @@ public class UpdateMovements {
         int futureX = entity.getFutureMapLocation().getX();
         int futureY = entity.getFutureMapLocation().getY();
 
-        // this clearly works ;)
         entity.setRealX(linearInterpolate(currentX, futureX, entity.getWalkTime() / entity.getMoveSpeed()) * ServerConstants.TILE_SIZE);
         entity.setRealY(linearInterpolate(currentY, futureY, entity.getWalkTime() / entity.getMoveSpeed()) * ServerConstants.TILE_SIZE);
 
         if (entity.getWalkTime() <= entity.getMoveSpeed()) return;
 
-        System.out.println("Performing arrival code");
-
         if (entity instanceof Player) {
 
             Player player = (Player) entity;
-
-            System.out.println("finishMove()");
             finishMove(entity);
 
             if (player.getLatestMoveRequest() != null) {
-                System.out.println("Readding player addPlayer() for more movement");
                 addPlayer(player, player.getLatestMoveRequest());
                 player.setLatestMoveRequest(null);
             }
-
-        } else { // todo figure out how to handle other entities
-
+        } else {
+            // todo figure out how to handle other entities
+            System.err.println("[UpdateMovements] Deal with other entities");
         }
     }
 
     private void finishMove(Entity entity) {
-        System.out.println("PLAYER HAS ARRIVED AT [" + entity.getFutureMapLocation().getX() + ", " + entity.getFutureMapLocation().getY() + "]");
         entity.getCurrentMapLocation().set(entity.getFutureMapLocation());
         entity.setRealX(entity.getFutureMapLocation().getX() * ServerConstants.TILE_SIZE);
         entity.setRealY(entity.getFutureMapLocation().getY() * ServerConstants.TILE_SIZE);
@@ -78,8 +65,6 @@ public class UpdateMovements {
     public void addPlayer(Player player, MoveDirection direction) {
 
         if (MoveUtil.isEntityMoving(player)) {
-            // What if the player actually did arrive and the server is somehow behind?...
-            System.out.println("For some dumb reason the server thinks the player is already moving");
             player.setLatestMoveRequest(direction);
             return;
         }
@@ -88,17 +73,11 @@ public class UpdateMovements {
         Location attemptLocation = new Location(player.getCurrentMapLocation()).add(addToLocation);
 
         // Prevents the player from moving places they are not allowed to go.
-        if (!isMovable(player.getMapData(), attemptLocation.getX(), attemptLocation.getY())) {
-            System.out.println("Is not movable");
-            return;
-        }
+        if (!isMovable(player.getMapData(), attemptLocation.getX(), attemptLocation.getY())) return;
 
         player.setFutureMapLocation(attemptLocation);
         player.setWalkTime(0f);
 
-        System.out.println("Future Location [" + attemptLocation.getY() + ", " + attemptLocation.getY());
-
-        System.out.println("Sending that data to the other clients");
         PlayerManager.getInstance().sendToAllButPlayer(player, clientHandler ->
                 new MoveEntityPacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
@@ -114,23 +93,6 @@ public class UpdateMovements {
             // Play sound or something
             return false;
         }
-
         return true;
     }
-
-    // todo: add this later if needed
-//    /**
-//     * Removes a entity from the list of entities that need to be processed.
-//     * Then resets their movement and sends an update to all players of their
-//     * current currentMapLocation.
-//     *
-//     * @param player The entity to remove.
-//     */
-//    private void removePlayer(Player player) {
-//        // Remove from list so entity will not be updated.
-//        movingEntities.remove(player);
-//
-//        // Reset defaults
-//        player.resetMovement();
-//    }
 }

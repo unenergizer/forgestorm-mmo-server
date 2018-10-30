@@ -49,7 +49,6 @@ public class ServerLoop extends Thread {
              *  !! Update Start !!
              ***********************/
 
-            // TODO: Create dynamic pulse event that all server operations listen to.
             updateMovements.updatePlayerMovement();
 
             // Update ping every X ticks
