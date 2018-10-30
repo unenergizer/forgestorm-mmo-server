@@ -10,6 +10,9 @@ import java.io.ObjectOutputStream;
 
 public class MoveEntityPacket extends ServerOutPacket {
 
+
+    private static int packetId = 0;
+
     private Entity entityToMove;
     private Location attemptLocation;
 
@@ -24,5 +27,7 @@ public class MoveEntityPacket extends ServerOutPacket {
         write.writeShort(entityToMove.getServerEntityId());
         write.writeInt(attemptLocation.getX());
         write.writeInt(attemptLocation.getY());
+        write.writeInt(packetId++);
+        write.writeLong(System.currentTimeMillis());
     }
 }
