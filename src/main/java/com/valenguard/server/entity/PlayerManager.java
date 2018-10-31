@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class PlayerManager {
 
-    private static final float DEFAULT_MOVE_SPEED = .5f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
+    private static final float DEFAULT_MOVE_SPEED = .9f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
     private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
     private static PlayerManager instance;
     private Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
