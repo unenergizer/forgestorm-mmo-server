@@ -38,6 +38,9 @@ public class PlayerMove implements PacketListener {
 
         System.out.println("REQUESTED DIRECTION : " + direction);
 
+        
+        if (direction == null || direction == MoveDirection.NONE) return;
+
         Player player = PlayerManager.getInstance().getPlayer(clientHandler);
         // todo this is a terrible way to get the map name
         ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, direction);
