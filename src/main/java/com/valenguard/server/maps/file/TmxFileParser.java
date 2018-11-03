@@ -2,8 +2,8 @@ package com.valenguard.server.maps.file;
 
 import com.valenguard.server.entity.Entity;
 import com.valenguard.server.maps.data.Location;
-import com.valenguard.server.maps.data.TmxMap;
 import com.valenguard.server.maps.data.Tile;
+import com.valenguard.server.maps.data.TmxMap;
 import com.valenguard.server.maps.data.Warp;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,7 +56,7 @@ public class TmxFileParser {
         Element tmx = document.getDocumentElement();
 
 
-        /************************************************************************************************
+        /* ***********************************************************************************************
          * BUILD TILED MAP TILES......
          ***********************************************************************************************/
 
@@ -132,22 +132,22 @@ public class TmxFileParser {
             }
         }
 
-        /************************************************************************************************
-         * GET SPECIFIC TILE ATTRIBUTES
+        /* ***********************************************************************************************
+         * GET SPECIFIC TILE ATTRIBUTES - WARNING: Element names are CASE sensitive!
          ***********************************************************************************************/
 
         // Examine XML file and find tags called "layer" then loop through them.
-        NodeList objectgroupTag = tmx.getElementsByTagName("objectgroup");
+        NodeList objectGroupTag = tmx.getElementsByTagName("objectgroup");
         List<Entity> entityList = new ArrayList<>();
 
-        for (int i = 0; i < objectgroupTag.getLength(); i++) {
+        for (int i = 0; i < objectGroupTag.getLength(); i++) {
 
 
             // Get entities
-            if (((Element) objectgroupTag.item(i)).getAttribute("name").equals("entities")) {
-                NodeList objectTag = ((Element) objectgroupTag.item(i)).getElementsByTagName("object");
+            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entities")) {
+                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
 
-                System.out.println("Found " + objectgroupTag.getLength() + " entity spawns.");
+                System.out.println("Found " + objectGroupTag.getLength() + " entity spawns.");
 
                 for (int j = 0; j < objectTag.getLength(); j++) {
 
@@ -170,10 +170,10 @@ public class TmxFileParser {
             }
 
             // Get warps
-            if (((Element) objectgroupTag.item(i)).getAttribute("name").equals("warp")) {
+            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("warp")) {
 
 
-                NodeList objectTag = ((Element) objectgroupTag.item(i)).getElementsByTagName("object");
+                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
 
 //                System.out.println("WARPS: " + objectTag.getLength());
 
@@ -237,7 +237,7 @@ public class TmxFileParser {
             }
         }
 
-        /**
+        /*
          * Print the map to console.
          */
         if (PRINT_MAP) {

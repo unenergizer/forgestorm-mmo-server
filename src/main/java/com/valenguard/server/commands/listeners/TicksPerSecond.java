@@ -5,7 +5,7 @@ import com.valenguard.server.commands.CommandListener;
 
 import java.nio.channels.Channel;
 
-public class TicksPerSecond implements CommandListener {
+class TicksPerSecond implements CommandListener {
 
     @Command(getCommands = {"/tps"})
     public void onTPSCmd(Channel playerChannel) {

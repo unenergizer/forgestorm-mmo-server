@@ -6,6 +6,7 @@ import com.valenguard.server.maps.MapManager;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.PlayerMove;
 import com.valenguard.server.network.packet.in.PingIn;
+import com.valenguard.server.network.packet.out.OutputStreamManager;
 import com.valenguard.server.util.ConsoleLogger;
 import lombok.Getter;
 
@@ -18,7 +19,7 @@ public class ValenguardMain {
     private MapManager mapManager;
     private CommandProcessor commandProcessor;
     private ServerLoop serverLoop;
-    private volatile boolean isOnline = false;
+    private OutputStreamManager outStreamManager;
 
     private ValenguardMain() {}
 
@@ -41,19 +42,21 @@ public class ValenguardMain {
      * Starts all server processes.
      */
     private void start() {
-        isOnline = true;
 
         mapManager = new MapManager();
-
-        // start server loop
-        serverLoop = new ServerLoop();
-        serverLoop.start();
 
         // register commands
         registerCommands();
 
         // start serverConnection code
         initializeNetwork();
+
+        // start server loop
+        serverLoop = new ServerLoop();
+        serverLoop.start();
+
+        outStreamManager = new OutputStreamManager();
+        new Thread(outStreamManager, "OutputStream Thread").start();
 
 //        // TODO: MOVE OR REMOVE....
 //        Scanner scanner = new Scanner(System.in);
@@ -94,8 +97,6 @@ public class ValenguardMain {
      */
     public void stop() {
         System.out.println(ConsoleLogger.SERVER.toString() + "ServerConnection shutdown initialized!");
-
-        isOnline = false; // this will stop the server loop
 
         //TODO: Stop network functions and shut down nicely.
         ServerConnection.getInstance().close();

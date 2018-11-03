@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 
 public class EntitySpawnPacket extends ServerOutPacket {
 
-    private Entity entityToSpawn;
+    private final Entity entityToSpawn;
 
     public EntitySpawnPacket(Player player, Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player);

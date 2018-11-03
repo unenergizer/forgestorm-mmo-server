@@ -9,10 +9,9 @@ import java.io.ObjectOutputStream;
 
 public class InitClientPacket extends ServerOutPacket {
 
-    private boolean loginSuccess;
-    private short clientPlayerId;
-    private Location location;
-    private float moveSpeed;
+    private final boolean loginSuccess;
+    private final short clientPlayerId;
+    private final Location location;
 
     public InitClientPacket(Player player, boolean loginSuccess, short clientPlayerId, Location location) {
         super(Opcodes.INIT_PLAYER_CLIENT, player);

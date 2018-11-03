@@ -12,17 +12,16 @@ import com.valenguard.server.network.shared.ClientHandler;
 import lombok.Getter;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class PlayerManager {
 
-    private static final float DEFAULT_MOVE_SPEED = .9f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
+    private static final float DEFAULT_MOVE_SPEED = .5f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
     private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
     private static PlayerManager instance;
-    private Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
+    private final Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
     @Getter
     private PingManager pingManager = new PingManager();
 

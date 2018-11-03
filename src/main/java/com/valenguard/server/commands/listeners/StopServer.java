@@ -5,7 +5,7 @@ import com.valenguard.server.commands.CommandListener;
 
 import java.nio.channels.Channel;
 
-public class StopServer implements CommandListener {
+class StopServer implements CommandListener {
 
     @Command(getCommands = {"/stop"})
     public void onTPSCmd(Channel playerChannel) {

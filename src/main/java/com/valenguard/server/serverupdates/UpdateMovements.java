@@ -37,9 +37,8 @@ public class UpdateMovements {
             Player player = (Player) entity;
             finishMove(entity);
 
-            if (player.getLatestMoveRequest() != null) {
-                addPlayer(player, player.getLatestMoveRequest());
-                player.setLatestMoveRequest(null);
+            if (!player.getLatestMoveRequests().isEmpty()) {
+                addPlayer(player, player.getLatestMoveRequests().remove());
             }
         } else {
             // todo figure out how to handle other entities
@@ -65,7 +64,7 @@ public class UpdateMovements {
     public void addPlayer(Player player, MoveDirection direction) {
 
         if (MoveUtil.isEntityMoving(player)) {
-            player.setLatestMoveRequest(direction);
+            player.addDirectionToFutureQueue(direction);
             return;
         }
 
@@ -89,10 +88,6 @@ public class UpdateMovements {
             return false;
         }
 
-        if (tmxMap.isOutOfBounds(x, y)) {
-            // Play sound or something
-            return false;
-        }
-        return true;
+        return !tmxMap.isOutOfBounds(x, y);
     }
 }

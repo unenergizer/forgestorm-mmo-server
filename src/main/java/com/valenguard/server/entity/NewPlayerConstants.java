@@ -1,6 +1,7 @@
 package com.valenguard.server.entity;
 
-public class NewPlayerConstants {
+@SuppressWarnings("SpellCheckingInspection")
+class NewPlayerConstants {
     public static final String STARTING_MAP = "maintown";
 
     /**

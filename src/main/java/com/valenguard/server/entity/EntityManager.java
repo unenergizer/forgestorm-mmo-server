@@ -13,7 +13,7 @@ public class EntityManager {
     private final static EntityManager instance = new EntityManager();
 
     //  EntityId -> Entity
-    private Map<Short, Entity> entities = new ConcurrentHashMap<>();
+    private final Map<Short, Entity> entities = new ConcurrentHashMap<>();
 
     public void addEntity(short entityId, Entity entity) {
         entities.put(entityId, entity);

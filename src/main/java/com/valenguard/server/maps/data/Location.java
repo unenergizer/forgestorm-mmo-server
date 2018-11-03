@@ -1,10 +1,10 @@
 package com.valenguard.server.maps.data;
 
 import com.valenguard.server.ValenguardMain;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+@SuppressWarnings("unused")
 @Getter
 @Setter
 public class Location {

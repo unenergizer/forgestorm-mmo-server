@@ -1,5 +1,6 @@
 package com.valenguard.server.network.packet.out;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.entity.Player;
 import com.valenguard.server.network.shared.ClientHandler;
 
@@ -11,19 +12,19 @@ public abstract class ServerOutPacket {
     /**
      * Opcode to send with the out-going packet.
      */
-    protected byte opcode;
+    private final byte opcode;
 
     /**
      * The player who will receive the packet.
      */
-    protected Player player;
+    final Player player;
 
     /**
      * The client handler that holds the object output stream
      */
-    protected ClientHandler clientHandler;
+    private final ClientHandler clientHandler;
 
-    public ServerOutPacket(byte opcode, Player player) {
+    ServerOutPacket(byte opcode, Player player) {
         this.opcode = opcode;
         this.player = player;
         this.clientHandler = player.getClientHandler();
@@ -33,7 +34,11 @@ public abstract class ServerOutPacket {
      * Sends the packet to the player.
      */
     public void sendPacket() {
-        clientHandler.write(opcode, write -> createPacket(write));
+        ValenguardMain.getInstance().getOutStreamManager().addServerOutPacket(this);
+    }
+
+    void writeData() {
+        clientHandler.write(opcode, this::createPacket);
     }
 
     /**

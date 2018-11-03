@@ -10,8 +10,8 @@ import java.io.ObjectOutputStream;
 
 public class MoveEntityPacket extends ServerOutPacket {
 
-    private Entity entityToMove;
-    private Location attemptLocation;
+    private final Entity entityToMove;
+    private final Location attemptLocation;
 
     public MoveEntityPacket(Player sendTo, Entity entityToMove, Location attemptLocation) {
         super(Opcodes.ENTITY_MOVE_UPDATE, sendTo);

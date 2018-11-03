@@ -95,6 +95,7 @@ public class TmxMap {
      * @param location the currentMapLocation on the map.
      * @return The tile associated with the currentMapLocation.
      */
+    @SuppressWarnings("unused")
     public Tile getTileByLocation(Location location) {
         return map[location.getX()][location.getY()];
     }

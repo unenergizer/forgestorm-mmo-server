@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 
 public class EntityDespawnPacket extends ServerOutPacket {
 
-    private Entity despawnTarget;
+    private final Entity despawnTarget;
 
     public EntityDespawnPacket(Player receiver, Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver);

@@ -1,7 +1,5 @@
 package com.valenguard.server.maps;
 
-import com.valenguard.server.entity.Entity;
-import com.valenguard.server.entity.Player;
 import com.valenguard.server.maps.data.TmxMap;
 import com.valenguard.server.maps.file.TmxFileParser;
 
@@ -14,7 +12,7 @@ public class MapManager {
     private static final String MAP_DIRECTORY = "src/main/resources/maps/";
     //private static final String MAP_DIRECTORY = "maps/";
 
-    private Map<String, TmxMap> tmxMaps = new HashMap<>();
+    private final Map<String, TmxMap> tmxMaps = new HashMap<>();
 
     public MapManager() {
         loadAllMaps();
@@ -60,26 +58,6 @@ public class MapManager {
             return tmxMaps.get(mapName);
         } else {
             throw new RuntimeException("Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
-        }
-    }
-
-    /**
-     * Sends a currentMapLocation update to all players of a entity that moved.
-     *
-     * @param entityWhoMoved The entity that moved.
-     */
-    public void sendAllMapPlayersEntityMoveUpdate(Entity entityWhoMoved) {
-
-        // TODO REMOVE ALL THIS GARBAGE
-
-        // Get all the players on the map.
-        for (Player playersToUpdate : entityWhoMoved.getMapData().getPlayerList()) {
-
-            // Don't send the player an update about themselves.
-            if (playersToUpdate.equals(entityWhoMoved)) continue;
-
-            // Send packets!
-            //new EntityMoveUpdate(playersToUpdate, entityWhoMoved).sendPacket();
         }
     }
 }

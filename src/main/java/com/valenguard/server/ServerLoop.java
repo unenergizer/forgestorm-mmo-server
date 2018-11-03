@@ -1,6 +1,7 @@
 package com.valenguard.server;
 
 import com.valenguard.server.entity.PlayerManager;
+import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.shared.ServerConstants;
 import com.valenguard.server.serverupdates.UpdateMovements;
 import lombok.Getter;
@@ -42,10 +43,10 @@ public class ServerLoop extends Thread {
         long nanoSecond = 1000000000; // 1 second -> 1000 ms -> 1000*1,000,000 ns
         long startTime, endTime;
 
-        while (ValenguardMain.getInstance().isOnline()) {
+        while (ServerConnection.getInstance().isRunning()) {
             startTime = System.nanoTime();
 
-            /************************
+            /* ***********************
              *  !! Update Start !!
              ***********************/
 
@@ -56,7 +57,7 @@ public class ServerLoop extends Thread {
                 PlayerManager.getInstance().getPingManager().tick();
             }
 
-            /************************
+            /* ***********************
              * !! Update End !!
              ***********************/
 
@@ -82,7 +83,7 @@ public class ServerLoop extends Thread {
      *
      * @param fps The desired frame rate, in frames per second.
      */
-    private void sync(int fps) {
+    private void sync(@SuppressWarnings("SameParameterValue") int fps) {
         if (fps <= 0) return;
 
         long sleepTime = 1000000000 / fps; // nanoseconds to sleep this frame

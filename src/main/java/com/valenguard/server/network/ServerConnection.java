@@ -6,6 +6,7 @@ import com.valenguard.server.entity.PlayerManager;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
 import com.valenguard.server.network.shared.ServerConstants;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.io.EOFException;
@@ -29,6 +30,7 @@ public class ServerConnection implements Runnable {
     // the server. Volatile allows the variable to exist
     // between threads
     @Setter
+    @Getter
     private volatile boolean running = false;
 
     private ServerConnection() {
@@ -62,6 +64,8 @@ public class ServerConnection implements Runnable {
         // A callback for registering the listeners at a later time
         this.registerListeners = registerListeners;
 
+        running = true;
+
         // Runs a thread for setting up
         new Thread(this, "Start").start();
     }
@@ -73,7 +77,6 @@ public class ServerConnection implements Runnable {
     @Override
     public void run() {
         System.out.println("Server opened on port: " + ServerConstants.SERVER_PORT);
-        running = true;
         registerListeners.accept(eventBus);
         listenForConnections();
     }
