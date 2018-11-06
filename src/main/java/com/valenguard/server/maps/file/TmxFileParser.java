@@ -1,6 +1,8 @@
 package com.valenguard.server.maps.file;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.entity.Entity;
+import com.valenguard.server.entity.MoveDirection;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.Tile;
 import com.valenguard.server.maps.data.TmxMap;
@@ -21,7 +23,7 @@ import java.util.List;
 public class TmxFileParser {
 
     private static final int TILE_SIZE = 16;
-    private static final boolean PRINT_MAP = false;
+    private static final boolean PRINT_MAP = true;
 
     private static short entityCount = 1000;
 
@@ -60,8 +62,11 @@ public class TmxFileParser {
          * BUILD TILED MAP TILES......
          ***********************************************************************************************/
 
-        int mapWidth = Integer.parseInt(tmx.getAttributes().getNamedItem("width").getNodeValue());
-        int mapHeight = Integer.parseInt(tmx.getAttributes().getNamedItem("height").getNodeValue());
+        final int mapWidth = Integer.parseInt(tmx.getAttributes().getNamedItem("width").getNodeValue());
+        final int mapHeight = Integer.parseInt(tmx.getAttributes().getNamedItem("height").getNodeValue());
+
+        System.out.println("MapWidth: "+ mapWidth);
+        System.out.println("MapHeight: "+ mapHeight);
 
         Tile map[][] = new Tile[mapWidth][mapHeight];
 
@@ -184,20 +189,24 @@ public class TmxFileParser {
                     if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element objectTagElement = (Element) objectTag.item(j);
-                    int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
-                    int y = Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE;
-                    int width = Integer.parseInt(objectTagElement.getAttribute("width")) / TILE_SIZE;
-                    int height = Integer.parseInt(objectTagElement.getAttribute("height")) / TILE_SIZE;
+                    int tmxFileX = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
+                    int tmxFileY = Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE;
+                    int tmxFileWidth = Integer.parseInt(objectTagElement.getAttribute("width")) / TILE_SIZE;
+                    int tmxFileHeight = Integer.parseInt(objectTagElement.getAttribute("height")) / TILE_SIZE;
 
                     String warpMapName = null;
                     // Set to negative one to let the server know that the warp is an outbound
                     // warp to another map
                     int warpX = -1;
                     int warpY = -1;
+                    MoveDirection moveDirection = null;
 
 //                    System.out.println("[WARP #" + j + "] X: " + x + ", Y: " + y + ", Width: " + width + ", Height: " + height);
 
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
+
+                    System.out.println();
+                    System.out.println("===[ WARP ]==================================");
 
                     for (int k = 0; k < properties.getLength(); k++) {
 
@@ -205,32 +214,40 @@ public class TmxFileParser {
                         Element propertyElement = (Element) properties.item(k);
 
                         // Get map name:
-                        if (propertyElement.getAttribute("name").equals("map")) {
+                        if (propertyElement.getAttribute("name").equals("mapname")) {
                             warpMapName = propertyElement.getAttribute("value");
-//                            System.out.println("Map: " + warpMapName);
+                            System.out.println("WarpMap: " + warpMapName);
                         }
 
                         // Get map X:
-                        if (propertyElement.getAttribute("name").equals("X")) {
+                        if (propertyElement.getAttribute("name").equals("x")) {
                             warpX = Integer.parseInt(propertyElement.getAttribute("value"));
-//                            System.out.println("X: " + warpX);
+                            System.out.println("WarpX: " + warpX);
                         }
 
                         // Get map Y:
-                        if (propertyElement.getAttribute("name").equals("Y")) {
+                        if (propertyElement.getAttribute("name").equals("y")) {
                             warpY = Integer.parseInt(propertyElement.getAttribute("value"));
-//                            System.out.println("Y: " + warpY);
+                            System.out.println("WarpY: " + warpY);
                         }
 
-                        // Print the map to console.
-                        for (int ii = y; ii < y + height; ii++) {
-                            for (int jj = x; jj < x + width; jj++) {
-                                Tile tile = map[jj][mapHeight - ii - 1];
-                                tile.setWarp(new Warp(warpMapName + ".tmx", warpX, warpY));
-//                                System.out.println(tile.getWarp().getMapName());
-//                                System.out.println(tile.getWarp().getX());
-//                                System.out.println(tile.getWarp().getY());
-                            }
+                        // Get map facing moveDirection:
+                        if (propertyElement.getAttribute("name").equals("direction")) {
+                            moveDirection = MoveDirection.valueOf(propertyElement.getAttribute("value").toUpperCase());
+                            System.out.println("WarpDirection: " + moveDirection);
+                        }
+                    }
+
+                    // Print the map to console.
+                    for (int ii = tmxFileY; ii < tmxFileY + tmxFileHeight; ii++) {
+                        for (int jj = tmxFileX; jj < tmxFileX + tmxFileWidth; jj++) {
+                            int tileX = jj;
+                            int tileY = mapHeight - ii - 1;
+                            Tile tile = map[jj][mapHeight - ii - 1];
+                            tile.setWarp(new Warp(warpMapName, warpX, warpY, moveDirection));
+                            System.out.println(tile.getWarp().getMapName());
+                            System.out.println("TileX: " + tileX);
+                            System.out.println("TileY: " + tileY);
                         }
                     }
                 }

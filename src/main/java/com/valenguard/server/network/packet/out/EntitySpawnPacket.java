@@ -19,6 +19,7 @@ public class EntitySpawnPacket extends ServerOutPacket {
     @Override
     protected void createPacket(ObjectOutputStream write) throws IOException {
         write.writeShort(entityToSpawn.getServerEntityId());
+        write.writeUTF(entityToSpawn.getCurrentMapLocation().getMapName());
         write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
         write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
         write.writeUTF(entityToSpawn.getName());
@@ -28,6 +29,7 @@ public class EntitySpawnPacket extends ServerOutPacket {
 
         System.out.println("[PACKET] " +
                 "\nID -> " + entityToSpawn.getServerEntityId() +
+                "\nMAP -> " + entityToSpawn.getCurrentMapLocation().getMapName() +
                 "\nX -> " + entityToSpawn.getCurrentMapLocation().getX() +
                 "\nY -> " + entityToSpawn.getCurrentMapLocation().getY() +
                 "\nName -> " + entityToSpawn.getName() +

@@ -3,12 +3,14 @@ package com.valenguard.server.entity;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.maps.data.Location;
 import com.valenguard.server.maps.data.TmxMap;
+import com.valenguard.server.maps.data.Warp;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
 import com.valenguard.server.network.packet.out.InitClientPacket;
 import com.valenguard.server.network.packet.out.PingOut;
 import com.valenguard.server.network.shared.ClientHandler;
+import com.valenguard.server.network.shared.ServerConstants;
 import lombok.Getter;
 
 import java.util.Collection;
@@ -18,7 +20,7 @@ import java.util.function.Consumer;
 
 public class PlayerManager {
 
-    private static final float DEFAULT_MOVE_SPEED = .5f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
+    private static final float DEFAULT_MOVE_SPEED = .4f; //TODO MOVE TO SOME DEFAULT CLIENT INFO CLASS OR LOAD FROM FILE/DB
     private short serverEntityID = 0; //Temporary player ID. In the future this ID will come from the database.
     private static PlayerManager instance;
     private final Map<ClientHandler, Short> mappedPlayerIds = new ConcurrentHashMap<>();
@@ -49,7 +51,7 @@ public class PlayerManager {
      */
     public void onPlayerConnect(Player player, ClientHandler clientHandler) {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
-        TmxMap tmxMap = ValenguardMain.getInstance().getMapManager().getMapData(NewPlayerConstants.STARTING_MAP);
+        TmxMap tmxMap = ValenguardMain.getInstance().getMapManager().getTmxMap(NewPlayerConstants.STARTING_MAP);
 
         // Below we create a starting currentMapLocation for a new player.
         // The Y cord is subtracted from the height of the map.
@@ -89,9 +91,6 @@ public class PlayerManager {
         // Let's update everyone because a player has joined the map.
         updateMapWithNewPlayer(player, tmxMap);
 
-        // Add the player to the map they are on.
-        tmxMap.addPlayer(player);
-
         //TODO: This should be a ID from the database. Until then, increment the fake ID for the next client connection.
         serverEntityID++;
     }
@@ -127,28 +126,26 @@ public class PlayerManager {
     /**
      * Handles switching maps for the player passed and spawns them at
      * the spawnLocation on the new map.
-     *
-     * @param player        The player who is switching maps.
-     * @param spawnLocation The new spawn currentMapLocation on the new map.
      */
-    public void playerSwitchMap(Player player, Location spawnLocation) {
+    public void playerSwitchMap(Player player, Warp warp) {
 
-        // TODO: CHANGE THIS. MAP SWITCHING WAS REMOVED TEMP. D:<
-
-        // Tell the client to switch maps.
-        //new PlayerMapChange(player, spawnLocation).sendPacket();
-
-        // Let's update everyone because a player has joined the map.
-        updateMapWithNewPlayer(player, spawnLocation.getMapData());
-
-        // Let's update everyone because a player has left the map.
+        // Despawn on current map
         updateMapWithPlayerLeave(player);
 
-        // Setting the new map for the player
-        spawnLocation.getMapData().addPlayer(player);
+        System.out.println();
+        System.out.println("[WARP] Name: " + warp.getMapName());
+        System.out.println("[WARP] x: " + warp.getToX());
+        System.out.println("[WARP] y: " + warp.getToY());
 
-        // Setting the new currentMapLocation of the player the server.
-        player.setCurrentMapLocation(spawnLocation);
+        Location warpDestination = new Location(warp.getMapName(), warp.getToX(), warp.getToY());
+        player.setCurrentMapLocation(warpDestination);
+        player.setFutureMapLocation(warpDestination);
+        player.setFacingDirection(warp.getMoveDirection());
+        player.setRealX(player.getFutureMapLocation().getX() * ServerConstants.TILE_SIZE);
+        player.setRealY(player.getFutureMapLocation().getY() * ServerConstants.TILE_SIZE);
+
+        // Spawn on target map
+        updateMapWithNewPlayer(player, warpDestination.getTmxMap());
     }
 
     /**
@@ -160,12 +157,15 @@ public class PlayerManager {
      * @param mapToUpdate     The map that the player has just joined.
      */
     private void updateMapWithNewPlayer(Player playerWhoJoined, TmxMap mapToUpdate) {
+        // Add the player to the map they are on.
+        mapToUpdate.addPlayer(playerWhoJoined);
+
         mapToUpdate.getPlayerList().forEach(playerOnMap -> {
 
-//             Send all players on the map info of the new player.
+            // Send all players on the map info of the new player.
             new EntitySpawnPacket(playerOnMap, playerWhoJoined).sendPacket();
 
-//             Send the new player info about all players already on the map.
+            // Send the new player info about all players already on the map.
             new EntitySpawnPacket(playerWhoJoined, playerOnMap).sendPacket();
         });
     }
@@ -176,24 +176,15 @@ public class PlayerManager {
      * @param despawnTarget The player who left the map
      */
     private void updateMapWithPlayerLeave(Player despawnTarget) {
-        despawnTarget.getCurrentMapLocation().getMapData().getPlayerList().forEach(playerOnMap -> {
-
-            if (despawnTarget.equals(playerOnMap)) {
-                System.out.println("TRIED SENDING THE DESPAWN TARGET A DESPAWN PACKET!");
-                return;
-            }
-
-            // Let all the players on the map know about the exit
-            new EntityDespawnPacket(playerOnMap, despawnTarget).sendPacket();
-        });
-        // Remove the player from the map they are currently in.
-        despawnTarget.getMapData().removePlayer(despawnTarget);
+        despawnTarget.getTmxMap().removePlayer(despawnTarget);
+        sendToAllButPlayer(despawnTarget, clientHandler ->
+                new EntityDespawnPacket(clientHandler.getPlayer(), despawnTarget).sendPacket());
     }
 
     public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
-        mappedPlayerIds.forEach((clientHandler, playerId) -> {
-            if (player.getServerEntityId() == playerId) return;
-            callback.accept(clientHandler);
+        player.getTmxMap().getPlayerList().forEach(playerOnMap -> {
+            if (player.equals(playerOnMap)) return;
+            callback.accept(playerOnMap.getClientHandler());
         });
     }
 }

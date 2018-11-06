@@ -53,6 +53,7 @@ public class TmxMap {
      * @throws RuntimeException Tried to remove a player that is not on this map.
      */
     public synchronized void removePlayer(Player player) {
+        System.out.println("=== REMOVING PLAYER ===");
         // Make sure the player is actually on this map.
         if (!playerList.contains(player)) {
             throw new RuntimeException("Tried to remove a player from a map they are not on.");

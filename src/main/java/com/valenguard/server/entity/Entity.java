@@ -25,8 +25,7 @@ public class Entity {
     private Location futureMapLocation;
     private float moveSpeed;
 
-    private float realX;
-    private float realY;
+    private float realX, realY;
 
     private float walkTime = 0f;
 
@@ -36,7 +35,7 @@ public class Entity {
      */
     private MoveDirection facingDirection;
 
-    public TmxMap getMapData() {
-        return currentMapLocation.getMapData();
+    public TmxMap getTmxMap() {
+        return currentMapLocation.getTmxMap();
     }
 }

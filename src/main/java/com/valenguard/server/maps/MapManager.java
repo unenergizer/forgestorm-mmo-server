@@ -1,6 +1,7 @@
 package com.valenguard.server.maps;
 
 import com.valenguard.server.maps.data.TmxMap;
+import com.valenguard.server.maps.data.Warp;
 import com.valenguard.server.maps.file.TmxFileParser;
 
 import java.io.File;
@@ -43,7 +44,23 @@ public class MapManager {
                     TmxFileParser.loadXMLFile(MAP_DIRECTORY, mapName));
         }
         System.out.println("[TMX MAPS] Loaded: " + files.length);
+
+        fixWarpHeights();
     }
+
+    private void fixWarpHeights() {
+        tmxMaps.values().forEach(tmxMap -> {
+            for (int i = 0; i < tmxMap.getMapWidth(); i++) {
+                for (int j = 0; j < tmxMap.getMapHeight(); j++) {
+                    if (tmxMap.isOutOfBounds(i, j)) continue;
+                    Warp warp = tmxMap.getMap()[i][j].getWarp();
+                    if (warp == null) continue;
+                    warp.setToY(tmxMaps.get(warp.getMapName()).getMapHeight() - warp.getToY() - 1);
+                }
+            }
+        });
+    }
+
 
     /**
      * Gets the map data associated with a map name. The map name is determined by
@@ -53,11 +70,10 @@ public class MapManager {
      * @return TmxMap that contains information about this map.
      * @throws RuntimeException Requested map could not be found or was not loaded.
      */
-    public TmxMap getMapData(String mapName) throws RuntimeException {
+    public TmxMap getTmxMap(String mapName) throws RuntimeException {
         if (tmxMaps.containsKey(mapName)) {
             return tmxMaps.get(mapName);
-        } else {
-            throw new RuntimeException("Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
         }
+        throw new RuntimeException("Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
     }
 }

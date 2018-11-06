@@ -30,26 +30,8 @@ public class Location {
      *
      * @return The map data that relates to this currentMapLocation object.
      */
-    public TmxMap getMapData() {
-        return ValenguardMain.getInstance().getMapManager().getMapData(mapName);
-    }
-
-    /**
-     * Wrapper method to see if this current currentMapLocation is traversable.
-     *
-     * @return True if this tile can be walked on, false otherwise.
-     */
-    public boolean isTraversable() {
-        return getMapData().isTraversable(x, y);
-    }
-
-    /**
-     * Wrapper method to check if this currentMapLocation is going out of bounds of the map.
-     *
-     * @return True if the currentMapLocation is out of bounds, false otherwise.
-     */
-    public boolean isOutOfBounds() {
-        return getMapData().isOutOfBounds(x, y);
+    public TmxMap getTmxMap() {
+        return ValenguardMain.getInstance().getMapManager().getTmxMap(mapName);
     }
 
     /**
