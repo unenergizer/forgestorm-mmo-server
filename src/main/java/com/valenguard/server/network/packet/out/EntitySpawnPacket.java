@@ -1,7 +1,7 @@
 package com.valenguard.server.network.packet.out;
 
-import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.entity.MovingEntity;
+import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
 import java.io.IOException;
@@ -27,13 +27,13 @@ public class EntitySpawnPacket extends ServerOutPacket {
         write.writeFloat(entityToSpawn.getMoveSpeed());
         write.writeShort(entityToSpawn.getEntityType());
 
-        System.out.println("[PACKET] " +
-                "\nID -> " + entityToSpawn.getServerEntityId() +
-                "\nMAP -> " + entityToSpawn.getCurrentMapLocation().getMapName() +
-                "\nX -> " + entityToSpawn.getCurrentMapLocation().getX() +
-                "\nY -> " + entityToSpawn.getCurrentMapLocation().getY() +
-                "\nName -> " + entityToSpawn.getName() +
-                "\nMoveSpeed -> " + entityToSpawn.getMoveSpeed() +
-                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());
+//        Log.println(getClass(),
+//                "\nID -> " + entityToSpawn.getServerEntityId() +
+//                "\nMAP -> " + entityToSpawn.getCurrentMapLocation().getMapName() +
+//                "\nX -> " + entityToSpawn.getCurrentMapLocation().getX() +
+//                "\nY -> " + entityToSpawn.getCurrentMapLocation().getY() +
+//                "\nName -> " + entityToSpawn.getName() +
+//                "\nMoveSpeed -> " + entityToSpawn.getMoveSpeed() +
+//                "\nFaceDir -> " + entityToSpawn.getFacingDirection().getDirectionByte());
     }
 }

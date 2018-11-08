@@ -1,5 +1,6 @@
 package com.valenguard.server.network.shared;
 
+import com.valenguard.server.util.Log;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,7 +62,7 @@ public class EventBus {
     public void publish(byte opcode, ClientHandler clientHandler) {
         CallbackData callbackData = packetListenerMap.get(opcode);
         if (callbackData == null) {
-            System.out.println("Callback data was null for " + opcode + ". Is the event registered?");
+            Log.println(getClass(), "Callback data was null for " + opcode + ". Is the event registered?", true);
             return;
         }
         try {

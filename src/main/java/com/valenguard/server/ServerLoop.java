@@ -63,7 +63,7 @@ public class ServerLoop extends Thread {
              ***********************/
 
             sync(GameConstants.TICKS_PER_SECOND);
-            //System.out.println(ConsoleLogger.INFO.toString() + "TPS: " + getCurrentTPS());
+            //Log.println(getClass(),ConsoleLogger.INFO.toString() + "TPS: " + getCurrentTPS());
 
             endTime = System.nanoTime();
 

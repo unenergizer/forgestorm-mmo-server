@@ -4,6 +4,7 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
 import com.valenguard.server.network.shared.ServerConstants;
+import com.valenguard.server.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -76,7 +77,7 @@ public class ServerConnection implements Runnable {
      */
     @Override
     public void run() {
-        System.out.println("Server opened on port: " + ServerConstants.SERVER_PORT);
+        Log.println(getClass(),"Server opened on port: " + ServerConstants.SERVER_PORT);
         registerListeners.accept(eventBus);
         listenForConnections();
     }
@@ -86,7 +87,7 @@ public class ServerConnection implements Runnable {
      * a link between the client and the server.
      */
     private void listenForConnections() {
-        System.out.println("Listening for client connections...");
+        Log.println(getClass(),"Listening for client connections...");
 
         // Creating a thread that runs as long as the server is alive and listens
         // for incoming connections
@@ -134,13 +135,13 @@ public class ServerConnection implements Runnable {
                 // sending and receiving data
 
                 clientHandler = new ClientHandler(clientSocket, outStream, inStream);
-                System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
+                Log.println(getClass(),"Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
 
                 // Adding the client handle to a list of current client handles
                 ValenguardMain.getInstance().getGameManager().playerJoinServer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
                 tempID++;
 
-                System.out.println("Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
+                Log.println(getClass(),"Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
 
 
                 // Reading in a byte which represents an opcode that the client sent to the
@@ -155,9 +156,9 @@ public class ServerConnection implements Runnable {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
+                        Log.println(getClass(),"Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
                         ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
-                        System.out.println("Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
+                        Log.println(getClass(),"Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
                     }
                 } else {
                     e.printStackTrace();
@@ -182,7 +183,7 @@ public class ServerConnection implements Runnable {
      */
     public void close() {
         running = false;
-        System.out.println("Closing down server...");
+        Log.println(getClass(),"Closing down server...");
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException e) {

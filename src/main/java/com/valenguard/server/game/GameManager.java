@@ -2,16 +2,13 @@ package com.valenguard.server.game;
 
 import com.google.common.base.Preconditions;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.maps.Location;
-import com.valenguard.server.game.maps.Warp;
-import com.valenguard.server.game.maps.TmxFileParser;
+import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.InitClientPacket;
 import com.valenguard.server.network.packet.out.PingOut;
 import com.valenguard.server.network.packet.out.PlayerSwitchMapPacket;
 import com.valenguard.server.network.shared.ClientHandler;
+import com.valenguard.server.util.Log;
 import lombok.Getter;
 
 import java.io.File;
@@ -93,7 +90,7 @@ public class GameManager {
             String mapName = file.getName().replace(".tmx", "");
             gameMaps.put(mapName, TmxFileParser.parseGameMap(MAP_DIRECTORY, mapName));
         }
-        System.out.println("[TMX MAPS] Loaded: " + files.length);
+        Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
     }
 

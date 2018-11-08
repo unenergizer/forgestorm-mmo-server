@@ -1,6 +1,7 @@
 package com.valenguard.server.commands;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.util.Log;
 
 import java.util.Scanner;
 
@@ -10,7 +11,7 @@ public class ConsoleCommandManager implements Runnable {
      * This will start listening to console commands.
      */
     public void start() {
-        System.out.println("[ConsoleCommands] Initializing server commands...");
+        Log.println(getClass(), "Initializing server commands...");
         new Thread(this, "ConsoleCommandManager").start();
     }
 

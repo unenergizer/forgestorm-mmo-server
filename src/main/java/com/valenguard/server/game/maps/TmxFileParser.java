@@ -1,5 +1,6 @@
 package com.valenguard.server.game.maps;
 
+import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,8 +58,8 @@ public class TmxFileParser {
         final int mapWidth = Integer.parseInt(tmx.getAttributes().getNamedItem("width").getNodeValue());
         final int mapHeight = Integer.parseInt(tmx.getAttributes().getNamedItem("height").getNodeValue());
 
-        if (PRINT_MAP) System.out.println("MapWidth: " + mapWidth);
-        if (PRINT_MAP) System.out.println("MapHeight: " + mapHeight);
+        if (PRINT_MAP) Log.println(TmxFileParser.class,"MapWidth: " + mapWidth);
+        if (PRINT_MAP) Log.println(TmxFileParser.class,"MapHeight: " + mapHeight);
 
         Tile map[][] = new Tile[mapWidth][mapHeight];
 
@@ -121,7 +122,7 @@ public class TmxFileParser {
 
                     // Check for end of map width
                     if (currentX == mapWidth) {
-                        //System.out.println("");
+                        //Log.println(TmxFileParser.class,("");
                         currentX = 0; // reset x counter
                         currentY--; // decrement y value
                     }
@@ -160,8 +161,8 @@ public class TmxFileParser {
                     MoveDirection moveDirection = null;
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
-                    if (PRINT_MAP) System.out.println();
-                    if (PRINT_MAP) System.out.println("===[ WARP ]==================================");
+                    if (PRINT_MAP) Log.println(TmxFileParser.class,"");
+                    if (PRINT_MAP) Log.println(TmxFileParser.class,"===[ WARP ]==================================");
 
                     for (int k = 0; k < properties.getLength(); k++) {
 
@@ -171,25 +172,25 @@ public class TmxFileParser {
                         // Get map name:
                         if (propertyElement.getAttribute("name").equals("mapname")) {
                             warpMapName = propertyElement.getAttribute("value");
-                            if (PRINT_MAP) System.out.println("WarpMap: " + warpMapName);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"WarpMap: " + warpMapName);
                         }
 
                         // Get map X:
                         if (propertyElement.getAttribute("name").equals("x")) {
                             warpX = Integer.parseInt(propertyElement.getAttribute("value"));
-                            if (PRINT_MAP) System.out.println("WarpX: " + warpX);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"WarpX: " + warpX);
                         }
 
                         // Get map Y:
                         if (propertyElement.getAttribute("name").equals("y")) {
                             warpY = Integer.parseInt(propertyElement.getAttribute("value"));
-                            if (PRINT_MAP) System.out.println("WarpY: " + warpY);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"WarpY: " + warpY);
                         }
 
                         // Get map facing moveDirection:
                         if (propertyElement.getAttribute("name").equals("direction")) {
                             moveDirection = MoveDirection.valueOf(propertyElement.getAttribute("value").toUpperCase());
-                            if (PRINT_MAP) System.out.println("WarpDirection: " + moveDirection);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"WarpDirection: " + moveDirection);
                         }
                     }
 
@@ -199,9 +200,9 @@ public class TmxFileParser {
                             int tileY = mapHeight - ii - 1;
                             Tile tile = map[jj][mapHeight - ii - 1];
                             tile.setWarp(new Warp(new Location(warpMapName, warpX, warpY), moveDirection));
-                            if (PRINT_MAP) System.out.println(tile.getWarp().getLocation().getMapName());
-                            if (PRINT_MAP) System.out.println("TileX: " + jj);
-                            if (PRINT_MAP) System.out.println("TileY: " + tileY);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,tile.getWarp().getLocation().getMapName());
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"TileX: " + jj);
+                            if (PRINT_MAP) Log.println(TmxFileParser.class,"TileY: " + tileY);
                         }
                     }
                 }
@@ -226,9 +227,9 @@ public class TmxFileParser {
                     }
 
                 }
-                System.out.println();
+                Log.println(TmxFileParser.class,"");
             }
-            System.out.println(); // Clear a line for next map
+            Log.println(TmxFileParser.class,""); // Clear a line for next map
         }
         return new GameMap(fileName.replace(".tmx", ""), mapWidth, mapHeight, map);
     }

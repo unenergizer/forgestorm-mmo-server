@@ -7,6 +7,7 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.packet.out.MoveEntityPacket;
+import com.valenguard.server.util.Log;
 
 public class UpdateMovements {
 
@@ -65,14 +66,14 @@ public class UpdateMovements {
             ValenguardMain.getInstance().getGameManager().playerSwitchGameMap(player);
             player.setWarp(null);
 
-            System.out.println("===[P WARP]========================");
-            System.out.println("GameMap: " + player.getCurrentMapLocation().getMapName());
-            System.out.println("CLx: " + player.getCurrentMapLocation().getX());
-            System.out.println("CLy: " + player.getCurrentMapLocation().getY());
-            System.out.println("FLx: " + player.getFutureMapLocation().getX());
-            System.out.println("FLy: " + player.getFutureMapLocation().getY());
-            System.out.println("DRx: " + player.getRealX());
-            System.out.println("DRy: " + player.getRealY());
+            Log.println(getClass(), "===[P WARP]========================");
+            Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getMapName());
+            Log.println(getClass(), "CLx: " + player.getCurrentMapLocation().getX());
+            Log.println(getClass(), "CLy: " + player.getCurrentMapLocation().getY());
+            Log.println(getClass(), "FLx: " + player.getFutureMapLocation().getX());
+            Log.println(getClass(), "FLy: " + player.getFutureMapLocation().getY());
+            Log.println(getClass(), "DRx: " + player.getRealX());
+            Log.println(getClass(), "DRy: " + player.getRealY());
         }
     }
 

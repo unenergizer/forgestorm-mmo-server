@@ -8,6 +8,7 @@ import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.PingIn;
 import com.valenguard.server.network.packet.in.PlayerMove;
 import com.valenguard.server.network.packet.out.OutputStreamManager;
+import com.valenguard.server.util.Log;
 import lombok.Getter;
 
 @Getter
@@ -34,7 +35,6 @@ public class ValenguardMain {
     }
 
     public static void main(String[] args) {
-        System.out.println("Booting Valenguard Server!");
         ValenguardMain.getInstance().start();
     }
 
@@ -42,6 +42,7 @@ public class ValenguardMain {
      * Starts all server processes.
      */
     private void start() {
+        Log.println(getClass(),"Booting Valenguard Server!");
         gameManager = new GameManager();
         getGameManager().init();
 
@@ -65,12 +66,12 @@ public class ValenguardMain {
      * Stops server operations and terminates the program.
      */
     public void stop() {
-        System.out.println("ServerConnection shutdown initialized!");
+        Log.println(getClass(),"ServerConnection shutdown initialized!");
 
         //TODO: Stop network functions and shut down nicely.
         ServerConnection.getInstance().close();
 
-        System.out.println("ServerConnection shutdown complete!");
+        Log.println(getClass(),"ServerConnection shutdown complete!");
     }
 
     /**
@@ -78,7 +79,7 @@ public class ValenguardMain {
      * and registers network event listeners.
      */
     private void initializeNetwork() {
-        System.out.println("Initializing network...");
+        Log.println(getClass(),"Initializing network...");
         ServerConnection.getInstance().openServer((eventBus) -> {
             eventBus.registerListener(new PlayerMove());
             eventBus.registerListener(new PingIn());
@@ -89,7 +90,7 @@ public class ValenguardMain {
      * Register server commands.
      */
     private void registerCommands() {
-        System.out.println("Registering commands.");
+        Log.println(getClass(),"Registering commands.");
         commandProcessor = new CommandProcessor();
 
         // console command manager
