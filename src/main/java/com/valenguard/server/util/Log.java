@@ -3,11 +3,16 @@ package com.valenguard.server.util;
 public class Log {
 
     public static void println(Class clazz, String message) {
-        println(clazz, message, false);
+        println(clazz, message, false, true);
     }
 
-    public static void println(Class clazz, String message, boolean error) {
-        if (error) System.err.println(buildMessage(clazz, message));
+    public static void println(Class clazz, String message, boolean isError) {
+        println(clazz, message, isError, true);
+    }
+
+    public static void println(Class clazz, String message, boolean isError, boolean print) {
+        if (!print) return;
+        if (isError) System.err.println(buildMessage(clazz, message));
         else System.out.println(buildMessage(clazz, message));
     }
 
