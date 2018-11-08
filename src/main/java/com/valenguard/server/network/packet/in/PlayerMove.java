@@ -1,9 +1,7 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.entity.MoveDirection;
-import com.valenguard.server.entity.Player;
-import com.valenguard.server.entity.PlayerManager;
+import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.Opcode;
 import com.valenguard.server.network.shared.Opcodes;
@@ -17,8 +15,6 @@ public class PlayerMove implements PacketListener {
 
         if (direction == null || direction == MoveDirection.NONE) return;
 
-        Player player = PlayerManager.getInstance().getPlayer(clientHandler);
-
-        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(player, direction);
+        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(clientHandler.getPlayer(), direction);
     }
 }

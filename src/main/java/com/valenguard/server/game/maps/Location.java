@@ -1,5 +1,6 @@
-package com.valenguard.server.maps.data;
+package com.valenguard.server.game.maps;
 
+import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,24 +26,13 @@ public class Location {
         this.y = location.y;
     }
 
-    /**
-     * Helper method to quickly get the map data for this currentMapLocation object.
-     *
-     * @return The map data that relates to this currentMapLocation object.
-     */
-    public TmxMap getTmxMap() {
-        return ValenguardMain.getInstance().getMapManager().getTmxMap(mapName);
+    public GameMap getGameMap() {
+        return ValenguardMain.getInstance().getGameManager().getGameMap(mapName);
     }
 
-    /**
-     * Adds two locations coordinates together.
-     *
-     * @param location The currentMapLocation to add to this.
-     * @return A new currentMapLocation with added X and Y coordinates.
-     */
     public Location add(Location location) {
-        if (!location.getMapName().equals(mapName))
-            throw new RuntimeException("Can't add locations. " + location.getMapName() + " doesn't equal " + mapName + ".");
+         Preconditions.checkArgument(location.getMapName().equals(mapName),
+                "Can't add locations. " + location.getMapName() + " doesn't equal " + mapName + ".");
         return new Location(mapName, this.x + location.getX(), this.y + location.getY());
     }
 

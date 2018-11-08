@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextobjectid="17">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" infinite="0" nextobjectid="18">
+ <properties>
+  <property name="y" type="int" value="27"/>
+ </properties>
  <tileset firstgid="1" source="tileset/cave1.0/Cave_A.tsx"/>
  <tileset firstgid="61" source="tileset/cave1.0/Cave_B.tsx"/>
  <tileset firstgid="285" source="tileset/desert1.0/Desert_A.tsx"/>
@@ -413,6 +416,14 @@
     <property name="mapname" value="pub_rooms"/>
     <property name="x" type="int" value="31"/>
     <property name="y" type="int" value="16"/>
+   </properties>
+  </object>
+  <object id="17" x="576" y="416" width="16" height="16">
+   <properties>
+    <property name="direction" value="UP"/>
+    <property name="mapname" value="house"/>
+    <property name="x" type="int" value="34"/>
+    <property name="y" type="int" value="30"/>
    </properties>
   </object>
  </objectgroup>

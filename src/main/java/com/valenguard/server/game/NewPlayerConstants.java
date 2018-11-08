@@ -1,7 +1,16 @@
-package com.valenguard.server.entity;
+package com.valenguard.server.game;
 
-@SuppressWarnings("SpellCheckingInspection")
 class NewPlayerConstants {
+
+    /**
+     * How fast our player can move around the map.
+     */
+    public static final float DEFAULT_MOVE_SPEED = .4f;
+
+    /**
+     * This is the map new players with join on first login.
+     */
+    @SuppressWarnings("SpellCheckingInspection")
     public static final String STARTING_MAP = "maintown";
 
     /**

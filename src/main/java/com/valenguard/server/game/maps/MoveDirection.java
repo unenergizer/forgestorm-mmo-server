@@ -1,4 +1,4 @@
-package com.valenguard.server.entity;
+package com.valenguard.server.game.maps;
 
 public enum MoveDirection {
     UP,

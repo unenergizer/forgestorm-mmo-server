@@ -1,29 +1,37 @@
 package com.valenguard.server.network.shared;
 
-import com.valenguard.server.entity.Player;
-import lombok.AllArgsConstructor;
+import com.valenguard.server.game.entity.Player;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-@SuppressWarnings({"unused"})
-@AllArgsConstructor
+@SuppressWarnings("unused")
 @Getter
 public class ClientHandler {
-    private Player player;
+
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+
+    @Setter
+    private Player player;
+
+    public ClientHandler(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) {
+        this.socket = socket;
+        this.outputStream = outputStream;
+        this.inputStream = inputStream;
+    }
 
     @FunctionalInterface
     private interface Reader {
         Object accept() throws IOException;
     }
 
-    public boolean readBoolean()  {
+    public boolean readBoolean() {
         return (boolean) readIn(inputStream::readBoolean);
     }
 

@@ -12,7 +12,7 @@ public class EventBus {
     /**
      * Contains opcodes and the associated class/method combinations to listen for.
      * <p>
-     * Map:
+     * GameMap:
      * Byte: Packet Opcode
      * CallbackData: Class and Method reference.
      */

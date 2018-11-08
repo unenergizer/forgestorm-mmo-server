@@ -1,8 +1,6 @@
 package com.valenguard.server.network;
 
-import com.valenguard.server.entity.EntityManager;
-import com.valenguard.server.entity.Player;
-import com.valenguard.server.entity.PlayerManager;
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
 import com.valenguard.server.network.shared.ServerConstants;
@@ -25,6 +23,8 @@ public class ServerConnection implements Runnable {
     private final EventBus eventBus = new EventBus();
     private ServerSocket serverSocket;
     private Consumer<EventBus> registerListeners;
+
+    private short tempID = 0;
 
     // Used to handle closing down all threads associated with
     // the server. Volatile allows the variable to exist
@@ -132,14 +132,16 @@ public class ServerConnection implements Runnable {
 
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving data
-                Player player = new Player();
-                clientHandler = new ClientHandler(player, clientSocket, outStream, inStream);
 
+                clientHandler = new ClientHandler(clientSocket, outStream, inStream);
                 System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
 
                 // Adding the client handle to a list of current client handles
-                PlayerManager.getInstance().onPlayerConnect(player, clientHandler);
-                System.out.println("Clients Online: " + EntityManager.getInstance().entitiesLoaded());
+                ValenguardMain.getInstance().getGameManager().playerJoinServer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
+                tempID++;
+
+                System.out.println("Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
+
 
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
@@ -154,8 +156,8 @@ public class ServerConnection implements Runnable {
 
                         // The client has disconnected
                         System.out.println("Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
-                        PlayerManager.getInstance().onPlayerDisconnect(clientHandler);
-                        System.out.println("Clients Online: " + EntityManager.getInstance().entitiesLoaded());
+                        ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
+                        System.out.println("Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
                     }
                 } else {
                     e.printStackTrace();

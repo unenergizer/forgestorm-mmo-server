@@ -1,7 +1,7 @@
 package com.valenguard.server.network.packet.out;
 
-import com.valenguard.server.entity.Entity;
-import com.valenguard.server.entity.Player;
+import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.network.shared.Opcodes;
 
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.io.ObjectOutputStream;
 
 public class EntitySpawnPacket extends ServerOutPacket {
 
-    private final Entity entityToSpawn;
+    private final MovingEntity entityToSpawn;
 
-    public EntitySpawnPacket(Player player, Entity entityToSpawn) {
+    public EntitySpawnPacket(Player player, MovingEntity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player);
         this.entityToSpawn = entityToSpawn;
     }

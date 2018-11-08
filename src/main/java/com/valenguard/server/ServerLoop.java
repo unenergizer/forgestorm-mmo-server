@@ -1,9 +1,9 @@
 package com.valenguard.server;
 
-import com.valenguard.server.entity.PlayerManager;
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.shared.ServerConstants;
-import com.valenguard.server.serverupdates.UpdateMovements;
+import com.valenguard.server.game.task.UpdateMovements;
 import lombok.Getter;
 
 /**
@@ -51,17 +51,18 @@ public class ServerLoop extends Thread {
              ***********************/
 
             updateMovements.updatePlayerMovement();
+            ValenguardMain.getInstance().getGameManager().tick();
 
             // Update ping every X ticks
             if (updates % 10 == 0) {
-                PlayerManager.getInstance().getPingManager().tick();
+                ValenguardMain.getInstance().getPingManager().tick();
             }
 
             /* ***********************
              * !! Update End !!
              ***********************/
 
-            sync(ServerConstants.TICKS_PER_SECOND);
+            sync(GameConstants.TICKS_PER_SECOND);
             //System.out.println(ConsoleLogger.INFO.toString() + "TPS: " + getCurrentTPS());
 
             endTime = System.nanoTime();

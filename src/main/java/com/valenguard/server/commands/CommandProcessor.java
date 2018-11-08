@@ -36,7 +36,7 @@ public class CommandProcessor {
         commandListeners.put(commandListener, commandMethods);
     }
 
-    public boolean runListeners(String command, Channel playerChannel) {
+    public void runListeners(String command, Channel playerChannel) {
         for (CommandListener commandListener : commandListeners.keySet()) {
             Map<String[], Method> commands = commandListeners.get(commandListener);
             for (String[] methodCommands : commands.keySet()) {
@@ -47,11 +47,10 @@ public class CommandProcessor {
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
-                        return true;
+                        return;
                     }
                 }
             }
         }
-        return false;
     }
 }
