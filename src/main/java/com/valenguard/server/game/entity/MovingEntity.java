@@ -17,7 +17,7 @@ public class MovingEntity extends Entity {
     private MoveDirection facingDirection;
 
     public void gameMapRegister(Warp warp) {
-        setCurrentMapLocation(warp.getLocation());
+        setCurrentMapLocation(new Location(warp.getLocation()));
         setFutureMapLocation(new Location(warp.getLocation()));
         setRealX(warp.getLocation().getX() * GameConstants.TILE_SIZE);
         setRealY(warp.getLocation().getY() * GameConstants.TILE_SIZE);
@@ -26,5 +26,9 @@ public class MovingEntity extends Entity {
 
     void gameMapDeregister() {
         setWalkTime(0f);
+    }
+
+    public boolean isEntityMoving() {
+        return getCurrentMapLocation().getX() != getFutureMapLocation().getX() || getCurrentMapLocation().getY() != getFutureMapLocation().getY();
     }
 }

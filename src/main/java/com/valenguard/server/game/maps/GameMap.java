@@ -5,6 +5,8 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
+import com.valenguard.server.network.packet.out.InitializeMapPacket;
+import com.valenguard.server.util.Log;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class GameMap {
 
@@ -29,7 +33,7 @@ public class GameMap {
     private final Queue<QueueData> playerJoinQueue = new ConcurrentLinkedQueue<>();
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
-    public GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
+    GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
         this.mapName = mapName;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
@@ -37,20 +41,17 @@ public class GameMap {
     }
 
     public void tick() {
-        // Add players
-        for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
-            if (playerJoinQueue.isEmpty()) break;
-            playerJoinGameMap(playerJoinQueue.remove());
-        }
-
         // Remove players
         for (int quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
             if (playerQuitQueue.isEmpty()) break;
             playerQuitGameMap(playerQuitQueue.remove());
         }
 
-        // TODO: mob/entity/item tick
-//        if (playerList.isEmpty() && mobList.isEmpty()) return;
+        // Add players
+        for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
+            if (playerJoinQueue.isEmpty()) break;
+            playerJoinGameMap(playerJoinQueue.remove());
+        }
     }
 
     public void addPlayer(Player player, Warp warp) {
@@ -66,11 +67,18 @@ public class GameMap {
         player.gameMapRegister(queueData.getWarp());
         playerList.add(player);
 
+        new InitializeMapPacket(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
+
+        Log.println(getClass(), "Sending packet to initialize their own player");
         new EntitySpawnPacket(player, player).sendPacket();
 
         for (Player otherPlayer : playerList) {
             if (otherPlayer == player) continue;
             new EntitySpawnPacket(otherPlayer, player).sendPacket();
+        }
+
+        for (Player otherPlayer : playerList) {
+            if (otherPlayer == player) continue;
             new EntitySpawnPacket(player, otherPlayer).sendPacket();
         }
     }
@@ -117,7 +125,7 @@ public class GameMap {
     }
 
     private Tile getTileByLocation(Location location) {
-        if (isOutOfBounds(location)) return null;
+        checkArgument(!isOutOfBounds(location));
         return location.getGameMap().getMap()[location.getX()][location.getY()];
     }
 

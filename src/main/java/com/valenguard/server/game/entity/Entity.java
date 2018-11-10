@@ -1,6 +1,5 @@
 package com.valenguard.server.game.entity;
 
-import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import lombok.Getter;
@@ -19,6 +18,6 @@ public class Entity {
     }
 
     public GameMap getGameMap() {
-        return ValenguardMain.getInstance().getGameManager().getGameMap(currentMapLocation.getMapName());
+        return currentMapLocation.getGameMap();
     }
 }

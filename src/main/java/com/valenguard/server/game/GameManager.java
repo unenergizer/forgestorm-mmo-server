@@ -1,12 +1,10 @@
 package com.valenguard.server.game;
 
-import com.google.common.base.Preconditions;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
-import com.valenguard.server.network.packet.out.InitClientPacket;
+import com.valenguard.server.network.packet.out.InitClientSessionPacket;
 import com.valenguard.server.network.packet.out.PingOut;
-import com.valenguard.server.network.packet.out.PlayerSwitchMapPacket;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
@@ -14,7 +12,13 @@ import lombok.Getter;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameManager {
 
@@ -22,13 +26,28 @@ public class GameManager {
     private static final String MAP_DIRECTORY = "src/main/resources/maps/";
 
     @Getter
-    private Map<String, GameMap> gameMaps = new HashMap<>();
+    private final Map<String, GameMap> gameMaps = new HashMap<>();
+    private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
 
     public void init() {
         loadAllMaps();
     }
 
-    public void playerJoinServer(PlayerSessionData playerSessionData) {
+    public void initializeNewPlayer(PlayerSessionData playerSessionData) {
+        playerSessionDataQueue.add(playerSessionData);
+    }
+
+    /**
+     * Ran on the game thread. Dump players from network.
+     */
+    public void processPlayerJoin() {
+        PlayerSessionData playerSessionData;
+        while ((playerSessionData = playerSessionDataQueue.poll()) != null) {
+            playerJoinServer(playerSessionData);
+        }
+    }
+
+    private void playerJoinServer(PlayerSessionData playerSessionData) {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(NewPlayerConstants.STARTING_MAP);
 
@@ -49,7 +68,9 @@ public class GameManager {
 
         playerSessionData.getClientHandler().setPlayer(player);
 
-        new InitClientPacket(player, true, playerSessionData.getServerID(), location).sendPacket();
+        Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID());
+
+        new InitClientSessionPacket(player, true, playerSessionData.getServerID()).sendPacket();
         new PingOut(player).sendPacket();
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.DOWN));
@@ -64,16 +85,17 @@ public class GameManager {
     public void playerSwitchGameMap(Player player) {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
-        Preconditions.checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
+        Log.println(getClass(), "ToMap: " + warp.getLocation().getMapName() + ", FromMap: " + player.getMapName(), true);
+        checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
                 "The player is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 
         gameMaps.get(currentMapName).removePlayer(player);
-        new PlayerSwitchMapPacket(player, warp).sendPacket();
         gameMaps.get(warp.getLocation().getMapName()).addPlayer(player, warp);
+        player.setWarp(null);
     }
 
-    public void tick() {
-        gameMaps.values().forEach(gameMap -> gameMap.tick());
+    public void gameMapTick() {
+        gameMaps.values().forEach(GameMap::tick);
     }
 
     public int getTotalPlayersOnline() {
@@ -84,12 +106,13 @@ public class GameManager {
 
     private void loadAllMaps() {
         File[] files = new File(MAP_DIRECTORY).listFiles((d, name) -> name.endsWith(".tmx"));
-        Preconditions.checkNotNull(files, "No game maps were loaded.");
+        checkNotNull(files, "No game maps were loaded.");
 
         for (File file : files) {
             String mapName = file.getName().replace(".tmx", "");
             gameMaps.put(mapName, TmxFileParser.parseGameMap(MAP_DIRECTORY, mapName));
         }
+
         Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
     }
@@ -108,7 +131,7 @@ public class GameManager {
     }
 
     public GameMap getGameMap(String mapName) throws RuntimeException {
-        Preconditions.checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
+        checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
         return gameMaps.get(mapName);
     }
 
@@ -121,5 +144,9 @@ public class GameManager {
 
     public void forAllPlayers(Consumer<Player> callback) {
         gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().forEach(callback));
+    }
+
+    public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().stream().filter(predicate).forEach(callback));
     }
 }

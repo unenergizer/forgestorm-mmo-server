@@ -2,19 +2,29 @@ package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.network.shared.ClientHandler;
-import com.valenguard.server.network.shared.Opcode;
-import com.valenguard.server.network.shared.Opcodes;
-import com.valenguard.server.network.shared.PacketListener;
+import com.valenguard.server.network.shared.*;
+import lombok.AllArgsConstructor;
 
-public class PlayerMove implements PacketListener {
+@Opcode(getOpcode = Opcodes.MOVE_REQUEST)
+public class PlayerMove implements PacketListener<PlayerMove.MovePacket> {
 
-    @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
-    public void onMoveRequest(ClientHandler clientHandler) {
-        MoveDirection direction = MoveDirection.getDirection(clientHandler.readByte());
+    @Override
+    public PacketData decodePacket(ClientHandler clientHandler) {
+        return new MovePacket(clientHandler.readByte());
+    }
+
+    @Override
+    public void onEvent(MovePacket packetData) {
+
+        MoveDirection direction = MoveDirection.getDirection(packetData.directionalByte);
 
         if (direction == null || direction == MoveDirection.NONE) return;
 
-        ValenguardMain.getInstance().getServerLoop().getUpdateMovements().addPlayer(clientHandler.getPlayer(), direction);
+        ValenguardMain.getInstance().getGameLoop().getUpdateMovements().performMove(packetData.getPlayer(), direction);
+    }
+
+    @AllArgsConstructor
+    class MovePacket extends PacketData {
+        byte directionalByte;
     }
 }

@@ -21,6 +21,7 @@ public class ServerConnection implements Runnable {
 
     private static ServerConnection instance;
 
+    @Getter
     private final EventBus eventBus = new EventBus();
     private ServerSocket serverSocket;
     private Consumer<EventBus> registerListeners;
@@ -68,7 +69,7 @@ public class ServerConnection implements Runnable {
         running = true;
 
         // Runs a thread for setting up
-        new Thread(this, "Start").start();
+        new Thread(this, "NetworkThread").start();
     }
 
     /**
@@ -77,7 +78,7 @@ public class ServerConnection implements Runnable {
      */
     @Override
     public void run() {
-        Log.println(getClass(),"Server opened on port: " + ServerConstants.SERVER_PORT);
+        Log.println(getClass(), "Server opened on port: " + ServerConstants.SERVER_PORT);
         registerListeners.accept(eventBus);
         listenForConnections();
     }
@@ -87,7 +88,7 @@ public class ServerConnection implements Runnable {
      * a link between the client and the server.
      */
     private void listenForConnections() {
-        Log.println(getClass(),"Listening for client connections...");
+        Log.println(getClass(), "Listening for client connections...");
 
         // Creating a thread that runs as long as the server is alive and listens
         // for incoming connections
@@ -135,19 +136,19 @@ public class ServerConnection implements Runnable {
                 // sending and receiving data
 
                 clientHandler = new ClientHandler(clientSocket, outStream, inStream);
-                Log.println(getClass(),"Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
+                Log.println(getClass(), "Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
 
                 // Adding the client handle to a list of current client handles
-                ValenguardMain.getInstance().getGameManager().playerJoinServer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
+                ValenguardMain.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
                 tempID++;
 
-                Log.println(getClass(),"Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
+                Log.println(getClass(), "Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
 
 
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
                 // be called
-                while (running) eventBus.publish(inStream.readByte(), clientHandler);
+                while (running) eventBus.decodeListenerOnNetworkThread(inStream.readByte(), clientHandler);
 
             } catch (IOException e) {
 
@@ -156,9 +157,9 @@ public class ServerConnection implements Runnable {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        Log.println(getClass(),"Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
+                        Log.println(getClass(), "Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
                         ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
-                        Log.println(getClass(),"Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
+                        Log.println(getClass(), "Clients Online: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() - 1));
                     }
                 } else {
                     e.printStackTrace();
@@ -183,7 +184,7 @@ public class ServerConnection implements Runnable {
      */
     public void close() {
         running = false;
-        Log.println(getClass(),"Closing down server...");
+        Log.println(getClass(), "Closing down server...");
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException e) {

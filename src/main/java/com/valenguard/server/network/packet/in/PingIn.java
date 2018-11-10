@@ -1,15 +1,24 @@
 package com.valenguard.server.network.packet.in;
 
-import com.valenguard.server.network.shared.ClientHandler;
-import com.valenguard.server.network.shared.Opcode;
-import com.valenguard.server.network.shared.Opcodes;
-import com.valenguard.server.network.shared.PacketListener;
+import com.valenguard.server.network.shared.*;
+import lombok.AllArgsConstructor;
 
-public class PingIn implements PacketListener {
+@Opcode(getOpcode = Opcodes.PING)
+public class PingIn implements PacketListener<PingIn.PingPacket> {
 
-    @Opcode(getOpcode = Opcodes.PING)
-    public void onPingIn(ClientHandler clientHandler) {
-        long timeTaken = System.currentTimeMillis() - clientHandler.getPlayer().getPingOutTime();
-        clientHandler.getPlayer().setLastPingTime(timeTaken);
+    @Override
+    public PacketData decodePacket(ClientHandler clientHandler) {
+        return new PingPacket(System.currentTimeMillis());
+    }
+
+    @Override
+    public void onEvent(PingPacket packetData) {
+        long timeTaken = packetData.packetReceivedTime - packetData.getPlayer().getPingOutTime();
+        packetData.getPlayer().setLastPingTime(timeTaken);
+    }
+
+    @AllArgsConstructor
+    class PingPacket extends PacketData {
+        private long packetReceivedTime;
     }
 }

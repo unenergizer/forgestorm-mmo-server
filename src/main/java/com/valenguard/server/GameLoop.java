@@ -1,9 +1,9 @@
 package com.valenguard.server;
 
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.network.ServerConnection;
-import com.valenguard.server.network.shared.ServerConstants;
 import com.valenguard.server.game.task.UpdateMovements;
+import com.valenguard.server.game.task.WarpManager;
+import com.valenguard.server.network.ServerConnection;
 import lombok.Getter;
 
 /**
@@ -13,17 +13,19 @@ import lombok.Getter;
  * https://github.com/Wulf/crescent/blob/master/LICENSE.txt
  * Modified: Robert Brown & Joseph Rugh
  */
-public class ServerLoop extends Thread {
+public class GameLoop extends Thread {
 
     /* UPDATES PER SECOND */
     private int currentTPS;
     private long variableYieldTime, lastTime;
 
     @Getter
-    private UpdateMovements updateMovements = new UpdateMovements();
+    private UpdateMovements updateMovements = new UpdateMovements(); //TODO: MOVE
 
-    public ServerLoop() {
-        super("MainServerLoop");
+    private WarpManager warpManager = new WarpManager(); // TODO: MOVE
+
+    GameLoop() {
+        super("GameThread");
     }
 
     /**
@@ -50,8 +52,12 @@ public class ServerLoop extends Thread {
              *  !! Update Start !!
              ***********************/
 
+            ServerConnection.getInstance().getEventBus().gameThreadPublish();
             updateMovements.updatePlayerMovement();
-            ValenguardMain.getInstance().getGameManager().tick();
+            warpManager.warpPlayers();
+            ValenguardMain.getInstance().getGameManager().gameMapTick();
+            ValenguardMain.getInstance().getGameManager().processPlayerJoin();
+            ValenguardMain.getInstance().getOutStreamManager().sendPackets();
 
             // Update ping every X ticks
             if (updates % 10 == 0) {

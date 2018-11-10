@@ -18,17 +18,12 @@ public class ValenguardMain {
     private PingManager pingManager;
     private GameManager gameManager;
     private CommandProcessor commandProcessor;
-    private ServerLoop serverLoop;
+    private GameLoop gameLoop;
     private OutputStreamManager outStreamManager;
 
     private ValenguardMain() {
     }
 
-    /**
-     * Singleton implementation of the main class.
-     *
-     * @return a static instance of this class.
-     */
     public static ValenguardMain getInstance() {
         if (instance == null) instance = new ValenguardMain();
         return instance;
@@ -38,62 +33,40 @@ public class ValenguardMain {
         ValenguardMain.getInstance().start();
     }
 
-    /**
-     * Starts all server processes.
-     */
     private void start() {
         Log.println(getClass(),"Booting Valenguard Server!");
+
         gameManager = new GameManager();
         getGameManager().init();
 
         pingManager = new PingManager();
 
-        // Register commands
         registerCommands();
-
-        // start serverConnection code
         initializeNetwork();
 
-        // start server loop
-        serverLoop = new ServerLoop();
-        serverLoop.start();
+        gameLoop = new GameLoop();
+        gameLoop.start();
 
         outStreamManager = new OutputStreamManager();
-        new Thread(outStreamManager, "OutputStream Thread").start();
     }
 
-    /**
-     * Stops server operations and terminates the program.
-     */
     public void stop() {
         Log.println(getClass(),"ServerConnection shutdown initialized!");
-
-        //TODO: Stop network functions and shut down nicely.
         ServerConnection.getInstance().close();
-
         Log.println(getClass(),"ServerConnection shutdown complete!");
     }
 
-    /**
-     * Initializes the network. Starts listening for connection
-     * and registers network event listeners.
-     */
+    private void registerCommands() {
+        Log.println(getClass(),"Registering commands.");
+        commandProcessor = new CommandProcessor();
+        new ConsoleCommandManager().start();
+    }
+
     private void initializeNetwork() {
         Log.println(getClass(),"Initializing network...");
         ServerConnection.getInstance().openServer((eventBus) -> {
             eventBus.registerListener(new PlayerMove());
             eventBus.registerListener(new PingIn());
         });
-    }
-
-    /**
-     * Register server commands.
-     */
-    private void registerCommands() {
-        Log.println(getClass(),"Registering commands.");
-        commandProcessor = new CommandProcessor();
-
-        // console command manager
-        new ConsoleCommandManager().start();
     }
 }

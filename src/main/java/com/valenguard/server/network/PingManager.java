@@ -6,12 +6,9 @@ import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.network.packet.out.PingOut;
 
 public class PingManager {
-
     public void tick() {
         for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
-            for (Player player : gameMap.getPlayerList()) {
-                new PingOut(player).sendPacket();
-            }
+            for (Player player : gameMap.getPlayerList()) new PingOut(player).sendPacket();
         }
     }
 }

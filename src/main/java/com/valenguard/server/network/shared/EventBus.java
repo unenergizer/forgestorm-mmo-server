@@ -1,37 +1,16 @@
 package com.valenguard.server.network.shared;
 
 import com.valenguard.server.util.Log;
-import lombok.AllArgsConstructor;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class EventBus {
 
-    /**
-     * Contains opcodes and the associated class/method combinations to listen for.
-     * <p>
-     * GameMap:
-     * Byte: Packet Opcode
-     * CallbackData: Class and Method reference.
-     */
-    private final Map<Byte, CallbackData> packetListenerMap = new HashMap<>();
-
-    @AllArgsConstructor
-    private class CallbackData {
-
-        /**
-         * The PacketListener class associated with this callback data.
-         */
-        private PacketListener packetListener;
-
-        /**
-         * The method to invoke when a packet is received.
-         */
-        private Method method;
-    }
+    private final Map<Byte, PacketListener> packetListenerMap = new ConcurrentHashMap<>();
+    private final Queue<PacketData> decodedPackets = new ConcurrentLinkedQueue<>();
 
     /**
      * Prepares the server to listen to a particular packet.
@@ -40,36 +19,41 @@ public class EventBus {
      * @param packetListener The PacketListener we will listen for.
      */
     public void registerListener(PacketListener packetListener) {
-        for (Method method : packetListener.getClass().getMethods()) {
-            for (Opcode opcodeAnnotation : method.getAnnotationsByType(Opcode.class)) {
-                Class<?>[] params = method.getParameterTypes();
-                String error = "PacketListener: " + packetListener;
-                if (params.length != 1)
-                    throw new RuntimeException(error + " must have 1 parameters.");
-                if (!params[0].equals(ClientHandler.class))
-                    throw new RuntimeException(error + " first parameter must be of type ClientHandler");
-                packetListenerMap.put(opcodeAnnotation.getOpcode(), new CallbackData(packetListener, method));
-            }
-        }
+        Opcode[] opcodes = packetListener.getClass().getAnnotationsByType(Opcode.class);
+        if (opcodes.length != 1) throw new RuntimeException("Must have only one annotation.");
+        packetListenerMap.put(opcodes[0].getOpcode(), packetListener);
+    }
+
+    public void decodeListenerOnNetworkThread(byte opcode, ClientHandler clientHandler) {
+        PacketListener packetListener = getPacketListener(opcode);
+        if (packetListener == null) return;
+        PacketData packetData = packetListener.decodePacket(clientHandler);
+        packetData.setOpcode(opcode);
+        packetData.setPlayer(clientHandler.getPlayer());
+        decodedPackets.add(packetData);
+    }
+
+    private void publishOnGameThread(PacketData packetData) {
+        PacketListener packetListener = getPacketListener(packetData.getOpcode());
+        if (packetListener == null) return;
+        //noinspection unchecked
+        packetListener.onEvent(packetData);
+    }
+
+    private PacketListener getPacketListener(byte opcode) {
+        PacketListener packetListener = packetListenerMap.get(opcode);
+        if (packetListener == null)
+            Log.println(getClass(), "Callback data was null for " + opcode + ". Is the event registered?", true);
+        return packetListener;
     }
 
     /**
-     * When a packet is received we attempt to invoke methods that listen for its Opcode.
-     *
-     * @param opcode        Determines what class and methods to invoke.
-     * @param clientHandler The client the packet was received from.
+     * This code is ran on the game thread.
      */
-    public void publish(byte opcode, ClientHandler clientHandler) {
-        CallbackData callbackData = packetListenerMap.get(opcode);
-        if (callbackData == null) {
-            Log.println(getClass(), "Callback data was null for " + opcode + ". Is the event registered?", true);
-            return;
-        }
-        try {
-            // Opcode exists and PacketListener is registered, now lets invoke its methods.
-            callbackData.method.invoke(callbackData.packetListener, clientHandler);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+    public void gameThreadPublish() {
+        PacketData packetData;
+        while ((packetData = decodedPackets.poll()) != null) {
+            publishOnGameThread(packetData);
         }
     }
 }

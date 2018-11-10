@@ -58,8 +58,8 @@ public class TmxFileParser {
         final int mapWidth = Integer.parseInt(tmx.getAttributes().getNamedItem("width").getNodeValue());
         final int mapHeight = Integer.parseInt(tmx.getAttributes().getNamedItem("height").getNodeValue());
 
-        Log.println(TmxFileParser.class,"MapWidth: " + mapWidth, false, PRINT_MAP);
-        Log.println(TmxFileParser.class,"MapHeight: " + mapHeight, false, PRINT_MAP);
+        Log.println(TmxFileParser.class, "MapWidth: " + mapWidth, false, PRINT_MAP);
+        Log.println(TmxFileParser.class, "MapHeight: " + mapHeight, false, PRINT_MAP);
 
         Tile map[][] = new Tile[mapWidth][mapHeight];
 
@@ -161,8 +161,8 @@ public class TmxFileParser {
                     MoveDirection moveDirection = null;
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
-                    Log.println(TmxFileParser.class,"", false, PRINT_MAP);
-                    Log.println(TmxFileParser.class,"===[ WARP ]==================================", true, PRINT_MAP);
+                    Log.println(TmxFileParser.class, "", false, PRINT_MAP);
+                    Log.println(TmxFileParser.class, "===[ WARP ]==================================", true, PRINT_MAP);
 
                     for (int k = 0; k < properties.getLength(); k++) {
 
@@ -172,25 +172,25 @@ public class TmxFileParser {
                         // Get map name:
                         if (propertyElement.getAttribute("name").equals("mapname")) {
                             warpMapName = propertyElement.getAttribute("value");
-                            Log.println(TmxFileParser.class,"WarpMap: " + warpMapName, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "WarpMap: " + warpMapName, false, PRINT_MAP);
                         }
 
                         // Get map X:
                         if (propertyElement.getAttribute("name").equals("x")) {
                             warpX = Integer.parseInt(propertyElement.getAttribute("value"));
-                            Log.println(TmxFileParser.class,"WarpX: " + warpX, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "WarpX: " + warpX, false, PRINT_MAP);
                         }
 
                         // Get map Y:
                         if (propertyElement.getAttribute("name").equals("y")) {
                             warpY = Integer.parseInt(propertyElement.getAttribute("value"));
-                            Log.println(TmxFileParser.class,"WarpY: " + warpY, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "WarpY: " + warpY, false, PRINT_MAP);
                         }
 
                         // Get map facing moveDirection:
                         if (propertyElement.getAttribute("name").equals("direction")) {
                             moveDirection = MoveDirection.valueOf(propertyElement.getAttribute("value").toUpperCase());
-                            Log.println(TmxFileParser.class,"WarpDirection: " + moveDirection, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "WarpDirection: " + moveDirection, false, PRINT_MAP);
                         }
                     }
 
@@ -200,9 +200,9 @@ public class TmxFileParser {
                             int tileY = mapHeight - ii - 1;
                             Tile tile = map[jj][mapHeight - ii - 1];
                             tile.setWarp(new Warp(new Location(warpMapName, warpX, warpY), moveDirection));
-                            Log.println(TmxFileParser.class,tile.getWarp().getLocation().getMapName(), false, PRINT_MAP);
-                            Log.println(TmxFileParser.class,"TileX: " + jj, false, PRINT_MAP);
-                            Log.println(TmxFileParser.class,"TileY: " + tileY, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, tile.getWarp().getLocation().getMapName(), false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "TileX: " + jj, false, PRINT_MAP);
+                            Log.println(TmxFileParser.class, "TileY: " + tileY, false, PRINT_MAP);
                         }
                     }
                 }

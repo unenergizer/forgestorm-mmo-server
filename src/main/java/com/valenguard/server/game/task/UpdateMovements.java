@@ -6,79 +6,71 @@ import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.network.packet.out.MoveEntityPacket;
+import com.valenguard.server.network.packet.out.EntityMovePacket;
 import com.valenguard.server.util.Log;
 
 public class UpdateMovements {
+
+    private final static boolean PRINT_DEBUG = false;
 
     /**
      * Process the list of moving players.
      */
     public void updatePlayerMovement() {
-        ValenguardMain.getInstance().getGameManager().forAllPlayers(this::updateEntitiesPosition);
+        ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
     }
 
-    private void updateEntitiesPosition(MovingEntity entity) {
+    private void updateEntitiesPosition(MovingEntity movingEntity) {
 
-        moveEntity(entity);
+        moveEntity(movingEntity);
 
-        if (entity.getWalkTime() <= entity.getMoveSpeed()) return;
+        if (movingEntity.getWalkTime() <= movingEntity.getMoveSpeed()) return;
 
-        if (entity instanceof Player) {
+        if (movingEntity instanceof Player) {
 
-            Player player = (Player) entity;
-            finishMove(entity);
+            Player player = (Player) movingEntity;
+            finishMove(movingEntity);
 
             if (!player.getLatestMoveRequests().isEmpty()) {
-                addPlayer(player, player.getLatestMoveRequests().remove());
+                performMove(player, player.getLatestMoveRequests().remove());
             }
         } else {
             // todo figure out how to handle other entities
-            System.err.println("[UpdateMovements] Deal with other entities");
+            Log.println(getClass(), "TODO: Deal with other entities", true);
         }
     }
 
-    private void moveEntity(MovingEntity entity) {
+    private void moveEntity(MovingEntity movingEntity) {
         float delta = 1.0f / 20.0f;
 
-        entity.setWalkTime(entity.getWalkTime() + delta);
+        movingEntity.setWalkTime(movingEntity.getWalkTime() + delta);
 
-        int currentX = entity.getCurrentMapLocation().getX();
-        int currentY = entity.getCurrentMapLocation().getY();
+        int currentX = movingEntity.getCurrentMapLocation().getX();
+        int currentY = movingEntity.getCurrentMapLocation().getY();
 
-        int futureX = entity.getFutureMapLocation().getX();
-        int futureY = entity.getFutureMapLocation().getY();
+        int futureX = movingEntity.getFutureMapLocation().getX();
+        int futureY = movingEntity.getFutureMapLocation().getY();
 
-        entity.setRealX(linearInterpolate(currentX, futureX, entity.getWalkTime() / entity.getMoveSpeed()) * GameConstants.TILE_SIZE);
-        entity.setRealY(linearInterpolate(currentY, futureY, entity.getWalkTime() / entity.getMoveSpeed()) * GameConstants.TILE_SIZE);
-    }
-
-    private void finishMove(MovingEntity entity) {
-
-        entity.getCurrentMapLocation().set(entity.getFutureMapLocation());
-        entity.setRealX(entity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
-        entity.setRealY(entity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
-
-        if (!(entity instanceof Player)) return;
-        Player player = (Player) entity;
-
-        if (player.getWarp() != null) {
-            ValenguardMain.getInstance().getGameManager().playerSwitchGameMap(player);
-            player.setWarp(null);
-
-            Log.println(getClass(), "===[P WARP]========================");
-            Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getMapName());
-            Log.println(getClass(), "CLx: " + player.getCurrentMapLocation().getX());
-            Log.println(getClass(), "CLy: " + player.getCurrentMapLocation().getY());
-            Log.println(getClass(), "FLx: " + player.getFutureMapLocation().getX());
-            Log.println(getClass(), "FLy: " + player.getFutureMapLocation().getY());
-            Log.println(getClass(), "DRx: " + player.getRealX());
-            Log.println(getClass(), "DRy: " + player.getRealY());
-        }
+        movingEntity.setRealX(linearInterpolate(currentX, futureX, movingEntity.getWalkTime() / movingEntity.getMoveSpeed()) * GameConstants.TILE_SIZE);
+        movingEntity.setRealY(linearInterpolate(currentY, futureY, movingEntity.getWalkTime() / movingEntity.getMoveSpeed()) * GameConstants.TILE_SIZE);
     }
 
     private float linearInterpolate(float start, float end, float a) {
         return start + (end - start) * a;
+    }
+
+    private void finishMove(MovingEntity movingEntity) {
+        /*Log.println(getClass(),
+                "\nID -> " + movingEntity.getServerEntityId() +
+                        "\nMAP -> " + movingEntity.getFutureMapLocation().getMapName() +
+                        "\nX -> " + movingEntity.getFutureMapLocation().getX() +
+                        "\nY -> " + movingEntity.getFutureMapLocation().getY() +
+                        "\nName -> " + movingEntity.getName() +
+                        "\nMoveSpeed -> " + movingEntity.getMoveSpeed() +
+                        "\nFaceDir -> " + movingEntity.getFacingDirection().getDirectionByte());*/
+        movingEntity.getCurrentMapLocation().set(movingEntity.getFutureMapLocation());
+        movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
+        movingEntity.setRealY(movingEntity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
     }
 
     /**
@@ -86,7 +78,7 @@ public class UpdateMovements {
      *
      * @param player The entity ot add.
      */
-    public void addPlayer(Player player, MoveDirection direction) {
+    public void performMove(Player player, MoveDirection direction) {
         if (player.getWarp() != null) return; // Stop player moving during warp init
 
         if (isEntityMoving(player)) {
@@ -94,8 +86,13 @@ public class UpdateMovements {
             return;
         }
 
-        Location addToLocation = getLocation(player, direction);
+        Location addToLocation = getAddToLocation(player, direction);
         Location attemptLocation = new Location(player.getCurrentMapLocation()).add(addToLocation);
+
+        if (attemptLocation.equals(player.getCurrentMapLocation())) {
+            Log.println(getClass(), "A player tried request a movement to the tile they are already on.", true);
+            return;
+        }
 
         // Prevents the player from moving places they are not allowed to go.
         if (!player.getGameMap().isMovable(attemptLocation)) return;
@@ -106,12 +103,13 @@ public class UpdateMovements {
 
         player.setFutureMapLocation(attemptLocation);
         player.setWalkTime(0f);
+        player.setFacingDirection(direction);
 
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                new MoveEntityPacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
+                new EntityMovePacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 
-    private Location getLocation(Player player, MoveDirection direction) {
+    private Location getAddToLocation(Player player, MoveDirection direction) {
         if (direction == MoveDirection.DOWN) return new Location(player.getMapName(), 0, -1);
         if (direction == MoveDirection.UP) return new Location(player.getMapName(), 0, 1);
         if (direction == MoveDirection.LEFT) return new Location(player.getMapName(), -1, 0);
@@ -119,7 +117,8 @@ public class UpdateMovements {
         return null;
     }
 
-    private boolean isEntityMoving(MovingEntity entity) {
-        return entity.getCurrentMapLocation().getX() != entity.getFutureMapLocation().getX() || entity.getCurrentMapLocation().getY() != entity.getFutureMapLocation().getY();
+    private boolean isEntityMoving(MovingEntity movingEntity) {
+        return movingEntity.getCurrentMapLocation().getX() != movingEntity.getFutureMapLocation().getX()
+                || movingEntity.getCurrentMapLocation().getY() != movingEntity.getFutureMapLocation().getY();
     }
 }

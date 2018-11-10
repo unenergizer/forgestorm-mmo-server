@@ -1,9 +1,10 @@
 package com.valenguard.server.game.maps;
 
-import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 @SuppressWarnings("unused")
 @Getter
@@ -31,7 +32,7 @@ public class Location {
     }
 
     public Location add(Location location) {
-         Preconditions.checkArgument(location.getMapName().equals(mapName),
+        checkArgument(location.getMapName().equals(mapName),
                 "Can't add locations. " + location.getMapName() + " doesn't equal " + mapName + ".");
         return new Location(mapName, this.x + location.getX(), this.y + location.getY());
     }
@@ -45,5 +46,17 @@ public class Location {
     public void add(int x, int y) {
         this.x = this.x + x;
         this.y = this.y + y;
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Location)) return false;
+        Location otherLocation = (Location) obj;
+
+        if (!otherLocation.getMapName().equals(mapName)) return false;
+        if (otherLocation.getX() != x) return false;
+        if (otherLocation.getY() != y) return false;
+        return true;
     }
 }
