@@ -14,7 +14,7 @@ public class WarpManager {
     }
 
     private void warpPlayer(Player player) {
-        Log.println(getClass(), "===[P WARP]========================", false, PRINT_DEBUG);
+        Log.println(getClass(), "===[ WARP ]========================", false, PRINT_DEBUG);
         Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getMapName(), false, PRINT_DEBUG);
         Log.println(getClass(), "CLx: " + player.getCurrentMapLocation().getX(), false, PRINT_DEBUG);
         Log.println(getClass(), "CLy: " + player.getCurrentMapLocation().getY(), false, PRINT_DEBUG);
@@ -25,5 +25,4 @@ public class WarpManager {
 
         ValenguardMain.getInstance().getGameManager().playerSwitchGameMap(player);
     }
-
 }

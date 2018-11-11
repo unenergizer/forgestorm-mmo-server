@@ -33,13 +33,6 @@ public class EventBus {
         decodedPackets.add(packetData);
     }
 
-    private void publishOnGameThread(PacketData packetData) {
-        PacketListener packetListener = getPacketListener(packetData.getOpcode());
-        if (packetListener == null) return;
-        //noinspection unchecked
-        packetListener.onEvent(packetData);
-    }
-
     private PacketListener getPacketListener(byte opcode) {
         PacketListener packetListener = packetListenerMap.get(opcode);
         if (packetListener == null)
@@ -47,13 +40,17 @@ public class EventBus {
         return packetListener;
     }
 
-    /**
-     * This code is ran on the game thread.
-     */
     public void gameThreadPublish() {
         PacketData packetData;
         while ((packetData = decodedPackets.poll()) != null) {
             publishOnGameThread(packetData);
         }
+    }
+
+    private void publishOnGameThread(PacketData packetData) {
+        PacketListener packetListener = getPacketListener(packetData.getOpcode());
+        if (packetListener == null) return;
+        //noinspection unchecked
+        packetListener.onEvent(packetData);
     }
 }
