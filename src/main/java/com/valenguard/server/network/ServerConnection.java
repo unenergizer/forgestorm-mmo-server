@@ -136,14 +136,12 @@ public class ServerConnection implements Runnable {
                 // sending and receiving data
 
                 clientHandler = new ClientHandler(clientSocket, outStream, inStream);
-                Log.println(getClass(), "Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged in.");
 
                 // Adding the client handle to a list of current client handles
                 ValenguardMain.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
                 tempID++;
 
-                Log.println(getClass(), "Clients Online: " + ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline());
-
+                Log.println(getClass(), "PlayerJoin: " + clientSocket.getInetAddress().getHostAddress() + ", Online Players: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() + 1));
 
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
@@ -157,9 +155,8 @@ public class ServerConnection implements Runnable {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        Log.println(getClass(), "Client IP " + clientSocket.getInetAddress().getHostAddress() + " has logged out.");
                         ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
-                        Log.println(getClass(), "Clients Online: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() - 1));
+                        Log.println(getClass(), "PlayerQuit: " + clientSocket.getInetAddress().getHostAddress() + ", Online Players: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() - 1));
                     }
                 } else {
                     e.printStackTrace();

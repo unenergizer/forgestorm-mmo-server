@@ -6,6 +6,7 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
+import com.valenguard.server.util.Log;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -13,6 +14,8 @@ import java.io.ObjectOutputStream;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class EntityMovePacket extends ServerOutPacket {
+
+    private static final boolean PRINT_DEBUG = false;
 
     private final Entity entityToMove;
     private final Location attemptLocation;
@@ -33,5 +36,9 @@ public class EntityMovePacket extends ServerOutPacket {
         write.writeShort(entityToMove.getServerEntityId());
         write.writeInt(attemptLocation.getX());
         write.writeInt(attemptLocation.getY());
+
+        Log.println(getClass(), "", false, PRINT_DEBUG);
+        Log.println(getClass(), "ServerID: " + entityToMove.getServerEntityId() + ", " + attemptLocation, false, PRINT_DEBUG);
+
     }
 }

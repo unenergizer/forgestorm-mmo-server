@@ -2,17 +2,17 @@ package com.valenguard.server.game.maps;
 
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.Entity;
+import com.valenguard.server.game.entity.EntityType;
+import com.valenguard.server.game.entity.Npc;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
 import com.valenguard.server.network.packet.out.InitializeMapPacket;
+import com.valenguard.server.util.Log;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -40,19 +40,57 @@ public class GameMap {
         this.map = map;
     }
 
-    public void tick() {
+    boolean allSpawned = false;
 
+    public void tickNPC() {
+        // TODO: spawns, respawns, despawns, etc etc etc...
+        // TODO REMOVE THIS GOD DAMN SHIT
+        if (!allSpawned) {
+            if (!mapName.equals("pub_dining")) return;
+
+            mobList.add(thisIsBadGen("Evil Joseph"));
+            mobList.add(thisIsBadGen("Evil Andrew"));
+            mobList.add(thisIsBadGen("Evil Kenny"));
+            mobList.add(thisIsBadGen("Evil Tohmer"));
+            mobList.add(thisIsBadGen("Evil CaveyJ"));
+
+            Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
+
+            allSpawned = true;
+        }
+    }
+
+    private short thisIsBadGenId = 100;
+
+    private Npc thisIsBadGen(String name) {
+        Npc npc = new Npc();
+
+        float speed = new Random().nextFloat();
+        if (speed <= .2f) speed = .2f;
+
+        npc.setServerEntityId(thisIsBadGenId++);
+        npc.setMoveSpeed(speed);
+        npc.setName(name);
+        npc.setEntityType(EntityType.NPC);
+        npc.gameMapRegister(new Warp(new Location("pub_dining",
+                26,
+                20), MoveDirection.DOWN));
+
+        Log.println(getClass(), "Adding npc to be spawned.", false);
+        return npc;
+    }
+
+    public void tickGroundItems(GameMap gameMap) {
+        // TODO: tick ground items, despan, spawn, allow pickup etc...
+    }
+
+    public void tickPlayer() {
         // Remove players
         Iterator<Player> quitIterator = playerQuitQueue.iterator();
         int quitsProcessed = 0;
         while (quitIterator.hasNext() && quitsProcessed <= GameManager.PLAYERS_TO_PROCESS) {
             playerQuitGameMap(quitIterator.next());
             quitsProcessed++;
-        }
-
-        for (quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
-            if (playerQuitQueue.isEmpty()) break;
-            postPlayerDespawn(playerQuitQueue.remove());
         }
 
         // Add players
@@ -62,10 +100,30 @@ public class GameMap {
             playerJoinGameMap(joinIterator.next());
             joinsProcessed++;
         }
+    }
 
-        for (joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
+    public void sendPlayersPacket() {
+
+        // TODO check to see if the entity is registered for a respawn
+        if (playerJoinQueue.size() >= 1) {
+            for (Entity entity : mobList) {
+                // postEntityDespawn(entity);
+            }
+
+            for (Entity entity : mobList) {
+                Log.println(getClass(), "Sending npc to be spawned");
+                postEntitySpawn(entity);
+            }
+        }
+
+        for (int quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
+            if (playerQuitQueue.isEmpty()) break;
+            postEntityDespawn(playerQuitQueue.remove());
+        }
+
+        for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
-            postPlayerSpawn(playerJoinQueue.remove().getPlayer());
+            postEntitySpawn(playerJoinQueue.remove().getPlayer());
         }
     }
 
@@ -85,22 +143,26 @@ public class GameMap {
         new InitializeMapPacket(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
     }
 
-    private void postPlayerSpawn(Player player) {
-        for (Player otherPlayer : playerList) {
-            if (!otherPlayer.equals(player)) new EntitySpawnPacket(otherPlayer, player).sendPacket();
-            new EntitySpawnPacket(player, otherPlayer).sendPacket();
-        }
-    }
-
     private void playerQuitGameMap(Player player) {
         playerList.remove(player);
         player.gameMapDeregister();
     }
 
-    private void postPlayerDespawn(Player player) {
-        for (Player otherPlayer : playerList) {
-            if (otherPlayer == player) continue;
-            new EntityDespawnPacket(otherPlayer, player).sendPacket();
+    private void postEntitySpawn(Entity entityToSpawn) {
+        for (Player packetReceiver : playerList) {
+            if (!packetReceiver.equals(entityToSpawn)) {
+                new EntitySpawnPacket(packetReceiver, entityToSpawn).sendPacket();
+            }
+            if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
+                new EntitySpawnPacket((Player) entityToSpawn, packetReceiver).sendPacket();
+            }
+        }
+    }
+
+    private void postEntityDespawn(Entity entityToDespawn) {
+        for (Player packetReceiver : playerList) {
+            if (packetReceiver == entityToDespawn) continue;
+            new EntityDespawnPacket(packetReceiver, entityToDespawn).sendPacket();
         }
     }
 
@@ -138,6 +200,15 @@ public class GameMap {
     private Tile getTileByLocation(Location location) {
         checkArgument(!isOutOfBounds(location));
         return location.getGameMap().getMap()[location.getX()][location.getY()];
+    }
+
+    public Location getLocation(MoveDirection direction) {
+        if (direction == MoveDirection.DOWN) return new Location(mapName, 0, -1);
+        if (direction == MoveDirection.UP) return new Location(mapName, 0, 1);
+        if (direction == MoveDirection.LEFT) return new Location(mapName, -1, 0);
+        if (direction == MoveDirection.RIGHT) return new Location(mapName, 1, 0);
+        if (direction == MoveDirection.NONE) return new Location(mapName, 0, 0);
+        throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + mapName + ", MoveDirection: " + direction);
     }
 
     @Getter

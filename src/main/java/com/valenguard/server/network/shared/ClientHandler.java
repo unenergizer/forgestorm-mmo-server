@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 @SuppressWarnings("unused")
 @Getter
@@ -88,7 +89,8 @@ public class ClientHandler {
             writeCallback.accept(outputStream);
             outputStream.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            // If the client is not closing their socket.
+            if (!(e instanceof SocketException)) e.printStackTrace();
         }
     }
 

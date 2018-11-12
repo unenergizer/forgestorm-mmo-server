@@ -1,8 +1,11 @@
 package com.valenguard.server.game.task;
 
+import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
+import com.valenguard.server.game.entity.Npc;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
@@ -18,6 +21,25 @@ public class UpdateMovements {
      */
     public void updatePlayerMovement() {
         ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
+
+        // Try and start an entity move
+        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> generateNewNpcMovements((MovingEntity) entity),
+                entity -> entity instanceof MovingEntity && !((MovingEntity) entity).isEntityMoving());
+
+        // Continue entity movement
+        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> updateEntitiesPosition((MovingEntity) entity),
+                entity -> entity instanceof MovingEntity && ((MovingEntity) entity).isEntityMoving());
+    }
+
+    private void generateNewNpcMovements(MovingEntity movingEntity) {
+        if (movingEntity.getEntityType() != EntityType.NPC) return;
+        MoveDirection moveDirection = ((Npc) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
+
+        // Start performing a movement if the entity is not moving
+        if (moveDirection != MoveDirection.NONE) {
+            Log.println(getClass(), "Npc has started moving.", false, PRINT_DEBUG);
+            performMove(movingEntity, moveDirection);
+        }
     }
 
     private void updateEntitiesPosition(MovingEntity movingEntity) {
@@ -35,8 +57,20 @@ public class UpdateMovements {
                 performMove(player, player.getLatestMoveRequests().remove());
             }
         } else {
-            // todo figure out how to handle other entities
-            Log.println(getClass(), "TODO: Deal with other entities", true);
+
+            finishMove(movingEntity);
+
+            if (movingEntity.getEntityType() == EntityType.NPC) {
+
+                Log.println(getClass(), "Generating a new move.", false, PRINT_DEBUG);
+
+                ((Npc) movingEntity).getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
+                MoveDirection predictedMoveDirection = ((Npc) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(true);
+
+                if (predictedMoveDirection != MoveDirection.NONE) {
+                    performMove(movingEntity, predictedMoveDirection);
+                }
+            }
         }
     }
 
@@ -68,6 +102,7 @@ public class UpdateMovements {
                         "\nName -> " + movingEntity.getName() +
                         "\nMoveSpeed -> " + movingEntity.getMoveSpeed() +
                         "\nFaceDir -> " + movingEntity.getFacingDirection().getDirectionByte());*/
+        Log.println(getClass(), "EntityId: " + movingEntity.getServerEntityId() + " has finished it's move", false, PRINT_DEBUG);
         movingEntity.getCurrentMapLocation().set(movingEntity.getFutureMapLocation());
         movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
         movingEntity.setRealY(movingEntity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
@@ -86,7 +121,7 @@ public class UpdateMovements {
             return;
         }
 
-        Location addToLocation = getAddToLocation(player, direction);
+        Location addToLocation = player.getGameMap().getLocation(direction);
         Location attemptLocation = new Location(player.getCurrentMapLocation()).add(addToLocation);
 
         if (attemptLocation.equals(player.getCurrentMapLocation())) {
@@ -109,12 +144,21 @@ public class UpdateMovements {
                 new EntityMovePacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 
-    private Location getAddToLocation(Player player, MoveDirection direction) {
-        if (direction == MoveDirection.DOWN) return new Location(player.getMapName(), 0, -1);
-        if (direction == MoveDirection.UP) return new Location(player.getMapName(), 0, 1);
-        if (direction == MoveDirection.LEFT) return new Location(player.getMapName(), -1, 0);
-        if (direction == MoveDirection.RIGHT) return new Location(player.getMapName(), 1, 0);
-        return null;
+    private void performMove(MovingEntity movingEntity, MoveDirection moveDirection) {
+
+        Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
+
+        Location futureLocation = new Location(movingEntity.getCurrentMapLocation()).add(movingEntity.getGameMap().getLocation(moveDirection));
+        movingEntity.setFutureMapLocation(futureLocation);
+        movingEntity.setWalkTime(0f);
+        movingEntity.setFacingDirection(moveDirection);
+
+        Log.println(getClass(), "CurrentLocation: " + movingEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
+        Log.println(getClass(), "FutureLocation: " + movingEntity.getFutureMapLocation(),false, PRINT_DEBUG);
+
+
+        movingEntity.getGameMap().getPlayerList().forEach(player ->
+                new EntityMovePacket(player, movingEntity, movingEntity.getFutureMapLocation()).sendPacket());
     }
 
     private boolean isEntityMoving(MovingEntity movingEntity) {

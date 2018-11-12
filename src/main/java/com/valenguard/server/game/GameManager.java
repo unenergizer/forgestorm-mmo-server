@@ -1,5 +1,7 @@
 package com.valenguard.server.game;
 
+import com.valenguard.server.game.entity.Entity;
+import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
@@ -22,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameManager {
 
+    private static final boolean PRINT_DEBUG = false;
     public static final int PLAYERS_TO_PROCESS = 50;
     private static final String MAP_DIRECTORY = "src/main/resources/maps/";
 
@@ -62,13 +65,14 @@ public class GameManager {
                 gameMap.getMapHeight() - NewPlayerConstants.STARTING_Y_CORD);
 
         Player player = new Player();
+        player.setEntityType(EntityType.PLAYER);
         player.setServerEntityId(playerSessionData.getServerID());
         player.setMoveSpeed(NewPlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
 
         playerSessionData.getClientHandler().setPlayer(player);
 
-        Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID());
+        Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 
         new InitClientSessionPacket(player, true, playerSessionData.getServerID()).sendPacket();
         new PingOut(player).sendPacket();
@@ -85,7 +89,7 @@ public class GameManager {
     public void playerSwitchGameMap(Player player) {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
-        Log.println(getClass(), "ToMap: " + warp.getLocation().getMapName() + ", FromMap: " + player.getMapName(), true);
+        Log.println(getClass(), "ToMap: " + warp.getLocation().getMapName() + ", FromMap: " + player.getMapName(), true, PRINT_DEBUG);
         checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
                 "The player is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 
@@ -95,7 +99,10 @@ public class GameManager {
     }
 
     public void gameMapTick() {
-        gameMaps.values().forEach(GameMap::tick);
+        gameMaps.values().forEach(GameMap::tickNPC);
+//        gameMaps.values().forEach(GameMap::tickGroundItems);
+        gameMaps.values().forEach(GameMap::tickPlayer);
+        gameMaps.values().forEach(GameMap::sendPlayersPacket);
     }
 
     public int getTotalPlayersOnline() {
@@ -148,5 +155,9 @@ public class GameManager {
 
     public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
         gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().stream().filter(predicate).forEach(callback));
+    }
+
+    public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<Entity> predicate) {
+        gameMaps.values().forEach(gameMap -> gameMap.getMobList().stream().filter(predicate).forEach(callback));
     }
 }

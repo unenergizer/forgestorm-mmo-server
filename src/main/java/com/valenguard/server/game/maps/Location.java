@@ -59,4 +59,9 @@ public class Location {
         if (otherLocation.getY() != y) return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "[" + mapName + "] -> [" + x + ", " + y + "]";
+    }
 }
