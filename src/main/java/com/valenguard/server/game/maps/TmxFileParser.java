@@ -1,5 +1,8 @@
 package com.valenguard.server.game.maps;
 
+import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.game.entity.EntityType;
+import com.valenguard.server.game.entity.Npc;
 import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -139,7 +142,75 @@ public class TmxFileParser {
 
         for (int i = 0; i < objectGroupTag.getLength(); i++) {
 
-            // Get warps
+            /*
+             * Get Entities
+             */
+            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
+                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
+                System.out.println("Found " + objectGroupTag.getLength() + " entity spawns.");
+                for (int j = 0; j < objectTag.getLength(); j++) {
+
+                    //System.out.println("NodeType: " + objectTag.item(j).getNodeType());
+                    if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
+
+                    Element objectTagElement = (Element) objectTag.item(j);
+                    String name = objectTagElement.getAttribute("name");
+
+                    int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
+                    int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;
+                    float speed = 1f;
+                    int bounds1x = -2;
+                    int bounds1y = -2;
+                    int bounds2x = -2;
+                    int bounds2y = -2;
+
+                    NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
+
+                    // Get custom properties
+                    for (int k = 0; k < properties.getLength(); k++) {
+                        if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
+                        Element propertyElement = (Element) properties.item(k);
+
+                        if (propertyElement.getAttribute("name").equals("speed")) {
+                            speed = Float.parseFloat(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("bounds1x")) {
+                            bounds1x = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("bounds1y")) {
+                            bounds1y = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("bounds2x")) {
+                            bounds2x = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("bounds2y")) {
+                            bounds2y = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                    }
+
+                    Npc npc = null;
+
+                    if (bounds1x == -2 || bounds1x == -1) {
+                        npc = new Npc();
+                    } else {
+                        npc = new Npc(bounds1x, mapHeight -  bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
+                    }
+
+                    npc.setServerEntityId((short) j);
+                    npc.setName(name);
+                    npc.setMoveSpeed(speed);
+                    npc.setEntityType(EntityType.NPC);
+                    npc.gameMapRegister(new Warp(new Location(fileName, x, y), MoveDirection.DOWN));
+
+                    ValenguardMain.getInstance().getGameManager().queueNpcAdd(npc);
+
+                    System.out.println("[Entity] ID: " + j + ", name: " + name +  ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y);
+                }
+            }
+
+            /*
+             * Get Warps
+             */
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("warp")) {
 
                 NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
@@ -148,12 +219,13 @@ public class TmxFileParser {
                     if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element objectTagElement = (Element) objectTag.item(j);
+                    String targetMap = objectTagElement.getAttribute("name");
                     int tmxFileX = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
                     int tmxFileY = Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE;
                     int tmxFileWidth = Integer.parseInt(objectTagElement.getAttribute("width")) / TILE_SIZE;
                     int tmxFileHeight = Integer.parseInt(objectTagElement.getAttribute("height")) / TILE_SIZE;
 
-                    String warpMapName = null;
+//                    String warpMapName = null;
                     // Set to negative one to let the server know that the warp is an outbound
                     // warp to another map
                     int warpX = -1;
@@ -169,11 +241,11 @@ public class TmxFileParser {
                         if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
                         Element propertyElement = (Element) properties.item(k);
 
-                        // Get map name:
-                        if (propertyElement.getAttribute("name").equals("mapname")) {
-                            warpMapName = propertyElement.getAttribute("value");
-                            Log.println(TmxFileParser.class, "WarpMap: " + warpMapName, false, PRINT_MAP);
-                        }
+//                        // Get map name:
+//                        if (propertyElement.getAttribute("name").equals("mapname")) {
+//                            warpMapName = propertyElement.getAttribute("value");
+//                            Log.println(TmxFileParser.class, "WarpMap: " + warpMapName, false, PRINT_MAP);
+//                        }
 
                         // Get map X:
                         if (propertyElement.getAttribute("name").equals("x")) {
@@ -199,7 +271,7 @@ public class TmxFileParser {
                         for (int jj = tmxFileX; jj < tmxFileX + tmxFileWidth; jj++) {
                             int tileY = mapHeight - ii - 1;
                             Tile tile = map[jj][mapHeight - ii - 1];
-                            tile.setWarp(new Warp(new Location(warpMapName, warpX, warpY), moveDirection));
+                            tile.setWarp(new Warp(new Location(targetMap, warpX, warpY), moveDirection));
                             Log.println(TmxFileParser.class, tile.getWarp().getLocation().getMapName(), false, PRINT_MAP);
                             Log.println(TmxFileParser.class, "TileX: " + jj, false, PRINT_MAP);
                             Log.println(TmxFileParser.class, "TileY: " + tileY, false, PRINT_MAP);

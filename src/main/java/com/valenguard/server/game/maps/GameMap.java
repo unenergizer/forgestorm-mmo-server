@@ -42,17 +42,21 @@ public class GameMap {
 
     boolean allSpawned = false;
 
+    public void addNpc(Npc npc) {
+        mobList.add(npc);
+    }
+
     public void tickNPC() {
         // TODO: spawns, respawns, despawns, etc etc etc...
         // TODO REMOVE THIS GOD DAMN SHIT
         if (!allSpawned) {
-            if (!mapName.equals("pub_dining")) return;
+            if (!mapName.equals("maintown")) return;
 
-            mobList.add(thisIsBadGen("Evil Joseph"));
-            mobList.add(thisIsBadGen("Evil Andrew"));
-            mobList.add(thisIsBadGen("Evil Kenny"));
-            mobList.add(thisIsBadGen("Evil Tohmer"));
-            mobList.add(thisIsBadGen("Evil CaveyJ"));
+            int maxCrashTest = 0;
+
+            for (int i = 0; i < maxCrashTest; i++) {
+                mobList.add(thisIsBadGen(i,"ID: " + i));
+            }
 
             Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
 
@@ -62,7 +66,7 @@ public class GameMap {
 
     private short thisIsBadGenId = 100;
 
-    private Npc thisIsBadGen(String name) {
+    private Npc thisIsBadGen(int i, String name) {
         Npc npc = new Npc();
 
         float speed = new Random().nextFloat();
@@ -72,11 +76,11 @@ public class GameMap {
         npc.setMoveSpeed(speed);
         npc.setName(name);
         npc.setEntityType(EntityType.NPC);
-        npc.gameMapRegister(new Warp(new Location("pub_dining",
-                26,
-                20), MoveDirection.DOWN));
+        npc.gameMapRegister(new Warp(new Location("maintown",
+                17,
+                50 - 28 - 1), MoveDirection.DOWN));
 
-        Log.println(getClass(), "Adding npc to be spawned.", false);
+        Log.println(getClass(), "Adding npc to be spawned. ID: " + i, false);
         return npc;
     }
 

@@ -2,6 +2,7 @@ package com.valenguard.server.game;
 
 import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.EntityType;
+import com.valenguard.server.game.entity.Npc;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
@@ -32,12 +33,24 @@ public class GameManager {
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
 
+    private final Queue<Npc> npcToAdd = new ConcurrentLinkedQueue<>();
+
     public void init() {
         loadAllMaps();
     }
 
     public void initializeNewPlayer(PlayerSessionData playerSessionData) {
         playerSessionDataQueue.add(playerSessionData);
+    }
+
+    public void queueNpcAdd(Npc npc) {
+        npcToAdd.add(npc);
+    }
+
+    private void processEntities() {
+        for (Npc npc : npcToAdd) {
+            gameMaps.get(npc.getMapName()).addNpc(npc);
+        }
     }
 
     /**
@@ -122,6 +135,7 @@ public class GameManager {
 
         Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
+        processEntities();
     }
 
     private void fixWarpHeights() {
