@@ -1,15 +1,13 @@
 package com.valenguard.server.game;
 
-import com.valenguard.server.game.entity.Entity;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.Npc;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.InitClientSessionPacket;
 import com.valenguard.server.network.packet.out.PingOut;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.util.Log;
+import com.valenguard.server.util.RandomUtil;
 import lombok.Getter;
 
 import java.io.File;
@@ -82,8 +80,9 @@ public class GameManager {
         player.setServerEntityId(playerSessionData.getServerID());
         player.setMoveSpeed(NewPlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
-
+        player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
+        player.setAppearance(new Appearance(new short[]{(short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_HEADS), (short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_BODIES)}));
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 

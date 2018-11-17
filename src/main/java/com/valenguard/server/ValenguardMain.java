@@ -5,6 +5,7 @@ import com.valenguard.server.commands.ConsoleCommandManager;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
+import com.valenguard.server.network.packet.in.IncomingChatMessage;
 import com.valenguard.server.network.packet.in.PingIn;
 import com.valenguard.server.network.packet.in.PlayerMove;
 import com.valenguard.server.network.packet.out.OutputStreamManager;
@@ -67,6 +68,7 @@ public class ValenguardMain {
         ServerConnection.getInstance().openServer((eventBus) -> {
             eventBus.registerListener(new PlayerMove());
             eventBus.registerListener(new PingIn());
+            eventBus.registerListener(new IncomingChatMessage());
         });
     }
 }

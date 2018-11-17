@@ -55,7 +55,7 @@ public class GameMap {
             int maxCrashTest = 0;
 
             for (int i = 0; i < maxCrashTest; i++) {
-                mobList.add(thisIsBadGen(i,"ID: " + i));
+                mobList.add(thisIsBadGen(i, "ID: " + i));
             }
 
             Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
@@ -115,7 +115,6 @@ public class GameMap {
             }
 
             for (Entity entity : mobList) {
-                Log.println(getClass(), "Sending npc to be spawned");
                 postEntitySpawn(entity);
             }
         }

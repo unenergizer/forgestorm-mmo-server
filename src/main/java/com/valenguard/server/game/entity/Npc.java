@@ -16,4 +16,8 @@ public class Npc extends MovingEntity {
     public Npc(int bounds1x, int bounds1y, int bounds2x, int bounds2y) {
         randomRegionMoveGenerator = new RandomRegionMoveGenerator(this, 0.3f, 0.5f, bounds1x, bounds1y, bounds2x, bounds2y);
     }
+
+    public Npc(float probabilityStill, float probabilityWalkStart, int bounds1x, int bounds1y, int bounds2x, int bounds2y) {
+        randomRegionMoveGenerator = new RandomRegionMoveGenerator(this, probabilityStill, probabilityWalkStart, bounds1x, bounds1y, bounds2x, bounds2y);
+    }
 }

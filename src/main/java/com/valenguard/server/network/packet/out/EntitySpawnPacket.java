@@ -37,8 +37,22 @@ public class EntitySpawnPacket extends ServerOutPacket {
 
             write.writeInt(movingEntity.getFutureMapLocation().getX());
             write.writeInt(movingEntity.getFutureMapLocation().getY());
+
+            // Writing entity head texture id.
+            write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
+
+            switch (entityToSpawn.getEntityType()) {
+                case PLAYER:
+                case CLIENT_PLAYER:
+                case NPC:
+                    // Writing entity body texture id.
+                    write.writeShort(entityToSpawn.getAppearance().getTextureId(1));
+                    break;
+            }
+
             write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
             write.writeFloat(movingEntity.getMoveSpeed());
+
 
             Log.println(getClass(), "===================================", false, PRINT_DEBUG);
             Log.println(getClass(), "entityType: " + (entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
@@ -53,6 +67,8 @@ public class EntitySpawnPacket extends ServerOutPacket {
 
             write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
             write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
+
+            write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
 
         }
     }

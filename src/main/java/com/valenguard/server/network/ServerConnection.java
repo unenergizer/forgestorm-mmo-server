@@ -26,7 +26,7 @@ public class ServerConnection implements Runnable {
     private ServerSocket serverSocket;
     private Consumer<EventBus> registerListeners;
 
-    private short tempID = 0;
+    private short tempID = 30000;
 
     // Used to handle closing down all threads associated with
     // the server. Volatile allows the variable to exist

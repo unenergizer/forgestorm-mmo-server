@@ -31,6 +31,8 @@ public class GameLoop extends Thread {
     /**
      * Grabs the current ticks per second of the server.
      *
+     * TODO: USE FOR COMMANDS to SEND TO SERVER/CLIENT
+     *
      * @return The current server ticks per second.
      */
     public int getCurrentTPS() {
