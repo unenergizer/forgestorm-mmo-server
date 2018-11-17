@@ -82,7 +82,7 @@ public class GameManager {
         player.setClientHandler(playerSessionData.getClientHandler());
         player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
-        player.setAppearance(new Appearance(new short[]{(short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_HEADS), (short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_BODIES)}));
+        player.setAppearance(new Appearance(new short[]{RandomUtil.getNewRandom((short) 0, GameConstants.HUMAN_MAX_HEADS), RandomUtil.getNewRandom((short) 0, GameConstants.HUMAN_MAX_BODIES)}));
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 
