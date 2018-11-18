@@ -12,6 +12,11 @@ public class PingIn implements PacketListener<PingIn.PingPacket> {
     }
 
     @Override
+    public boolean sanitizePacket(PingPacket packetData) {
+        return true;
+    }
+
+    @Override
     public void onEvent(PingPacket packetData) {
         long timeTaken = packetData.packetReceivedTime - packetData.getPlayer().getPingOutTime();
         packetData.getPlayer().setLastPingTime(timeTaken);

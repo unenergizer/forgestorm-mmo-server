@@ -14,13 +14,14 @@ public class PlayerMove implements PacketListener<PlayerMove.MovePacket> {
     }
 
     @Override
-    public void onEvent(MovePacket packetData) {
-
+    public boolean sanitizePacket(MovePacket packetData) {
         MoveDirection direction = MoveDirection.getDirection(packetData.directionalByte);
+        return !(direction == null || direction == MoveDirection.NONE);
+    }
 
-        if (direction == null || direction == MoveDirection.NONE) return;
-
-        ValenguardMain.getInstance().getGameLoop().getUpdateMovements().performMove(packetData.getPlayer(), direction);
+    @Override
+    public void onEvent(MovePacket packetData) {
+        ValenguardMain.getInstance().getGameLoop().getUpdateMovements().performMove(packetData.getPlayer(), MoveDirection.getDirection(packetData.directionalByte));
     }
 
     @AllArgsConstructor

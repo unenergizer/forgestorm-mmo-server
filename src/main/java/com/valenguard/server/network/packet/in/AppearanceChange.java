@@ -16,15 +16,13 @@ public class AppearanceChange implements PacketListener<AppearanceChange.Appeara
     }
 
     @Override
+    public boolean sanitizePacket(AppearancePacket packetData) {
+        if (packetData.textureIds[0] < 0 || packetData.textureIds[0] > GameConstants.HUMAN_MAX_HEADS) return false;
+        return packetData.textureIds[1] >= 0 && packetData.textureIds[1] <= GameConstants.HUMAN_MAX_BODIES;
+    }
+
+    @Override
     public void onEvent(AppearancePacket packetData) {
-
-        if (packetData.textureIds[0] < 0 || packetData.textureIds[0] > GameConstants.HUMAN_MAX_HEADS) {
-            return;
-        }
-
-        if (packetData.textureIds[1] < 0 || packetData.textureIds[1] > GameConstants.HUMAN_MAX_BODIES) {
-            return;
-        }
 
         packetData.getPlayer().setAppearance(new Appearance(packetData.textureIds));
 

@@ -47,10 +47,12 @@ public class EventBus {
         }
     }
 
+
+    @SuppressWarnings("unchecked")
     private void publishOnGameThread(PacketData packetData) {
         PacketListener packetListener = getPacketListener(packetData.getOpcode());
         if (packetListener == null) return;
-        //noinspection unchecked
+        if (!packetListener.sanitizePacket(packetData)) return;
         packetListener.onEvent(packetData);
     }
 }
