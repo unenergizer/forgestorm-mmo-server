@@ -89,7 +89,7 @@ public class GameManager {
         new InitClientSessionPacket(player, true, playerSessionData.getServerID()).sendPacket();
         new PingOut(player).sendPacket();
 
-        gameMap.addPlayer(player, new Warp(location, MoveDirection.DOWN));
+        gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
     }
 
     public void playerQuitServer(Player player) {

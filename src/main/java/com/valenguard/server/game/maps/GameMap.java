@@ -80,7 +80,7 @@ public class GameMap {
 //        npc.setEntityType(EntityType.NPC);
 //        npc.gameMapRegister(new Warp(new Location("maintown",
 //                17,
-//                50 - 28 - 1), MoveDirection.DOWN));
+//                50 - 28 - 1), MoveDirection.SOUTH));
 //
 //        Log.println(getClass(), "Adding npc to be spawned. ID: " + i, false);
 //        return npc;
@@ -204,10 +204,10 @@ public class GameMap {
     }
 
     public Location getLocation(MoveDirection direction) {
-        if (direction == MoveDirection.DOWN) return new Location(mapName, 0, -1);
-        if (direction == MoveDirection.UP) return new Location(mapName, 0, 1);
-        if (direction == MoveDirection.LEFT) return new Location(mapName, -1, 0);
-        if (direction == MoveDirection.RIGHT) return new Location(mapName, 1, 0);
+        if (direction == MoveDirection.SOUTH) return new Location(mapName, 0, -1);
+        if (direction == MoveDirection.NORTH) return new Location(mapName, 0, 1);
+        if (direction == MoveDirection.WEST) return new Location(mapName, -1, 0);
+        if (direction == MoveDirection.EAST) return new Location(mapName, 1, 0);
         if (direction == MoveDirection.NONE) return new Location(mapName, 0, 0);
         throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + mapName + ", MoveDirection: " + direction);
     }

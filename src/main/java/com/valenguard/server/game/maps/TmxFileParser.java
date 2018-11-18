@@ -163,7 +163,7 @@ public class TmxFileParser {
                     int bounds1y = -2;
                     int bounds2x = -2;
                     int bounds2y = -2;
-                    MoveDirection direction = MoveDirection.DOWN;
+                    MoveDirection direction = MoveDirection.SOUTH;
                     short atlasHeadId = 0;
                     short atlasBodyId = 0;
                     float probabilityStill = -2f;
@@ -212,7 +212,7 @@ public class TmxFileParser {
                     AIEntity aiEntity = null;
                     if (entityType == EntityType.NPC) {
                         aiEntity = new Npc();
-                        aiEntity.setAppearance(new Appearance(new short[]{atlasHeadId, atlasHeadId}));
+                        aiEntity.setAppearance(new Appearance(new short[]{atlasHeadId, atlasBodyId}));
                     } else if (entityType == EntityType.MONSTER) {
                         aiEntity = new Monster();
                         aiEntity.setAppearance(new Appearance(new short[]{atlasBodyId}));
