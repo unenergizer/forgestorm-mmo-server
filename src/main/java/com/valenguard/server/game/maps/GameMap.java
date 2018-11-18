@@ -3,16 +3,18 @@ package com.valenguard.server.game.maps;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.Npc;
+import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.EntityDespawnPacket;
 import com.valenguard.server.network.packet.out.EntitySpawnPacket;
 import com.valenguard.server.network.packet.out.InitializeMapPacket;
-import com.valenguard.server.util.Log;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -29,7 +31,7 @@ public class GameMap {
     @Getter
     private final List<Player> playerList = new ArrayList<>();
     @Getter
-    private final List<Entity> mobList = new ArrayList<>();
+    private final List<MovingEntity> mobList = new ArrayList<>();
     private final Queue<QueueData> playerJoinQueue = new ConcurrentLinkedQueue<>();
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
@@ -42,51 +44,47 @@ public class GameMap {
 
     boolean allSpawned = false;
 
-    public void addNpc(Npc npc) {
-        mobList.add(npc);
+    public void addNpc(MovingEntity movingEntity) {
+        mobList.add(movingEntity);
     }
 
     public void tickNPC() {
-        // TODO: spawns, respawns, despawns, etc etc etc...
-        // TODO REMOVE THIS GOD DAMN SHIT
-        if (!allSpawned) {
-            if (!mapName.equals("maintown")) return;
-
-            int maxCrashTest = 0;
-
-            for (int i = 0; i < maxCrashTest; i++) {
-                mobList.add(thisIsBadGen(i, "ID: " + i));
-            }
-
-            Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
-
-            allSpawned = true;
-        }
+//        // TODO: spawns, respawns, despawns, etc etc etc...
+//        // TODO REMOVE THIS GOD DAMN SHIT
+//        if (!allSpawned) {
+//            if (!mapName.equals("maintown")) return;
+//
+//            int maxCrashTest = 0;
+//
+//            for (int i = 0; i < maxCrashTest; i++) {
+//                mobList.add(thisIsBadGen(i, "ID: " + i));
+//            }
+//
+//            Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
+//
+//            allSpawned = true;
+//        }
     }
-
-    private short thisIsBadGenId = 100;
-
-    private Npc thisIsBadGen(int i, String name) {
-        Npc npc = new Npc();
-
-        float speed = new Random().nextFloat();
-        if (speed <= .2f) speed = .2f;
-
-        npc.setServerEntityId(thisIsBadGenId++);
-        npc.setMoveSpeed(speed);
-        npc.setName(name);
-        npc.setEntityType(EntityType.NPC);
-        npc.gameMapRegister(new Warp(new Location("maintown",
-                17,
-                50 - 28 - 1), MoveDirection.DOWN));
-
-        Log.println(getClass(), "Adding npc to be spawned. ID: " + i, false);
-        return npc;
-    }
-
-    public void tickGroundItems(GameMap gameMap) {
-        // TODO: tick ground items, despan, spawn, allow pickup etc...
-    }
+//
+//    private short thisIsBadGenId = 100;
+//
+//    private Npc thisIsBadGen(int i, String name) {
+//        Npc npc = new Npc();
+//
+//        float speed = new Random().nextFloat();
+//        if (speed <= .2f) speed = .2f;
+//
+//        npc.setServerEntityId(thisIsBadGenId++);
+//        npc.setMoveSpeed(speed);
+//        npc.setName(name);
+//        npc.setEntityType(EntityType.NPC);
+//        npc.gameMapRegister(new Warp(new Location("maintown",
+//                17,
+//                50 - 28 - 1), MoveDirection.DOWN));
+//
+//        Log.println(getClass(), "Adding npc to be spawned. ID: " + i, false);
+//        return npc;
+//    }
 
     public void tickPlayer() {
         // Remove players

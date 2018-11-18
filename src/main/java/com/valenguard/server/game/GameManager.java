@@ -31,7 +31,7 @@ public class GameManager {
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<Npc> npcToAdd = new ConcurrentLinkedQueue<>();
+    private final Queue<MovingEntity> npcToAdd = new ConcurrentLinkedQueue<>();
 
     public void init() {
         loadAllMaps();
@@ -41,13 +41,13 @@ public class GameManager {
         playerSessionDataQueue.add(playerSessionData);
     }
 
-    public void queueNpcAdd(Npc npc) {
-        npcToAdd.add(npc);
+    public void queueNpcAdd(MovingEntity movingEntity) {
+        npcToAdd.add(movingEntity);
     }
 
     private void processEntities() {
-        for (Npc npc : npcToAdd) {
-            gameMaps.get(npc.getMapName()).addNpc(npc);
+        for (MovingEntity movingEntity : npcToAdd) {
+            gameMaps.get(movingEntity.getMapName()).addNpc(movingEntity);
         }
     }
 

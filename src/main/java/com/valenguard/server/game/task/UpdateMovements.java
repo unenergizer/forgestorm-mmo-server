@@ -3,9 +3,9 @@ package com.valenguard.server.game.task;
 import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.entity.AIEntity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.Npc;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
@@ -23,7 +23,7 @@ public class UpdateMovements {
         ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
-        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> generateNewNpcMovements((MovingEntity) entity),
+        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> generateNewAIMovements((MovingEntity) entity),
                 entity -> entity instanceof MovingEntity && !((MovingEntity) entity).isEntityMoving());
 
         // Continue entity movement
@@ -31,9 +31,9 @@ public class UpdateMovements {
                 entity -> entity instanceof MovingEntity && ((MovingEntity) entity).isEntityMoving());
     }
 
-    private void generateNewNpcMovements(MovingEntity movingEntity) {
-        if (movingEntity.getEntityType() != EntityType.NPC) return;
-        MoveDirection moveDirection = ((Npc) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
+    private void generateNewAIMovements(MovingEntity movingEntity) {
+        if (movingEntity.getEntityType() != EntityType.NPC && movingEntity.getEntityType() != EntityType.MONSTER) return;
+        MoveDirection moveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
 
         // Start performing a movement if the entity is not moving
         if (moveDirection != MoveDirection.NONE) {
@@ -60,12 +60,12 @@ public class UpdateMovements {
 
             finishMove(movingEntity);
 
-            if (movingEntity.getEntityType() == EntityType.NPC) {
+            if (movingEntity.getEntityType() == EntityType.NPC || movingEntity.getEntityType() == EntityType.MONSTER) {
 
                 Log.println(getClass(), "Generating a new move.", false, PRINT_DEBUG);
 
-                ((Npc) movingEntity).getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
-                MoveDirection predictedMoveDirection = ((Npc) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(true);
+                ((AIEntity) movingEntity).getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
+                MoveDirection predictedMoveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(true);
 
                 if (predictedMoveDirection != MoveDirection.NONE) {
                     performMove(movingEntity, predictedMoveDirection);
@@ -94,14 +94,6 @@ public class UpdateMovements {
     }
 
     private void finishMove(MovingEntity movingEntity) {
-        /*Log.println(getClass(),
-                "\nID -> " + movingEntity.getServerEntityId() +
-                        "\nMAP -> " + movingEntity.getFutureMapLocation().getMapName() +
-                        "\nX -> " + movingEntity.getFutureMapLocation().getX() +
-                        "\nY -> " + movingEntity.getFutureMapLocation().getY() +
-                        "\nName -> " + movingEntity.getName() +
-                        "\nMoveSpeed -> " + movingEntity.getMoveSpeed() +
-                        "\nFaceDir -> " + movingEntity.getFacingDirection().getDirectionByte());*/
         Log.println(getClass(), "EntityId: " + movingEntity.getServerEntityId() + " has finished it's move", false, PRINT_DEBUG);
         movingEntity.getCurrentMapLocation().set(movingEntity.getFutureMapLocation());
         movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);

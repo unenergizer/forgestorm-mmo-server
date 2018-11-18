@@ -10,11 +10,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MovingEntity extends Entity {
+
     private Location futureMapLocation;
     private float moveSpeed;
     private float realX, realY;
     private float walkTime = 0f;
     private MoveDirection facingDirection;
+
+
 
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));

@@ -1,12 +1,8 @@
 package com.valenguard.server.game.maps;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.Appearance;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.Npc;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.util.Log;
-import com.valenguard.server.util.RandomUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -150,7 +146,6 @@ public class TmxFileParser {
              */
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
                 NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
-                System.out.println("Found " + objectGroupTag.getLength() + " entity spawns.");
                 for (int j = 0; j < objectTag.getLength(); j++) {
 
                     //System.out.println("NodeType: " + objectTag.item(j).getNodeType());
@@ -161,22 +156,33 @@ public class TmxFileParser {
 
                     int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
                     int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;
+                    EntityType entityType = EntityType.valueOf(objectTagElement.getAttribute("type"));
+
                     float speed = 1f;
                     int bounds1x = -2;
                     int bounds1y = -2;
                     int bounds2x = -2;
                     int bounds2y = -2;
                     MoveDirection direction = MoveDirection.DOWN;
+                    short atlasHeadId = 0;
+                    short atlasBodyId = 0;
                     float probabilityStill = -2f;
                     float probabilityWalkStart = -2f;
 
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
+
 
                     // Get custom properties
                     for (int k = 0; k < properties.getLength(); k++) {
                         if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
                         Element propertyElement = (Element) properties.item(k);
 
+                        if (propertyElement.getAttribute("name").equals("atlasHeadId")) {
+                            atlasHeadId = Short.parseShort(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("atlasBodyId")) {
+                            atlasBodyId = Short.parseShort(propertyElement.getAttribute("value"));
+                        }
                         if (propertyElement.getAttribute("name").equals("probabilityStill")) {
                             probabilityStill = Float.parseFloat(propertyElement.getAttribute("value"));
                         }
@@ -203,26 +209,32 @@ public class TmxFileParser {
                         }
                     }
 
-                    Npc npc = null;
-
-                    if (bounds1x == -2 || bounds1x == -1) {
-                        npc = new Npc();
-                    } else if (probabilityStill != -2f && probabilityStill != -1f) {
-                        npc = new Npc(probabilityStill, probabilityWalkStart, bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
-                    } else {
-                        npc = new Npc(bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
+                    AIEntity aiEntity = null;
+                    if (entityType == EntityType.NPC) {
+                        aiEntity = new Npc();
+                        aiEntity.setAppearance(new Appearance(new short[]{atlasHeadId, atlasHeadId}));
+                    } else if (entityType == EntityType.MONSTER) {
+                        aiEntity = new Monster();
+                        aiEntity.setAppearance(new Appearance(new short[]{atlasBodyId}));
                     }
 
-                    npc.setServerEntityId((short) j);
-                    npc.setName(name);
-                    npc.setMoveSpeed(speed);
-                    npc.setEntityType(EntityType.NPC);
-                    npc.gameMapRegister(new Warp(new Location(fileName, x, y), direction));
-                    npc.setAppearance(new Appearance(new short[]{(short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_HEADS), (short) RandomUtil.getNewRandom(0, GameConstants.HUMAN_MAX_BODIES)}));
+                    if (bounds1x == -2 || bounds1x == -1) {
+                        aiEntity.setDefaultMovement();
+                    } else if (probabilityStill != -2f && probabilityStill != -1f) {
+                        aiEntity.setMovementInfo(probabilityStill, probabilityWalkStart, bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
+                    } else {
+                        aiEntity.setMovementBounds(bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
+                    }
 
-                    ValenguardMain.getInstance().getGameManager().queueNpcAdd(npc);
+                    aiEntity.setServerEntityId((short) j);
+                    aiEntity.setEntityType(entityType);
+                    aiEntity.setName(name);
+                    aiEntity.setMoveSpeed(speed);
+                    aiEntity.gameMapRegister(new Warp(new Location(fileName, x, y), direction));
+                    ValenguardMain.getInstance().getGameManager().queueNpcAdd(aiEntity);
 
                     Log.println(TmxFileParser.class, "[Entity] ID: " + j + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
+
                 }
             }
 
