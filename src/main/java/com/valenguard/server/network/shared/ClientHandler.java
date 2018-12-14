@@ -4,9 +4,9 @@ import com.valenguard.server.game.entity.Player;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -15,13 +15,13 @@ import java.net.SocketException;
 public class ClientHandler {
 
     private Socket socket;
-    private ObjectOutputStream outputStream;
-    private ObjectInputStream inputStream;
+    private DataOutputStream outputStream;
+    private DataInputStream inputStream;
 
     @Setter
     private Player player;
 
-    public ClientHandler(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) {
+    public ClientHandler(Socket socket, DataOutputStream outputStream, DataInputStream inputStream) {
         this.socket = socket;
         this.outputStream = outputStream;
         this.inputStream = inputStream;

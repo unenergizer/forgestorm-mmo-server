@@ -1,7 +1,11 @@
 package com.valenguard.server.game.entity;
 
+import com.valenguard.server.game.inventory.InventoryActions;
+import com.valenguard.server.game.inventory.ItemStack;
+import com.valenguard.server.game.inventory.PlayerInventory;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.network.packet.out.InventoryChangePacket;
 import com.valenguard.server.network.shared.ClientHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +25,9 @@ public class Player extends MovingEntity {
     private long pingOutTime = 0;
     private long lastPingTime = 0;
 
+    @Getter
+    private PlayerInventory playerInventory = new PlayerInventory();
+
     public void addDirectionToFutureQueue(MoveDirection moveDirection) {
         latestMoveRequests.add(moveDirection);
     }
@@ -31,4 +38,8 @@ public class Player extends MovingEntity {
         getLatestMoveRequests().clear();
     }
 
+    public void giveItem(ItemStack itemStack) {
+        if (!playerInventory.addItemStack(itemStack)) return;
+        new InventoryChangePacket(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
+    }
 }

@@ -8,10 +8,10 @@ import com.valenguard.server.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -128,8 +128,8 @@ public class ServerConnection implements Runnable {
             // Using a new implementation in java that handles closing the streams
             // upon initialization. These streams are for sending and receiving data
             try (
-                    ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                    ObjectInputStream inStream = new ObjectInputStream(clientSocket.getInputStream())
+                    DataOutputStream outStream = new DataOutputStream(clientSocket.getOutputStream());
+                    DataInputStream inStream = new DataInputStream(clientSocket.getInputStream())
             ) {
 
                 // Creating a new client handle that contains the necessary components for

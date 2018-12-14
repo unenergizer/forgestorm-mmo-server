@@ -5,10 +5,7 @@ import com.valenguard.server.commands.ConsoleCommandManager;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
-import com.valenguard.server.network.packet.in.AppearanceChange;
-import com.valenguard.server.network.packet.in.IncomingChatMessage;
-import com.valenguard.server.network.packet.in.PingIn;
-import com.valenguard.server.network.packet.in.PlayerMove;
+import com.valenguard.server.network.packet.in.*;
 import com.valenguard.server.network.packet.out.OutputStreamManager;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
@@ -71,6 +68,7 @@ public class ValenguardMain {
             eventBus.registerListener(new PingIn());
             eventBus.registerListener(new IncomingChatMessage());
             eventBus.registerListener(new AppearanceChange());
+            eventBus.registerListener(new InventoryUpdate());
         });
     }
 }

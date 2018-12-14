@@ -3,8 +3,8 @@ package com.valenguard.server.network.packet.out;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public class InitializeMapPacket extends ServerOutPacket {
 
@@ -16,7 +16,7 @@ public class InitializeMapPacket extends ServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ObjectOutputStream write) throws IOException {
+    protected void createPacket(DataOutputStream write) throws IOException {
         write.writeUTF(mapName);
     }
 }

@@ -4,8 +4,8 @@ import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public class AppearanceUpdate extends ServerOutPacket {
 
@@ -17,7 +17,7 @@ public class AppearanceUpdate extends ServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ObjectOutputStream write) throws IOException {
+    protected void createPacket(DataOutputStream write) throws IOException {
         write.writeShort(entity.getServerEntityId());
         write.writeShort(entity.getAppearance().getTextureId(0));
         write.writeShort(entity.getAppearance().getTextureId(1));

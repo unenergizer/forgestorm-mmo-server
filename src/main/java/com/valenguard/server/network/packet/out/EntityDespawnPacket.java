@@ -4,8 +4,8 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public class EntityDespawnPacket extends ServerOutPacket {
 
@@ -17,7 +17,7 @@ public class EntityDespawnPacket extends ServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ObjectOutputStream write) throws IOException {
+    protected void createPacket(DataOutputStream write) throws IOException {
         write.writeShort(despawnTarget.getServerEntityId());
     }
 }

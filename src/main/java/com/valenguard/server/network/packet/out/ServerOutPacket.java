@@ -4,8 +4,8 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.ClientHandler;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public abstract class ServerOutPacket {
 
@@ -44,5 +44,5 @@ public abstract class ServerOutPacket {
     /**
      * Creates the packet.
      */
-    protected abstract void createPacket(ObjectOutputStream write) throws IOException;
+    protected abstract void createPacket(DataOutputStream write) throws IOException;
 }

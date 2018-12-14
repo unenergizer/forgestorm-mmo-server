@@ -8,8 +8,8 @@ import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -24,7 +24,7 @@ public class EntitySpawnPacket extends ServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ObjectOutputStream write) throws IOException {
+    protected void createPacket(DataOutputStream write) throws IOException {
 
         write.writeByte(entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER.getEntityTypeByte() : entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());

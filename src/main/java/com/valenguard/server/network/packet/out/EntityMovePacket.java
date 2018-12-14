@@ -8,8 +8,8 @@ import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -27,7 +27,7 @@ public class EntityMovePacket extends ServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ObjectOutputStream write) throws IOException {
+    protected void createPacket(DataOutputStream write) throws IOException {
         if (entityToMove instanceof MovingEntity) {
             MovingEntity movingEntity = (MovingEntity) entityToMove;
             checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
