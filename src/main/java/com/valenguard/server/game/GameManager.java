@@ -1,7 +1,6 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.InitClientSessionPacket;
@@ -91,8 +90,6 @@ public class GameManager {
         new InitClientSessionPacket(player, true, playerSessionData.getServerID()).sendPacket();
         new PingOut(player).sendPacket();
         new MessagePacket(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
-
-        player.giveItem(new ItemStack(55, 3));
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
     }

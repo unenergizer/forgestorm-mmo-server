@@ -1,55 +1,112 @@
 package com.valenguard.server.commands;
 
+import com.valenguard.server.util.Log;
+import lombok.AllArgsConstructor;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.channels.Channel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CommandProcessor {
 
-    private final Map<CommandListener, Map<String[], Method>> commandListeners = new HashMap<>();
-
-    public void addListener(CommandListener commandListener) {
-        Map<String[], Method> commandMethods = new HashMap<>();
-
-        for (Method method : commandListener.getClass().getMethods()) {
-            Command[] commands = method.getAnnotationsByType(Command.class);
-
-            if (commands.length == 0) continue;
-            if (commands.length > 1)
-                throw new RuntimeException("The annotation @Command may only be used once per method.");
-
-            Class<?>[] parameters = method.getParameterTypes();
-
-            if (parameters.length != 1)
-                throw new RuntimeException("The length of the parameters of a method with the @Command annotation must be 1.");
-
-            if (!parameters[0].equals(Channel.class)) {
-                throw new RuntimeException(
-                        "The parameter for a method with the @Command annotation must be of type: " + Channel.class);
-            }
-
-            commandMethods.put(commands[0].getCommands(), method);
-        }
-
-        commandListeners.put(commandListener, commandMethods);
+    @AllArgsConstructor
+    private class CommandInfo {
+        private Object listener;
+        private Method method;
+        private int reqArgs;
+        private String incompleteMsg;
     }
 
-    public void runListeners(String command, Channel playerChannel) {
-        for (CommandListener commandListener : commandListeners.keySet()) {
-            Map<String[], Method> commands = commandListeners.get(commandListener);
-            for (String[] methodCommands : commands.keySet()) {
-                for (String methodCmd : methodCommands) {
-                    if (methodCmd.equals(command)) {
-                        try {
-                            commands.get(methodCommands).invoke(commandListener, playerChannel);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                        return;
-                    }
+    @AllArgsConstructor
+    private class PublishInfo {
+        private String[] arguments;
+        private CommandInfo commandInfo;
+    }
+
+    private Queue<PublishInfo> publishedCommands = new ConcurrentLinkedQueue<>();
+
+    private Map<String, Map<Integer, CommandInfo>> commandListeners = new HashMap<>();
+
+    public void addListener(Object listener) {
+        for (Method method : listener.getClass().getMethods()) {
+            Command[] cmdAnnotations = method.getAnnotationsByType(Command.class);
+
+            if (cmdAnnotations.length != 1) continue;
+
+            Command command = cmdAnnotations[0];
+            String commandBaseMessage = command.base();
+            int argumentLengthRequirement = command.argLenReq();
+            Class<?>[] params = method.getParameterTypes();
+
+            if (cmdAnnotations[0].argLenReq() < 0)
+                throw new RuntimeException("The Required argument length for a command cannot be below 0.");
+
+            if (argumentLengthRequirement != 0) {
+                if (params.length != 1)
+                    throw new RuntimeException("The Parameter Length of Command methods must be 1.");
+
+                if (!params[0].equals(String[].class))
+                    throw new RuntimeException("The parameter of a Command method must be String[].");
+            }
+
+            String incompleteMsg = "";
+            IncompleteCommand[] incompleteCms = method.getAnnotationsByType(IncompleteCommand.class);
+            if (incompleteCms.length == 1) incompleteMsg = incompleteCms[0].missing();
+
+            String commandBaseLowerCase = commandBaseMessage.toLowerCase();
+            Map<Integer, CommandInfo> commandInfoMap = commandListeners.get(commandBaseLowerCase);
+            if (commandInfoMap == null) {
+                commandInfoMap = new HashMap<>();
+            }
+            commandInfoMap.put(argumentLengthRequirement, new CommandInfo(
+                    listener, method, cmdAnnotations[0].argLenReq(), incompleteMsg
+            ));
+
+            commandListeners.put(commandBaseLowerCase, commandInfoMap);
+        }
+    }
+
+    synchronized boolean publish(String command, String[] args) {
+        Map<Integer, CommandInfo> commandInfoMap = commandListeners.get(command.toLowerCase());
+        if (commandInfoMap == null) return false;
+        CommandInfo commandInfo = commandInfoMap.get(args.length);
+        if (commandInfo == null) {
+
+            if (commandInfoMap.size() == 1) {
+                CommandInfo commandInfoSuggestion = (CommandInfo) commandInfoMap.values().toArray()[0];
+                if (commandInfoSuggestion.incompleteMsg.isEmpty()) return false;
+                Log.println(getClass(), "[Command] -> " + commandInfoSuggestion.incompleteMsg);
+                return true;
+            }
+
+            Log.println(getClass(), "Suggested Alternatives:");
+            for (CommandInfo commandInfoSuggestion : commandInfoMap.values()) {
+                if (commandInfoSuggestion.incompleteMsg.isEmpty()) continue;
+                Log.println(getClass(), "  - [Command] -> " + commandInfoSuggestion.incompleteMsg);
+            }
+
+            return true;
+        }
+        publishedCommands.add(new PublishInfo(args, commandInfo));
+        return true;
+    }
+
+    public void executeCommands() {
+        PublishInfo publishInfo;
+        while ((publishInfo = publishedCommands.poll()) != null) {
+            Object listener = publishInfo.commandInfo.listener;
+            Method method = publishInfo.commandInfo.method;
+            try {
+                if (publishInfo.commandInfo.reqArgs == 0) {
+                    method.invoke(listener);
+                } else {
+                    method.invoke(listener, (Object) publishInfo.arguments);
                 }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
         }
     }

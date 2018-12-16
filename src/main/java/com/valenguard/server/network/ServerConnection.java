@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.function.Consumer;
 
 public class ServerConnection implements Runnable {
@@ -150,7 +151,7 @@ public class ServerConnection implements Runnable {
 
             } catch (IOException e) {
 
-                if (e instanceof EOFException || e instanceof SocketException) {
+                if (e instanceof EOFException || e instanceof SocketException || e instanceof SocketTimeoutException) {
                     // The user has logged out of the server
                     if (clientHandler != null && running) {
 

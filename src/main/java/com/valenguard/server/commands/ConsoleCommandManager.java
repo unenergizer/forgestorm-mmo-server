@@ -21,8 +21,22 @@ public class ConsoleCommandManager implements Runnable {
         String input = "";
 
         while (!input.equalsIgnoreCase("stop")) {
-            input = scanner.next();
-            ValenguardMain.getInstance().getCommandProcessor().runListeners(input, null);
+            input = scanner.nextLine();
+
+            String[] content =  input.split("\\s+");
+            boolean commandFound = false;
+
+            if (content.length == 1) {
+                commandFound = ValenguardMain.getInstance().getCommandProcessor().publish(content[0], new String[0]);
+            } else if (content.length > 1) {
+                String[] args = new String[content.length - 1];
+                System.arraycopy(content, 1, args, 0, content.length - 1);
+                commandFound = ValenguardMain.getInstance().getCommandProcessor().publish(content[0], args);
+            }
+
+            if (!input.equals("stop") && !commandFound) {
+                System.out.println("Unknown Command");
+            }
         }
 
         ValenguardMain.getInstance().stop();

@@ -54,6 +54,7 @@ public class GameLoop extends Thread {
              *  !! Update Start !!
              ***********************/
 
+            ValenguardMain.getInstance().getCommandProcessor().executeCommands();
             ServerConnection.getInstance().getEventBus().gameThreadPublish();
             updateMovements.updatePlayerMovement();
             warpManager.warpPlayers();

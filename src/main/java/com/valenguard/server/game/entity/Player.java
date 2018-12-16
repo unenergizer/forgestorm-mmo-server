@@ -39,7 +39,7 @@ public class Player extends MovingEntity {
     }
 
     public void giveItem(ItemStack itemStack) {
-        if (!playerInventory.addItemStack(itemStack)) return;
+        playerInventory.addItemStack(itemStack);
         new InventoryChangePacket(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
     }
 }

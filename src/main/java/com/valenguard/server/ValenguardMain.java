@@ -2,6 +2,8 @@ package com.valenguard.server;
 
 import com.valenguard.server.commands.CommandProcessor;
 import com.valenguard.server.commands.ConsoleCommandManager;
+import com.valenguard.server.commands.listeners.InventoryCommands;
+import com.valenguard.server.commands.listeners.TicksPerSecond;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
@@ -58,6 +60,8 @@ public class ValenguardMain {
     private void registerCommands() {
         Log.println(getClass(),"Registering commands.");
         commandProcessor = new CommandProcessor();
+        commandProcessor.addListener(new TicksPerSecond());
+        commandProcessor.addListener(new InventoryCommands());
         new ConsoleCommandManager().start();
     }
 
