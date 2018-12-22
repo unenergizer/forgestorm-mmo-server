@@ -23,6 +23,6 @@ repositories {
 }
 
 dependencies {
-    compile group: 'com.google.guava', name: 'guava', version: '24.1-jre'
+    compile 'com.google.guava:guava:24.1-jre'
     compileOnly 'org.projectlombok:lombok:1.18.2'
 }

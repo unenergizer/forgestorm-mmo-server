@@ -11,31 +11,59 @@ public class InventoryCommands {
     @IncompleteCommand(missing = "give <itemId>")
     public void onGiveItem(String[] args) {
 
-        try {
+        int itemId = parseItemId(args[0]);
+        if (itemId < 0) return;
 
-            int itemId = Integer.parseInt(args[0]);
+        ValenguardMain.getInstance().getGameManager().forAllPlayers(player ->
+                player.giveItemStack(new ItemStack(itemId, 1)));
 
-            if (itemId < 0) {
-                System.out.println("The itemId number cannot be below zero.");
-                return;
-            } else if (itemId > 1779) {
-                System.out.println("The itemId number cannot be above 1779.");
-                return;
-            }
-
-            ValenguardMain.getInstance().getGameManager().forAllPlayers(player ->
-                    player.giveItem(new ItemStack(itemId, 1)));
-
-        } catch (NumberFormatException e) {
-            System.out.println("Must provide a itemId as a number.");
-        }
     }
 
     @Command(base = "give", argLenReq = 2)
     @IncompleteCommand(missing = "give <itemId> <amount>")
     public void onGiveItems(String[] args) {
 
-        System.out.println("Something incredible happened.");
+        int itemId = parseItemId(args[0]);
+
+        try {
+
+            int itemAmount = Integer.parseInt(args[1]);
+
+            if (itemAmount < 1) {
+                System.out.println("Item amount must be at least 1.");
+                return;
+            }
+
+            ValenguardMain.getInstance().getGameManager().forAllPlayers(player ->
+                    player.giveItemStack(new ItemStack(itemId, itemAmount)));
+
+        } catch (NumberFormatException e) {
+            System.out.println("Must provide an itemAmount as a number.");
+        }
+    }
+
+    private int parseItemId(String argument) {
+
+        int itemId;
+
+        try {
+
+            itemId = Integer.parseInt(argument);
+
+            if (itemId < 0) {
+                System.out.println("The itemId number cannot be below zero.");
+                return -1;
+            } else if (itemId > 1779) {
+                System.out.println("The itemId number cannot be above 1779.");
+                return -1;
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Must provide an itemId as a number.");
+            return -1;
+        }
+
+        return itemId;
     }
 
 }

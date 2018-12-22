@@ -38,7 +38,7 @@ public class Player extends MovingEntity {
         getLatestMoveRequests().clear();
     }
 
-    public void giveItem(ItemStack itemStack) {
+    public void giveItemStack(ItemStack itemStack) {
         playerInventory.addItemStack(itemStack);
         new InventoryChangePacket(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
     }
