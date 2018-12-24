@@ -72,7 +72,7 @@ public class ValenguardMain {
             eventBus.registerListener(new PingIn());
             eventBus.registerListener(new IncomingChatMessage());
             eventBus.registerListener(new AppearanceChange());
-            eventBus.registerListener(new InventoryUpdate());
+            eventBus.registerListener(new IncomingInventoryUpdate());
         });
     }
 }

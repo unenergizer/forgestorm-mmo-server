@@ -13,4 +13,9 @@ public class ItemStack {
         // TODO get isStackable based on the item type / inventory type such as bank/player inventory ect..
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "{ ID = " + itemId + ", Amount = " + amount + " }";
+    }
 }

@@ -1,6 +1,7 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.InitClientSessionPacket;
@@ -8,7 +9,6 @@ import com.valenguard.server.network.packet.out.MessagePacket;
 import com.valenguard.server.network.packet.out.PingOut;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.util.Log;
-import com.valenguard.server.util.RandomUtil;
 import lombok.Getter;
 
 import java.io.File;
@@ -83,7 +83,7 @@ public class GameManager {
         player.setClientHandler(playerSessionData.getClientHandler());
         player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
-        player.setAppearance(new Appearance(new short[]{RandomUtil.getNewRandom((short) 0, GameConstants.HUMAN_MAX_HEADS), RandomUtil.getNewRandom((short) 0, GameConstants.HUMAN_MAX_BODIES)}));
+        player.setAppearance(new Appearance(new short[]{(short) 0, 0}));
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 
@@ -92,6 +92,10 @@ public class GameManager {
         new MessagePacket(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
+
+        for (int itemId = 0; itemId <= 7; itemId++) {
+            player.giveItemStack(new ItemStack(itemId, 1));
+        }
     }
 
     public void playerQuitServer(Player player) {

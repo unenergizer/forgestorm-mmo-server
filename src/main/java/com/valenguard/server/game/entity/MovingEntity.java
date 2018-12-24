@@ -17,8 +17,6 @@ public class MovingEntity extends Entity {
     private float walkTime = 0f;
     private MoveDirection facingDirection;
 
-
-
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));
         setFutureMapLocation(new Location(warp.getLocation()));

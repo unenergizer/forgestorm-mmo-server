@@ -2,7 +2,7 @@ package com.valenguard.server.game.inventory;
 
 public class PlayerInventory {
 
-    private static final int CAPACITY = 5*6;
+    public static final int CAPACITY = 5*6;
 
     private ItemStack[] items = new ItemStack[CAPACITY];
 
