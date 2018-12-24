@@ -4,7 +4,7 @@ import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.PING)
-public class PingIn implements PacketListener<PingIn.PingPacket> {
+public class PingPacketIn implements PacketListener<PingPacketIn.PingPacket> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {

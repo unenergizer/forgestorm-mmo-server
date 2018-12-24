@@ -13,14 +13,14 @@ import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class EntityMovePacket extends ServerOutPacket {
+public class EntityMovePacketOut extends ServerAbstractOutPacket {
 
     private static final boolean PRINT_DEBUG = false;
 
     private final Entity entityToMove;
     private final Location attemptLocation;
 
-    public EntityMovePacket(Player sendTo, Entity entityToMove, Location attemptLocation) {
+    public EntityMovePacketOut(Player sendTo, Entity entityToMove, Location attemptLocation) {
         super(Opcodes.ENTITY_MOVE_UPDATE, sendTo);
         this.entityToMove = entityToMove;
         this.attemptLocation = attemptLocation;

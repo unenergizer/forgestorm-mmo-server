@@ -5,9 +5,9 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.EntityDespawnPacket;
-import com.valenguard.server.network.packet.out.EntitySpawnPacket;
-import com.valenguard.server.network.packet.out.InitializeMapPacket;
+import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
+import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
+import com.valenguard.server.network.packet.out.InitializeMapPacketOut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -141,7 +141,7 @@ public class GameMap {
         player.gameMapRegister(queueData.getWarp());
         playerList.add(player);
 
-        new InitializeMapPacket(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
+        new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
     }
 
     private void playerQuitGameMap(Player player) {
@@ -152,10 +152,10 @@ public class GameMap {
     private void postEntitySpawn(Entity entityToSpawn) {
         for (Player packetReceiver : playerList) {
             if (!packetReceiver.equals(entityToSpawn)) {
-                new EntitySpawnPacket(packetReceiver, entityToSpawn).sendPacket();
+                new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
             }
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
-                new EntitySpawnPacket((Player) entityToSpawn, packetReceiver).sendPacket();
+                new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
         }
     }
@@ -163,7 +163,7 @@ public class GameMap {
     private void postEntityDespawn(Entity entityToDespawn) {
         for (Player packetReceiver : playerList) {
             if (packetReceiver == entityToDespawn) continue;
-            new EntityDespawnPacket(packetReceiver, entityToDespawn).sendPacket();
+            new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
         }
     }
 

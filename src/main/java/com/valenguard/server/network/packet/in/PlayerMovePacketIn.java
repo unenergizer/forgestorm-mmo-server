@@ -6,7 +6,7 @@ import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
-public class PlayerMove implements PacketListener<PlayerMove.MovePacket> {
+public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.MovePacket> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {

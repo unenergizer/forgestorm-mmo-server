@@ -1,12 +1,13 @@
 package com.valenguard.server.game;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
-import com.valenguard.server.network.packet.out.InitClientSessionPacket;
-import com.valenguard.server.network.packet.out.MessagePacket;
-import com.valenguard.server.network.packet.out.PingOut;
+import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
+import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.packet.out.PingPacketOut;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
@@ -84,17 +85,18 @@ public class GameManager {
         player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
         player.setAppearance(new Appearance(new short[]{(short) 0, 0}));
+        player.initEquipment();
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 
-        new InitClientSessionPacket(player, true, playerSessionData.getServerID()).sendPacket();
-        new PingOut(player).sendPacket();
-        new MessagePacket(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
+        new InitClientSessionPacketOut(player, true, playerSessionData.getServerID()).sendPacket();
+        new PingPacketOut(player).sendPacket();
+        new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         for (int itemId = 0; itemId <= 7; itemId++) {
-            player.giveItemStack(new ItemStack(itemId, 1));
+            player.giveItemStack(ValenguardMain.getInstance().getItemManager().makeItemStack(itemId, 1));
         }
     }
 

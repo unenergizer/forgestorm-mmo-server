@@ -7,11 +7,11 @@ import com.valenguard.server.network.shared.Opcodes;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class EntityDespawnPacket extends ServerOutPacket {
+public class EntityDespawnPacketOut extends ServerAbstractOutPacket {
 
     private final Entity despawnTarget;
 
-    public EntityDespawnPacket(Player receiver, Entity despawnTarget) {
+    public EntityDespawnPacketOut(Player receiver, Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver);
         this.despawnTarget = despawnTarget;
     }

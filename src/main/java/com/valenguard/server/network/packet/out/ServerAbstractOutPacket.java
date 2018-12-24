@@ -7,7 +7,7 @@ import com.valenguard.server.network.shared.ClientHandler;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class ServerOutPacket {
+public abstract class ServerAbstractOutPacket {
 
     /**
      * Opcode to send with the out-going packet.
@@ -24,7 +24,7 @@ public abstract class ServerOutPacket {
      */
     private final ClientHandler clientHandler;
 
-    ServerOutPacket(byte opcode, Player player) {
+    ServerAbstractOutPacket(byte opcode, Player player) {
         this.opcode = opcode;
         this.player = player;
         this.clientHandler = player.getClientHandler();

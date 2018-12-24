@@ -5,14 +5,14 @@ import java.util.Queue;
 
 public class OutputStreamManager {
 
-    private final Queue<ServerOutPacket> outputContexts = new LinkedList<>();
+    private final Queue<ServerAbstractOutPacket> outputContexts = new LinkedList<>();
 
     public void sendPackets() {
-        ServerOutPacket serverOutPacket;
-        while ((serverOutPacket = outputContexts.poll()) != null) serverOutPacket.writeData();
+        ServerAbstractOutPacket serverAbstractOutPacket;
+        while ((serverAbstractOutPacket = outputContexts.poll()) != null) serverAbstractOutPacket.writeData();
     }
 
-    void addServerOutPacket(ServerOutPacket serverOutPacket) {
-        outputContexts.add(serverOutPacket);
+    void addServerOutPacket(ServerAbstractOutPacket serverAbstractOutPacket) {
+        outputContexts.add(serverAbstractOutPacket);
     }
 }

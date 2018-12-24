@@ -7,11 +7,11 @@ import com.valenguard.server.util.Log;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class MessagePacket extends ServerOutPacket {
+public class ChatMessagePacketOut extends ServerAbstractOutPacket {
 
     private String message;
 
-    public MessagePacket(Player player, String message) {
+    public ChatMessagePacketOut(Player player, String message) {
         super(Opcodes.CHAT, player);
         this.message = message;
     }

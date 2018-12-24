@@ -24,5 +24,6 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:24.1-jre'
+    compile "org.yaml:snakeyaml:1.23:android"
     compileOnly 'org.projectlombok:lombok:1.18.2'
 }

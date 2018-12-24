@@ -6,15 +6,17 @@ import com.valenguard.server.network.shared.Opcodes;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PingOut extends ServerOutPacket {
+public class InitializeMapPacketOut extends ServerAbstractOutPacket {
 
-    public PingOut(Player player) {
-        super(Opcodes.PING, player);
+    private final String mapName;
+
+    public InitializeMapPacketOut(Player player, String mapName) {
+        super(Opcodes.INIT_MAP, player);
+        this.mapName = mapName;
     }
 
     @Override
     protected void createPacket(DataOutputStream write) throws IOException {
-        player.setPingOutTime(System.currentTimeMillis());
-        write.writeLong(player.getLastPingTime());
+        write.writeUTF(mapName);
     }
 }

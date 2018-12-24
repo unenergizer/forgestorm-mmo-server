@@ -7,11 +7,11 @@ import com.valenguard.server.network.shared.Opcodes;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class AppearanceUpdate extends ServerOutPacket {
+public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
 
     private final MovingEntity entity;
 
-    public AppearanceUpdate(Player receiver, MovingEntity entity) {
+    public EntityAppearancePacketOut(Player receiver, MovingEntity entity) {
         super(Opcodes.APPEARANCE, receiver);
         this.entity = entity;
     }

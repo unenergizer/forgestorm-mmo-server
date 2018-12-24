@@ -7,11 +7,11 @@ import com.valenguard.server.network.shared.Opcodes;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class InventoryChangePacket extends ServerOutPacket  {
+public class InventoryPacketOut extends ServerAbstractOutPacket {
 
     private InventoryActions inventoryAction;
 
-    public InventoryChangePacket(Player player, InventoryActions inventoryAction) {
+    public InventoryPacketOut(Player player, InventoryActions inventoryAction) {
         super(Opcodes.INVENTORY_UPDATE, player);
         this.inventoryAction = inventoryAction;
     }

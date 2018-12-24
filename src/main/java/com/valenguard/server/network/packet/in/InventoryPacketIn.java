@@ -1,43 +1,12 @@
 package com.valenguard.server.network.packet.in;
 
-import com.valenguard.server.game.inventory.InventoryActions;
-import com.valenguard.server.game.inventory.InventoryType;
-import com.valenguard.server.game.inventory.PlayerInventory;
+import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.game.inventory.*;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
-public class IncomingInventoryUpdate implements PacketListener<IncomingInventoryUpdate.InventoryActionsPacket> {
-
-    private enum WindowMovementInfo {
-        FROM_BAG_TO_BAG,
-        FROM_BAG_TO_CHARACTER,
-        FROM_CHARACTER_TO_BAG;
-
-        private InventoryType getFromWindow() {
-            switch (this) {
-                case FROM_BAG_TO_BAG:
-                    return InventoryType.BAG;
-                case FROM_BAG_TO_CHARACTER:
-                    return InventoryType.BAG;
-                case FROM_CHARACTER_TO_BAG:
-                    return InventoryType.CHARACTER;
-            }
-            throw new RuntimeException("Must implement all cases.");
-        }
-
-        private InventoryType getToWindow() {
-            switch (this) {
-                case FROM_BAG_TO_BAG:
-                    return InventoryType.BAG;
-                case FROM_BAG_TO_CHARACTER:
-                    return InventoryType.CHARACTER;
-                case FROM_CHARACTER_TO_BAG:
-                    return InventoryType.BAG;
-            }
-            throw new RuntimeException("Must implement all cases.");
-        }
-    }
+public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -52,8 +21,9 @@ public class IncomingInventoryUpdate implements PacketListener<IncomingInventory
         if (inventoryAction == InventoryActions.MOVE) {
             fromPosition = clientHandler.readByte();
             toPosition = clientHandler.readByte();
-            fromWindow = clientHandler.readByte();
-            toWindow = clientHandler.readByte();
+            byte windowsByte = clientHandler.readByte();
+            fromWindow = (byte) (windowsByte >> 4);
+            toWindow = (byte) (windowsByte & 0x0F);
         }
 
         return new InventoryActionsPacket(inventoryAction, fromPosition, toPosition, fromWindow, toWindow);
@@ -87,44 +57,37 @@ public class IncomingInventoryUpdate implements PacketListener<IncomingInventory
 
         WindowMovementInfo windowMovementInfo = determineWindowMovementInfo(fromWindow, toWindow);
 
-        if (windowMovementInfo == WindowMovementInfo.FROM_BAG_TO_BAG) {
-            packetData.getPlayer().getPlayerInventory().moveItem(packetData.fromPosition, packetData.toPosition);
-        }
+        PlayerInventoryEvents playerInventoryEvents = ValenguardMain.getInstance().getGameLoop().getPlayerInventoryEvents();
+        playerInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementInfo));
 
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
         if (fromWindow == InventoryType.BAG) {
-
-            if (packetData.fromPosition >= PlayerInventory.CAPACITY || packetData.fromPosition < 0) return false;
-
-        } else if (fromWindow == InventoryType.CHARACTER) {
-
-            // TODO need to create a character window and determine capacity limits
-
+            if (packetData.fromPosition >= PlayerBag.CAPACITY || packetData.fromPosition < 0) return false;
+        } else if (fromWindow == InventoryType.EQUIPMENT) {
+            if (packetData.fromPosition >= PlayerEquipment.CAPACITY || packetData.fromPosition < 0) return false;
         }
 
         if (toWindow == InventoryType.BAG) {
-
-            return packetData.toPosition < PlayerInventory.CAPACITY && packetData.toPosition >= 0;
-
-        } else if (fromWindow == InventoryType.CHARACTER) {
-
-            // TODO need to create a character window and determine capacity limits
-
+            return packetData.toPosition < PlayerBag.CAPACITY && packetData.toPosition >= 0;
+        } else if (fromWindow == InventoryType.EQUIPMENT) {
+            return packetData.toPosition < PlayerEquipment.CAPACITY && packetData.toPosition >= 0;
         }
 
         return true;
     }
 
     private WindowMovementInfo determineWindowMovementInfo(InventoryType fromWindow, InventoryType toWindow) {
-        if (fromWindow == InventoryType.CHARACTER && toWindow == InventoryType.BAG) {
-            return WindowMovementInfo.FROM_CHARACTER_TO_BAG;
-        } else if (fromWindow == InventoryType.BAG && toWindow == InventoryType.CHARACTER) {
-            return WindowMovementInfo.FROM_BAG_TO_CHARACTER;
+        if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.BAG) {
+            return WindowMovementInfo.FROM_EQUIPMENT_TO_BAG;
+        } else if (fromWindow == InventoryType.BAG && toWindow == InventoryType.EQUIPMENT) {
+            return WindowMovementInfo.FROM_BAG_TO_EQUIPMENT;
         } else if (fromWindow == InventoryType.BAG && toWindow == InventoryType.BAG) {
             return WindowMovementInfo.FROM_BAG_TO_BAG;
+        } else if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.EQUIPMENT) {
+            return WindowMovementInfo.FROM_EQUIPMENT_TO_EQUIPMENT;
         }
         throw new RuntimeException("The sanitization should have already checked for this.");
     }

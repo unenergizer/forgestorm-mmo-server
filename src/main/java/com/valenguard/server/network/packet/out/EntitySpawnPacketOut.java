@@ -13,12 +13,12 @@ import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class EntitySpawnPacket extends ServerOutPacket {
+public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
 
     private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
 
-    public EntitySpawnPacket(Player player, Entity entityToSpawn) {
+    public EntitySpawnPacketOut(Player player, Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player);
         this.entityToSpawn = entityToSpawn;
     }

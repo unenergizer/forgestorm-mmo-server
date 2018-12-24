@@ -6,12 +6,12 @@ import com.valenguard.server.network.shared.Opcodes;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class InitClientSessionPacket extends ServerOutPacket {
+public class InitClientSessionPacketOut extends ServerAbstractOutPacket {
 
     private final boolean loginSuccess;
     private final short clientPlayerId;
 
-    public InitClientSessionPacket(Player player, boolean loginSuccess, short clientPlayerId) {
+    public InitClientSessionPacketOut(Player player, boolean loginSuccess, short clientPlayerId) {
         super(Opcodes.INIT_CLIENT_SESSION, player);
         this.loginSuccess = loginSuccess;
         this.clientPlayerId = clientPlayerId;

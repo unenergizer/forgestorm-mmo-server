@@ -1,12 +1,12 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.network.packet.out.MessagePacket;
+import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.CHAT)
-public class IncomingChatMessage implements PacketListener<IncomingChatMessage.TextMessage> {
+public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.TextMessage> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -28,7 +28,7 @@ public class IncomingChatMessage implements PacketListener<IncomingChatMessage.T
     public void onEvent(TextMessage packetData) {
         // TODO : Use StringBuilder
         ValenguardMain.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
-                new MessagePacket(onlinePlayer, packetData.getPlayer().getName() + ": " + packetData.text).sendPacket());
+                new ChatMessagePacketOut(onlinePlayer, packetData.getPlayer().getName() + ": " + packetData.text).sendPacket());
     }
 
     @AllArgsConstructor

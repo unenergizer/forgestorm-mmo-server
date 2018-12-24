@@ -9,7 +9,7 @@ import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.network.packet.out.EntityMovePacket;
+import com.valenguard.server.network.packet.out.EntityMovePacketOut;
 import com.valenguard.server.util.Log;
 
 public class UpdateMovements {
@@ -133,7 +133,7 @@ public class UpdateMovements {
         player.setFacingDirection(direction);
 
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                new EntityMovePacket(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
+                new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 
     private void performMove(MovingEntity movingEntity, MoveDirection moveDirection) {
@@ -150,7 +150,7 @@ public class UpdateMovements {
 
 
         movingEntity.getGameMap().getPlayerList().forEach(player ->
-                new EntityMovePacket(player, movingEntity, movingEntity.getFutureMapLocation()).sendPacket());
+                new EntityMovePacketOut(player, movingEntity, movingEntity.getFutureMapLocation()).sendPacket());
     }
 
     private boolean isEntityMoving(MovingEntity movingEntity) {
