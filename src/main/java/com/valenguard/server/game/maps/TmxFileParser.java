@@ -212,10 +212,15 @@ public class TmxFileParser {
                     AIEntity aiEntity = null;
                     if (entityType == EntityType.NPC) {
                         aiEntity = new Npc();
-                        aiEntity.setAppearance(new Appearance(new short[]{atlasHeadId, atlasBodyId}));
+                        short[] appearanceTextureIds = new short[2];
+                        appearanceTextureIds[Appearance.BODY] = atlasBodyId;
+                        appearanceTextureIds[Appearance.HEAD] = atlasHeadId;
+                        aiEntity.setAppearance(new Appearance((byte) 0, appearanceTextureIds));
                     } else if (entityType == EntityType.MONSTER) {
                         aiEntity = new Monster();
-                        aiEntity.setAppearance(new Appearance(new short[]{atlasBodyId}));
+                        short[] appearanceTextureIds = new short[1];
+                        appearanceTextureIds[Appearance.BODY] = atlasBodyId;
+                        aiEntity.setAppearance(new Appearance((byte) 0, appearanceTextureIds));
                     }
 
                     if (bounds1x == -2 || bounds1x == -1) {

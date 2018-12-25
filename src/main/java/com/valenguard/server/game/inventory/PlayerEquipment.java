@@ -1,12 +1,17 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.game.entity.Player;
+
 public class PlayerEquipment {
 
     public static final int CAPACITY = 12;
 
     private EquipmentSlot[] equipmentSlots = new EquipmentSlot[CAPACITY];
 
-    public void init() {
+    private Player player;
+
+    public void init(Player player) {
+        this.player = player;
         equipmentSlots[0] = new EquipmentSlot(ItemStackType.HELM);
         equipmentSlots[1] = new EquipmentSlot(ItemStackType.ARROW);
         equipmentSlots[2] = new EquipmentSlot(ItemStackType.NECKLACE);
@@ -34,8 +39,27 @@ public class PlayerEquipment {
         playerBag.setItemStack(bagIndex, equipmentItemStack);
         equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
 
-        System.out.println("PLAYER_BAG[" + bagIndex + "] = " + playerBag.getItemStack(bagIndex));
-        System.out.println("EQUIPMENT[" + equipmentIndex + "] = " + equipmentSlots[equipmentIndex].getItemStack());
+        updateAppearance(equipmentIndex);
+
+    }
+
+    private void updateAppearance(byte equipmentIndex) {
+        if (equipmentSlots[equipmentIndex].getItemStack() != null) {
+            if (equipmentSlots[equipmentIndex].getItemStack() instanceof WearableItemStack) {
+                WearableItemStack newAppearanceStack = (WearableItemStack) equipmentSlots[equipmentIndex].getItemStack();
+                if (newAppearanceStack.getItemStackType() == ItemStackType.CHEST) {
+                    player.setArmorAppearance(newAppearanceStack.getTextureId());
+                } else if (newAppearanceStack.getItemStackType() == ItemStackType.HELM) {
+                    player.setHelmAppearance(newAppearanceStack.getTextureId());
+                }
+            }
+        } else {
+            if (equipmentSlots[equipmentIndex].getItemStackType() == ItemStackType.CHEST) {
+                player.setArmorAppearance((short) -1);
+            } else if (equipmentSlots[equipmentIndex].getItemStackType() == ItemStackType.HELM) {
+                player.setHelmAppearance((short) -1);
+            }
+        }
     }
 
     public ItemStack getItemStack(byte index) {

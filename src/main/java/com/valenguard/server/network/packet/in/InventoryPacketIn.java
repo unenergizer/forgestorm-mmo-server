@@ -16,8 +16,6 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         byte fromWindow = -1;
         byte toWindow = -1;
 
-        System.out.println("Decoding inventory packet");
-
         if (inventoryAction == InventoryActions.MOVE) {
             fromPosition = clientHandler.readByte();
             toPosition = clientHandler.readByte();
@@ -33,6 +31,11 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     public boolean sanitizePacket(InventoryActionsPacket packetData) {
         // Making sure they are sending correct window types.
         if (packetData.toWindow >= InventoryType.values().length || packetData.fromWindow >= InventoryType.values().length) {
+            return false;
+        }
+
+        // The client is simply picking up and placing down the itemstack in the same position.
+        if (packetData.fromWindow == packetData.toWindow && packetData.fromPosition == packetData.toPosition) {
             return false;
         }
 

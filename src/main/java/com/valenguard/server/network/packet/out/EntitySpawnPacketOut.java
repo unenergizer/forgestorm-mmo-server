@@ -1,9 +1,6 @@
 package com.valenguard.server.network.packet.out;
 
-import com.valenguard.server.game.entity.Entity;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
@@ -38,21 +35,29 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
             write.writeInt(movingEntity.getFutureMapLocation().getX());
             write.writeInt(movingEntity.getFutureMapLocation().getY());
 
-            // Writing entity base texture id.
-            write.writeShort(entityToSpawn.getAppearance().getTextureId(0)); // head npc / body monster
-
+            Appearance appearance = movingEntity.getAppearance();
             switch (entityToSpawn.getEntityType()) {
+                case MONSTER:
+                case ITEM:
+                    write.writeShort(appearance.getTextureId(Appearance.BODY));
+                    break;
+                case NPC:
+                    write.writeByte(appearance.getColorId());
+                    write.writeShort(appearance.getTextureId(Appearance.BODY));
+                    write.writeShort(appearance.getTextureId(Appearance.HEAD));
+                    break;
                 case PLAYER:
                 case CLIENT_PLAYER:
-                case NPC:
-                    // Writing additional texture ids.
-                    write.writeShort(entityToSpawn.getAppearance().getTextureId(1)); // body
+                    write.writeByte(appearance.getColorId());
+                    write.writeShort(appearance.getTextureId(Appearance.BODY));
+                    write.writeShort(appearance.getTextureId(Appearance.HEAD));
+                    write.writeShort(appearance.getTextureId(Appearance.ARMOR));
+                    write.writeShort(appearance.getTextureId(Appearance.HELM));
                     break;
             }
 
             write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
             write.writeFloat(movingEntity.getMoveSpeed());
-
 
             Log.println(getClass(), "===================================", false, PRINT_DEBUG);
             Log.println(getClass(), "entityType: " + (entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);

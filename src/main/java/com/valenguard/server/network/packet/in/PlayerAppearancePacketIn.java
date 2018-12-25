@@ -24,10 +24,14 @@ public class PlayerAppearancePacketIn implements PacketListener<PlayerAppearance
     @Override
     public void onEvent(AppearancePacket packetData) {
 
-        packetData.getPlayer().setAppearance(new Appearance(packetData.textureIds));
+        short[] textureIds = packetData.getPlayer().getAppearance().getTextureIds();
+        textureIds[Appearance.BODY] = packetData.textureIds[Appearance.BODY];
+        textureIds[Appearance.HEAD] = packetData.textureIds[Appearance.HEAD];
+
+        final byte appearanceByte = EntityAppearancePacketOut.BODY_INDEX | EntityAppearancePacketOut.HEAD_INDEX;
 
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(packetData.getPlayer(), clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), packetData.getPlayer()).sendPacket());
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), packetData.getPlayer(), appearanceByte).sendPacket());
     }
 
     @AllArgsConstructor

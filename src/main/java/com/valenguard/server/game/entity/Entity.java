@@ -22,4 +22,5 @@ public class Entity {
     public GameMap getGameMap() {
         return currentMapLocation.getGameMap();
     }
+
 }

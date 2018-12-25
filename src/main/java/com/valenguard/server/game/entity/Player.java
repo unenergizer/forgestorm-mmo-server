@@ -1,11 +1,13 @@
 package com.valenguard.server.game.entity;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.inventory.InventoryActions;
 import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.inventory.PlayerBag;
 import com.valenguard.server.game.inventory.PlayerEquipment;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.shared.ClientHandler;
 import lombok.Getter;
@@ -37,7 +39,7 @@ public class Player extends MovingEntity {
     }
 
     public void initEquipment() {
-        playerEquipment.init();
+        playerEquipment.init(this);
     }
 
     @Override
@@ -49,5 +51,29 @@ public class Player extends MovingEntity {
     public void giveItemStack(ItemStack itemStack) {
         playerBag.addItemStack(itemStack);
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
+    }
+
+    public void setHeadAppearance(short headTextureId) {
+        getAppearance().getTextureIds()[Appearance.HEAD] = headTextureId;
+        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.HEAD_INDEX).sendPacket());
+    }
+
+    public void setBodyAppearance(short bodyTextureId) {
+        getAppearance().getTextureIds()[Appearance.BODY] = bodyTextureId;
+        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.BODY_INDEX).sendPacket());
+    }
+
+    public void setHelmAppearance(short helmTextureId) {
+        getAppearance().getTextureIds()[Appearance.HELM] = helmTextureId;
+        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.HELM_INDEX).sendPacket());
+    }
+
+    public void setArmorAppearance(short armorTextureId) {
+        getAppearance().getTextureIds()[Appearance.ARMOR] = armorTextureId;
+        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
     }
 }

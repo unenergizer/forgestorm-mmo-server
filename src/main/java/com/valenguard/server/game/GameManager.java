@@ -2,11 +2,10 @@ package com.valenguard.server.game;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.network.PlayerSessionData;
-import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
 import com.valenguard.server.network.packet.out.PingPacketOut;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.util.Log;
@@ -84,7 +83,13 @@ public class GameManager {
         player.setClientHandler(playerSessionData.getClientHandler());
         player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
-        player.setAppearance(new Appearance(new short[]{(short) 0, 0}));
+        short[] initialPlayerTextureIds = new short[4];
+        initialPlayerTextureIds[Appearance.BODY] = 0;
+        initialPlayerTextureIds[Appearance.HEAD] = 0;
+        initialPlayerTextureIds[Appearance.ARMOR] = -1;
+        initialPlayerTextureIds[Appearance.HELM] = -1;
+        player.setAppearance(new Appearance((byte) 0, initialPlayerTextureIds));
+
         player.initEquipment();
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
