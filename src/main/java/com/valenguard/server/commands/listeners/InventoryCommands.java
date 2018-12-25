@@ -3,7 +3,6 @@ package com.valenguard.server.commands.listeners;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.commands.Command;
 import com.valenguard.server.commands.IncompleteCommand;
-import com.valenguard.server.game.inventory.ItemStack;
 
 public class InventoryCommands {
 
@@ -50,11 +49,12 @@ public class InventoryCommands {
 
             itemId = Integer.parseInt(argument);
 
+            int maxItems = ValenguardMain.getInstance().getItemManager().numberOfItems() - 1;
             if (itemId < 0) {
                 System.out.println("The itemId number cannot be below zero.");
                 return -1;
-            } else if (itemId > 1779) {
-                System.out.println("The itemId number cannot be above 1779.");
+            } else if (itemId > maxItems) {
+                System.out.println("The itemId number cannot be above " + maxItems + ".");
                 return -1;
             }
 

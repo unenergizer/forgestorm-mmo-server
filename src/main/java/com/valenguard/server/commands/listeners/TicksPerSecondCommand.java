@@ -4,7 +4,7 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.commands.Command;
 import com.valenguard.server.util.Log;
 
-public class TicksPerSecond {
+public class TicksPerSecondCommand {
 
     @Command(base = "tps")
     public void onTPSCmd() {

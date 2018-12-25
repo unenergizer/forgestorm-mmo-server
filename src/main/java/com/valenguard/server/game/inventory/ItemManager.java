@@ -22,4 +22,8 @@ public class ItemManager {
         itemStack.setAmount(amount);
         return itemStack;
     }
+
+    public int numberOfItems() {
+        return itemStacks.length;
+    }
 }

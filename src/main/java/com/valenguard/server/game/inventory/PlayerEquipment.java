@@ -16,10 +16,10 @@ public class PlayerEquipment {
         equipmentSlots[1] = new EquipmentSlot(ItemStackType.ARROW);
         equipmentSlots[2] = new EquipmentSlot(ItemStackType.NECKLACE);
         equipmentSlots[3] = new EquipmentSlot(ItemStackType.CAPE);
-        equipmentSlots[4] = new EquipmentSlot(ItemStackType.RINGS);
+        equipmentSlots[4] = new EquipmentSlot(ItemStackType.RING);
         equipmentSlots[5] = new EquipmentSlot(ItemStackType.CHEST);
         equipmentSlots[6] = new EquipmentSlot(ItemStackType.GLOVES);
-        equipmentSlots[7] = new EquipmentSlot(ItemStackType.RINGS);
+        equipmentSlots[7] = new EquipmentSlot(ItemStackType.RING);
         equipmentSlots[8] = new EquipmentSlot(ItemStackType.BELT);
         equipmentSlots[9] = new EquipmentSlot(ItemStackType.BOOTS);
         equipmentSlots[10] = new EquipmentSlot(ItemStackType.SWORD);

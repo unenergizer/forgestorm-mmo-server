@@ -62,6 +62,8 @@ public class GameManager {
         }
     }
 
+    private int tempColor = 0;
+
     private void playerJoinServer(PlayerSessionData playerSessionData) {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(NewPlayerConstants.STARTING_MAP);
@@ -88,7 +90,7 @@ public class GameManager {
         initialPlayerTextureIds[Appearance.HEAD] = 0;
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance((byte) 0, initialPlayerTextureIds));
+        player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
 
         player.initEquipment();
 
@@ -100,9 +102,12 @@ public class GameManager {
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
-        for (int itemId = 0; itemId <= 7; itemId++) {
+        for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemManager().numberOfItems() - 1; itemId++) {
             player.giveItemStack(ValenguardMain.getInstance().getItemManager().makeItemStack(itemId, 1));
         }
+
+        tempColor++;
+        if (tempColor > 15) tempColor = 0;
     }
 
     public void playerQuitServer(Player player) {
