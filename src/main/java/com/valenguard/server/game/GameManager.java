@@ -108,9 +108,22 @@ public class GameManager {
 
         tempColor++;
         if (tempColor > 15) tempColor = 0;
+
+        for (GameMap mapSearch : gameMaps.values()) {
+            for (Player playerSearch : mapSearch.getPlayerList()) {
+                if (playerSearch == player) continue;
+                new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has joined the server.").sendPacket();
+            }
+        }
     }
 
     public void playerQuitServer(Player player) {
+        for (GameMap mapSearch : gameMaps.values()) {
+            for (Player playerSearch : mapSearch.getPlayerList()) {
+                if (playerSearch == player) continue;
+                new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
+            }
+        }
         // TODO: Save player specific data
         GameMap gameMap = player.getGameMap();
         gameMap.removePlayer(player);
