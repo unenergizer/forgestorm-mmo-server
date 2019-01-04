@@ -1,6 +1,7 @@
 package com.valenguard.server.network;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.network.packet.out.ValenguardOutputStream;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
 import com.valenguard.server.network.shared.ServerConstants;
@@ -136,13 +137,11 @@ public class ServerConnection implements Runnable {
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving data
 
-                clientHandler = new ClientHandler(clientSocket, outStream, inStream);
+                clientHandler = new ClientHandler(clientSocket, new ValenguardOutputStream(outStream), inStream);
 
                 // Adding the client handle to a list of current client handles
                 ValenguardMain.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, new Credentials("TODO: UN", "TODO: PW"), clientHandler));
                 tempID++;
-
-                Log.println(getClass(), "PlayerJoin: " + clientSocket.getInetAddress().getHostAddress() + ", Online Players: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() + 1));
 
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
@@ -157,8 +156,7 @@ public class ServerConnection implements Runnable {
 
                         // The client has disconnected
                         ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
-                        Log.println(getClass(), "PlayerQuit: " + clientSocket.getInetAddress().getHostAddress() + ", Online Players: " + (ValenguardMain.getInstance().getGameManager().getTotalPlayersOnline() - 1));
-                    }
+                        }
                 } else {
                     e.printStackTrace();
                 }

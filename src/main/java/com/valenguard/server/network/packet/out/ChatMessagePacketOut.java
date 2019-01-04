@@ -4,9 +4,6 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class ChatMessagePacketOut extends ServerAbstractOutPacket {
 
     private String message;
@@ -17,8 +14,8 @@ public class ChatMessagePacketOut extends ServerAbstractOutPacket {
     }
 
     @Override
-    protected void createPacket(DataOutputStream write) throws IOException {
-        write.writeUTF(message);
+    protected void createPacket(ValenguardOutputStream write) {
+        write.writeString(message);
         Log.println(getClass(), message);
     }
 }

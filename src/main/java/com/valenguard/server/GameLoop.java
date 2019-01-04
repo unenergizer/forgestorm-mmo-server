@@ -69,8 +69,8 @@ public class GameLoop extends Thread {
             ValenguardMain.getInstance().getOutStreamManager().sendPackets();
 
             // Update ping every X ticks
-            if (updates % 10 == 0) {
-                ValenguardMain.getInstance().getPingManager().tick();
+            if (updates % 50000 == 0) {
+                //ValenguardMain.getInstance().getPingManager().tick();
             }
 
             /* ***********************

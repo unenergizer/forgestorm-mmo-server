@@ -3,9 +3,6 @@ package com.valenguard.server.network.packet.out;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class InitClientSessionPacketOut extends ServerAbstractOutPacket {
 
     private final boolean loginSuccess;
@@ -18,7 +15,7 @@ public class InitClientSessionPacketOut extends ServerAbstractOutPacket {
     }
 
     @Override
-    protected void createPacket(DataOutputStream write) throws IOException {
+    protected void createPacket(ValenguardOutputStream write) {
         write.writeBoolean(loginSuccess);
         write.writeShort(clientPlayerId);
     }

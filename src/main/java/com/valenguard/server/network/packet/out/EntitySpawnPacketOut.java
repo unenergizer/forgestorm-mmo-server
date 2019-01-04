@@ -5,9 +5,6 @@ import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
@@ -21,11 +18,11 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
     }
 
     @Override
-    protected void createPacket(DataOutputStream write) throws IOException {
+    protected void createPacket(ValenguardOutputStream write) {
 
         write.writeByte(entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER.getEntityTypeByte() : entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
-        write.writeUTF(entityToSpawn.getName());
+        write.writeString(entityToSpawn.getName());
 
         if (entityToSpawn instanceof MovingEntity) {
             MovingEntity movingEntity = (MovingEntity) entityToSpawn;

@@ -4,9 +4,6 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.inventory.InventoryActions;
 import com.valenguard.server.network.shared.Opcodes;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class InventoryPacketOut extends ServerAbstractOutPacket {
 
     private InventoryActions inventoryAction;
@@ -17,7 +14,7 @@ public class InventoryPacketOut extends ServerAbstractOutPacket {
     }
 
     @Override
-    protected void createPacket(DataOutputStream write) throws IOException {
+    protected void createPacket(ValenguardOutputStream write) {
 
         write.writeByte(inventoryAction.getInventoryActionType());
 

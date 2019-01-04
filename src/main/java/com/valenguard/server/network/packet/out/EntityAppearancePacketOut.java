@@ -5,9 +5,6 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
 
     public static final int COLOR_INDEX = 0x01;
@@ -26,7 +23,7 @@ public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
     }
 
     @Override
-    protected void createPacket(DataOutputStream write) throws IOException {
+    protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(entity.getServerEntityId());
         write.writeByte(appearanceBits);
         Appearance appearance = entity.getAppearance();

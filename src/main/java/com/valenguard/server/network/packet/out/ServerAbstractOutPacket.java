@@ -3,15 +3,14 @@ package com.valenguard.server.network.packet.out;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.ClientHandler;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
+import lombok.Getter;
 
 public abstract class ServerAbstractOutPacket {
 
     /**
      * Opcode to send with the out-going packet.
      */
+    @Getter
     private final byte opcode;
 
     /**
@@ -37,12 +36,8 @@ public abstract class ServerAbstractOutPacket {
         ValenguardMain.getInstance().getOutStreamManager().addServerOutPacket(this);
     }
 
-    void writeData() {
-        clientHandler.write(opcode, this::createPacket);
-    }
-
     /**
      * Creates the packet.
      */
-    protected abstract void createPacket(DataOutputStream write) throws IOException;
+    protected abstract void createPacket(ValenguardOutputStream write);
 }

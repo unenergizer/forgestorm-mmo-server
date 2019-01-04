@@ -7,6 +7,7 @@ import com.valenguard.server.game.inventory.PlayerBag;
 import com.valenguard.server.game.inventory.PlayerEquipment;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.game.rpg.Skills;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.shared.ClientHandler;
@@ -20,6 +21,8 @@ import java.util.Queue;
 @Setter
 public class Player extends MovingEntity {
 
+    private Skills skills = new Skills();
+
     private ClientHandler clientHandler;
     private Queue<MoveDirection> latestMoveRequests = new LinkedList<>();
 
@@ -28,10 +31,8 @@ public class Player extends MovingEntity {
     private long pingOutTime = 0;
     private long lastPingTime = 0;
 
-    @Getter
     private PlayerBag playerBag = new PlayerBag();
 
-    @Getter
     private PlayerEquipment playerEquipment = new PlayerEquipment();
 
     public void addDirectionToFutureQueue(MoveDirection moveDirection) {

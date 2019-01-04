@@ -65,6 +65,9 @@ public class GameManager {
     private int tempColor = 0;
 
     private void playerJoinServer(PlayerSessionData playerSessionData) {
+
+        ValenguardMain.getInstance().getOutStreamManager().addClient(playerSessionData.getClientHandler());
+
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(NewPlayerConstants.STARTING_MAP);
 
@@ -78,21 +81,7 @@ public class GameManager {
                 NewPlayerConstants.STARTING_X_CORD,
                 gameMap.getMapHeight() - NewPlayerConstants.STARTING_Y_CORD);
 
-        Player player = new Player();
-        player.setEntityType(EntityType.PLAYER);
-        player.setServerEntityId(playerSessionData.getServerID());
-        player.setMoveSpeed(NewPlayerConstants.DEFAULT_MOVE_SPEED);
-        player.setClientHandler(playerSessionData.getClientHandler());
-        player.setName(Short.toString(playerSessionData.getServerID()));
-        playerSessionData.getClientHandler().setPlayer(player);
-        short[] initialPlayerTextureIds = new short[4];
-        initialPlayerTextureIds[Appearance.BODY] = 0;
-        initialPlayerTextureIds[Appearance.HEAD] = 0;
-        initialPlayerTextureIds[Appearance.ARMOR] = -1;
-        initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
-
-        player.initEquipment();
+        Player player = initializePlayer(playerSessionData);
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
 
@@ -115,6 +104,28 @@ public class GameManager {
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has joined the server.").sendPacket();
             }
         }
+
+        Log.println(getClass(), "PlayerJoin: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() + 1));
+    }
+
+    private Player initializePlayer(final PlayerSessionData playerSessionData) {
+        Player player = new Player();
+        player.setEntityType(EntityType.PLAYER);
+        player.setServerEntityId(playerSessionData.getServerID());
+        player.setMoveSpeed(NewPlayerConstants.DEFAULT_MOVE_SPEED);
+        player.setClientHandler(playerSessionData.getClientHandler());
+        player.setName(Short.toString(playerSessionData.getServerID()));
+        playerSessionData.getClientHandler().setPlayer(player);
+        short[] initialPlayerTextureIds = new short[4];
+        initialPlayerTextureIds[Appearance.BODY] = 0;
+        initialPlayerTextureIds[Appearance.HEAD] = 0;
+        initialPlayerTextureIds[Appearance.ARMOR] = -1;
+        initialPlayerTextureIds[Appearance.HELM] = -1;
+        player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
+
+        player.initEquipment();
+
+        return player;
     }
 
     public void playerQuitServer(Player player) {
@@ -127,6 +138,9 @@ public class GameManager {
         // TODO: Save player specific data
         GameMap gameMap = player.getGameMap();
         gameMap.removePlayer(player);
+        ValenguardMain.getInstance().getOutStreamManager().removeClient(player.getClientHandler());
+
+        Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));
     }
 
     public void playerSwitchGameMap(Player player) {
