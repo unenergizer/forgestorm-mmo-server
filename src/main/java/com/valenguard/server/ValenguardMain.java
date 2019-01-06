@@ -37,7 +37,7 @@ public class ValenguardMain {
     }
 
     private void start() {
-        Log.println(getClass(),"Booting Valenguard Server!");
+        Log.println(getClass(), "Booting Valenguard Server!");
 
         itemManager = new ItemManager();
 
@@ -56,13 +56,13 @@ public class ValenguardMain {
     }
 
     public void stop() {
-        Log.println(getClass(),"ServerConnection shutdown initialized!");
+        Log.println(getClass(), "ServerConnection shutdown initialized!");
         ServerConnection.getInstance().close();
-        Log.println(getClass(),"ServerConnection shutdown complete!");
+        Log.println(getClass(), "ServerConnection shutdown complete!");
     }
 
     private void registerCommands() {
-        Log.println(getClass(),"Registering commands.");
+        Log.println(getClass(), "Registering commands.");
         commandProcessor = new CommandProcessor();
         commandProcessor.addListener(new TicksPerSecondCommand());
         commandProcessor.addListener(new InventoryCommands());
@@ -70,13 +70,14 @@ public class ValenguardMain {
     }
 
     private void initializeNetwork() {
-        Log.println(getClass(),"Initializing network...");
+        Log.println(getClass(), "Initializing network...");
         ServerConnection.getInstance().openServer((eventBus) -> {
             eventBus.registerListener(new PlayerMovePacketIn());
             eventBus.registerListener(new PingPacketIn());
             eventBus.registerListener(new ChatMessagePacketIn());
             eventBus.registerListener(new PlayerAppearancePacketIn());
             eventBus.registerListener(new InventoryPacketIn());
+            eventBus.registerListener(new ClickActionPacketIn());
         });
     }
 }
