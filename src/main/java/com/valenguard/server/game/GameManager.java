@@ -13,6 +13,7 @@ import lombok.Getter;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,7 +33,31 @@ public class GameManager {
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
 
-    private final Queue<MovingEntity> npcToAdd = new ConcurrentLinkedQueue<>();
+    /**
+     * This queue is needed because the entities need to be queued to spawn before
+     * the map object is created.
+     */
+    private final Queue<MovingEntity> mobsToSpawn = new LinkedList<>();
+    private final Queue<StationaryEntity> stationaryEntities = new LinkedList<>();
+
+    public void queueMobSpawn(MovingEntity movingEntity) {
+        mobsToSpawn.add(movingEntity);
+    }
+
+    public void queueStationarySpawn(StationaryEntity stationaryEntity) {
+        stationaryEntities.add(stationaryEntity);
+    }
+
+    private void spawnEntities() {
+        MovingEntity movingEntity;
+        while ((movingEntity = mobsToSpawn.poll()) != null) {
+            movingEntity.getGameMap().queueMobSpawn(movingEntity);
+        }
+        StationaryEntity stationaryEntity;
+        while ((stationaryEntity = stationaryEntities.poll()) != null) {
+            stationaryEntity.getGameMap().queueStationarySpawn(stationaryEntity);
+        }
+    }
 
     public void init() {
         loadAllMaps();
@@ -40,16 +65,6 @@ public class GameManager {
 
     public void initializeNewPlayer(PlayerSessionData playerSessionData) {
         playerSessionDataQueue.add(playerSessionData);
-    }
-
-    public void queueNpcAdd(MovingEntity movingEntity) {
-        npcToAdd.add(movingEntity);
-    }
-
-    private void processEntities() {
-        for (MovingEntity movingEntity : npcToAdd) {
-            gameMaps.get(movingEntity.getMapName()).addNpc(movingEntity);
-        }
     }
 
     /**
@@ -109,6 +124,7 @@ public class GameManager {
     }
 
     private Player initializePlayer(final PlayerSessionData playerSessionData) {
+        // todo this big chunk of data needs to be read from a database
         Player player = new Player();
         player.setEntityType(EntityType.PLAYER);
         player.setServerEntityId(playerSessionData.getServerID());
@@ -122,8 +138,9 @@ public class GameManager {
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
         player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
-
         player.initEquipment();
+
+        player.getSkills().MINING.addExperience(50); // Initializes the player with 50 mining experience.
 
         return player;
     }
@@ -156,7 +173,9 @@ public class GameManager {
     }
 
     public void gameMapTick() {
-        gameMaps.values().forEach(GameMap::tickNPC);
+        spawnEntities();
+        gameMaps.values().forEach(GameMap::tickStationaryEntities);
+        gameMaps.values().forEach(GameMap::tickMOB);
 //        gameMaps.values().forEach(GameMap::tickGroundItems);
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
@@ -179,7 +198,6 @@ public class GameManager {
 
         Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
-        processEntities();
     }
 
     private void fixWarpHeights() {
@@ -216,6 +234,6 @@ public class GameManager {
     }
 
     public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<Entity> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getMobList().stream().filter(predicate).forEach(callback));
+        gameMaps.values().forEach(gameMap -> gameMap.getMobList().values().stream().filter(predicate).forEach(callback));
     }
 }

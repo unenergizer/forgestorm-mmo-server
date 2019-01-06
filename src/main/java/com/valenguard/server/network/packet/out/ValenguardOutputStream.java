@@ -2,6 +2,7 @@ package com.valenguard.server.network.packet.out;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ValenguardOutputStream {
 
@@ -16,34 +17,34 @@ public class ValenguardOutputStream {
     private OpcodePacketData opcodePacketData = new OpcodePacketData();
 
     // The current buffer being worked on.
-    private byte[] buffer = new byte[500];
+    private byte[] buffer = new byte[200];
 
-    public void writeByte(byte b) {
+    void writeByte(byte b) {
         buffer[bytePosition++] = b;
     }
 
-    public void writeBoolean(boolean b) {
+    void writeBoolean(boolean b) {
         buffer[bytePosition++] = (byte) (b ? 0x01 : 0x00);
     }
 
-    public void writeChar(char c) {
+    void writeChar(char c) {
         buffer[bytePosition++] = (byte) ((c >>> 8) & 0xFF);
         buffer[bytePosition++] = (byte) (c & 0xFF);
     }
 
-    public void writeShort(short c) {
+    void writeShort(short c) {
         buffer[bytePosition++] = (byte) ((c >>> 8) & 0xFF);
         buffer[bytePosition++] = (byte) (c & 0xFF);
     }
 
-    public void writeInt(int i) {
+    void writeInt(int i) {
         buffer[bytePosition++] = (byte) ((i >>> 24) & 0xFF);
         buffer[bytePosition++] = (byte) ((i >>> 16) & 0xFF);
         buffer[bytePosition++] = (byte) ((i >>> 8) & 0xFF);
         buffer[bytePosition++] = (byte) (i & 0xFF);
     }
 
-    public void writeLong(long l) {
+    void writeLong(long l) {
         buffer[bytePosition++] = (byte) ((l >>> 56) & 0xFF);
         buffer[bytePosition++] = (byte) ((l >>> 48) & 0xFF);
         buffer[bytePosition++] = (byte) ((l >>> 40) & 0xFF);
@@ -54,18 +55,18 @@ public class ValenguardOutputStream {
         buffer[bytePosition++] = (byte) (l & 0xFF);
     }
 
-    public void writeFloat(float f) {
+    void writeFloat(float f) {
         writeInt(Float.floatToIntBits(f));
     }
 
-    public void writeDouble(double d) {
+    void writeDouble(double d) {
         writeLong(Double.doubleToLongBits(d));
     }
 
     /**
      * Ascii bits of string only. Lower 8 bits
      */
-    public void writeString(String s) {
+    void writeString(String s) {
         if (s.length() > 0x7F)
             throw new RuntimeException("Tried writing a string greater than 0x7F in length.");
         buffer[bytePosition++] = (byte) s.length();
@@ -74,27 +75,15 @@ public class ValenguardOutputStream {
         }
     }
 
-    // Fill current buffer up
-    // Grab size
-    // check if the size causes us to need to flush
-    //     if yes
-    //        finish writing any left over data (we have not added the current buffer at this point in time)
-    //        then flush
-    //        if last buffer write and flush
-    //        else store buffer for later
-    //     if no
-    //        then check if opcodes are swapped
-    //        if yes then write data
-
-    public boolean currentBuffersInitialized() {
+    boolean currentBuffersInitialized() {
         return opcodePacketData.isInitialized();
     }
 
-    public boolean doOpcodesMatch(ServerAbstractOutPacket serverAbstractOutPacket) {
+    boolean doOpcodesMatch(ServerAbstractOutPacket serverAbstractOutPacket) {
         return opcodePacketData.getOpcode() == serverAbstractOutPacket.getOpcode();
     }
 
-    public void createNewBuffers(ServerAbstractOutPacket serverAbstractOutPacket) {
+    void createNewBuffers(ServerAbstractOutPacket serverAbstractOutPacket) {
         opcodePacketData.setOpcode(serverAbstractOutPacket.getOpcode());
         opcodePacketData.getBuffers().add(createNewBuffer());
         opcodePacketData.setInitialized(true);
@@ -102,7 +91,7 @@ public class ValenguardOutputStream {
     }
 
 
-    public void appendBewBuffer() {
+    void appendBewBuffer() {
         opcodePacketData.getBuffers().add(createNewBuffer());
         opcodePacketData.setNumberOfRepeats(opcodePacketData.getNumberOfRepeats() + 1);
     }
@@ -136,7 +125,7 @@ public class ValenguardOutputStream {
     private byte[] createNewBuffer() {
         byte[] newBuffer = new byte[bytePosition];
         System.arraycopy(buffer, 0, newBuffer, 0, bytePosition);
-        buffer = new byte[500]; // todo zero memory might be faster
+        Arrays.fill(buffer, (byte) 0);
         bytePosition = 0;
         return newBuffer;
     }

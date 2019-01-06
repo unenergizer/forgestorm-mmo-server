@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class OpcodePacketData {
+class OpcodePacketData {
     private boolean initialized = false;
     private byte opcode;
     private int numberOfRepeats;

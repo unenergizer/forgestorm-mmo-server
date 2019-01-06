@@ -21,7 +21,7 @@ import java.util.Queue;
 @Setter
 public class Player extends MovingEntity {
 
-    private Skills skills = new Skills();
+    private Skills skills = new Skills(this);
 
     private ClientHandler clientHandler;
     private Queue<MoveDirection> latestMoveRequests = new LinkedList<>();

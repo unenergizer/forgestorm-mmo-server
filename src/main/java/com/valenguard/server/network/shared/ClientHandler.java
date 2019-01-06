@@ -3,10 +3,12 @@ package com.valenguard.server.network.shared;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.ServerAbstractOutPacket;
 import com.valenguard.server.network.packet.out.ValenguardOutputStream;
+import com.valenguard.server.util.Log;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -38,7 +40,28 @@ public class ClientHandler {
     }
 
     public String readString() {
-        return (String) readIn(inputStream::readUTF);
+        return (String) readIn(() -> {
+            byte stringLength;
+            // The byte the client sent can indeed be negative.
+            try {
+                stringLength = inputStream.readByte();
+            } catch (EOFException e) {
+                Log.println(getClass(), "The client tried sending a string length of negative.", true);
+                return ""; // The client sent a negative value for some reason.
+            }
+            if (((stringLength >>> 8) & 0x01) != 0) {
+                // we might later want to use two's compliment method
+                Log.println(getClass(), "The client tried sending a string length of negative.", true);
+                return "";
+            }
+            byte[] charArray = new byte[stringLength];
+            inputStream.read(charArray);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (byte ch : charArray) {
+                stringBuilder.append((char) ch);
+            }
+            return stringBuilder.toString();
+        });
     }
 
     public byte readByte() {

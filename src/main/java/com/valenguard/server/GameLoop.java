@@ -52,6 +52,8 @@ public class GameLoop extends Thread {
         long nanoSecond = 1000000000; // 1 second -> 1000 ms -> 1000*1,000,000 ns
         long startTime, endTime;
 
+        long numberOfTicksPassed = 0;
+
         while (ServerConnection.getInstance().isRunning()) {
             startTime = System.nanoTime();
 
@@ -69,7 +71,7 @@ public class GameLoop extends Thread {
             ValenguardMain.getInstance().getOutStreamManager().sendPackets();
 
             // Update ping every X ticks
-            if (updates % 50000 == 0) {
+            if (numberOfTicksPassed % 100 == 0) {
                 //ValenguardMain.getInstance().getPingManager().tick();
             }
 
@@ -83,6 +85,8 @@ public class GameLoop extends Thread {
             endTime = System.nanoTime();
 
             updates++;
+            numberOfTicksPassed++;
+
             time += endTime - startTime;
             if (time >= nanoSecond) {
                 time -= nanoSecond;

@@ -1,20 +1,14 @@
 package com.valenguard.server.game.maps;
 
 import com.valenguard.server.game.GameManager;
-import com.valenguard.server.game.entity.Entity;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
 import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
 import com.valenguard.server.network.packet.out.InitializeMapPacketOut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -30,10 +24,17 @@ public class GameMap {
 
     @Getter
     private final List<Player> playerList = new ArrayList<>();
-    @Getter
-    private final List<MovingEntity> mobList = new ArrayList<>();
     private final Queue<QueueData> playerJoinQueue = new ConcurrentLinkedQueue<>();
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
+
+    @Getter
+    private final Map<Short, MovingEntity> mobList = new HashMap<>();
+    private final Queue<MovingEntity> mobSpawnQueue = new LinkedList<>();
+    private final Queue<MovingEntity> mobDespawnQueue = new LinkedList<>();
+
+    private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
+    private final Queue<StationaryEntity> stationaryEntitiesSpawnQueue = new LinkedList<>();
+    private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
 
     GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
         this.mapName = mapName;
@@ -42,49 +43,57 @@ public class GameMap {
         this.map = map;
     }
 
-    boolean allSpawned = false;
-
-    public void addNpc(MovingEntity movingEntity) {
-        mobList.add(movingEntity);
+    public void queueMobSpawn(MovingEntity movingEntity) {
+        mobSpawnQueue.add(movingEntity);
     }
 
-    public void tickNPC() {
-//        // TODO: spawns, respawns, despawns, etc etc etc...
-//        // TODO REMOVE THIS GOD DAMN SHIT
-//        if (!allSpawned) {
-//            if (!mapName.equals("maintown")) return;
-//
-//            int maxCrashTest = 0;
-//
-//            for (int i = 0; i < maxCrashTest; i++) {
-//                mobList.add(thisIsBadGen(i, "ID: " + i));
-//            }
-//
-//            Log.println(getClass(), "Total NPCs: " + mobList.size(), true, true);
-//
-//            allSpawned = true;
-//        }
+    public void queueMobDespawn(MovingEntity movingEntity) {
+        mobDespawnQueue.add(movingEntity);
     }
-//
-//    private short thisIsBadGenId = 100;
-//
-//    private Npc thisIsBadGen(int i, String name) {
-//        Npc npc = new Npc();
-//
-//        float speed = new Random().nextFloat();
-//        if (speed <= .2f) speed = .2f;
-//
-//        npc.setServerEntityId(thisIsBadGenId++);
-//        npc.setMoveSpeed(speed);
-//        npc.setName(name);
-//        npc.setEntityType(EntityType.NPC);
-//        npc.gameMapRegister(new Warp(new Location("maintown",
-//                17,
-//                50 - 28 - 1), MoveDirection.SOUTH));
-//
-//        Log.println(getClass(), "Adding npc to be spawned. ID: " + i, false);
-//        return npc;
-//    }
+
+    public void queueStationarySpawn(StationaryEntity stationaryEntity) {
+        stationaryEntitiesSpawnQueue.add(stationaryEntity);
+    }
+
+    public void queueStationaryDespawn(StationaryEntity stationaryEntity) {
+        stationaryEntitiesDespawnQueue.add(stationaryEntity);
+    }
+
+    public void tickMOB() {
+        mobSpawnQueue.forEach(this::mobSpawnRegistration);
+        mobDespawnQueue.forEach(this::mobDespawnRegistration);
+
+        MovingEntity mob;
+        while ((mob = mobSpawnQueue.poll()) != null) {
+            postEntitySpawn(mob);
+        }
+
+        while ((mob = mobDespawnQueue.poll()) != null) {
+            postEntityDespawn(mob);
+        }
+    }
+
+    public void tickStationaryEntities() {
+        stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.put(stationaryEntity.getServerEntityId(), stationaryEntity));
+        mobDespawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.remove(stationaryEntity.getServerEntityId()));
+
+        StationaryEntity stationaryEntity;
+        while ((stationaryEntity = stationaryEntitiesDespawnQueue.poll()) != null) {
+            postEntitySpawn(stationaryEntity);
+        }
+
+        while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
+            postEntityDespawn(stationaryEntity);
+        }
+    }
+
+    private void mobSpawnRegistration(MovingEntity movingEntity) {
+        mobList.put(movingEntity.getServerEntityId(), movingEntity);
+    }
+
+    private void mobDespawnRegistration(MovingEntity movingEntity) {
+        mobList.remove(movingEntity.getServerEntityId());
+    }
 
     public void tickPlayer() {
         // Remove players
@@ -106,17 +115,6 @@ public class GameMap {
 
     public void sendPlayersPacket() {
 
-        // TODO check to see if the entity is registered for a respawn
-        if (playerJoinQueue.size() >= 1) {
-            for (Entity entity : mobList) {
-                // postEntityDespawn(entity);
-            }
-
-            for (Entity entity : mobList) {
-                postEntitySpawn(entity);
-            }
-        }
-
         for (int quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
             if (playerQuitQueue.isEmpty()) break;
             postEntityDespawn(playerQuitQueue.remove());
@@ -124,7 +122,12 @@ public class GameMap {
 
         for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
-            postEntitySpawn(playerJoinQueue.remove().getPlayer());
+            // Tell everyone already online about the player and the player about everyone online.
+            Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
+            postEntitySpawn(playerWhoJoined);
+            // Tell the player about all the mobs currently on the map.
+            mobList.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
+            stationaryEntitiesList.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
         }
     }
 
@@ -151,13 +154,21 @@ public class GameMap {
 
     private void postEntitySpawn(Entity entityToSpawn) {
         for (Player packetReceiver : playerList) {
+
+            // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
                 new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
             }
+
+            // Send joined player all online players
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
                 new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
         }
+    }
+
+    private void postEntitySpawn(Player receiver, Entity entityToSpawn) {
+        new EntitySpawnPacketOut(receiver, entityToSpawn).sendPacket();
     }
 
     private void postEntityDespawn(Entity entityToDespawn) {

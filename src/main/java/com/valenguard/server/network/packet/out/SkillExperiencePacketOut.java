@@ -4,22 +4,18 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
 import com.valenguard.server.network.shared.Opcodes;
 
-import java.util.List;
-
 public class SkillExperiencePacketOut extends ServerAbstractOutPacket {
 
-    private List<ExperiencePacketInfo> experiencePacketInfos;
+    private ExperiencePacketInfo experiencePacketInfo;
 
-    public SkillExperiencePacketOut(Player player, List<ExperiencePacketInfo> experiencePacketInfos) {
+    public SkillExperiencePacketOut(Player player, ExperiencePacketInfo experiencePacketInfo) {
         super(Opcodes.EXPERIENCE, player);
-        this.experiencePacketInfos = experiencePacketInfos;
+        this.experiencePacketInfo = experiencePacketInfo;
     }
 
     @Override
     protected void createPacket(ValenguardOutputStream write) {
-        for (ExperiencePacketInfo experiencePacketInfo : experiencePacketInfos) {
-            write.writeByte(experiencePacketInfo.getSkillType());
-            write.writeInt(experiencePacketInfo.getExperienceGained());
-        }
+        write.writeByte(experiencePacketInfo.getSkillOpcode());
+        write.writeInt(experiencePacketInfo.getExperienceGained());
     }
 }

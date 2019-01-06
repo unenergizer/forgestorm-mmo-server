@@ -37,7 +37,7 @@ public class UpdateMovements {
 
         // Start performing a movement if the entity is not moving
         if (moveDirection != MoveDirection.NONE) {
-            Log.println(getClass(), "Npc has started moving.", false, PRINT_DEBUG);
+            Log.println(getClass(), "MOB has started moving.", false, PRINT_DEBUG);
             performMove(movingEntity, moveDirection);
         }
     }

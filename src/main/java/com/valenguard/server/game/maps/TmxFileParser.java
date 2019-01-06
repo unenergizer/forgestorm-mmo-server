@@ -135,6 +135,8 @@ public class TmxFileParser {
         /* *********************************************************************************************
          * GET SPECIFIC TILE ATTRIBUTES - WARNING: Element names are CASE sensitive!
          ***********************************************************************************************/
+        int entityUUID = 0;
+
 
         // Examine XML file and find tags called "layer" then loop through them.
         NodeList objectGroupTag = tmx.getElementsByTagName("objectgroup");
@@ -211,7 +213,7 @@ public class TmxFileParser {
 
                     AIEntity aiEntity = null;
                     if (entityType == EntityType.NPC) {
-                        aiEntity = new Npc();
+                        aiEntity = new MOB();
                         short[] appearanceTextureIds = new short[2];
                         appearanceTextureIds[Appearance.BODY] = atlasBodyId;
                         appearanceTextureIds[Appearance.HEAD] = atlasHeadId;
@@ -231,15 +233,60 @@ public class TmxFileParser {
                         aiEntity.setMovementBounds(bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
                     }
 
-                    aiEntity.setServerEntityId((short) j);
+                    aiEntity.setServerEntityId((short) entityUUID++);
                     aiEntity.setEntityType(entityType);
                     aiEntity.setName(name);
                     aiEntity.setMoveSpeed(speed);
                     aiEntity.gameMapRegister(new Warp(new Location(fileName, x, y), direction));
-                    ValenguardMain.getInstance().getGameManager().queueNpcAdd(aiEntity);
+                    ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 
-                    Log.println(TmxFileParser.class, "[Entity] ID: " + j + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
+                    Log.println(TmxFileParser.class, "[Entity] ID: " + entityUUID + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
 
+                }
+            }
+
+            /*
+             * Get SKILL NODES
+             */
+            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("skill")) {
+                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
+                for (int j = 0; j < objectTag.getLength(); j++) {
+
+                    //System.out.println("NodeType: " + objectTag.item(j).getNodeType());
+                    if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
+
+                    Element objectTagElement = (Element) objectTag.item(j);
+
+                    int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
+                    int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;
+
+                    int typeID = 0;
+
+                    NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
+
+                    // Get custom properties
+                    for (int k = 0; k < properties.getLength(); k++) {
+                        if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
+                        Element propertyElement = (Element) properties.item(k);
+
+                        if (propertyElement.getAttribute("name").equals("type")) {
+                            typeID = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                    }
+
+                    // TODO: SEND SKILL NODE OFF TO BE MANAGED. DECIPHER TYPE IN SPECIFIC MANAGER (reduce code here)
+                    StationaryEntity stationaryEntity = new StationaryEntity();
+                    stationaryEntity.setServerEntityId((short) entityUUID++); // todo need to determine a real id
+                    stationaryEntity.setCurrentMapLocation(new Location(fileName, x, y));
+                    stationaryEntity.setEntityType(EntityType.SKILL_NODE);
+                    stationaryEntity.setAppearance(new Appearance((byte) 0, new short[]{0})); // todo determine texture id
+                    stationaryEntity.setName(""); // todo will these even have names?
+                    ValenguardMain.getInstance().getGameManager().queueStationarySpawn(stationaryEntity);
+
+                    // Making it's associated tile non-traversable
+                    map[x][y].setTraversable(false);
+
+                    Log.println(TmxFileParser.class, "[SILL] ID: " + entityUUID + ", TYPE: " + typeID, false, PRINT_DEBUG);
                 }
             }
 

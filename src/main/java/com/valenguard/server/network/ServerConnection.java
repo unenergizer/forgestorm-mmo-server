@@ -146,7 +146,21 @@ public class ServerConnection implements Runnable {
                 // Reading in a byte which represents an opcode that the client sent to the
                 // server. Based on this opcode the event bus determines which listener should
                 // be called
-                while (running) eventBus.decodeListenerOnNetworkThread(inStream.readByte(), clientHandler);
+                while (running) {
+
+                    byte opcodeByte = inStream.readByte();
+                    byte numberOfRepeats = 1;
+                    if (((opcodeByte >>> 8) & 0x01) != 0) {
+
+                        // Removing the special bit.
+                        opcodeByte = (byte) (opcodeByte & 0x7F);
+                        numberOfRepeats = inStream.readByte();
+                    }
+
+                    for (byte i = 0; i < numberOfRepeats; i++)
+                        eventBus.decodeListenerOnNetworkThread(opcodeByte, clientHandler);
+
+                }
 
             } catch (IOException e) {
 
