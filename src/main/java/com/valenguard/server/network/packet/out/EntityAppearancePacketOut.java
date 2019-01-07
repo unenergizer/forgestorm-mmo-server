@@ -7,11 +7,11 @@ import com.valenguard.server.network.shared.Opcodes;
 
 public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
 
-    public static final int COLOR_INDEX = 0x01;
-    public static final int BODY_INDEX = 0x02;
-    public static final int HEAD_INDEX = 0x04;
-    public static final int ARMOR_INDEX = 0x08;
-    public static final int HELM_INDEX = 0x10;
+    public static final byte COLOR_INDEX = 0x01;
+    public static final byte BODY_INDEX = 0x02;
+    public static final byte HEAD_INDEX = 0x04;
+    public static final byte ARMOR_INDEX = 0x08;
+    public static final byte HELM_INDEX = 0x10;
 
     private final Entity entity;
     private final byte appearanceBits;

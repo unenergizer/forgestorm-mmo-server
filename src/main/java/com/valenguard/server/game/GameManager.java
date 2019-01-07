@@ -233,7 +233,11 @@ public class GameManager {
         gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
-    public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<Entity> predicate) {
+    public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<MovingEntity> predicate) {
         gameMaps.values().forEach(gameMap -> gameMap.getMobList().values().stream().filter(predicate).forEach(callback));
+    }
+
+    public void forAllStationaryEntitiesFiltered(Consumer<Entity> callback, Predicate<StationaryEntity> predicate) {
+        gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntitiesList().values().stream().filter(predicate).forEach(callback));
     }
 }

@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -32,6 +33,7 @@ public class GameMap {
     private final Queue<MovingEntity> mobSpawnQueue = new LinkedList<>();
     private final Queue<MovingEntity> mobDespawnQueue = new LinkedList<>();
 
+    @Getter
     private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
     private final Queue<StationaryEntity> stationaryEntitiesSpawnQueue = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
@@ -228,5 +230,9 @@ public class GameMap {
     private class QueueData {
         private final Player player;
         private final Warp warp;
+    }
+
+    public void forAllPlayers(Consumer<Player> callback) {
+        playerList.forEach(callback);
     }
 }
