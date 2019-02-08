@@ -4,6 +4,7 @@ import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.game.rpg.Attributes;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +12,37 @@ import lombok.Setter;
 @Setter
 public class MovingEntity extends Entity {
 
+    /**
+     * The exact tile location of the entity on the tile grid.
+     */
     private Location futureMapLocation;
-    private float moveSpeed;
-    private float realX, realY;
-    private float walkTime = 0f;
+
+    /**
+     * The direction the entity is facing. Is not always the same direction
+     * as they are moving because the move direction can be NONE.
+     */
     private MoveDirection facingDirection;
+
+    /**
+     * The rate of speed the entity moves across tiles.
+     * The smaller the number, the faster the entity moves.
+     */
+    private float moveSpeed;
+
+    /**
+     * Current X and Y of the player (this is the interpolated values)
+     */
+    private float realX, realY;
+
+    /**
+     * Used by entity manager to measure the walk time between tiles/locations.
+     */
+    private float walkTime = 0f;
+
+    /**
+     * Entity attributes
+     */
+    private Attributes attributes = new Attributes();
 
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));

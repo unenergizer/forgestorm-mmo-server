@@ -36,13 +36,11 @@ public class PlayerInventoryEvents {
         Player player = inventoryEvent.getPlayer();
         byte fromPosition = inventoryEvent.getFromPosition();
 
-        if (fromWindowType == InventoryType.BAG && player.getPlayerBag().getItemStack(fromPosition) == null) {
+        if (fromWindowType == InventoryType.BAG_1 && player.getPlayerBag().getItemStack(fromPosition) == null) {
             return false;
-        } else if (fromWindowType == InventoryType.EQUIPMENT && player.getPlayerEquipment().getItemStack(fromPosition) == null) {
-            return false;
-        }
+        } else
+            return fromWindowType != InventoryType.EQUIPMENT || player.getPlayerEquipment().getItemStack(fromPosition) != null;
 
-        return true;
     }
 
     private void bagMove(InventoryEvent inventoryEvent) {
@@ -51,12 +49,12 @@ public class PlayerInventoryEvents {
 
     private void fromBagToEquipment(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
-        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
+        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPosition(), inventoryEvent.getToPosition(), true);
     }
 
     private void fromEquipmentToBag(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
-        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPosition(), inventoryEvent.getFromPosition());
+        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPosition(), inventoryEvent.getFromPosition(), false);
     }
 
     private void fromEquipmentToEquipment(InventoryEvent inventoryEvent) {

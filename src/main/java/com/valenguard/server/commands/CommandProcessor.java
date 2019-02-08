@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+
 public class CommandProcessor {
 
     @AllArgsConstructor
@@ -41,8 +44,7 @@ public class CommandProcessor {
             int argumentLengthRequirement = command.argLenReq();
             Class<?>[] params = method.getParameterTypes();
 
-            if (cmdAnnotations[0].argLenReq() < 0)
-                throw new RuntimeException("The Required argument length for a command cannot be below 0.");
+            checkArgument(!(cmdAnnotations[0].argLenReq() < 0), "The Required argument length for a command cannot be below 0.");
 
             if (argumentLengthRequirement != 0) {
                 if (params.length != 1)

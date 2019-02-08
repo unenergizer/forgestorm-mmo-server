@@ -1,5 +1,6 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.game.rpg.Attributes;
 import lombok.Data;
 
 @Data
@@ -11,6 +12,8 @@ public class ItemStack implements Cloneable {
     private ItemStackType itemStackType;
     private boolean isStackable;
     private int amount;
+
+    private Attributes attributes;
 
     public ItemStack(int itemId) {
         this.itemId = itemId;
@@ -24,6 +27,7 @@ public class ItemStack implements Cloneable {
         itemStack.setDescription(description);
         itemStack.setItemStackType(itemStackType);
         itemStack.setStackable(isStackable);
+        itemStack.setAttributes(attributes);
         return itemStack;
     }
 

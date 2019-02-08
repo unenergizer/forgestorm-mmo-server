@@ -67,13 +67,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
-        if (fromWindow == InventoryType.BAG) {
+        if (fromWindow == InventoryType.BAG_1) {
             if (packetData.fromPosition >= PlayerBag.CAPACITY || packetData.fromPosition < 0) return false;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
             if (packetData.fromPosition >= PlayerEquipment.CAPACITY || packetData.fromPosition < 0) return false;
         }
 
-        if (toWindow == InventoryType.BAG) {
+        if (toWindow == InventoryType.BAG_1) {
             return packetData.toPosition < PlayerBag.CAPACITY && packetData.toPosition >= 0;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
             return packetData.toPosition < PlayerEquipment.CAPACITY && packetData.toPosition >= 0;
@@ -83,11 +83,11 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     }
 
     private WindowMovementInfo determineWindowMovementInfo(InventoryType fromWindow, InventoryType toWindow) {
-        if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.BAG) {
+        if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.BAG_1) {
             return WindowMovementInfo.FROM_EQUIPMENT_TO_BAG;
-        } else if (fromWindow == InventoryType.BAG && toWindow == InventoryType.EQUIPMENT) {
+        } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.EQUIPMENT) {
             return WindowMovementInfo.FROM_BAG_TO_EQUIPMENT;
-        } else if (fromWindow == InventoryType.BAG && toWindow == InventoryType.BAG) {
+        } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.BAG_1) {
             return WindowMovementInfo.FROM_BAG_TO_BAG;
         } else if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.EQUIPMENT) {
             return WindowMovementInfo.FROM_EQUIPMENT_TO_EQUIPMENT;

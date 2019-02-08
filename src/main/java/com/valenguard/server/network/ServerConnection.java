@@ -4,7 +4,7 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.network.packet.out.ValenguardOutputStream;
 import com.valenguard.server.network.shared.ClientHandler;
 import com.valenguard.server.network.shared.EventBus;
-import com.valenguard.server.network.shared.ServerConstants;
+import com.valenguard.server.network.shared.NetworkSettings;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +27,8 @@ public class ServerConnection implements Runnable {
     private final EventBus eventBus = new EventBus();
     private ServerSocket serverSocket;
     private Consumer<EventBus> registerListeners;
+
+    private NetworkSettings networkSettings;
 
     private short tempID = 30000;
 
@@ -55,11 +57,12 @@ public class ServerConnection implements Runnable {
      *
      * @param registerListeners Listeners to listen to.
      */
-    public void openServer(Consumer<EventBus> registerListeners) {
+    public void openServer(NetworkSettings networkSettings, Consumer<EventBus> registerListeners) {
+        this.networkSettings = networkSettings;
 
         // Creates a socket to allow for communication between clients and the server.
         try {
-            serverSocket = new ServerSocket(ServerConstants.SERVER_PORT);
+            serverSocket = new ServerSocket(networkSettings.getPort());
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -80,7 +83,7 @@ public class ServerConnection implements Runnable {
      */
     @Override
     public void run() {
-        Log.println(getClass(), "Server opened on port: " + ServerConstants.SERVER_PORT);
+        Log.println(getClass(), "Server opened on port: " + networkSettings.getPort());
         registerListeners.accept(eventBus);
         listenForConnections();
     }
@@ -170,7 +173,7 @@ public class ServerConnection implements Runnable {
 
                         // The client has disconnected
                         ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
-                        }
+                    }
                 } else {
                     e.printStackTrace();
                 }

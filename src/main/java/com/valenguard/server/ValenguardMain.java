@@ -10,6 +10,7 @@ import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.*;
 import com.valenguard.server.network.packet.out.OutputStreamManager;
+import com.valenguard.server.network.shared.NetworkSettingsLoader;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 
@@ -71,7 +72,8 @@ public class ValenguardMain {
 
     private void initializeNetwork() {
         Log.println(getClass(), "Initializing network...");
-        ServerConnection.getInstance().openServer((eventBus) -> {
+        NetworkSettingsLoader networkSettingsLoader = new NetworkSettingsLoader();
+        ServerConnection.getInstance().openServer(networkSettingsLoader.loadNetworkSettings(), (eventBus) -> {
             eventBus.registerListener(new PlayerMovePacketIn());
             eventBus.registerListener(new PingPacketIn());
             eventBus.registerListener(new ChatMessagePacketIn());

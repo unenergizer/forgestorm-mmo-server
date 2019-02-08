@@ -2,6 +2,9 @@ package com.valenguard.server.util;
 
 public class Log {
 
+    private Log() {
+    }
+
     public static void println(Class clazz, String message) {
         println(clazz, message, false, true);
     }
@@ -18,5 +21,9 @@ public class Log {
 
     private static String buildMessage(Class clazz, String message) {
         return "[" + clazz.getSimpleName() + "] " + message;
+    }
+
+    public static void printEmptyLine(boolean print) {
+        if (print) System.out.println();
     }
 }

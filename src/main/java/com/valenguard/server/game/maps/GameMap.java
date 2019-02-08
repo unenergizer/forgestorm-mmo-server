@@ -2,6 +2,7 @@ package com.valenguard.server.game.maps;
 
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
 import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
 import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
 import com.valenguard.server.network.packet.out.InitializeMapPacketOut;
@@ -160,11 +161,14 @@ public class GameMap {
             // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
                 new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                // TODO: Send stats ????
+//                new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
 
-            // Send joined player all online players
+            // Send joined player to all online players
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
                 new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
+                new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
         }
     }

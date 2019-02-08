@@ -9,9 +9,9 @@ public enum WindowMovementInfo {
     public InventoryType getFromWindow() {
         switch (this) {
             case FROM_BAG_TO_BAG:
-                return InventoryType.BAG;
+                return InventoryType.BAG_1;
             case FROM_BAG_TO_EQUIPMENT:
-                return InventoryType.BAG;
+                return InventoryType.BAG_1;
             case FROM_EQUIPMENT_TO_BAG:
                 return InventoryType.EQUIPMENT;
             case FROM_EQUIPMENT_TO_EQUIPMENT:

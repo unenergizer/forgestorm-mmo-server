@@ -3,6 +3,7 @@ package com.valenguard.server.game;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.*;
+import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
@@ -27,7 +28,7 @@ public class GameManager {
 
     private static final boolean PRINT_DEBUG = false;
     public static final int PLAYERS_TO_PROCESS = 50;
-    private static final String MAP_DIRECTORY = "src/main/resources/maps/";
+    private static final String MAP_DIRECTORY = "src/main/resources/data/maps/";
 
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
@@ -104,6 +105,7 @@ public class GameManager {
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 
+
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemManager().numberOfItems() - 1; itemId++) {
@@ -139,6 +141,14 @@ public class GameManager {
         initialPlayerTextureIds[Appearance.HELM] = -1;
         player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
         player.initEquipment();
+
+        // Setup base player attributes
+        Attributes baseAttributes = new Attributes();
+        baseAttributes.setHealth(10);
+        baseAttributes.setArmor(1);
+        baseAttributes.setDamage(2);
+
+        player.setAttributes(baseAttributes);
 
         player.getSkills().MINING.addExperience(50); // Initializes the player with 50 mining experience.
 
