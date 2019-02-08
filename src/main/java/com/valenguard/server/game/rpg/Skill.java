@@ -6,9 +6,9 @@ import lombok.Getter;
 
 public class Skill {
 
-    private byte skillOpcode;
+    private final byte skillOpcode;
 
-    private Player player;
+    private final Player player;
 
     @Getter
     private int experience = 0;

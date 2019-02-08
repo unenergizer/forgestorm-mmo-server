@@ -29,9 +29,9 @@ public class CommandProcessor {
         private CommandInfo commandInfo;
     }
 
-    private Queue<PublishInfo> publishedCommands = new ConcurrentLinkedQueue<>();
+    private final Queue<PublishInfo> publishedCommands = new ConcurrentLinkedQueue<>();
 
-    private Map<String, Map<Integer, CommandInfo>> commandListeners = new HashMap<>();
+    private final Map<String, Map<Integer, CommandInfo>> commandListeners = new HashMap<>();
 
     public void addListener(Object listener) {
         for (Method method : listener.getClass().getMethods()) {

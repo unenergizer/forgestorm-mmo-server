@@ -24,11 +24,11 @@ public class UpdateMovements {
 
         // Try and start an entity move
         ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> generateNewAIMovements((MovingEntity) entity),
-                entity -> entity instanceof MovingEntity && !((MovingEntity) entity).isEntityMoving());
+                entity -> entity instanceof MovingEntity && !entity.isEntityMoving());
 
         // Continue entity movement
         ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> updateEntitiesPosition((MovingEntity) entity),
-                entity -> entity instanceof MovingEntity && ((MovingEntity) entity).isEntityMoving());
+                entity -> entity instanceof MovingEntity && entity.isEntityMoving());
     }
 
     private void generateNewAIMovements(MovingEntity movingEntity) {

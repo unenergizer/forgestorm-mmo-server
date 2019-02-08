@@ -26,7 +26,7 @@ public class GameLoop extends Thread {
     @Getter
     private UpdateMovements updateMovements = new UpdateMovements(); //TODO: MOVE
 
-    private WarpManager warpManager = new WarpManager(); // TODO: MOVE
+    private final WarpManager warpManager = new WarpManager(); // TODO: MOVE
 
 
     GameLoop() {
@@ -72,6 +72,7 @@ public class GameLoop extends Thread {
 
             // Update ping every X ticks
             if (numberOfTicksPassed % 100 == 0) {
+                // TODO: Fix PingManager
                 //ValenguardMain.getInstance().getPingManager().tick();
             }
 

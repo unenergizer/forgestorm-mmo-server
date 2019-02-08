@@ -7,7 +7,7 @@ import java.util.Queue;
 
 public class PlayerInventoryEvents {
 
-    private Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
+    private final Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
 
     public void addInventoryEvent(InventoryEvent inventoryEvent) {
         inventoryEvents.add(inventoryEvent);

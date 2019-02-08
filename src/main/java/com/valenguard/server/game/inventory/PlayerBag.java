@@ -4,7 +4,7 @@ public class PlayerBag {
 
     public static final int CAPACITY = 5*6;
 
-    private ItemStack[] items = new ItemStack[CAPACITY];
+    private final ItemStack[] items = new ItemStack[CAPACITY];
 
     public void addItemStack(ItemStack itemStack) {
         for (int i = 0; i < CAPACITY; i++) {

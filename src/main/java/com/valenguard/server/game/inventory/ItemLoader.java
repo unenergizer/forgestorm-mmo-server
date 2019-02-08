@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.valenguard.server.util.Log.printEmptyLine;
 import static com.valenguard.server.util.Log.println;
 
-public class ItemLoader {
+class ItemLoader {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -30,7 +29,7 @@ public class ItemLoader {
 
         Map<String, Map<String, Object>> root = yaml.load(inputStream);
 
-        List<ItemStack> itemStacks = new ArrayList<ItemStack>();
+        List<ItemStack> itemStacks = new ArrayList<>();
 
         for (Map.Entry<String, Map<String, Object>> entry : root.entrySet()) {
             int itemId = Integer.parseInt(entry.getKey());
@@ -86,7 +85,7 @@ public class ItemLoader {
             println(getClass(), "Damage: " + attributes.getDamage(), false, PRINT_DEBUG && attributes.getDamage() != 0);
             println(getClass(), "Armor: " + attributes.getArmor(), false, PRINT_DEBUG && attributes.getArmor() != 0);
 
-            printEmptyLine(PRINT_DEBUG);
+            println(PRINT_DEBUG);
 
             itemStacks.add(itemStack);
         }

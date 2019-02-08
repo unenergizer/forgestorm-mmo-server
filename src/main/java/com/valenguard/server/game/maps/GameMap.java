@@ -188,6 +188,7 @@ public class GameMap {
         return playerList.size();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isMovable(Location location) {
         return !isOutOfBounds(location) && isTraversable(location);
     }

@@ -6,7 +6,7 @@ import com.valenguard.server.network.shared.Opcodes;
 
 public class SkillExperiencePacketOut extends ServerAbstractOutPacket {
 
-    private ExperiencePacketInfo experiencePacketInfo;
+    private final ExperiencePacketInfo experiencePacketInfo;
 
     public SkillExperiencePacketOut(Player player, ExperiencePacketInfo experiencePacketInfo) {
         super(Opcodes.EXPERIENCE, player);

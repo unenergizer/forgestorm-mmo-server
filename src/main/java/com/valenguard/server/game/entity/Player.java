@@ -57,24 +57,24 @@ public class Player extends MovingEntity {
     public void setHeadAppearance(short headTextureId) {
         getAppearance().getTextureIds()[Appearance.HEAD] = headTextureId;
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.HEAD_INDEX).sendPacket());
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, EntityAppearancePacketOut.HEAD_INDEX).sendPacket());
     }
 
     public void setBodyAppearance(short bodyTextureId) {
         getAppearance().getTextureIds()[Appearance.BODY] = bodyTextureId;
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.BODY_INDEX).sendPacket());
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
     }
 
     public void setHelmAppearance(short helmTextureId) {
         getAppearance().getTextureIds()[Appearance.HELM] = helmTextureId;
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.HELM_INDEX).sendPacket());
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, EntityAppearancePacketOut.HELM_INDEX).sendPacket());
     }
 
     public void setArmorAppearance(short armorTextureId) {
         getAppearance().getTextureIds()[Appearance.ARMOR] = armorTextureId;
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, (byte) EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), this, EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
     }
 }

@@ -6,7 +6,7 @@ import com.valenguard.server.util.Log;
 
 public class ChatMessagePacketOut extends ServerAbstractOutPacket {
 
-    private String message;
+    private final String message;
 
     public ChatMessagePacketOut(Player player, String message) {
         super(Opcodes.CHAT, player);

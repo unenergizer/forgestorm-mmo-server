@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
+@SuppressWarnings("ConstantConditions")
 public class TmxFileParser {
 
     private static final int TILE_SIZE = 16;

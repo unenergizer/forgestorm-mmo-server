@@ -34,7 +34,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             return false;
         }
 
-        // The client is simply picking up and placing down the itemstack in the same position.
+        // The client is simply picking up and placing down the ItemStack in the same position.
         if (packetData.fromWindow == packetData.toWindow && packetData.fromPosition == packetData.toPosition) {
             return false;
         }

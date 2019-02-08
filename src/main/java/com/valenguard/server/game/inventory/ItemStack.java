@@ -20,6 +20,7 @@ public class ItemStack implements Cloneable {
         // TODO get isStackable based on the item type / inventory type such as bank/player inventory ect..
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public Object clone() {
         ItemStack itemStack = generateCloneableInstance();
@@ -31,7 +32,7 @@ public class ItemStack implements Cloneable {
         return itemStack;
     }
 
-    protected ItemStack generateCloneableInstance() {
+    ItemStack generateCloneableInstance() {
         return new ItemStack(itemId);
     }
 

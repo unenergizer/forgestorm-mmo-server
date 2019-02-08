@@ -191,7 +191,7 @@ public class GameManager {
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
     }
 
-    public int getTotalPlayersOnline() {
+    private int getTotalPlayersOnline() {
         int onlinePlayers = 0;
         for (GameMap gameMap : gameMaps.values()) onlinePlayers = onlinePlayers + gameMap.getPlayerCount();
         return onlinePlayers;

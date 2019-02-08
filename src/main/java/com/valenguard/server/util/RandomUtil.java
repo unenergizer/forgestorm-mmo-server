@@ -2,7 +2,8 @@ package com.valenguard.server.util;
 
 import java.util.Random;
 
-public class RandomUtil {
+@SuppressWarnings("unused")
+class RandomUtil {
 
     private static final Random RANDOM = new Random();
 

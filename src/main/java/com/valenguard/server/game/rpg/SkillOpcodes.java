@@ -1,7 +1,7 @@
 package com.valenguard.server.game.rpg;
 
-public class SkillOpcodes {
+class SkillOpcodes {
 
-    public static final byte MINING = 0x00;
+    static final byte MINING = 0x00;
 
 }

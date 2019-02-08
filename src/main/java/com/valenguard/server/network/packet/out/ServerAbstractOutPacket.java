@@ -2,7 +2,6 @@ package com.valenguard.server.network.packet.out;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.shared.ClientHandler;
 import lombok.Getter;
 
 public abstract class ServerAbstractOutPacket {
@@ -18,15 +17,9 @@ public abstract class ServerAbstractOutPacket {
      */
     final Player player;
 
-    /**
-     * The client handler that holds the object output stream
-     */
-    private final ClientHandler clientHandler;
-
     ServerAbstractOutPacket(byte opcode, Player player) {
         this.opcode = opcode;
         this.player = player;
-        this.clientHandler = player.getClientHandler();
     }
 
     /**

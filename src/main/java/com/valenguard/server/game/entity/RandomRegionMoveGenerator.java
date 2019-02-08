@@ -9,12 +9,15 @@ import java.util.Random;
 
 public class RandomRegionMoveGenerator {
 
-    private MovingEntity movingEntity;
+    private final MovingEntity movingEntity;
 
-    private float probabilityStill;
-    private float probabilityWalkStart;
+    private final float probabilityStill;
+    private final float probabilityWalkStart;
 
-    private int regionStartX, regionStartY, regionEndX, regionEndY;
+    private final int regionStartX;
+    private final int regionStartY;
+    private final int regionEndX;
+    private final int regionEndY;
 
     public RandomRegionMoveGenerator(MovingEntity movingEntity, float probabilityStill, float probabilityWalkStart,
                                      int regionStartX, int regionStartY, int regionEndX, int regionEndY) {
@@ -48,7 +51,7 @@ public class RandomRegionMoveGenerator {
             return MoveDirection.NONE;
         }
 
-        MoveDirection moveDirection = null;
+        MoveDirection moveDirection;
 
         if (isMoving) {
 

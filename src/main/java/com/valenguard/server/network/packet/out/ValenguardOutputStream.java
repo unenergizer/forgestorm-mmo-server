@@ -4,9 +4,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+@SuppressWarnings("unused")
 public class ValenguardOutputStream {
 
-    private DataOutputStream dataOutputStream;
+    private final DataOutputStream dataOutputStream;
 
     public ValenguardOutputStream(DataOutputStream dataOutputStream) {
         this.dataOutputStream = dataOutputStream;
@@ -14,10 +15,10 @@ public class ValenguardOutputStream {
 
     private int bytePosition = 0;
 
-    private OpcodePacketData opcodePacketData = new OpcodePacketData();
+    private final OpcodePacketData opcodePacketData = new OpcodePacketData();
 
     // The current buffer being worked on.
-    private byte[] buffer = new byte[200];
+    private final byte[] buffer = new byte[200];
 
     void writeByte(byte b) {
         buffer[bytePosition++] = b;

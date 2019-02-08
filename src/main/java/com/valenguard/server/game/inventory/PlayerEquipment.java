@@ -4,7 +4,6 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
 
-import static com.valenguard.server.util.Log.printEmptyLine;
 import static com.valenguard.server.util.Log.println;
 
 public class PlayerEquipment {
@@ -13,7 +12,7 @@ public class PlayerEquipment {
 
     public static final int CAPACITY = 12;
 
-    private EquipmentSlot[] equipmentSlots = new EquipmentSlot[CAPACITY];
+    private final EquipmentSlot[] equipmentSlots = new EquipmentSlot[CAPACITY];
 
     private Player player;
 
@@ -43,9 +42,9 @@ public class PlayerEquipment {
         ItemStack equipmentItemStack = getItemStack(equipmentIndex);
 
         if (equipItem) {
-            updatePlayerEquipment(bagItemStack, equipItem);
+            updatePlayerEquipment(bagItemStack, true);
         } else {
-            updatePlayerEquipment(equipmentItemStack, equipItem);
+            updatePlayerEquipment(equipmentItemStack, false);
         }
 
         // Confirming that the equipment is allowed to be switched.
@@ -71,7 +70,7 @@ public class PlayerEquipment {
         Attributes playerClientAttributes = player.getAttributes();
         Attributes itemStackAttributes = itemStack.getAttributes();
 
-        printEmptyLine(true);
+        println(PRINT_DEBUG);
         println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), PRINT_DEBUG);
         println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), PRINT_DEBUG);
         println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), PRINT_DEBUG);

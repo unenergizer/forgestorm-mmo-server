@@ -6,7 +6,7 @@ import com.valenguard.server.network.shared.Opcodes;
 
 public class InventoryPacketOut extends ServerAbstractOutPacket {
 
-    private InventoryActions inventoryAction;
+    private final InventoryActions inventoryAction;
 
     public InventoryPacketOut(Player player, InventoryActions inventoryAction) {
         super(Opcodes.INVENTORY_UPDATE, player);
