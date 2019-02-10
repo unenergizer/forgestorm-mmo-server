@@ -6,7 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Attributes {
-    private int health = 0;
+    // max health
+    private int health = 0; // current health
     private int armor = 0;
     private int damage = 0;
 }

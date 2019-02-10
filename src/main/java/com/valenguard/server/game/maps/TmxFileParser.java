@@ -2,6 +2,7 @@ package com.valenguard.server.game.maps;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -239,6 +240,15 @@ public class TmxFileParser {
                     aiEntity.setName(name);
                     aiEntity.setMoveSpeed(speed);
                     aiEntity.gameMapRegister(new Warp(new Location(fileName, x, y), direction));
+
+                    // Setup basic attributes. TODO: Values here should come from file
+                    Attributes attributes = new Attributes();
+                    attributes.setHealth(11);
+                    attributes.setArmor(10);
+                    attributes.setDamage(1);
+
+                    aiEntity.setAttributes(attributes);
+
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 
                     Log.println(TmxFileParser.class, "[Entity] ID: " + entityUUID + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);

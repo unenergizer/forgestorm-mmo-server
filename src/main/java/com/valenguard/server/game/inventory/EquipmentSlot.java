@@ -7,10 +7,10 @@ import lombok.Setter;
 @Setter
 class EquipmentSlot {
 
+    private EquipmentSlotTypes equipmentSlot;
     private ItemStack itemStack;
-    private ItemStackType itemStackType;
 
-    EquipmentSlot(ItemStackType itemStackType) {
-        this.itemStackType = itemStackType;
+    EquipmentSlot(EquipmentSlotTypes equipmentSlot) {
+        this.equipmentSlot = equipmentSlot;
     }
 }

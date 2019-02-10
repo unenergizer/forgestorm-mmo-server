@@ -5,8 +5,6 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.shared.Opcodes;
 
-import static com.valenguard.server.util.Log.println;
-
 public class EntityAttributesUpdatePacketOut extends ServerAbstractOutPacket {
 
 
@@ -25,8 +23,8 @@ public class EntityAttributesUpdatePacketOut extends ServerAbstractOutPacket {
         write.writeInt(attributes.getArmor());
         write.writeInt(attributes.getDamage());
 
-        println(getClass(), "Health: " + attributes.getHealth());
-        println(getClass(), "Armor: " + attributes.getArmor());
-        println(getClass(), "Damage: " + attributes.getDamage());
+//        println(getClass(), "Health: " + attributes.getHealth());
+//        println(getClass(), "Armor: " + attributes.getArmor());
+//        println(getClass(), "Damage: " + attributes.getDamage());
     }
 }

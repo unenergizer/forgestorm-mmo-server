@@ -19,43 +19,42 @@ public class PlayerEquipment {
     public void init(Player player) {
         this.player = player;
         // Main Body
-        equipmentSlots[0] = new EquipmentSlot(ItemStackType.HELM);
-        equipmentSlots[1] = new EquipmentSlot(ItemStackType.CHEST);
-        equipmentSlots[2] = new EquipmentSlot(ItemStackType.BOOTS);
-        equipmentSlots[3] = new EquipmentSlot(ItemStackType.CAPE);
-        equipmentSlots[4] = new EquipmentSlot(ItemStackType.GLOVES);
-        equipmentSlots[5] = new EquipmentSlot(ItemStackType.BELT);
+        equipmentSlots[0] = new EquipmentSlot(EquipmentSlotTypes.HELM);
+        equipmentSlots[1] = new EquipmentSlot(EquipmentSlotTypes.CHEST);
+        equipmentSlots[2] = new EquipmentSlot(EquipmentSlotTypes.BOOTS);
+        equipmentSlots[3] = new EquipmentSlot(EquipmentSlotTypes.CAPE);
+        equipmentSlots[4] = new EquipmentSlot(EquipmentSlotTypes.GLOVES);
+        equipmentSlots[5] = new EquipmentSlot(EquipmentSlotTypes.BELT);
 
         // Trinket
-        equipmentSlots[6] = new EquipmentSlot(ItemStackType.RING);
-        equipmentSlots[7] = new EquipmentSlot(ItemStackType.RING);
-        equipmentSlots[8] = new EquipmentSlot(ItemStackType.NECKLACE);
+        equipmentSlots[6] = new EquipmentSlot(EquipmentSlotTypes.RING_0);
+        equipmentSlots[7] = new EquipmentSlot(EquipmentSlotTypes.RING_1);
+        equipmentSlots[8] = new EquipmentSlot(EquipmentSlotTypes.NECKLACE);
 
         // Weapon
-        equipmentSlots[9] = new EquipmentSlot(ItemStackType.SWORD);
-        equipmentSlots[10] = new EquipmentSlot(ItemStackType.SHIELD);
-        equipmentSlots[11] = new EquipmentSlot(ItemStackType.ARROW);
+        equipmentSlots[9] = new EquipmentSlot(EquipmentSlotTypes.WEAPON);
+        equipmentSlots[10] = new EquipmentSlot(EquipmentSlotTypes.SHIELD);
+        equipmentSlots[11] = new EquipmentSlot(EquipmentSlotTypes.AMMO);
     }
 
-    public void swapBagAndEquipmentWindow(PlayerBag playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
+    void swapBagAndEquipmentWindow(PlayerBag playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
         ItemStack bagItemStack = playerBag.getItemStack(bagIndex);
         ItemStack equipmentItemStack = getItemStack(equipmentIndex);
-
-        if (equipItem) {
-            updatePlayerEquipment(bagItemStack, true);
-        } else {
-            updatePlayerEquipment(equipmentItemStack, false);
-        }
 
         // Confirming that the equipment is allowed to be switched.
         // If bagItemStack == null then the equipment is being removed.
         if (bagItemStack != null) {
-            if (equipmentSlots[equipmentIndex].getItemStackType() != bagItemStack.getItemStackType()) return;
+            boolean foundType = false;
+            for (ItemStackType itemStackType : equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()) {
+                if (itemStackType == bagItemStack.getItemStackType()) foundType = true;
+            }
+            if (!foundType) return;
         }
 
         playerBag.setItemStack(bagIndex, equipmentItemStack);
         equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
 
+        updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem);
         updateAppearance(equipmentIndex);
     }
 
@@ -65,18 +64,18 @@ public class PlayerEquipment {
      * @param itemStack The {@link ItemStack} the player is equipping or removing.
      * @param equipItem True if the player is equipping the {@link ItemStack}, false otherwise.
      */
-    private void updatePlayerEquipment(ItemStack itemStack, boolean equipItem) {
+    private void updatePlayerAttributes(ItemStack bagItemStack, ItemStack equipItemStack, boolean equipItem) {
 
         Attributes playerClientAttributes = player.getAttributes();
-        Attributes itemStackAttributes = itemStack.getAttributes();
+        Attributes itemStackAttributes = equipItem ? bagItemStack.getAttributes() : equipItemStack.getAttributes();
 
         println(PRINT_DEBUG);
-        println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), PRINT_DEBUG);
-        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), PRINT_DEBUG);
-        println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), PRINT_DEBUG);
-        println(getClass(), "IS Health: " + itemStackAttributes.getHealth(), PRINT_DEBUG);
-        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(), PRINT_DEBUG);
-        println(getClass(), "IS Damage: " + itemStackAttributes.getDamage(), PRINT_DEBUG);
+//        println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), false, PRINT_DEBUG);
+//        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
+//        println(getClass(), "IS Health: " + itemStackAttributes.getHealth(),  false,PRINT_DEBUG);
+//        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "IS Damage: " + itemStackAttributes.getDamage(), false, PRINT_DEBUG);
 
         // TODO: Instead of manually adding the new values, we should possible loop through all equipped items and get values this way.
         if (equipItem) {
@@ -84,12 +83,39 @@ public class PlayerEquipment {
             playerClientAttributes.setHealth(playerClientAttributes.getHealth() + itemStackAttributes.getHealth());
             playerClientAttributes.setArmor(playerClientAttributes.getArmor() + itemStackAttributes.getArmor());
             playerClientAttributes.setDamage(playerClientAttributes.getDamage() + itemStackAttributes.getDamage());
+
+            if (equipItemStack != null) {
+                println(getClass(), "SWAPPING ITEM STATES", false, PRINT_DEBUG);
+
+                Attributes removedAttributes = equipItemStack.getAttributes();
+                playerClientAttributes.setHealth(playerClientAttributes.getHealth() - removedAttributes.getHealth());
+                playerClientAttributes.setArmor(playerClientAttributes.getArmor() - removedAttributes.getArmor());
+                playerClientAttributes.setDamage(playerClientAttributes.getDamage() - removedAttributes.getDamage());
+            } else {
+                println(getClass(), "ADDING ITEM STATES", false, PRINT_DEBUG);
+            }
+
         } else {
+
+            println(getClass(), "REMOVING ITEM STATES", false, PRINT_DEBUG);
+
             // Player Unequipped an Item. Update attributes!
             playerClientAttributes.setHealth(playerClientAttributes.getHealth() - itemStackAttributes.getHealth());
             playerClientAttributes.setArmor(playerClientAttributes.getArmor() - itemStackAttributes.getArmor());
             playerClientAttributes.setDamage(playerClientAttributes.getDamage() - itemStackAttributes.getDamage());
+
+            if (bagItemStack != null) {
+                Attributes addAttributes = bagItemStack.getAttributes();
+                playerClientAttributes.setHealth(playerClientAttributes.getHealth() + addAttributes.getHealth());
+                playerClientAttributes.setArmor(playerClientAttributes.getArmor() + addAttributes.getArmor());
+                playerClientAttributes.setDamage(playerClientAttributes.getDamage() + addAttributes.getDamage());
+            }
         }
+
+//        println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), false, PRINT_DEBUG);
+//        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Final Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
+        println(PRINT_DEBUG);
 
         // Send attributes packet
         new EntityAttributesUpdatePacketOut(player, player).sendPacket();
@@ -106,15 +132,15 @@ public class PlayerEquipment {
                 }
             }
         } else {
-            if (equipmentSlots[equipmentIndex].getItemStackType() == ItemStackType.CHEST) {
+            if (equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()[0] == ItemStackType.CHEST) {
                 player.setArmorAppearance((short) -1);
-            } else if (equipmentSlots[equipmentIndex].getItemStackType() == ItemStackType.HELM) {
+            } else if (equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()[0] == ItemStackType.HELM) {
                 player.setHelmAppearance((short) -1);
             }
         }
     }
 
-    public ItemStack getItemStack(byte index) {
+    ItemStack getItemStack(byte index) {
         return equipmentSlots[index].getItemStack();
     }
 }
