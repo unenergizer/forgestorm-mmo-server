@@ -7,5 +7,5 @@ public class GameConstants {
     public static final short HUMAN_MAX_HEADS = 79;
     public static final short HUMAN_MAX_BODIES = 59;
 
-    public static final int GENERAL_ATTACK_RADIUS = 10;
+    public static final int GENERAL_ATTACK_RADIUS = 7;
 }
