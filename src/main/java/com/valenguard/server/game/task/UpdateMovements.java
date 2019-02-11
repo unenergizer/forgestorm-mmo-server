@@ -7,6 +7,7 @@ import com.valenguard.server.game.entity.AIEntity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.packet.out.EntityMovePacketOut;
@@ -32,7 +33,11 @@ public class UpdateMovements {
     }
 
     private void generateNewAIMovements(MovingEntity movingEntity) {
-        if (movingEntity.getEntityType() != EntityType.NPC && movingEntity.getEntityType() != EntityType.MONSTER) return;
+        if (movingEntity.getEntityType() != EntityType.NPC && movingEntity.getEntityType() != EntityType.MONSTER)
+            return;
+
+        if (movingEntity.getTargetEntity() != null) return;
+
         MoveDirection moveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
 
         // Start performing a movement if the entity is not moving
@@ -65,6 +70,9 @@ public class UpdateMovements {
                 Log.println(getClass(), "Generating a new move.", false, PRINT_DEBUG);
 
                 ((AIEntity) movingEntity).getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
+
+                if (movingEntity.getTargetEntity() != null) return;
+
                 MoveDirection predictedMoveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(true);
 
                 if (predictedMoveDirection != MoveDirection.NONE) {
@@ -95,9 +103,103 @@ public class UpdateMovements {
 
     private void finishMove(MovingEntity movingEntity) {
         Log.println(getClass(), "EntityId: " + movingEntity.getServerEntityId() + " has finished it's move", false, PRINT_DEBUG);
+
         movingEntity.getCurrentMapLocation().set(movingEntity.getFutureMapLocation());
         movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
         movingEntity.setRealY(movingEntity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
+
+        // Check radius to see if hostile entities need to move towards a player or another entity (crab vs human or wolf vs bunny)
+
+        GameMap gameMap = movingEntity.getGameMap();
+        if (movingEntity instanceof Player) {
+            // Player
+            for (MovingEntity mob : gameMap.getMobList().values()) {
+
+                if (mob.getEntityType() != EntityType.MONSTER) {
+                    continue;
+                }
+
+                if (mob.getTargetEntity() == null) {
+                    findTrackingPath(mob, movingEntity);
+                } else if (mob.getTargetEntity().equals(movingEntity)) {
+                    findTrackingPath(mob, movingEntity);
+                }
+            }
+        } else if (movingEntity.getEntityType() == EntityType.MONSTER) {
+            // MovingEntity
+            if (movingEntity.getTargetEntity() != null) {
+                findTrackingPath(movingEntity, movingEntity.getTargetEntity());
+                return;
+            }
+
+            for (Player targetPlayer : gameMap.getPlayerList()) {
+                if (findTrackingPath(movingEntity, targetPlayer)) break;
+            }
+        }
+    }
+
+    private boolean findTrackingPath(MovingEntity movingEntity, MovingEntity targetPlayer) {
+
+        if (movingEntity.isEntityMoving()) {
+            return false;
+        }
+
+        Location currentLocation = movingEntity.getCurrentMapLocation();
+        Location targetLocation = targetPlayer.getCurrentMapLocation();
+        int diffX = targetLocation.getX() - currentLocation.getX();
+        int diffY = targetLocation.getY() - currentLocation.getY();
+        GameMap gameMap = movingEntity.getGameMap();
+
+        double realDifference = Math.sqrt((double) (diffX * diffX + diffY * diffY));
+        int distance = (int) Math.floor(realDifference);
+
+        if (distance <= GameConstants.GENERAL_ATTACK_RADIUS) {
+            // Fuckem up!
+
+            movingEntity.setTargetEntity(targetPlayer);
+
+            Location northLocation = currentLocation.add(gameMap.getLocation(MoveDirection.NORTH));
+            Location southLocation = currentLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
+            Location eastLocation = currentLocation.add(gameMap.getLocation(MoveDirection.EAST));
+            Location westLocation = currentLocation.add(gameMap.getLocation(MoveDirection.WEST));
+
+            if (targetLocation.getX() > currentLocation.getX()) {
+                if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
+                    if (gameMap.isMovable(eastLocation))
+                        performMove(movingEntity, MoveDirection.EAST);
+                }
+            } else if (targetLocation.getX() < currentLocation.getX()) {
+                if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
+                    if (gameMap.isMovable(westLocation))
+                        performMove(movingEntity, MoveDirection.WEST);
+                }
+            } else if (targetLocation.getY() > currentLocation.getY()) {
+                if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
+                    if (gameMap.isMovable(northLocation))
+                        performMove(movingEntity, MoveDirection.NORTH);
+                }
+            } else if (targetLocation.getY() < currentLocation.getY()) {
+                if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
+                    if (gameMap.isMovable(southLocation))
+                        performMove(movingEntity, MoveDirection.SOUTH);
+                }
+            } else {
+                // on top of each other
+                if (gameMap.isMovable(northLocation)) {
+                    performMove(movingEntity, MoveDirection.NORTH);
+                } else if (gameMap.isMovable(southLocation)) {
+                    performMove(movingEntity, MoveDirection.SOUTH);
+                } else if (gameMap.isMovable(westLocation)) {
+                    performMove(movingEntity, MoveDirection.WEST);
+                } else if (gameMap.isMovable(eastLocation)) {
+                    performMove(movingEntity, MoveDirection.EAST);
+                } else {
+                    movingEntity.setTargetEntity(null);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -146,7 +248,7 @@ public class UpdateMovements {
         movingEntity.setFacingDirection(moveDirection);
 
         Log.println(getClass(), "CurrentLocation: " + movingEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
-        Log.println(getClass(), "FutureLocation: " + movingEntity.getFutureMapLocation(),false, PRINT_DEBUG);
+        Log.println(getClass(), "FutureLocation: " + movingEntity.getFutureMapLocation(), false, PRINT_DEBUG);
 
 
         movingEntity.getGameMap().getPlayerList().forEach(player ->

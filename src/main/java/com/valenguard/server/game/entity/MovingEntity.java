@@ -44,6 +44,14 @@ public class MovingEntity extends Entity {
      */
     private Attributes attributes = new Attributes();
 
+    /**
+     * This is the entity that we are interested in
+     */
+    private MovingEntity targetEntity;
+
+    private MoveDirection previousDirection = MoveDirection.NONE;
+
+
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));
         setFutureMapLocation(new Location(warp.getLocation()));
