@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.valenguard.server.util.Log.println;
 
 public class GameMap {
 
@@ -50,7 +49,7 @@ public class GameMap {
         mobSpawnQueue.add(movingEntity);
     }
 
-    public void queueMobDespawn(MovingEntity movingEntity) {
+    private void queueMobDespawn(MovingEntity movingEntity) {
         mobDespawnQueue.add(movingEntity);
     }
 
@@ -129,6 +128,7 @@ public class GameMap {
 
                 MovingEntity targetEntity = movingEntity.getTargetEntity();
 
+                // Check for distance
                 if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), 1) || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), 1)) {
 
                     Attributes movingEntityAttributes = movingEntity.getAttributes();
@@ -137,61 +137,57 @@ public class GameMap {
                     movingEntityAttributes.setHealth(movingEntityAttributes.getHealth() - targetEntityAttributes.getDamage());
                     targetEntityAttributes.setHealth(targetEntityAttributes.getHealth() - movingEntityAttributes.getDamage());
 
-                    println(true);
-                    println(getClass(), "[MovingEntity] HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage());
-                    println(getClass(), "[TargetEntity] HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage());
-
-                    if (movingEntity instanceof Player) {
-                        new ChatMessagePacketOut((Player) movingEntity, "Your HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-                        new ChatMessagePacketOut((Player) movingEntity, "Enemy HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
-                    }
-                    if (targetEntity instanceof Player) {
-                        new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-                        new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
-                    }
+                    sendCombatMessage(movingEntity, targetEntity);
 
                     if (movingEntityAttributes.getHealth() <= 0) {
-                        println(getClass(), "[MovingEntity] died! :(");
-                        targetEntity.setTargetEntity(null);
-
-                        if (movingEntity instanceof Player) {
-                            new ChatMessagePacketOut((Player) movingEntity, "You died!").sendPacket();
-                            Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
-                            movingEntity.setCurrentMapLocation(teleportLocation);
-                            movingEntity.setFutureMapLocation(teleportLocation);
-                            movingEntity.setFacingDirection(MoveDirection.SOUTH);
-                            new PlayerTeleportPacketOut((Player) movingEntity, movingEntity, teleportLocation, MoveDirection.SOUTH).sendPacket();
-
-                        } else if (movingEntity instanceof Monster) {
-                            println(getClass(), "[MovingEntity] despawning monster");
-                            queueMobDespawn(movingEntity);
-                        }
-                        if (targetEntity instanceof Player) {
-                            new ChatMessagePacketOut((Player) targetEntity, "You killed the enemy").sendPacket();
-                        }
+                        finishCombat(targetEntity, movingEntity);
                     }
 
                     if (targetEntityAttributes.getHealth() <= 0) {
-                        println(getClass(), "[TargetEntity] died! :(");
-                        movingEntity.setTargetEntity(null);
-
-                        if (movingEntity instanceof Player) {
-                            new ChatMessagePacketOut((Player) movingEntity, "You killed the enemy").sendPacket();
-                        } else if (movingEntity instanceof Monster) {
-                            println(getClass(), "[TargetEntity] despawning monster");
-                            queueMobDespawn(targetEntity);
-                        }
-                        if (targetEntity instanceof Player) {
-                            new ChatMessagePacketOut((Player) targetEntity, "You died!").sendPacket();
-                            Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
-                            targetEntity.setCurrentMapLocation(teleportLocation);
-                            targetEntity.setFutureMapLocation(teleportLocation);
-                            targetEntity.setFacingDirection(MoveDirection.SOUTH);
-                            new PlayerTeleportPacketOut((Player) targetEntity, targetEntity, teleportLocation, MoveDirection.SOUTH).sendPacket();
-                        }
+                        finishCombat(movingEntity, targetEntity);
                     }
                 }
             }
+        }
+    }
+
+    private void sendCombatMessage(MovingEntity attackerEntity, MovingEntity targetEntity) {
+        Attributes movingEntityAttributes = attackerEntity.getAttributes();
+        Attributes targetEntityAttributes = targetEntity.getAttributes();
+
+        if (attackerEntity instanceof Player) {
+            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
+        }
+        if (targetEntity instanceof Player) {
+            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
+        }
+    }
+
+    private void finishCombat(MovingEntity killerEntity, MovingEntity deadEntity) {
+        killerEntity.setTargetEntity(null); // Remove the killer entities target!
+
+        if (killerEntity instanceof Player) {
+            new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
+        }
+
+        if (deadEntity instanceof Monster || deadEntity instanceof MOB) {
+            queueMobDespawn(deadEntity); // A mob died, despawn them!
+        } else if (deadEntity instanceof Player) {
+            // Player Died. Lets respawn them!
+
+            // TODO: Check to see if the player needs to change maps!
+
+            Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
+            MoveDirection facingDirection = MoveDirection.SOUTH;
+
+            deadEntity.setCurrentMapLocation(teleportLocation);
+            deadEntity.setFutureMapLocation(teleportLocation);
+            deadEntity.setFacingDirection(facingDirection);
+
+            new PlayerTeleportPacketOut((Player) deadEntity, deadEntity, teleportLocation, facingDirection).sendPacket();
+            new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
         }
     }
 
