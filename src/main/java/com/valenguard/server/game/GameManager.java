@@ -188,6 +188,7 @@ public class GameManager {
         gameMaps.values().forEach(GameMap::tickMOB);
 //        gameMaps.values().forEach(GameMap::tickGroundItems);
         gameMaps.values().forEach(GameMap::tickPlayer);
+        gameMaps.values().forEach(GameMap::tickCombat);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
     }
 

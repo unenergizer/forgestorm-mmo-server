@@ -48,6 +48,11 @@ public class Location {
         this.y = this.y + y;
     }
 
+    public boolean isWithinDistance(Location location, int distance) {
+        return (x + distance == location.getX() || x - distance == location.getX() || x == location.getX())
+                && (y + distance == location.getY() || y - distance == location.getY() || y == location.getY());
+    }
+
     @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object obj) {

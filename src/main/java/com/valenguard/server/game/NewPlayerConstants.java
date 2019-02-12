@@ -1,6 +1,6 @@
 package com.valenguard.server.game;
 
-class NewPlayerConstants {
+public class NewPlayerConstants {
 
     /**
      * How fast our player can move around the map.
@@ -17,11 +17,23 @@ class NewPlayerConstants {
      * This is the first spawn point of the player. This coordinate is based on the coordinate system in Tiled Editor.
      * This Tiled Editor coordinate gets translated later to in-game coordinates.
      */
-    public static final int STARTING_X_CORD = 40;
+    public static final int STARTING_X_CORD = 43;
 
     /**
      * This is the first spawn point of the player. This coordinate is based on the coordinate system in Tiled Editor.
      * This Tiled Editor coordinate gets translated later to in-game coordinates.
      */
     public static final int STARTING_Y_CORD = 30;
+
+    /**
+     * This is the first respawn point of the player. This coordinate is based on the coordinate system in Tiled Editor.
+     * This Tiled Editor coordinate gets translated later to in-game coordinates.
+     */
+    public static final int RESPAWN_X_CORD = 42;
+
+    /**
+     * This is the first respawn point of the player. This coordinate is based on the coordinate system in Tiled Editor.
+     * This Tiled Editor coordinate gets translated later to in-game coordinates.
+     */
+    public static final int RESPAWN_Y_CORD = 15;
 }
