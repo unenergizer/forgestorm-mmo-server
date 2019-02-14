@@ -20,6 +20,7 @@ public class TmxFileParser {
 
     private static final int TILE_SIZE = 16;
     private static final boolean PRINT_DEBUG = false;
+    private static final boolean SHOW_ID_IN_NAME = false;
 
     /**
      * This takes in a TMX map and gets the collision elements from it and builds a collision
@@ -156,7 +157,9 @@ public class TmxFileParser {
                     if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element objectTagElement = (Element) objectTag.item(j);
+
                     String name = objectTagElement.getAttribute("name");
+                    if (SHOW_ID_IN_NAME) name = name + " " + j;
 
                     int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
                     int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;

@@ -6,6 +6,7 @@ import com.valenguard.server.util.Log;
 
 public class ChatMessagePacketOut extends ServerAbstractOutPacket {
 
+    private static final boolean PRINT_DEBUG = false;
     private final String message;
 
     public ChatMessagePacketOut(Player player, String message) {
@@ -16,6 +17,6 @@ public class ChatMessagePacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeString(message);
-        Log.println(getClass(), message);
+        Log.println(getClass(), message, false, PRINT_DEBUG);
     }
 }

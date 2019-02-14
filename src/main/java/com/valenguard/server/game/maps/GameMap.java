@@ -124,10 +124,9 @@ public class GameMap {
 
             // Now do combat
             for (MovingEntity movingEntity : mobList.values()) {
-                if (movingEntity.getTargetEntity() == null) return;
+                if (movingEntity.getTargetEntity() == null) continue;
 
                 MovingEntity targetEntity = movingEntity.getTargetEntity();
-
                 // Check for distance
                 if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), 1) || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), 1)) {
 
@@ -152,32 +151,42 @@ public class GameMap {
     }
 
     private void sendCombatMessage(MovingEntity attackerEntity, MovingEntity targetEntity) {
-        Attributes movingEntityAttributes = attackerEntity.getAttributes();
+        Attributes attackerEntityAttributes = attackerEntity.getAttributes();
         Attributes targetEntityAttributes = targetEntity.getAttributes();
 
         if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + attackerEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) attackerEntity, attackerEntity, attackerEntityAttributes.getHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) attackerEntity, targetEntity, targetEntityAttributes.getHealth(), attackerEntityAttributes.getDamage()).sendPacket();
         }
         if (targetEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + movingEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + movingEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) targetEntity, attackerEntity, attackerEntityAttributes.getHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) targetEntity, targetEntity, targetEntityAttributes.getHealth(), attackerEntityAttributes.getDamage()).sendPacket();
         }
     }
 
     private void finishCombat(MovingEntity killerEntity, MovingEntity deadEntity) {
-        killerEntity.setTargetEntity(null); // Remove the killer entities target!
+
+        // Remove the deadEntity from all entities target!
+        releaseEntityTargets(deadEntity);
 
         if (killerEntity instanceof Player) {
             new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
         }
 
         if (deadEntity instanceof Monster || deadEntity instanceof MOB) {
+
+            // TODO: Respawn mobs after X amount of time
+
             queueMobDespawn(deadEntity); // A mob died, despawn them!
         } else if (deadEntity instanceof Player) {
             // Player Died. Lets respawn them!
 
             // TODO: Check to see if the player needs to change maps!
+            // TODO: Reheal the player and adjust any other attributes!
 
             Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
             MoveDirection facingDirection = MoveDirection.SOUTH;
@@ -186,8 +195,19 @@ public class GameMap {
             deadEntity.setFutureMapLocation(teleportLocation);
             deadEntity.setFacingDirection(facingDirection);
 
-            new PlayerTeleportPacketOut((Player) deadEntity, deadEntity, teleportLocation, facingDirection).sendPacket();
+            // Send all players in map the teleport packet
+            forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+
             new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
+        }
+    }
+
+    private void releaseEntityTargets(MovingEntity targetToRemove) {
+        for (MovingEntity movingEntity : mobList.values()) {
+            if (movingEntity.getTargetEntity() != null
+                    && movingEntity.getTargetEntity().equals(targetToRemove)) {
+                movingEntity.setTargetEntity(null);
+            }
         }
     }
 
@@ -226,6 +246,7 @@ public class GameMap {
     }
 
     private void playerQuitGameMap(Player player) {
+        releaseEntityTargets(player);
         playerList.remove(player);
         player.gameMapDeregister();
     }

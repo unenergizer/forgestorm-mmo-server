@@ -212,7 +212,7 @@ public class GameManager {
     }
 
     private void fixWarpHeights() {
-        gameMaps.values().forEach(gameMap -> {
+        for (GameMap gameMap : gameMaps.values()) {
             for (int i = 0; i < gameMap.getMapWidth(); i++) {
                 for (int j = 0; j < gameMap.getMapHeight(); j++) {
                     if (gameMap.isOutOfBounds(i, j)) continue;
@@ -221,7 +221,7 @@ public class GameManager {
                     warp.getLocation().setY(gameMaps.get(warp.getLocation().getMapName()).getMapHeight() - warp.getLocation().getY() - 1);
                 }
             }
-        });
+        }
     }
 
     public GameMap getGameMap(String mapName) throws RuntimeException {
