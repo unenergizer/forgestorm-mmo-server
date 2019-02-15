@@ -144,9 +144,12 @@ public class GameManager {
 
         // Setup base player attributes
         Attributes baseAttributes = new Attributes();
-        baseAttributes.setHealth(10);
-        baseAttributes.setArmor(1);
-        baseAttributes.setDamage(2);
+        baseAttributes.setArmor(NewPlayerConstants.BASE_ARMOR);
+        baseAttributes.setDamage(NewPlayerConstants.BASE_DAMAGE);
+
+        // Setup health
+        player.setCurrentHealth(NewPlayerConstants.BASE_HP);
+        player.setMaxHealth(NewPlayerConstants.BASE_HP);
 
         player.setAttributes(baseAttributes);
 
@@ -182,7 +185,7 @@ public class GameManager {
         player.setWarp(null);
     }
 
-    public void gameMapTick() {
+    public void gameMapTick(long numberOfTicksPassed) {
         spawnEntities();
         gameMaps.values().forEach(GameMap::tickStationaryEntities);
         gameMaps.values().forEach(GameMap::tickMOB);
@@ -190,6 +193,7 @@ public class GameManager {
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::tickCombat);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
+        gameMaps.values().forEach(gameMap -> gameMap.tickPlayerShuffle(numberOfTicksPassed));
     }
 
     private int getTotalPlayersOnline() {

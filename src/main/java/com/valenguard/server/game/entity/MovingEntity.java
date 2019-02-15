@@ -44,10 +44,15 @@ public class MovingEntity extends Entity {
      */
     private Attributes attributes = new Attributes();
 
+    private int maxHealth;
+    private int currentHealth;
+
     /**
      * This is the entity that we are interested in
      */
     private MovingEntity targetEntity;
+
+    private Warp spawnWarp;
 
     private MoveDirection previousDirection = MoveDirection.NONE;
 

@@ -1,6 +1,7 @@
 package com.valenguard.server.game.maps;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.util.Log;
@@ -242,15 +243,19 @@ public class TmxFileParser {
                     aiEntity.setEntityType(entityType);
                     aiEntity.setName(name);
                     aiEntity.setMoveSpeed(speed);
-                    aiEntity.gameMapRegister(new Warp(new Location(fileName, x, y), direction));
+                    aiEntity.setSpawnWarp(new Warp(new Location(fileName, x, y), direction));
+                    aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
                     // Setup basic attributes. TODO: Values here should come from file
                     Attributes attributes = new Attributes();
-                    attributes.setHealth(11);
                     attributes.setArmor(10);
                     attributes.setDamage(1);
 
                     aiEntity.setAttributes(attributes);
+
+                    // Setup health
+                    aiEntity.setCurrentHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
+                    aiEntity.setMaxHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
 
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 

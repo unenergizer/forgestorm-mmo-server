@@ -3,6 +3,7 @@ package com.valenguard.server.game.inventory;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
+import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -12,6 +13,7 @@ public class PlayerEquipment {
 
     public static final int CAPACITY = 12;
 
+    @Getter
     private final EquipmentSlot[] equipmentSlots = new EquipmentSlot[CAPACITY];
 
     private Player player;
@@ -60,9 +62,6 @@ public class PlayerEquipment {
 
     /**
      * Update the {@link Player} with the {@link Attributes} found on equipped item.
-     *
-     * @param itemStack The {@link ItemStack} the player is equipping or removing.
-     * @param equipItem True if the player is equipping the {@link ItemStack}, false otherwise.
      */
     private void updatePlayerAttributes(ItemStack bagItemStack, ItemStack equipItemStack, boolean equipItem) {
 
@@ -70,17 +69,14 @@ public class PlayerEquipment {
         Attributes itemStackAttributes = equipItem ? bagItemStack.getAttributes() : equipItemStack.getAttributes();
 
         println(PRINT_DEBUG);
-//        println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), false, PRINT_DEBUG);
-//        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
         println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
-//        println(getClass(), "IS Health: " + itemStackAttributes.getHealth(),  false,PRINT_DEBUG);
-//        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(),  false,PRINT_DEBUG);
         println(getClass(), "IS Damage: " + itemStackAttributes.getDamage(), false, PRINT_DEBUG);
 
         // TODO: Instead of manually adding the new values, we should possible loop through all equipped items and get values this way.
         if (equipItem) {
             // Player Equipped an Item. Update attributes!
-            playerClientAttributes.setHealth(playerClientAttributes.getHealth() + itemStackAttributes.getHealth());
             playerClientAttributes.setArmor(playerClientAttributes.getArmor() + itemStackAttributes.getArmor());
             playerClientAttributes.setDamage(playerClientAttributes.getDamage() + itemStackAttributes.getDamage());
 
@@ -88,7 +84,6 @@ public class PlayerEquipment {
                 println(getClass(), "SWAPPING ITEM STATES", false, PRINT_DEBUG);
 
                 Attributes removedAttributes = equipItemStack.getAttributes();
-                playerClientAttributes.setHealth(playerClientAttributes.getHealth() - removedAttributes.getHealth());
                 playerClientAttributes.setArmor(playerClientAttributes.getArmor() - removedAttributes.getArmor());
                 playerClientAttributes.setDamage(playerClientAttributes.getDamage() - removedAttributes.getDamage());
             } else {
@@ -100,20 +95,17 @@ public class PlayerEquipment {
             println(getClass(), "REMOVING ITEM STATES", false, PRINT_DEBUG);
 
             // Player Unequipped an Item. Update attributes!
-            playerClientAttributes.setHealth(playerClientAttributes.getHealth() - itemStackAttributes.getHealth());
             playerClientAttributes.setArmor(playerClientAttributes.getArmor() - itemStackAttributes.getArmor());
             playerClientAttributes.setDamage(playerClientAttributes.getDamage() - itemStackAttributes.getDamage());
 
             if (bagItemStack != null) {
                 Attributes addAttributes = bagItemStack.getAttributes();
-                playerClientAttributes.setHealth(playerClientAttributes.getHealth() + addAttributes.getHealth());
                 playerClientAttributes.setArmor(playerClientAttributes.getArmor() + addAttributes.getArmor());
                 playerClientAttributes.setDamage(playerClientAttributes.getDamage() + addAttributes.getDamage());
             }
         }
 
-//        println(getClass(), "PC Health: " + playerClientAttributes.getHealth(), false, PRINT_DEBUG);
-//        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
         println(getClass(), "PC Final Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
         println(PRINT_DEBUG);
 

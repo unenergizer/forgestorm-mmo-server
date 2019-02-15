@@ -6,20 +6,20 @@ import com.valenguard.server.network.shared.Opcodes;
 
 public class EntityDamagePacketOut extends ServerAbstractOutPacket {
 
-    private final MovingEntity teleportedEntity;
+    private final MovingEntity damagedEntity;
     private final int health;
     private final int damageTaken;
 
-    public EntityDamagePacketOut(Player receiver, MovingEntity teleportedEntity, int health, int damageTaken) {
+    public EntityDamagePacketOut(Player receiver, MovingEntity damagedEntity, int health, int damageTaken) {
         super(Opcodes.ENTITY_DAMAGE_OUT, receiver);
-        this.teleportedEntity = teleportedEntity;
+        this.damagedEntity = damagedEntity;
         this.health = health;
         this.damageTaken = damageTaken;
     }
 
     @Override
     protected void createPacket(ValenguardOutputStream write) {
-        write.writeShort(teleportedEntity.getServerEntityId());
+        write.writeShort(damagedEntity.getServerEntityId());
         write.writeInt(health);
         write.writeInt(damageTaken);
     }

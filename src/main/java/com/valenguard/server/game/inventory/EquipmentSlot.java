@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-class EquipmentSlot {
+public class EquipmentSlot {
 
     private EquipmentSlotTypes equipmentSlot;
     private ItemStack itemStack;

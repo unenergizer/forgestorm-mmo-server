@@ -35,7 +35,6 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
             Appearance appearance = movingEntity.getAppearance();
             switch (entityToSpawn.getEntityType()) {
                 case MONSTER:
-                case ITEM:
                     write.writeShort(appearance.getTextureId(Appearance.BODY));
                     break;
                 case NPC:
@@ -56,6 +55,10 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
             write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
             write.writeFloat(movingEntity.getMoveSpeed());
 
+            // send hp
+            write.writeInt(movingEntity.getMaxHealth());
+            write.writeInt(movingEntity.getCurrentHealth());
+
             Log.println(getClass(), "===================================", false, PRINT_DEBUG);
             Log.println(getClass(), "entityType: " + (entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
             Log.println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
@@ -67,8 +70,9 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
             for (int i = 0; i < entityToSpawn.getAppearance().getTextureIds().length; i++) {
                 Log.println(getClass(), "textureIds #" + i + ": " + entityToSpawn.getAppearance().getTextureIds()[i], false, PRINT_DEBUG);
             }
-
         } else {
+
+            // Is this ITEMS???
 
             write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
             write.writeInt(entityToSpawn.getCurrentMapLocation().getY());

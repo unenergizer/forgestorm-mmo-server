@@ -5,6 +5,7 @@ import com.valenguard.server.commands.ConsoleCommandManager;
 import com.valenguard.server.commands.listeners.InventoryCommands;
 import com.valenguard.server.commands.listeners.TicksPerSecondCommand;
 import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.entity.EntityRespawnTimer;
 import com.valenguard.server.game.inventory.ItemManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
@@ -24,6 +25,7 @@ public class ValenguardMain {
     private GameLoop gameLoop;
     private OutputStreamManager outStreamManager;
     private ItemManager itemManager;
+    private EntityRespawnTimer entityRespawnTimer;
 
     private ValenguardMain() {
     }
@@ -46,6 +48,8 @@ public class ValenguardMain {
         getGameManager().init();
 
         pingManager = new PingManager();
+
+        entityRespawnTimer = new EntityRespawnTimer();
 
         registerCommands();
         initializeNetwork();

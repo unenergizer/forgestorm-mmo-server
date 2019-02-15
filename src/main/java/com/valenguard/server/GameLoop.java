@@ -35,7 +35,7 @@ public class GameLoop extends Thread {
 
     /**
      * Grabs the current ticks per second of the server.
-     *
+     * <p>
      * TODO: USE FOR COMMANDS to SEND TO SERVER/CLIENT
      *
      * @return The current server ticks per second.
@@ -66,7 +66,8 @@ public class GameLoop extends Thread {
             playerInventoryEvents.processInventoryEvents();
             updateMovements.updatePlayerMovement();
             warpManager.warpPlayers();
-            ValenguardMain.getInstance().getGameManager().gameMapTick();
+            ValenguardMain.getInstance().getGameManager().gameMapTick(numberOfTicksPassed);
+            ValenguardMain.getInstance().getEntityRespawnTimer().tickRespawnTime();
             ValenguardMain.getInstance().getGameManager().processPlayerJoin();
             ValenguardMain.getInstance().getOutStreamManager().sendPackets();
 

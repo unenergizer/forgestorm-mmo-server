@@ -36,4 +36,8 @@ public class NewPlayerConstants {
      * This Tiled Editor coordinate gets translated later to in-game coordinates.
      */
     public static final int RESPAWN_Y_CORD = 15;
+
+    public static final int BASE_HP = 10;
+    public static final int BASE_ARMOR = 2;
+    public static final int BASE_DAMAGE = 1;
 }

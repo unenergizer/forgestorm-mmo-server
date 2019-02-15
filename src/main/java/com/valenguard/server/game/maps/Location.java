@@ -48,9 +48,16 @@ public class Location {
         this.y = this.y + y;
     }
 
-    public boolean isWithinDistance(Location location, int distance) {
-        return (x + distance == location.getX() || x - distance == location.getX() || x == location.getX())
-                && (y + distance == location.getY() || y - distance == location.getY() || y == location.getY());
+    public boolean isWithinDistance(Location otherLocation, int distance) {
+        return getDistanceAway(otherLocation) <= distance;
+    }
+
+    public int getDistanceAway(Location otherLocation) {
+        int diffX = otherLocation.getX() - x;
+        int diffY = otherLocation.getY() - y;
+
+        double realDifference = Math.sqrt((double) (diffX * diffX + diffY * diffY));
+        return (int) Math.floor(realDifference);
     }
 
     @SuppressWarnings("RedundantIfStatement")

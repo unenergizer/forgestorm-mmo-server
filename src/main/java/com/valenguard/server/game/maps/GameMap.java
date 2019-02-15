@@ -1,5 +1,6 @@
 package com.valenguard.server.game.maps;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.NewPlayerConstants;
 import com.valenguard.server.game.entity.*;
@@ -32,6 +33,7 @@ public class GameMap {
     private final Map<Short, MovingEntity> mobList = new HashMap<>();
     private final Queue<MovingEntity> mobSpawnQueue = new LinkedList<>();
     private final Queue<MovingEntity> mobDespawnQueue = new LinkedList<>();
+
 
     @Getter
     private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
@@ -95,6 +97,9 @@ public class GameMap {
 
     private void mobDespawnRegistration(MovingEntity movingEntity) {
         mobList.remove(movingEntity.getServerEntityId());
+
+        // Toggle respawns
+        ValenguardMain.getInstance().getEntityRespawnTimer().addMob(movingEntity);
     }
 
     public void tickPlayer() {
@@ -128,21 +133,22 @@ public class GameMap {
 
                 MovingEntity targetEntity = movingEntity.getTargetEntity();
                 // Check for distance
-                if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), 1) || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), 1)) {
+                if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), 1)
+                        || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), 1)) {
 
                     Attributes movingEntityAttributes = movingEntity.getAttributes();
                     Attributes targetEntityAttributes = targetEntity.getAttributes();
 
-                    movingEntityAttributes.setHealth(movingEntityAttributes.getHealth() - targetEntityAttributes.getDamage());
-                    targetEntityAttributes.setHealth(targetEntityAttributes.getHealth() - movingEntityAttributes.getDamage());
+                    movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                    targetEntity.setCurrentHealth(targetEntity.getCurrentHealth() - movingEntityAttributes.getDamage());
 
                     sendCombatMessage(movingEntity, targetEntity);
 
-                    if (movingEntityAttributes.getHealth() <= 0) {
+                    if (movingEntity.getCurrentHealth() <= 0) {
                         finishCombat(targetEntity, movingEntity);
                     }
 
-                    if (targetEntityAttributes.getHealth() <= 0) {
+                    if (targetEntity.getCurrentHealth() <= 0) {
                         finishCombat(movingEntity, targetEntity);
                     }
                 }
@@ -155,16 +161,19 @@ public class GameMap {
         Attributes targetEntityAttributes = targetEntity.getAttributes();
 
         if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + attackerEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) attackerEntity, attackerEntity, attackerEntityAttributes.getHealth(), targetEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) attackerEntity, targetEntity, targetEntityAttributes.getHealth(), attackerEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) attackerEntity, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut((Player) attackerEntity, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
         }
         if (targetEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntityAttributes.getHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntityAttributes.getHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) targetEntity, attackerEntity, attackerEntityAttributes.getHealth(), targetEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) targetEntity, targetEntity, targetEntityAttributes.getHealth(), attackerEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
+
+            forAllPlayers(player -> {
+                new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
+                new EntityDamagePacketOut(player, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
+            });
         }
     }
 
@@ -172,6 +181,7 @@ public class GameMap {
 
         // Remove the deadEntity from all entities target!
         releaseEntityTargets(deadEntity);
+        deadEntity.setTargetEntity(null);
 
         if (killerEntity instanceof Player) {
             new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
@@ -179,14 +189,12 @@ public class GameMap {
 
         if (deadEntity instanceof Monster || deadEntity instanceof MOB) {
 
-            // TODO: Respawn mobs after X amount of time
-
             queueMobDespawn(deadEntity); // A mob died, despawn them!
+
         } else if (deadEntity instanceof Player) {
             // Player Died. Lets respawn them!
 
             // TODO: Check to see if the player needs to change maps!
-            // TODO: Reheal the player and adjust any other attributes!
 
             Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
             MoveDirection facingDirection = MoveDirection.SOUTH;
@@ -195,8 +203,23 @@ public class GameMap {
             deadEntity.setFutureMapLocation(teleportLocation);
             deadEntity.setFacingDirection(facingDirection);
 
+            // Do a reheal
+            Player deadPlayer = (Player) deadEntity;
+            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
+
+            // TODO: Get and update attributes...
+//            for (EquipmentSlot equipmentSlot : deadPlayer.getPlayerEquipment().getEquipmentSlots()) {
+//                if (equipmentSlot.getItemStack() != null) {
+//                    resetHealth = resetHealth + equipmentSlot.getItemStack().getAttributes().getHealth();
+//                }
+//            }
+
+            // TODO: Send other players info about the reheal (if they are still on the same map)
+
             // Send all players in map the teleport packet
             forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+
+            forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
 
             new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
         }
@@ -208,6 +231,12 @@ public class GameMap {
                     && movingEntity.getTargetEntity().equals(targetToRemove)) {
                 movingEntity.setTargetEntity(null);
             }
+        }
+    }
+
+    public void tickPlayerShuffle(long numberOfTicksPassed) {
+        if ((numberOfTicksPassed % 40) == 0) {
+            Collections.shuffle(playerList);
         }
     }
 
