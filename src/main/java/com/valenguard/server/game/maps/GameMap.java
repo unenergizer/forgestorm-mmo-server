@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.valenguard.server.util.Log.println;
 
 public class GameMap {
 
@@ -252,7 +251,6 @@ public class GameMap {
             // Give player drop table item
             if (((AIEntity) deadEntity).getDropTableID() != null) {
                 ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(((AIEntity) deadEntity).getDropTableID(), 1);
-                println(getClass(), "<Killed Entity With a Drop Table> Should drop: " + itemStack.getName());
 
                 ItemStackDrop itemStackDrop = new ItemStackDrop();
                 itemStackDrop.setServerEntityId(lastItemStackDrop++);
@@ -328,6 +326,7 @@ public class GameMap {
             // Tell the player about all the mobs currently on the map.
             mobList.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
             stationaryEntitiesList.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
+            itemStackDropList.forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
         }
     }
 
