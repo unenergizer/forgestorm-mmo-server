@@ -1,18 +1,20 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.game.data.ItemStackLoader;
+
 import java.util.List;
 
-public class ItemManager {
+public class ItemStackManager {
 
     private ItemStack[] itemStacks;
 
-    public ItemManager() {
+    public ItemStackManager() {
         init();
     }
 
     private void init() {
-        ItemLoader itemLoader = new ItemLoader();
-        List<ItemStack> loadedItemStacks = itemLoader.loadItems();
+        ItemStackLoader itemStackLoader = new ItemStackLoader();
+        List<ItemStack> loadedItemStacks = itemStackLoader.loadItems();
         itemStacks = new ItemStack[loadedItemStacks.size()];
         loadedItemStacks.toArray(itemStacks);
     }

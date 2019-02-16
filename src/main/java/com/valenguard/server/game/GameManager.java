@@ -1,8 +1,12 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.game.data.TmxFileParser;
 import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.maps.*;
+import com.valenguard.server.game.maps.GameMap;
+import com.valenguard.server.game.maps.Location;
+import com.valenguard.server.game.maps.MoveDirection;
+import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
@@ -85,7 +89,7 @@ public class GameManager {
         ValenguardMain.getInstance().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
-        GameMap gameMap = gameMaps.get(NewPlayerConstants.STARTING_MAP);
+        GameMap gameMap = gameMaps.get(PlayerConstants.STARTING_MAP);
 
         // Below we create a starting currentMapLocation for a new player.
         // The Y cord is subtracted from the height of the map.
@@ -93,9 +97,9 @@ public class GameManager {
         // the Y cord is reversed.  This just makes our job
         // easier if we want to quickly grab a cord from the
         // Tiled Editor without doing the subtraction ourselves.
-        Location location = new Location(NewPlayerConstants.STARTING_MAP,
-                NewPlayerConstants.STARTING_X_CORD,
-                gameMap.getMapHeight() - NewPlayerConstants.STARTING_Y_CORD);
+        Location location = new Location(PlayerConstants.STARTING_MAP,
+                PlayerConstants.STARTING_X_CORD,
+                gameMap.getMapHeight() - PlayerConstants.STARTING_Y_CORD);
 
         Player player = initializePlayer(playerSessionData);
 
@@ -108,8 +112,8 @@ public class GameManager {
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
-        for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemManager().numberOfItems() - 1; itemId++) {
-            player.giveItemStack(ValenguardMain.getInstance().getItemManager().makeItemStack(itemId, 1));
+        for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemStackManager().numberOfItems() - 1; itemId++) {
+            player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
         }
 
         tempColor++;
@@ -130,7 +134,7 @@ public class GameManager {
         Player player = new Player();
         player.setEntityType(EntityType.PLAYER);
         player.setServerEntityId(playerSessionData.getServerID());
-        player.setMoveSpeed(NewPlayerConstants.DEFAULT_MOVE_SPEED);
+        player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
         player.setName(Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
@@ -144,12 +148,12 @@ public class GameManager {
 
         // Setup base player attributes
         Attributes baseAttributes = new Attributes();
-        baseAttributes.setArmor(NewPlayerConstants.BASE_ARMOR);
-        baseAttributes.setDamage(NewPlayerConstants.BASE_DAMAGE);
+        baseAttributes.setArmor(PlayerConstants.BASE_ARMOR);
+        baseAttributes.setDamage(PlayerConstants.BASE_DAMAGE);
 
         // Setup health
-        player.setCurrentHealth(NewPlayerConstants.BASE_HP);
-        player.setMaxHealth(NewPlayerConstants.BASE_HP);
+        player.setCurrentHealth(PlayerConstants.BASE_HP);
+        player.setMaxHealth(PlayerConstants.BASE_HP);
 
         player.setAttributes(baseAttributes);
 
@@ -189,7 +193,7 @@ public class GameManager {
         spawnEntities();
         gameMaps.values().forEach(GameMap::tickStationaryEntities);
         gameMaps.values().forEach(GameMap::tickMOB);
-//        gameMaps.values().forEach(GameMap::tickGroundItems);
+        gameMaps.values().forEach(gameMap -> gameMap.tickItemStackDrop(numberOfTicksPassed));
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::tickCombat);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);

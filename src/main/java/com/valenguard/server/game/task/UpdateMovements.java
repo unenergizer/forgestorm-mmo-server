@@ -110,8 +110,10 @@ public class UpdateMovements {
         movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
         movingEntity.setRealY(movingEntity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
 
-        // Check radius to see if hostile entities need to move towards a player or another entity (crab vs human or wolf vs bunny)
+        findEntityTarget(movingEntity);
+    }
 
+    private void findEntityTarget(MovingEntity movingEntity) {
         GameMap gameMap = movingEntity.getGameMap();
         if (movingEntity instanceof Player) {
             // Player

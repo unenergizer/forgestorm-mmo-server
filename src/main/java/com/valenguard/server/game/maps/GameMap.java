@@ -2,8 +2,9 @@ package com.valenguard.server.game.maps;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameManager;
-import com.valenguard.server.game.NewPlayerConstants;
+import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.packet.out.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.valenguard.server.util.Log.println;
 
 public class GameMap {
 
@@ -34,26 +36,26 @@ public class GameMap {
     private final Queue<MovingEntity> mobSpawnQueue = new LinkedList<>();
     private final Queue<MovingEntity> mobDespawnQueue = new LinkedList<>();
 
-
     @Getter
     private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
     private final Queue<StationaryEntity> stationaryEntitiesSpawnQueue = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
 
-    GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
+    @Getter
+    private final List<ItemStackDrop> itemStackDropList = new ArrayList<>();
+    private final Queue<ItemStackDrop> itemStackDropSpawnQueue = new LinkedList<>();
+    private final Queue<ItemStackDrop> itemStackDropDespawnQueue = new LinkedList<>();
+
+    public GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
         this.mapName = mapName;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.map = map;
     }
 
-    public void queueMobSpawn(MovingEntity movingEntity) {
-        mobSpawnQueue.add(movingEntity);
-    }
-
-    private void queueMobDespawn(MovingEntity movingEntity) {
-        mobDespawnQueue.add(movingEntity);
-    }
+    /*
+     * STATIONARY ENTITY ////////////////////////////////////////////////////////////////////////
+     */
 
     public void queueStationarySpawn(StationaryEntity stationaryEntity) {
         stationaryEntitiesSpawnQueue.add(stationaryEntity);
@@ -65,7 +67,7 @@ public class GameMap {
 
     public void tickStationaryEntities() {
         stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.put(stationaryEntity.getServerEntityId(), stationaryEntity));
-        mobDespawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.remove(stationaryEntity.getServerEntityId()));
+        stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.remove(stationaryEntity.getServerEntityId()));
 
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntitiesDespawnQueue.poll()) != null) {
@@ -75,6 +77,29 @@ public class GameMap {
         while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
             postEntityDespawn(stationaryEntity);
         }
+    }
+
+    /*
+     * MOB ////////////////////////////////////////////////////////////////////////
+     */
+
+    public void queueMobSpawn(MovingEntity movingEntity) {
+        mobSpawnQueue.add(movingEntity);
+    }
+
+    private void queueMobDespawn(MovingEntity movingEntity) {
+        mobDespawnQueue.add(movingEntity);
+    }
+
+    private void mobSpawnRegistration(MovingEntity movingEntity) {
+        mobList.put(movingEntity.getServerEntityId(), movingEntity);
+    }
+
+    private void mobDespawnRegistration(MovingEntity movingEntity) {
+        mobList.remove(movingEntity.getServerEntityId());
+
+        // Toggle respawns
+        ValenguardMain.getInstance().getEntityRespawnTimer().addMob(movingEntity);
     }
 
     public void tickMOB() {
@@ -91,16 +116,47 @@ public class GameMap {
         }
     }
 
-    private void mobSpawnRegistration(MovingEntity movingEntity) {
-        mobList.put(movingEntity.getServerEntityId(), movingEntity);
+    /*
+     * ItemStackDrop //////////////////////////////////////////////////////////////////////////
+     */
+
+    public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
+        itemStackDropSpawnQueue.add(itemStackDrop);
     }
 
-    private void mobDespawnRegistration(MovingEntity movingEntity) {
-        mobList.remove(movingEntity.getServerEntityId());
-
-        // Toggle respawns
-        ValenguardMain.getInstance().getEntityRespawnTimer().addMob(movingEntity);
+    private void queueItemStackDropDespawn(ItemStackDrop itemStackDrop) {
+        itemStackDropDespawnQueue.add(itemStackDrop);
     }
+
+    private void itemStackDropSpawnRegistration(ItemStackDrop itemStackDrop) {
+        itemStackDropList.add(itemStackDrop);
+    }
+
+    private void itemStackDropDespawnRegistration(ItemStackDrop itemStackDrop) {
+        itemStackDropList.remove(itemStackDrop);
+    }
+
+    public void tickItemStackDrop(long numberOfTicksPassed) {
+        itemStackDropSpawnQueue.forEach(this::itemStackDropSpawnRegistration);
+        itemStackDropDespawnQueue.forEach(this::itemStackDropDespawnRegistration);
+
+        ItemStackDrop itemStackDrop;
+        while ((itemStackDrop = itemStackDropSpawnQueue.poll()) != null) {
+            postEntitySpawn(itemStackDrop);
+        }
+
+        while ((itemStackDrop = itemStackDropDespawnQueue.poll()) != null) {
+            postEntityDespawn(itemStackDrop);
+        }
+
+        if (numberOfTicksPassed % 40 == 0) {
+            // TODO : Process itemStackDrop Times
+        }
+    }
+
+    /*
+     * Player ////////////////////////////////////////////////////////////////////////////////
+     */
 
     public void tickPlayer() {
         // Remove players
@@ -177,6 +233,8 @@ public class GameMap {
         }
     }
 
+    private short lastItemStackDrop = 2000;
+
     private void finishCombat(MovingEntity killerEntity, MovingEntity deadEntity) {
 
         // Remove the deadEntity from all entities target!
@@ -191,12 +249,27 @@ public class GameMap {
 
             queueMobDespawn(deadEntity); // A mob died, despawn them!
 
+            // Give player drop table item
+            if (((AIEntity) deadEntity).getDropTableID() != null) {
+                ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(((AIEntity) deadEntity).getDropTableID(), 1);
+                println(getClass(), "<Killed Entity With a Drop Table> Should drop: " + itemStack.getName());
+
+                ItemStackDrop itemStackDrop = new ItemStackDrop();
+                itemStackDrop.setServerEntityId(lastItemStackDrop++);
+                itemStackDrop.setEntityType(EntityType.ITEM_STACK);
+                itemStackDrop.setName(itemStack.getName());
+                itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
+                itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
+
+                queueItemStackDropSpawn(itemStackDrop);
+            }
+
         } else if (deadEntity instanceof Player) {
             // Player Died. Lets respawn them!
 
             // TODO: Check to see if the player needs to change maps!
 
-            Location teleportLocation = new Location(NewPlayerConstants.STARTING_MAP, NewPlayerConstants.RESPAWN_X_CORD, mapHeight - NewPlayerConstants.RESPAWN_Y_CORD);
+            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, mapHeight - PlayerConstants.RESPAWN_Y_CORD);
             MoveDirection facingDirection = MoveDirection.SOUTH;
 
             deadEntity.setCurrentMapLocation(teleportLocation);
@@ -235,7 +308,7 @@ public class GameMap {
     }
 
     public void tickPlayerShuffle(long numberOfTicksPassed) {
-        if ((numberOfTicksPassed % 40) == 0) {
+        if (numberOfTicksPassed % 40 == 0) {
             Collections.shuffle(playerList);
         }
     }
@@ -286,8 +359,6 @@ public class GameMap {
             // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
                 new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
-                // TODO: Send stats ????
-//                new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
 
             // Send joined player to all online players

@@ -14,7 +14,7 @@ public class InventoryCommands {
         if (itemId < 0) return;
 
         ValenguardMain.getInstance().getGameManager().forAllPlayers(player ->
-                player.giveItemStack(ValenguardMain.getInstance().getItemManager().makeItemStack(itemId, 1)));
+                player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1)));
 
     }
 
@@ -34,7 +34,7 @@ public class InventoryCommands {
             }
 
             ValenguardMain.getInstance().getGameManager().forAllPlayers(player ->
-                    player.giveItemStack(ValenguardMain.getInstance().getItemManager().makeItemStack(itemId, itemAmount)));
+                    player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount)));
 
         } catch (NumberFormatException e) {
             System.out.println("Must provide an itemAmount as a number.");
@@ -49,7 +49,7 @@ public class InventoryCommands {
 
             itemId = Integer.parseInt(argument);
 
-            int maxItems = ValenguardMain.getInstance().getItemManager().numberOfItems() - 1;
+            int maxItems = ValenguardMain.getInstance().getItemStackManager().numberOfItems() - 1;
             if (itemId < 0) {
                 System.out.println("The itemId number cannot be below zero.");
                 return -1;

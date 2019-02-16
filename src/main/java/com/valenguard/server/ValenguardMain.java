@@ -6,7 +6,8 @@ import com.valenguard.server.commands.listeners.InventoryCommands;
 import com.valenguard.server.commands.listeners.TicksPerSecondCommand;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.EntityRespawnTimer;
-import com.valenguard.server.game.inventory.ItemManager;
+import com.valenguard.server.game.inventory.DropTableManager;
+import com.valenguard.server.game.inventory.ItemStackManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.*;
@@ -24,7 +25,8 @@ public class ValenguardMain {
     private CommandProcessor commandProcessor;
     private GameLoop gameLoop;
     private OutputStreamManager outStreamManager;
-    private ItemManager itemManager;
+    private ItemStackManager itemStackManager;
+    private DropTableManager dropTableManager;
     private EntityRespawnTimer entityRespawnTimer;
 
     private ValenguardMain() {
@@ -42,7 +44,8 @@ public class ValenguardMain {
     private void start() {
         Log.println(getClass(), "Booting Valenguard Server!");
 
-        itemManager = new ItemManager();
+        itemStackManager = new ItemStackManager();
+        dropTableManager = new DropTableManager();
 
         gameManager = new GameManager();
         getGameManager().init();

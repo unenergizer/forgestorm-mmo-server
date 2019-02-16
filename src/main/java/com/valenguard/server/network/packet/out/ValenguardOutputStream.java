@@ -91,7 +91,6 @@ public class ValenguardOutputStream {
         opcodePacketData.setNumberOfRepeats(1);
     }
 
-
     void appendBewBuffer() {
         opcodePacketData.getBuffers().add(createNewBuffer());
         opcodePacketData.setNumberOfRepeats(opcodePacketData.getNumberOfRepeats() + 1);

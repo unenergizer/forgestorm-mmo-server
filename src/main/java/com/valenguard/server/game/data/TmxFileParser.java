@@ -1,8 +1,9 @@
-package com.valenguard.server.game.maps;
+package com.valenguard.server.game.data;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.maps.*;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
@@ -177,6 +178,8 @@ public class TmxFileParser {
                     float probabilityStill = -2f;
                     float probabilityWalkStart = -2f;
 
+                    Integer dropTable = null;
+
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
 
@@ -215,6 +218,9 @@ public class TmxFileParser {
                         if (propertyElement.getAttribute("name").equals("bounds2y")) {
                             bounds2y = Integer.parseInt(propertyElement.getAttribute("value"));
                         }
+                        if (propertyElement.getAttribute("name").equals("dropTable")) {
+                            dropTable = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
                     }
 
                     AIEntity aiEntity = null;
@@ -246,6 +252,8 @@ public class TmxFileParser {
                     aiEntity.setSpawnWarp(new Warp(new Location(fileName, x, y), direction));
                     aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
+                    if (dropTable != null) aiEntity.setDropTableID(dropTable);
+
                     // Setup basic attributes. TODO: Values here should come from file
                     Attributes attributes = new Attributes();
                     attributes.setArmor(10);
@@ -260,7 +268,6 @@ public class TmxFileParser {
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 
                     Log.println(TmxFileParser.class, "[Entity] ID: " + entityUUID + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
-
                 }
             }
 

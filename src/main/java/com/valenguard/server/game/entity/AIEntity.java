@@ -1,8 +1,13 @@
 package com.valenguard.server.game.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 public class AIEntity extends MovingEntity {
+
+    @Setter
+    @Getter
+    private Integer dropTableID;
 
     @Getter
     private RandomRegionMoveGenerator randomRegionMoveGenerator;

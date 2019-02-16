@@ -1,5 +1,8 @@
-package com.valenguard.server.game.inventory;
+package com.valenguard.server.game.data;
 
+import com.valenguard.server.game.inventory.ItemStack;
+import com.valenguard.server.game.inventory.ItemStackType;
+import com.valenguard.server.game.inventory.WearableItemStack;
 import com.valenguard.server.game.rpg.Attributes;
 import org.yaml.snakeyaml.Yaml;
 
@@ -13,16 +16,19 @@ import java.util.Map;
 
 import static com.valenguard.server.util.Log.println;
 
-class ItemLoader {
+public class ItemStackLoader {
 
     private static final boolean PRINT_DEBUG = false;
+    private static final String FILE_PATH = "src/main/resources/data/item/items.yaml";
 
-    List<ItemStack> loadItems() {
+    public List<ItemStack> loadItems() {
+        println(getClass(), "====== START LOADING ITEMS ======", false, PRINT_DEBUG);
+
         Yaml yaml = new Yaml();
 
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(new File("src/main/resources/data/item/items.yaml"));
+            inputStream = new FileInputStream(new File(FILE_PATH));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
