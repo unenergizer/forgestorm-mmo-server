@@ -6,14 +6,14 @@ import lombok.Getter;
 
 public class Skill {
 
-    private final byte skillOpcode;
+    private final SkillOpcodes skillOpcode;
 
     private final Player player;
 
     @Getter
     private int experience = 0;
 
-    Skill(Player player, byte skillOpcode) {
+    Skill(Player player, SkillOpcodes skillOpcode) {
         this.player = player;
         this.skillOpcode = skillOpcode;
     }

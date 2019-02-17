@@ -6,6 +6,8 @@ import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.rpg.ExperiencePacketInfo;
+import com.valenguard.server.game.rpg.SkillOpcodes;
 import com.valenguard.server.network.packet.out.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -231,10 +233,35 @@ public class GameMap {
 
         if (killerEntity instanceof Player) {
             new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
+            new SkillExperiencePacketOut((Player) killerEntity, new ExperiencePacketInfo(SkillOpcodes.MELEE, 10)).sendPacket();
         }
 
-        if (deadEntity instanceof Monster || deadEntity instanceof MOB) {
+        if (deadEntity instanceof Player) {
+            // Player Died. Lets respawn them!
 
+            // TODO: Check to see if the player needs to change maps!
+
+            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, mapHeight - PlayerConstants.RESPAWN_Y_CORD);
+            MoveDirection facingDirection = MoveDirection.SOUTH;
+
+            deadEntity.setCurrentMapLocation(teleportLocation);
+            deadEntity.setFutureMapLocation(teleportLocation);
+            deadEntity.setFacingDirection(facingDirection);
+
+            // Do a reheal
+            Player deadPlayer = (Player) deadEntity;
+            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
+
+            // TODO: Send other players info about the reheal (if they are still on the same map)
+
+            // Send all players in map the teleport packet
+            forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+
+            forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
+
+            new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
+
+        } else {
             queueMobDespawn(deadEntity); // A mob died, despawn them!
 
             // If a AI entity kills and AI entity, do not drop ItemStack
@@ -254,38 +281,6 @@ public class GameMap {
 
                 queueItemStackDropSpawn(itemStackDrop);
             }
-
-        } else if (deadEntity instanceof Player) {
-            // Player Died. Lets respawn them!
-
-            // TODO: Check to see if the player needs to change maps!
-
-            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, mapHeight - PlayerConstants.RESPAWN_Y_CORD);
-            MoveDirection facingDirection = MoveDirection.SOUTH;
-
-            deadEntity.setCurrentMapLocation(teleportLocation);
-            deadEntity.setFutureMapLocation(teleportLocation);
-            deadEntity.setFacingDirection(facingDirection);
-
-            // Do a reheal
-            Player deadPlayer = (Player) deadEntity;
-            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
-
-            // TODO: Get and update attributes...
-//            for (EquipmentSlot equipmentSlot : deadPlayer.getPlayerEquipment().getEquipmentSlots()) {
-//                if (equipmentSlot.getItemStack() != null) {
-//                    resetHealth = resetHealth + equipmentSlot.getItemStack().getAttributes().getHealth();
-//                }
-//            }
-
-            // TODO: Send other players info about the reheal (if they are still on the same map)
-
-            // Send all players in map the teleport packet
-            forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
-
-            forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
-
-            new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
         }
     }
 

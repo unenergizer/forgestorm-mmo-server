@@ -15,7 +15,7 @@ public class SkillExperiencePacketOut extends ServerAbstractOutPacket {
 
     @Override
     protected void createPacket(ValenguardOutputStream write) {
-        write.writeByte(experiencePacketInfo.getSkillOpcode());
+        write.writeByte(experiencePacketInfo.getSkillOpcode().getSkillOpcodeByte());
         write.writeInt(experiencePacketInfo.getExperienceGained());
     }
 }

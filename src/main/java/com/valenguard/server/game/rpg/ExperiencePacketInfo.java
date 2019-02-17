@@ -6,6 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ExperiencePacketInfo {
-    private byte skillOpcode;
+    private SkillOpcodes skillOpcode;
     private int experienceGained;
 }

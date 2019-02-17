@@ -117,9 +117,6 @@ public class GameManager {
             player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
         }
 
-        // TODO: Change me??
-        player.setEntityAlignment(EntityAlignment.FRIENDLY);
-
         tempColor++;
         if (tempColor > 15) tempColor = 0;
 
@@ -161,7 +158,10 @@ public class GameManager {
 
         player.setAttributes(baseAttributes);
 
+        player.setEntityAlignment(EntityAlignment.FRIENDLY);
+
         player.getSkills().MINING.addExperience(50); // Initializes the player with 50 mining experience.
+        player.getSkills().MELEE.addExperience(170);
 
         return player;
     }

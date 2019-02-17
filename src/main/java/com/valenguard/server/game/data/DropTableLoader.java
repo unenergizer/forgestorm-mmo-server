@@ -14,7 +14,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class DropTableLoader {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
     private static final String FILE_PATH = "src/main/resources/data/item/DropTables.yaml";
 
     public List<DropTable> loadDropTables() {
