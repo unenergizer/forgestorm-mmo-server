@@ -210,18 +210,15 @@ public class GameMap {
         if (attackerEntity instanceof Player) {
             new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
             new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) attackerEntity, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
-            new EntityDamagePacketOut((Player) attackerEntity, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
         }
         if (targetEntity instanceof Player) {
             new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
             new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
-
-            forAllPlayers(player -> {
-                new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
-                new EntityDamagePacketOut(player, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
-            });
         }
+        forAllPlayers(player -> {
+            new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            new EntityDamagePacketOut(player, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
+        });
     }
 
     private short lastItemStackDrop = 2000;
@@ -239,6 +236,9 @@ public class GameMap {
         if (deadEntity instanceof Monster || deadEntity instanceof MOB) {
 
             queueMobDespawn(deadEntity); // A mob died, despawn them!
+
+            // If a AI entity kills and AI entity, do not drop ItemStack
+            if (!(killerEntity instanceof Player)) return;
 
             // Give player drop table item
             if (((AIEntity) deadEntity).getDropTableID() != null) {
