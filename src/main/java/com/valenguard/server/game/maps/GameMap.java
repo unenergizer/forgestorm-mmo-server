@@ -41,7 +41,7 @@ public class GameMap {
     private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
 
     @Getter
-    private final List<ItemStackDrop> itemStackDropList = new ArrayList<>();
+    private final Map<Short, ItemStackDrop> itemStackDropList = new HashMap<>();
     private final Queue<ItemStackDrop> itemStackDropSpawnQueue = new LinkedList<>();
     private final Queue<ItemStackDrop> itemStackDropDespawnQueue = new LinkedList<>();
 
@@ -69,11 +69,11 @@ public class GameMap {
         stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.remove(stationaryEntity.getServerEntityId()));
 
         StationaryEntity stationaryEntity;
-        while ((stationaryEntity = stationaryEntitiesDespawnQueue.poll()) != null) {
+        while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
             postEntitySpawn(stationaryEntity);
         }
 
-        while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
+        while ((stationaryEntity = stationaryEntitiesDespawnQueue.poll()) != null) {
             postEntityDespawn(stationaryEntity);
         }
     }
@@ -119,25 +119,17 @@ public class GameMap {
      * ItemStackDrop //////////////////////////////////////////////////////////////////////////
      */
 
-    public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
+    private void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
         itemStackDropSpawnQueue.add(itemStackDrop);
     }
 
-    private void queueItemStackDropDespawn(ItemStackDrop itemStackDrop) {
+    public void queueItemStackDropDespawn(ItemStackDrop itemStackDrop) {
         itemStackDropDespawnQueue.add(itemStackDrop);
     }
 
-    private void itemStackDropSpawnRegistration(ItemStackDrop itemStackDrop) {
-        itemStackDropList.add(itemStackDrop);
-    }
-
-    private void itemStackDropDespawnRegistration(ItemStackDrop itemStackDrop) {
-        itemStackDropList.remove(itemStackDrop);
-    }
-
     public void tickItemStackDrop(long numberOfTicksPassed) {
-        itemStackDropSpawnQueue.forEach(this::itemStackDropSpawnRegistration);
-        itemStackDropDespawnQueue.forEach(this::itemStackDropDespawnRegistration);
+        itemStackDropSpawnQueue.forEach(itemStackDrop -> itemStackDropList.put(itemStackDrop.getServerEntityId(), itemStackDrop));
+        itemStackDropDespawnQueue.forEach(itemStackDrop -> itemStackDropList.remove(itemStackDrop.getServerEntityId()));
 
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = itemStackDropSpawnQueue.poll()) != null) {
@@ -258,6 +250,7 @@ public class GameMap {
                 itemStackDrop.setName(itemStack.getName());
                 itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
                 itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
+                itemStackDrop.setItemStack(itemStack);
 
                 queueItemStackDropSpawn(itemStackDrop);
             }
@@ -326,7 +319,7 @@ public class GameMap {
             // Tell the player about all the mobs currently on the map.
             mobList.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
             stationaryEntitiesList.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
-            itemStackDropList.forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
+            itemStackDropList.values().forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
         }
     }
 

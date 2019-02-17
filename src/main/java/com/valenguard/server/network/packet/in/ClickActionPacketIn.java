@@ -2,6 +2,7 @@ package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.game.entity.Appearance;
 import com.valenguard.server.game.entity.Entity;
+import com.valenguard.server.game.entity.ItemStackDrop;
 import com.valenguard.server.game.entity.StationaryEntity;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
@@ -38,8 +39,24 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
         GameMap gameMap = packetData.getPlayer().getGameMap();
 
-        StationaryEntity clickedOnEntity = gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID());
-        if (clickedOnEntity != null) changeEntityAppearance(clickedOnEntity, gameMap);
+        if (gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID()) != null) {
+            // Click received, lets perform our skill!
+            StationaryEntity clickedOnEntity = gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID());
+            if (clickedOnEntity != null) changeEntityAppearance(clickedOnEntity, gameMap);
+        } else if (gameMap.getItemStackDropList().get(packetData.getENTITY_UUID()) != null) {
+            // Click received, lets pick up the item!
+            ItemStackDrop itemStackDrop = gameMap.getItemStackDropList().get(packetData.getENTITY_UUID());
+
+            // Check inventory for being full first
+            if (!packetData.getPlayer().getPlayerBag().isBagFull()) {
+
+                // Despawn the item
+                gameMap.queueItemStackDropDespawn(itemStackDrop);
+
+                // Send the player the item
+                packetData.getPlayer().giveItemStack(itemStackDrop.getItemStack());
+            }
+        }
     }
 
     private void changeEntityAppearance(Entity entity, GameMap gameMap) {
