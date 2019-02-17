@@ -116,67 +116,45 @@ public class UpdateMovements {
 
     private void findEntityTarget(MovingEntity movingEntity) {
         GameMap gameMap = movingEntity.getGameMap();
-        if (movingEntity instanceof Player) {
-            // Player
-            for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
 
-                // TODO will need to be changed
-                if (otherMovingMobs.getEntityType() != EntityType.MONSTER) {
-                    continue;
-                }
+        // Find MovingEntity targets
+        for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
+            if (movingEntity.equals(otherMovingMobs)) continue;
+            if (movingEntity.getEntityType() == otherMovingMobs.getEntityType()) continue;
+            findEntityTarget(movingEntity, otherMovingMobs);
+        }
 
-                Location currentLocation = movingEntity.getCurrentMapLocation();
-                Location targetLocation = otherMovingMobs.getCurrentMapLocation();
+        // Find player targets
+        for (Player player : gameMap.getPlayerList()) {
+            if (movingEntity.equals(player)) continue;
+//            if (movingEntity.getEntityType() == player.getEntityType()) continue;
+            findEntityTarget(movingEntity, player);
+        }
+    }
 
-                if (otherMovingMobs.getTargetEntity() == null) {
-                    if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
+    private void findEntityTarget(MovingEntity movingEntity, MovingEntity targetEntity) {
 
-                        // TODO: Check if hostile entity
+        Location currentLocation = targetEntity.getCurrentMapLocation();
+        Location targetLocation = movingEntity.getCurrentMapLocation();
 
-                        if (movingEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
-                            otherMovingMobs.setTargetEntity(movingEntity);
-                            findTrackingPath(otherMovingMobs, movingEntity);
-                        }
-                    }
+        // This entity has no target, find one?
+        if (movingEntity.getTargetEntity() == null) {
 
-                } else if (otherMovingMobs.getTargetEntity().equals(movingEntity)) {
-                    if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
-                        findTrackingPath(otherMovingMobs, movingEntity);
-                    } else if (!currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_QUIT_RADIUS)) {
-                        movingEntity.setTargetEntity(null);
-                    }
+            // Is player within distance to target
+            if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
+
+                if (movingEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
+                    movingEntity.setTargetEntity(targetEntity);
+                    findTrackingPath(movingEntity, targetEntity);
                 }
             }
-        } else if (movingEntity.getEntityType() == EntityType.MONSTER) {
 
-            // Moving Entities find players to attack
-            for (Player player : gameMap.getPlayerList()) {
-
-                Location currentLocation = player.getCurrentMapLocation();
-                Location targetLocation = movingEntity.getCurrentMapLocation();
-
-                // This entity has no target, find one?
-                if (movingEntity.getTargetEntity() == null) {
-
-                    // Is player within distance to target
-                    if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
-
-                        // TODO: Check if hostile entity
-
-                        if (movingEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
-                            movingEntity.setTargetEntity(player);
-                            findTrackingPath(movingEntity, player);
-                        }
-                    }
-
-                } else if (movingEntity.getTargetEntity().equals(player)) {
-                    // We already have a target, so lets attack
-                    if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
-                        findTrackingPath(movingEntity, player);
-                    } else if (!currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_QUIT_RADIUS)) {
-                        movingEntity.setTargetEntity(null);
-                    }
-                }
+        } else if (movingEntity.getTargetEntity().equals(targetEntity)) {
+            // We already have a target, so lets attack
+            if (currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_FIND_RADIUS)) {
+                findTrackingPath(movingEntity, targetEntity);
+            } else if (!currentLocation.isWithinDistance(targetLocation, GameConstants.ATTACK_QUIT_RADIUS)) {
+                movingEntity.setTargetEntity(null);
             }
         }
     }
