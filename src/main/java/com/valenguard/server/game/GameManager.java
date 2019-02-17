@@ -8,6 +8,7 @@ import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
@@ -115,6 +116,9 @@ public class GameManager {
         for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemStackManager().numberOfItems() - 1; itemId++) {
             player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
         }
+
+        // TODO: Change me??
+        player.setEntityAlignment(EntityAlignment.FRIENDLY);
 
         tempColor++;
         if (tempColor > 15) tempColor = 0;

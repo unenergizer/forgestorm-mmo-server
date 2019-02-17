@@ -5,6 +5,7 @@ import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -56,6 +57,7 @@ public class MovingEntity extends Entity {
 
     private MoveDirection previousDirection = MoveDirection.NONE;
 
+    private EntityAlignment entityAlignment;
 
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));

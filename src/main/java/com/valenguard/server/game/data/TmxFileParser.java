@@ -5,6 +5,7 @@ import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -179,6 +180,7 @@ public class TmxFileParser {
                     float probabilityWalkStart = -2f;
 
                     Integer dropTable = null;
+                    EntityAlignment entityAlignment = null;
 
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
@@ -220,6 +222,9 @@ public class TmxFileParser {
                         }
                         if (propertyElement.getAttribute("name").equals("dropTable")) {
                             dropTable = Integer.parseInt(propertyElement.getAttribute("value"));
+                        }
+                        if (propertyElement.getAttribute("name").equals("alignment")) {
+                            entityAlignment = EntityAlignment.valueOf(propertyElement.getAttribute("value"));
                         }
                     }
 
@@ -264,6 +269,8 @@ public class TmxFileParser {
                     // Setup health
                     aiEntity.setCurrentHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
                     aiEntity.setMaxHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
+
+                    aiEntity.setEntityAlignment(entityAlignment);
 
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 

@@ -68,6 +68,9 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeInt(movingEntity.getMaxHealth());
         write.writeInt(movingEntity.getCurrentHealth());
 
+        // send alignment
+        write.writeByte(movingEntity.getEntityAlignment().getEntityAlignmentByte());
+
         Log.println(getClass(), "===================================", false, PRINT_DEBUG);
         Log.println(getClass(), "entityType: " + (entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         Log.println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
