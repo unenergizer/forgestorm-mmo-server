@@ -11,6 +11,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntityRespawnTimer {
 
+    private static final boolean PRINT_DEBUG = false;
     private final List<RespawnTimer> respawnTimers = new ArrayList<>();
 
     public void addMob(MovingEntity movingEntity) {
@@ -43,7 +44,7 @@ public class EntityRespawnTimer {
                     movingEntity.getCurrentMapLocation().getGameMap().queueMobSpawn(movingEntity);
 
                     iterator.remove();
-                    println(getClass(), "Respawning Entity: " + movingEntity.getName() + " " + movingEntity.getServerEntityId());
+                    println(getClass(), "Respawning Entity: " + movingEntity.getName() + " " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
                 }
             }
         }

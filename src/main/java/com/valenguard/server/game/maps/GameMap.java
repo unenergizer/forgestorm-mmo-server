@@ -413,6 +413,13 @@ public class GameMap {
         throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + mapName + ", MoveDirection: " + direction);
     }
 
+    public Player findPlayer(short uuid) {
+        for (Player player : playerList) {
+            if (player.getServerEntityId() == uuid) return player;
+        }
+        return null;
+    }
+
     @Getter
     @AllArgsConstructor
     private class QueueData {

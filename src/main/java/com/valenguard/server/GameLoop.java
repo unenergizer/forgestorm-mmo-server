@@ -61,15 +61,18 @@ public class GameLoop extends Thread {
              *  !! Update Start !!
              ***********************/
 
-            ValenguardMain.getInstance().getCommandProcessor().executeCommands();
+            ValenguardMain valenguardMain = ValenguardMain.getInstance();
+
+            valenguardMain.getCommandProcessor().executeCommands();
             ServerConnection.getInstance().getEventBus().gameThreadPublish();
             playerInventoryEvents.processInventoryEvents();
             updateMovements.updatePlayerMovement();
             warpManager.warpPlayers();
-            ValenguardMain.getInstance().getGameManager().gameMapTick(numberOfTicksPassed);
-            ValenguardMain.getInstance().getEntityRespawnTimer().tickRespawnTime();
-            ValenguardMain.getInstance().getGameManager().processPlayerJoin();
-            ValenguardMain.getInstance().getOutStreamManager().sendPackets();
+            valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
+            valenguardMain.getEntityRespawnTimer().tickRespawnTime();
+            valenguardMain.getGameManager().processPlayerJoin();
+            valenguardMain.getOutStreamManager().sendPackets();
+            valenguardMain.getTradeManager().tickTime(numberOfTicksPassed);
 
             // Update ping every X ticks
             if (numberOfTicksPassed % 100 == 0) {

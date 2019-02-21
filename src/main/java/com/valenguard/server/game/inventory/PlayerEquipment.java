@@ -9,7 +9,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerEquipment {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     public static final int CAPACITY = 12;
 
