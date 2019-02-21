@@ -18,40 +18,26 @@ public class PlayerTradePacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
 
+        // Write inner opcode (TradeStatusOpcode
         write.writeByte(tradePacketInfoOut.getTradeOpcode().getTradeOpcodeByte());
 
         switch (tradePacketInfoOut.getTradeOpcode()) {
-            case TRADE_REQUEST_PLAYER_SENDER:
-                writeUUIDOut(write, tradePacketInfoOut);
+            case TRADE_REQUEST_INIT_SENDER:
+            case TRADE_REQUEST_INIT_TARGET:
+            case TRADE_REQUEST_TARGET_ACCEPT:
+            case TRADE_REQUEST_TARGET_DECLINE:
+            case TRADE_REQUEST_SERVER_TIMED_OUT:
+            case TRADE_OFFER_COMPLETE:
+            case TRADE_CANCELED:
+                write.writeInt(tradePacketInfoOut.getTradeUUID());
                 break;
-            case TRADE_REQUEST_PLAYER_TARGET:
-                writeRequestOut(write, tradePacketInfoOut);
-                break;
-            case TRADE_REQUEST_ACCEPT:
-                break;
-            case TRADE_REQUEST_DECLINE:
-                break;
-            case TRADE_REQUEST_TIMED_OUT:
-                break;
-            case TRADE_ITEM_ADD:
-                break;
-            case TRADE_ITEM_REMOVE:
-                break;
-            case TRADE_OFFER_ACCEPT:
-                break;
-            case TRADE_OFFER_DECLINE:
+            case TRADE_OFFER_CONFIRM:
+                write.writeInt(tradePacketInfoOut.getTradeUUID());
+                write.writeShort(tradePacketInfoOut.getPlayerUUID());
                 break;
             default:
-                println(getClass(), "Create unused trade status: " + tradePacketInfoOut.getTradeOpcode(), true, true);
+                println(getClass(), "Sent unmodified trade status: " + tradePacketInfoOut.getTradeOpcode(), true, true);
                 break;
         }
-    }
-
-    private void writeUUIDOut(ValenguardOutputStream write, TradePacketInfoOut tradePacketInfoOut) {
-        write.writeInt(tradePacketInfoOut.getUuid());
-    }
-
-    private void writeRequestOut(ValenguardOutputStream write, TradePacketInfoOut tradePacketInfoOut) {
-        write.writeInt(tradePacketInfoOut.getUuid());
     }
 }
