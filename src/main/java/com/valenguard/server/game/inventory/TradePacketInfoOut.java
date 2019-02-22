@@ -8,6 +8,7 @@ public class TradePacketInfoOut {
     private TradeStatusOpcode tradeOpcode;
     private int tradeUUID;
     private short playerUUID;
+    private int itemStackUUID;
 
     public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode) {
         this.tradeOpcode = tradeStatusOpcode;
@@ -22,5 +23,11 @@ public class TradePacketInfoOut {
         this.tradeOpcode = tradeStatusOpcode;
         this.tradeUUID = tradeUUID;
         this.playerUUID = playerUUID;
+    }
+
+    public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, int itemStackUUID) {
+        this.tradeOpcode = tradeStatusOpcode;
+        this.tradeUUID = tradeUUID;
+        this.itemStackUUID = itemStackUUID;
     }
 }

@@ -54,6 +54,11 @@ public class Player extends MovingEntity {
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
     }
 
+    public void removeItemStack(ItemStack itemStack) {
+        playerBag.removeItemStack(itemStack);
+        new InventoryPacketOut(this, new InventoryActions(InventoryActions.REMOVE, itemStack)).sendPacket();
+    }
+
     public void setHeadAppearance(short headTextureId) {
         getAppearance().getTextureIds()[Appearance.HEAD] = headTextureId;
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(this, clientHandler ->

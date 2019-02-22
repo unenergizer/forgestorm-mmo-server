@@ -35,6 +35,11 @@ public class PlayerTradePacketOut extends ServerAbstractOutPacket {
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
                 write.writeShort(tradePacketInfoOut.getPlayerUUID());
                 break;
+            case TRADE_ITEM_ADD:
+            case TRADE_ITEM_REMOVE:
+                write.writeInt(tradePacketInfoOut.getTradeUUID());
+                write.writeInt(tradePacketInfoOut.getItemStackUUID());
+                break;
             default:
                 println(getClass(), "Sent unmodified trade status: " + tradePacketInfoOut.getTradeOpcode(), true, true);
                 break;

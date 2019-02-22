@@ -15,6 +15,7 @@ public class InventoryActions {
      *   SERVER -> CLIENT
      */
     public static final byte GIVE = 0x03;
+    public static final byte REMOVE = 0x04;
 
     @Getter
     private byte inventoryActionType;

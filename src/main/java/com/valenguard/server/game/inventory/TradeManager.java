@@ -1,12 +1,11 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.PlayerTradePacketOut;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -80,6 +79,12 @@ public class TradeManager {
             tradeDataMap.remove(tradeUUID);
 
             // TODO: Send player ItemStacks
+//            List<ItemStack> startersNewItems = getNewItems(tradeData, tradeData.tradeStarter);
+//            List<ItemStack> targetsNewItems = getNewItems(tradeData, tradeData.targetPlayer);
+
+            updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, tradeData.tradeTargetItems);
+            updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, tradeData.tradeStarterItems);
+
         } else {
             /*
              * TRADE ITEMS CONFIRMED FOR ONE PLAYER
@@ -89,6 +94,28 @@ public class TradeManager {
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
         }
+    }
+
+    private List<ItemStack> getNewItems(TradeData tradeData, Player trader) {
+        List<Integer> newStartItemsIds = new ArrayList<>();
+        for (ItemStack itemStack : trader.getPlayerBag().getItems()) {
+            newStartItemsIds.add(itemStack.itemId);
+        }
+
+        boolean traderIsStarter = trader == tradeData.tradeStarter;
+        List<Integer> traderItems = traderIsStarter ? tradeData.tradeStarterItems : tradeData.tradeTargetItems;
+        List<Integer> othersItems = !traderIsStarter ? tradeData.tradeStarterItems : tradeData.tradeTargetItems;
+
+
+        newStartItemsIds.removeIf(traderItems::contains);
+        newStartItemsIds.addAll(othersItems);
+
+        ItemStackManager itemStackManager = ValenguardMain.getInstance().getItemStackManager();
+
+        List<ItemStack> newItems = new ArrayList<>();
+        newStartItemsIds.forEach(itemId -> newItems.add(itemStackManager.makeItemStack(itemId, 1)));
+
+        return newItems;
     }
 
     /**
@@ -157,6 +184,48 @@ public class TradeManager {
         }
     }
 
+    public void sendItem(Player player, int tradeUUID, int itemStackUUID) {
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+
+        if (tradeData.targetPlayer == player) {
+            tradeData.tradeTargetItems.add(itemStackUUID);
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStackUUID)).sendPacket();
+        } else {
+            tradeData.tradeStarterItems.add(itemStackUUID);
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStackUUID)).sendPacket();
+        }
+    }
+
+    public void removeItem(Player player, int tradeUUID, int itemStackUUID) {
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+
+        if (tradeData.targetPlayer == player) {
+            println(getClass(), "Target List size = " + tradeData.tradeTargetItems.size());
+            tradeData.tradeTargetItems.remove(tradeUUID);
+            println(getClass(), "Target List size = " + tradeData.tradeTargetItems.size());
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemStackUUID)).sendPacket();
+        } else {
+            println(getClass(), "Starter List size = " + tradeData.tradeStarterItems.size());
+            tradeData.tradeStarterItems.remove(tradeUUID);
+            println(getClass(), "Starter List size = " + tradeData.tradeStarterItems.size());
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemStackUUID)).sendPacket();
+        }
+    }
+
+
+    private void updateInventories(Player playerToUpdate, List<Integer> itemsToRemove, List<Integer> itemsToAdd) {
+        ItemStackManager itemStackManager = ValenguardMain.getInstance().getItemStackManager();
+        // Dump items from trade starter bag
+        for (Integer itemStackUUID : itemsToRemove) {
+            playerToUpdate.removeItemStack(itemStackManager.makeItemStack(itemStackUUID, 1));
+        }
+
+        // Send the trade starter the target player items
+        for (Integer itemStackUUID : itemsToAdd) {
+            playerToUpdate.giveItemStack(itemStackManager.makeItemStack(itemStackUUID, 1));
+        }
+    }
+
     class TradeData {
         private final Player tradeStarter;
         private final Player targetPlayer;
@@ -168,6 +237,9 @@ public class TradeManager {
         private boolean tradeStarterConfirmedTrade = false;
         private boolean targetPlayerConfirmedTrade = false;
 
+        private List<Integer> tradeStarterItems = new ArrayList<>();
+        private List<Integer> tradeTargetItems = new ArrayList<>();
+
         TradeData(Player tradeStarter, Player targetPlayer) {
             this.tradeStarter = tradeStarter;
             this.targetPlayer = targetPlayer;
@@ -177,5 +249,4 @@ public class TradeManager {
             return player == tradeStarter || player == targetPlayer;
         }
     }
-
 }
