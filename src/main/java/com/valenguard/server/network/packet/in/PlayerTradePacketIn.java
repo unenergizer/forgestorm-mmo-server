@@ -18,7 +18,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
         final TradeStatusOpcode tradeStatusOpcode = TradeStatusOpcode.getTradeStatusOpcode(clientHandler.readByte());
         int tradeUUID = 0;
         short entityUUID = 0;
-        int itemId = 0;
+        byte slotId = 0;
 
         switch (tradeStatusOpcode) {
             case TRADE_REQUEST_INIT_TARGET:
@@ -34,7 +34,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
             case TRADE_ITEM_ADD:
             case TRADE_ITEM_REMOVE:
                 tradeUUID = clientHandler.readInt();
-                itemId = clientHandler.readInt();
+                slotId = clientHandler.readByte();
                 // TODO: Send item add/remove info
                 break;
             default:
@@ -42,7 +42,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
                 break;
         }
 
-        return new TradePacketIn(tradeStatusOpcode, tradeUUID, entityUUID, itemId);
+        return new TradePacketIn(tradeStatusOpcode, tradeUUID, entityUUID, slotId);
     }
 
     @Override
@@ -75,11 +75,11 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
 
             // Stage 3: Trade started -> adding/removing items from trade window
             case TRADE_ITEM_ADD:
-                tradeManager.sendItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemId());
+                tradeManager.sendItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemSlot());
                 break;
 
             case TRADE_ITEM_REMOVE:
-                tradeManager.removeItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemId());
+                tradeManager.removeItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemSlot());
                 break;
 
             // Stage 4: First Trade Confirm (items are in window, do trade or cancel)
@@ -106,6 +106,6 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
         final TradeStatusOpcode tradeStatusOpcode;
         final int tradeUUID;
         final short entityUUID;
-        final int itemId;
+        final byte itemSlot;
     }
 }

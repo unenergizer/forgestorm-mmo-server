@@ -14,17 +14,6 @@ public class PlayerBag {
         return true;
     }
 
-    public ItemStack getItemStackById(int itemUUID) {
-        for (int i = 0; i < CAPACITY; i++) {
-            if (items[i] != null) {
-                if (items[i].getItemId() == itemUUID) {
-                    return items[i];
-                }
-            }
-        }
-        return null;
-    }
-
     public void addItemStack(ItemStack itemStack) {
         if (isBagFull()) return;
         for (int i = 0; i < CAPACITY; i++) {
@@ -36,13 +25,8 @@ public class PlayerBag {
         throw new RuntimeException("Tried to add an item to a full inventory.");
     }
 
-    public void removeItemStack(ItemStack itemStack) {
-        for (int i = 0; i < CAPACITY; i++) {
-            if (items[i].itemId == itemStack.itemId) {
-                items[i] = null;
-                return;
-            }
-        }
+    public void removeItemStack(byte slotIndex) {
+        items[slotIndex] = null;
     }
 
     public void moveItemStacks(byte fromPosition, byte toPosition) {

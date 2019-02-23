@@ -1,6 +1,5 @@
 package com.valenguard.server.game.inventory;
 
-import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.PlayerTradePacketOut;
@@ -21,6 +20,7 @@ public class TradeManager {
      * @param targetPlayer The target {@link Player}
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
+        if (isTradeInProgress(tradeStarter)) return;
         final int UUID = generateTradeId(tradeStarter, targetPlayer);
 
         tradeDataMap.put(UUID, new TradeData(tradeStarter, targetPlayer));
@@ -38,6 +38,7 @@ public class TradeManager {
      * @param tradeUUID    The trade window unique reference id.
      */
     public void targetPlayerAcceptedTradeRequest(Player targetPlayer, int tradeUUID) {
+        if (!isValidTrade(targetPlayer, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
         if (tradeData == null) return;
@@ -52,6 +53,7 @@ public class TradeManager {
     }
 
     public void playerConfirmedTrade(Player confirmedPlayer, int tradeUUID, TradeStatusOpcode tradeStatusOpcode) {
+        if (!isValidTrade(confirmedPlayer, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
         // TODO: Set boolean on who confirmed trade. Don't do trade until both booleans are set by both players
@@ -72,18 +74,15 @@ public class TradeManager {
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_COMPLETE)).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_COMPLETE)).sendPacket();
 
-            // Cheap way of letting the iterator below to remove the trade data from the map
-            // TODO: FIX ME! OR IT WILL SAY TIMED OUT EVERY TIME WE CANCEL A TRADE
-//            tradeData.tradeActive = false;
-//            tradeData.timeLeft = 0;
+            // Trade finished, clear data
             tradeDataMap.remove(tradeUUID);
 
-            // TODO: Send player ItemStacks
-//            List<ItemStack> startersNewItems = getNewItems(tradeData, tradeData.tradeStarter);
-//            List<ItemStack> targetsNewItems = getNewItems(tradeData, tradeData.targetPlayer);
+            // Update player inventories
+            List<ItemStack> starterGiveItems = generateGiveItems(tradeData.tradeStarter, tradeData.tradeStarterItems);
+            List<ItemStack> targetGiveItems = generateGiveItems(tradeData.targetPlayer, tradeData.tradeTargetItems);
 
-            updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, tradeData.tradeTargetItems);
-            updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, tradeData.tradeStarterItems);
+            updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, targetGiveItems);
+            updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, starterGiveItems);
 
         } else {
             /*
@@ -96,28 +95,6 @@ public class TradeManager {
         }
     }
 
-    private List<ItemStack> getNewItems(TradeData tradeData, Player trader) {
-        List<Integer> newStartItemsIds = new ArrayList<>();
-        for (ItemStack itemStack : trader.getPlayerBag().getItems()) {
-            newStartItemsIds.add(itemStack.itemId);
-        }
-
-        boolean traderIsStarter = trader == tradeData.tradeStarter;
-        List<Integer> traderItems = traderIsStarter ? tradeData.tradeStarterItems : tradeData.tradeTargetItems;
-        List<Integer> othersItems = !traderIsStarter ? tradeData.tradeStarterItems : tradeData.tradeTargetItems;
-
-
-        newStartItemsIds.removeIf(traderItems::contains);
-        newStartItemsIds.addAll(othersItems);
-
-        ItemStackManager itemStackManager = ValenguardMain.getInstance().getItemStackManager();
-
-        List<ItemStack> newItems = new ArrayList<>();
-        newStartItemsIds.forEach(itemId -> newItems.add(itemStackManager.makeItemStack(itemId, 1)));
-
-        return newItems;
-    }
-
     /**
      * One size fits all trade cancel.
      *
@@ -126,9 +103,8 @@ public class TradeManager {
      * @param tradeStatusOpcode The type of trade cancel.
      */
     public void tradeCanceled(Player canceler, int tradeUUID, TradeStatusOpcode tradeStatusOpcode) {
+        if (!isValidTrade(canceler, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
-        if (tradeData == null) return;
-        if (!tradeData.isTrader(canceler)) return;
 
         if (tradeStatusOpcode == TradeStatusOpcode.TRADE_REQUEST_TARGET_DECLINE) {
             new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade request declined.").sendPacket();
@@ -184,46 +160,76 @@ public class TradeManager {
         }
     }
 
-    public void sendItem(Player player, int tradeUUID, int itemStackUUID) {
+    public void sendItem(Player player, int tradeUUID, byte itemSlot) {
+        if (!isValidTrade(player, tradeUUID)) return;
+        if (!slotInsideWindow(itemSlot)) return;
+
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
+        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        if (itemStack == null) return;
+
         if (tradeData.targetPlayer == player) {
-            tradeData.tradeTargetItems.add(itemStackUUID);
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStackUUID)).sendPacket();
+            //TODO => check if full?
+            tradeData.addItem(tradeData.tradeTargetItems, itemSlot);
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
         } else {
-            tradeData.tradeStarterItems.add(itemStackUUID);
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStackUUID)).sendPacket();
+            tradeData.addItem(tradeData.tradeStarterItems, itemSlot);
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
         }
     }
 
-    public void removeItem(Player player, int tradeUUID, int itemStackUUID) {
+    public void removeItem(Player player, int tradeUUID, byte itemSlot) {
+        if (!isValidTrade(player, tradeUUID)) return;
+        if (!slotInsideWindow(itemSlot)) return;
+
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
+        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        if (itemStack == null) return;
+
         if (tradeData.targetPlayer == player) {
-            println(getClass(), "Target List size = " + tradeData.tradeTargetItems.size());
-            tradeData.tradeTargetItems.remove(tradeUUID);
-            println(getClass(), "Target List size = " + tradeData.tradeTargetItems.size());
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemStackUUID)).sendPacket();
+            if (tradeData.tradeTargetItems[itemSlot] != null) return;
+            tradeData.tradeTargetItems[itemSlot] = null;
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
         } else {
-            println(getClass(), "Starter List size = " + tradeData.tradeStarterItems.size());
-            tradeData.tradeStarterItems.remove(tradeUUID);
-            println(getClass(), "Starter List size = " + tradeData.tradeStarterItems.size());
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemStackUUID)).sendPacket();
+            if (tradeData.tradeStarterItems[itemSlot] != null) return;
+            tradeData.tradeStarterItems[itemSlot] = null;
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
         }
     }
 
+    private boolean slotInsideWindow(byte itemSlot) {
+        return itemSlot >= 0 && itemSlot < 5 * 9;
+    }
 
-    private void updateInventories(Player playerToUpdate, List<Integer> itemsToRemove, List<Integer> itemsToAdd) {
-        ItemStackManager itemStackManager = ValenguardMain.getInstance().getItemStackManager();
+    private boolean isValidTrade(Player trader, int tradeUUID) {
+        if (!tradeDataMap.containsKey(tradeUUID)) return false;
+        return tradeDataMap.get(tradeUUID).isTrader(trader);
+    }
+
+    private List<ItemStack> generateGiveItems(Player trader, Byte[] tradeItems) {
+        List<ItemStack> giveItems = new ArrayList<>();
+        ItemStack[] bagItems = trader.getPlayerBag().getItems();
+        for (Byte itemSlot : tradeItems) {
+            if (itemSlot == null) continue;
+            ItemStack itemStack = bagItems[itemSlot];
+            giveItems.add(itemStack);
+        }
+        return giveItems;
+    }
+
+    private void updateInventories(Player playerToUpdate, Byte[] itemsToRemove, List<ItemStack> itemsToAdd) {
+
         // Dump items from trade starter bag
-        for (Integer itemStackUUID : itemsToRemove) {
-            playerToUpdate.removeItemStack(itemStackManager.makeItemStack(itemStackUUID, 1));
+        for (Byte slotIndex : itemsToRemove) {
+            if (slotIndex != null) {
+                playerToUpdate.removeItemStack(slotIndex);
+            }
         }
 
         // Send the trade starter the target player items
-        for (Integer itemStackUUID : itemsToAdd) {
-            playerToUpdate.giveItemStack(itemStackManager.makeItemStack(itemStackUUID, 1));
-        }
+        itemsToAdd.forEach(playerToUpdate::giveItemStack);
     }
 
     class TradeData {
@@ -237,8 +243,8 @@ public class TradeManager {
         private boolean tradeStarterConfirmedTrade = false;
         private boolean targetPlayerConfirmedTrade = false;
 
-        private List<Integer> tradeStarterItems = new ArrayList<>();
-        private List<Integer> tradeTargetItems = new ArrayList<>();
+        private Byte[] tradeStarterItems = new Byte[5 * 9];
+        private Byte[] tradeTargetItems = new Byte[5 * 9];
 
         TradeData(Player tradeStarter, Player targetPlayer) {
             this.tradeStarter = tradeStarter;
@@ -247,6 +253,15 @@ public class TradeManager {
 
         private boolean isTrader(Player player) {
             return player == tradeStarter || player == targetPlayer;
+        }
+
+        private void addItem(Byte[] tradeItems, byte bagSlot) {
+            for (byte i = 0; i < tradeItems.length; i++) {
+                if (tradeItems[i] == null) {
+                    tradeItems[i] = bagSlot;
+                    return;
+                }
+            }
         }
     }
 }

@@ -23,8 +23,16 @@ public class InventoryActions {
     @Getter
     private ItemStack itemStack;
 
+    @Getter
+    private byte slotIndex;
+
     public InventoryActions(byte inventoryActionType, ItemStack itemStack) {
         this.inventoryActionType = inventoryActionType;
         this.itemStack = itemStack;
+    }
+
+    public InventoryActions(byte inventoryActionType, byte slotIndex) {
+        this.inventoryActionType = inventoryActionType;
+        this.slotIndex = slotIndex;
     }
 }

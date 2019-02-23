@@ -18,11 +18,14 @@ public class InventoryPacketOut extends ServerAbstractOutPacket {
 
         write.writeByte(inventoryAction.getInventoryActionType());
 
-        if (inventoryAction.getInventoryActionType() == InventoryActions.GIVE ||
-                inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
+        if (inventoryAction.getInventoryActionType() == InventoryActions.GIVE) {
 
             write.writeInt(inventoryAction.getItemStack().getItemId());
             write.writeInt(inventoryAction.getItemStack().getAmount());
+
+        } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
+
+            write.writeByte(inventoryAction.getSlotIndex());
 
         }
     }
