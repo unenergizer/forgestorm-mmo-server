@@ -21,7 +21,7 @@ import java.io.IOException;
 @SuppressWarnings("ConstantConditions")
 public class TmxFileParser {
 
-    private static final int TILE_SIZE = 16;
+    private static final short TILE_SIZE = 16;
     private static final boolean PRINT_DEBUG = false;
     private static final boolean SHOW_ID_IN_NAME = false;
 
@@ -63,8 +63,8 @@ public class TmxFileParser {
          * BUILD TILED MAP TILES......
          ***********************************************************************************************/
 
-        final int mapWidth = Integer.parseInt(tmx.getAttributes().getNamedItem("width").getNodeValue());
-        final int mapHeight = Integer.parseInt(tmx.getAttributes().getNamedItem("height").getNodeValue());
+        final short mapWidth = Short.parseShort(tmx.getAttributes().getNamedItem("width").getNodeValue());
+        final short mapHeight = Short.parseShort(tmx.getAttributes().getNamedItem("height").getNodeValue());
 
         Log.println(TmxFileParser.class, "MapWidth: " + mapWidth, false, PRINT_DEBUG);
         Log.println(TmxFileParser.class, "MapHeight: " + mapHeight, false, PRINT_DEBUG);
@@ -164,15 +164,15 @@ public class TmxFileParser {
                     String name = objectTagElement.getAttribute("name");
                     if (SHOW_ID_IN_NAME) name = name + " " + j;
 
-                    int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
-                    int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;
+                    short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
+                    short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1);
                     EntityType entityType = EntityType.valueOf(objectTagElement.getAttribute("type"));
 
                     float speed = 1f;
-                    int bounds1x = -2;
-                    int bounds1y = -2;
-                    int bounds2x = -2;
-                    int bounds2y = -2;
+                    short bounds1x = -2;
+                    short bounds1y = -2;
+                    short bounds2x = -2;
+                    short bounds2y = -2;
                     MoveDirection direction = MoveDirection.SOUTH;
                     short atlasHeadId = 0;
                     short atlasBodyId = 0;
@@ -209,16 +209,16 @@ public class TmxFileParser {
                             speed = Float.parseFloat(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("bounds1x")) {
-                            bounds1x = Integer.parseInt(propertyElement.getAttribute("value"));
+                            bounds1x = Short.parseShort(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("bounds1y")) {
-                            bounds1y = Integer.parseInt(propertyElement.getAttribute("value"));
+                            bounds1y = Short.parseShort(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("bounds2x")) {
-                            bounds2x = Integer.parseInt(propertyElement.getAttribute("value"));
+                            bounds2x = Short.parseShort(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("bounds2y")) {
-                            bounds2y = Integer.parseInt(propertyElement.getAttribute("value"));
+                            bounds2y = Short.parseShort(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("dropTable")) {
                             dropTable = Integer.parseInt(propertyElement.getAttribute("value"));
@@ -290,8 +290,8 @@ public class TmxFileParser {
 
                     Element objectTagElement = (Element) objectTag.item(j);
 
-                    int x = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
-                    int y = mapHeight - (Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1;
+                    short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
+                    short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1);
 
                     int typeID = 0;
 
@@ -335,16 +335,16 @@ public class TmxFileParser {
 
                     Element objectTagElement = (Element) objectTag.item(j);
                     String targetMap = objectTagElement.getAttribute("name");
-                    int tmxFileX = Integer.parseInt(objectTagElement.getAttribute("x")) / TILE_SIZE;
-                    int tmxFileY = Integer.parseInt(objectTagElement.getAttribute("y")) / TILE_SIZE;
-                    int tmxFileWidth = Integer.parseInt(objectTagElement.getAttribute("width")) / TILE_SIZE;
-                    int tmxFileHeight = Integer.parseInt(objectTagElement.getAttribute("height")) / TILE_SIZE;
+                    short tmxFileX = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
+                    short tmxFileY = (short) (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE);
+                    short tmxFileWidth = (short) (Short.parseShort(objectTagElement.getAttribute("width")) / TILE_SIZE);
+                    short tmxFileHeight = (short) (Short.parseShort(objectTagElement.getAttribute("height")) / TILE_SIZE);
 
 //                    String warpMapName = null;
                     // Set to negative one to let the server know that the warp is an outbound
                     // warp to another map
-                    int warpX = -1;
-                    int warpY = -1;
+                    short warpX = -1;
+                    short warpY = -1;
                     MoveDirection moveDirection = null;
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
@@ -364,13 +364,13 @@ public class TmxFileParser {
 
                         // Get map X:
                         if (propertyElement.getAttribute("name").equals("x")) {
-                            warpX = Integer.parseInt(propertyElement.getAttribute("value"));
+                            warpX = Short.parseShort(propertyElement.getAttribute("value"));
                             Log.println(TmxFileParser.class, "WarpX: " + warpX, false, PRINT_DEBUG);
                         }
 
                         // Get map Y:
                         if (propertyElement.getAttribute("name").equals("y")) {
-                            warpY = Integer.parseInt(propertyElement.getAttribute("value"));
+                            warpY = Short.parseShort(propertyElement.getAttribute("value"));
                             Log.println(TmxFileParser.class, "WarpY: " + warpY, false, PRINT_DEBUG);
                         }
 
@@ -382,9 +382,9 @@ public class TmxFileParser {
                     }
 
                     // Print the map to console.
-                    for (int ii = tmxFileY; ii < tmxFileY + tmxFileHeight; ii++) {
-                        for (int jj = tmxFileX; jj < tmxFileX + tmxFileWidth; jj++) {
-                            int tileY = mapHeight - ii - 1;
+                    for (short ii = tmxFileY; ii < tmxFileY + tmxFileHeight; ii++) {
+                        for (short jj = tmxFileX; jj < tmxFileX + tmxFileWidth; jj++) {
+                            short tileY = (short) (mapHeight - ii - 1);
                             Tile tile = map[jj][mapHeight - ii - 1];
                             tile.setWarp(new Warp(new Location(targetMap, warpX, warpY), moveDirection));
                             Log.println(TmxFileParser.class, tile.getWarp().getLocation().getMapName(), false, PRINT_DEBUG);
@@ -400,9 +400,9 @@ public class TmxFileParser {
          * Print the map to console.
          */
         if (PRINT_DEBUG) {
-            int yOffset = mapHeight - 1;
-            for (int height = yOffset; height >= 0; height--) {
-                for (int width = 0; width < mapWidth; width++) {
+            short yOffset = (short) (mapHeight - 1);
+            for (short height = yOffset; height >= 0; height--) {
+                for (short width = 0; width < mapWidth; width++) {
                     Tile tile = map[width][height];
                     if (!tile.isTraversable()) System.out.print("X");
                     else if (tile.isTraversable() && tile.getWarp() != null) System.out.print("@");

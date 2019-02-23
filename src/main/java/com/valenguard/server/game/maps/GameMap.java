@@ -182,8 +182,8 @@ public class GameMap {
 
                 MovingEntity targetEntity = movingEntity.getTargetEntity();
                 // Check for distance
-                if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), 1)
-                        || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), 1)) {
+                if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
+                        || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), (short) 1)) {
 
                     Attributes movingEntityAttributes = movingEntity.getAttributes();
                     Attributes targetEntityAttributes = targetEntity.getAttributes();
@@ -241,7 +241,7 @@ public class GameMap {
 
             // TODO: Check to see if the player needs to change maps!
 
-            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, mapHeight - PlayerConstants.RESPAWN_Y_CORD);
+            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, (short) (mapHeight - PlayerConstants.RESPAWN_Y_CORD));
             MoveDirection facingDirection = MoveDirection.SOUTH;
 
             deadEntity.setCurrentMapLocation(teleportLocation);
@@ -382,12 +382,12 @@ public class GameMap {
     }
 
     private boolean isOutOfBounds(Location location) {
-        int x = location.getX();
-        int y = location.getY();
+        short x = location.getX();
+        short y = location.getY();
         return x < 0 || x >= location.getGameMap().getMapWidth() || y < 0 || y >= location.getGameMap().getMapHeight();
     }
 
-    public boolean isOutOfBounds(int x, int y) {
+    public boolean isOutOfBounds(short x, short y) {
         return x < 0 || x >= mapWidth || y < 0 || y >= mapHeight;
     }
 
@@ -405,11 +405,11 @@ public class GameMap {
     }
 
     public Location getLocation(MoveDirection direction) {
-        if (direction == MoveDirection.SOUTH) return new Location(mapName, 0, -1);
-        if (direction == MoveDirection.NORTH) return new Location(mapName, 0, 1);
-        if (direction == MoveDirection.WEST) return new Location(mapName, -1, 0);
-        if (direction == MoveDirection.EAST) return new Location(mapName, 1, 0);
-        if (direction == MoveDirection.NONE) return new Location(mapName, 0, 0);
+        if (direction == MoveDirection.SOUTH) return new Location(mapName, (short) 0, (short) -1);
+        if (direction == MoveDirection.NORTH) return new Location(mapName, (short) 0, (short) 1);
+        if (direction == MoveDirection.WEST) return new Location(mapName, (short) -1, (short) 0);
+        if (direction == MoveDirection.EAST) return new Location(mapName, (short) 1, (short) 0);
+        if (direction == MoveDirection.NONE) return new Location(mapName, (short) 0, (short) 0);
         throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + mapName + ", MoveDirection: " + direction);
     }
 

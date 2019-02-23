@@ -12,10 +12,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class Location {
 
     private String mapName;
-    private int x;
-    private int y;
+    private short x;
+    private short y;
 
-    public Location(String mapName, int x, int y) {
+    public Location(String mapName, short x, short y) {
         this.mapName = mapName;
         this.x = x;
         this.y = y;
@@ -34,7 +34,7 @@ public class Location {
     public Location add(Location location) {
         checkArgument(location.getMapName().equals(mapName),
                 "Can't add locations. " + location.getMapName() + " doesn't equal " + mapName + ".");
-        return new Location(mapName, this.x + location.getX(), this.y + location.getY());
+        return new Location(mapName, (short) (this.x + location.getX()), (short) (this.y + location.getY()));
     }
 
     public void set(Location location) {
@@ -43,21 +43,21 @@ public class Location {
         this.y = location.y;
     }
 
-    public void add(int x, int y) {
-        this.x = this.x + x;
-        this.y = this.y + y;
+    public void add(short x, short y) {
+        this.x = (short) (this.x + x);
+        this.y = (short) (this.y + y);
     }
 
-    public boolean isWithinDistance(Location otherLocation, int distance) {
+    public boolean isWithinDistance(Location otherLocation, short distance) {
         return getDistanceAway(otherLocation) <= distance;
     }
 
-    public int getDistanceAway(Location otherLocation) {
+    public short getDistanceAway(Location otherLocation) {
         int diffX = otherLocation.getX() - x;
         int diffY = otherLocation.getY() - y;
 
         double realDifference = Math.sqrt((double) (diffX * diffX + diffY * diffY));
-        return (int) Math.floor(realDifference);
+        return (short) Math.floor(realDifference);
     }
 
     @SuppressWarnings("RedundantIfStatement")

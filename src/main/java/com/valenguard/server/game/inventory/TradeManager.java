@@ -20,7 +20,7 @@ public class TradeManager {
     /**
      * The max trade distance allowed between two players.
      */
-    private static final int MAX_TRADE_DISTANCE = 5;
+    private static final short MAX_TRADE_DISTANCE = 5;
 
     /**
      * This holds a <tradeUUID, TradeData> for a live trade.

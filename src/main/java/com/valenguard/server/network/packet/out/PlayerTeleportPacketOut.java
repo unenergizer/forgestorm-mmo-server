@@ -25,8 +25,8 @@ public class PlayerTeleportPacketOut extends ServerAbstractOutPacket {
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(teleportedEntity.getServerEntityId());
         write.writeString(teleportLocation.getMapName());
-        write.writeInt(teleportLocation.getX());
-        write.writeInt(teleportLocation.getY());
+        write.writeShort(teleportLocation.getX());
+        write.writeShort(teleportLocation.getY());
         write.writeByte(facingDirection.getDirectionByte());
 
         println(getClass(), "MapName: " + teleportLocation.getMapName() + "X: " + teleportLocation.getX() + ", Y: " + teleportLocation.getY() + ", Facing: " + facingDirection.toString());

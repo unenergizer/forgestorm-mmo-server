@@ -100,7 +100,7 @@ public class GameManager {
         // Tiled Editor without doing the subtraction ourselves.
         Location location = new Location(PlayerConstants.STARTING_MAP,
                 PlayerConstants.STARTING_X_CORD,
-                gameMap.getMapHeight() - PlayerConstants.STARTING_Y_CORD);
+                (short) (gameMap.getMapHeight() - PlayerConstants.STARTING_Y_CORD));
 
         Player player = initializePlayer(playerSessionData);
 
@@ -226,12 +226,12 @@ public class GameManager {
 
     private void fixWarpHeights() {
         for (GameMap gameMap : gameMaps.values()) {
-            for (int i = 0; i < gameMap.getMapWidth(); i++) {
-                for (int j = 0; j < gameMap.getMapHeight(); j++) {
+            for (short i = 0; i < gameMap.getMapWidth(); i++) {
+                for (short j = 0; j < gameMap.getMapHeight(); j++) {
                     if (gameMap.isOutOfBounds(i, j)) continue;
                     Warp warp = gameMap.getMap()[i][j].getWarp();
                     if (warp == null) continue;
-                    warp.getLocation().setY(gameMaps.get(warp.getLocation().getMapName()).getMapHeight() - warp.getLocation().getY() - 1);
+                    warp.getLocation().setY((short) (gameMaps.get(warp.getLocation().getMapName()).getMapHeight() - warp.getLocation().getY() - 1));
                 }
             }
         }

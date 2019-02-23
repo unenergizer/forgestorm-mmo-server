@@ -31,8 +31,8 @@ public class EntityMovePacketOut extends ServerAbstractOutPacket {
             checkArgument(!movingEntity.getCurrentMapLocation().equals(movingEntity.getFutureMapLocation()), "FutureLocation and CurrentLocation should not be equal!");
         }
         write.writeShort(entityToMove.getServerEntityId());
-        write.writeInt(attemptLocation.getX());
-        write.writeInt(attemptLocation.getY());
+        write.writeShort(attemptLocation.getX());
+        write.writeShort(attemptLocation.getY());
 
         Log.println(getClass(), "", false, PRINT_DEBUG);
         Log.println(getClass(), "ServerID: " + entityToMove.getServerEntityId() + ", " + attemptLocation, false, PRINT_DEBUG);

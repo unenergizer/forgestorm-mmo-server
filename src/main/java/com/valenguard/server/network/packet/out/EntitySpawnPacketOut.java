@@ -38,8 +38,8 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
 
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
 
-        write.writeInt(movingEntity.getFutureMapLocation().getX());
-        write.writeInt(movingEntity.getFutureMapLocation().getY());
+        write.writeShort(movingEntity.getFutureMapLocation().getX());
+        write.writeShort(movingEntity.getFutureMapLocation().getY());
 
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
@@ -89,8 +89,8 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
+        write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
+        write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
         write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
     }
 
