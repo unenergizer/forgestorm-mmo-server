@@ -23,6 +23,7 @@ public class WarpManager {
         Log.println(getClass(), "DRx: " + player.getRealX(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
 
+        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player warping.");
         ValenguardMain.getInstance().getGameManager().playerSwitchGameMap(player);
     }
 }

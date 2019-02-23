@@ -234,6 +234,9 @@ public class UpdateMovements {
         // Prevents the player from moving places they are not allowed to go.
         if (!player.getGameMap().isMovable(attemptLocation)) return;
 
+        // Canceling trade for the player.
+        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
+
         if (player.getGameMap().locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
         }

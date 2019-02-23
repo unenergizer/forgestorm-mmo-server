@@ -1,5 +1,6 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.PlayerTradePacketOut;
@@ -8,21 +9,42 @@ import java.util.*;
 
 import static com.valenguard.server.util.Log.println;
 
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class TradeManager {
 
+    /**
+     * The max time to wait before the trade request times out.
+     */
     private static final int MAX_TIME = 20;
+
+    /**
+     * The max trade distance allowed between two players.
+     */
+    private static final int MAX_TRADE_DISTANCE = 5;
+
+    /**
+     * This holds a <tradeUUID, TradeData> for a live trade.
+     */
     private final Map<Integer, TradeData> tradeDataMap = new HashMap<>();
 
     /**
-     * Stage 1: TradeStarter {@link Player} sends a request to TargetPlayer to initial a trade window.
+     * Stage 1:
+     * TradeStarter {@link Player} sends a request to TargetPlayer to initial a trade window.
      *
      * @param tradeStarter The request sender {@link Player}
      * @param targetPlayer The target {@link Player}
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
         if (isTradeInProgress(tradeStarter)) return;
+        if (isTradeInProgress(targetPlayer)) return;
+        if (!checkMapSanity(tradeStarter, targetPlayer)) {
+            new ChatMessagePacketOut(tradeStarter, "[Server] You must be closer to begin a trade.").sendPacket();
+            return;
+        }
+
         final int UUID = generateTradeId(tradeStarter, targetPlayer);
 
+        tradeStarter.setTradeUUID(UUID);
         tradeDataMap.put(UUID, new TradeData(tradeStarter, targetPlayer));
 
         new ChatMessagePacketOut(tradeStarter, "[Server] Trade request received. Waiting on " + targetPlayer.getName() + "...").sendPacket();
@@ -32,6 +54,7 @@ public class TradeManager {
     }
 
     /**
+     * Stage 2:
      * The TargetPlayer has accepted the initial trade request. Now we tell them to open the trade window.
      *
      * @param targetPlayer The targetPlayer who accepted the trade.
@@ -46,18 +69,79 @@ public class TradeManager {
 
         tradeData.tradeActive = true;
 
+        targetPlayer.setTradeUUID(tradeUUID);
         new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade opened with " + tradeData.targetPlayer.getName() + ".").sendPacket();
         new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade opened with " + tradeData.tradeStarter.getName() + ".").sendPacket();
         new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
     }
 
-    public void playerConfirmedTrade(Player confirmedPlayer, int tradeUUID, TradeStatusOpcode tradeStatusOpcode) {
+    /**
+     * Stage 3:
+     * Called when we need to send the target player an update about an item they added to the trade window.
+     *
+     * @param player    The player who added the item.
+     * @param tradeUUID The unique id for this trade.
+     * @param itemSlot  The slot the item was contained in.
+     */
+    public void sendItem(Player player, int tradeUUID, byte itemSlot) {
+        if (!isValidTrade(player, tradeUUID)) return;
+        if (!slotInsideWindow(itemSlot)) return;
+
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+
+        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        if (itemStack == null) return;
+
+        if (tradeData.targetPlayer == player) {
+            tradeData.addItem(tradeData.tradeTargetItems, itemSlot);
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+        } else {
+            tradeData.addItem(tradeData.tradeStarterItems, itemSlot);
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+        }
+    }
+
+    /**
+     * Stage 3:
+     * Called when we need to remove an item from the trade menu.
+     *
+     * @param player    The player who removed the item.
+     * @param tradeUUID The unique id for this trade.
+     * @param itemSlot  The slot the item was removed from.
+     */
+    public void removeItem(Player player, int tradeUUID, byte itemSlot) {
+        if (!isValidTrade(player, tradeUUID)) return;
+        if (!slotInsideWindow(itemSlot)) return;
+
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+
+        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        if (itemStack == null) return;
+
+        if (tradeData.targetPlayer == player) {
+            if (tradeData.tradeTargetItems[itemSlot] != null) return;
+            tradeData.tradeTargetItems[itemSlot] = null;
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+        } else {
+            if (tradeData.tradeStarterItems[itemSlot] != null) return;
+            tradeData.tradeStarterItems[itemSlot] = null;
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+        }
+    }
+
+    /**
+     * Stage 4:
+     * Called when a trade confirmation has been received.
+     *
+     * @param confirmedPlayer The player who confirmed the item trade
+     * @param tradeUUID       The trade window unique reference id.
+     */
+    public void playerConfirmedTrade(Player confirmedPlayer, int tradeUUID) {
         if (!isValidTrade(confirmedPlayer, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
-        // TODO: Set boolean on who confirmed trade. Don't do trade until both booleans are set by both players
-
+        // Set boolean on who confirmed trade. Don't do trade until both booleans are set by both players
         if (confirmedPlayer == tradeData.targetPlayer) {
             tradeData.targetPlayerConfirmedTrade = true;
         } else {
@@ -75,12 +159,25 @@ public class TradeManager {
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_COMPLETE)).sendPacket();
 
             // Trade finished, clear data
-            tradeDataMap.remove(tradeUUID);
+            removeTradeData(tradeUUID, true);
 
             // Update player inventories
             List<ItemStack> starterGiveItems = generateGiveItems(tradeData.tradeStarter, tradeData.tradeStarterItems);
             List<ItemStack> targetGiveItems = generateGiveItems(tradeData.targetPlayer, tradeData.tradeTargetItems);
 
+            // Check to make sure the player has room for the traded items
+            if (!checkInventoryForTradeSpace(tradeData.tradeStarter, starterGiveItems, targetGiveItems)) {
+                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] You don't have enough inventory space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Other player didn't have enough inventory space.").sendPacket();
+                return;
+            }
+            if (!checkInventoryForTradeSpace(tradeData.targetPlayer, targetGiveItems, starterGiveItems)) {
+                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Other player didn't have enough inventory space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] You don't have enough inventory space.").sendPacket();
+                return;
+            }
+
+            // Finally update player inventories
             updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, targetGiveItems);
             updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, starterGiveItems);
 
@@ -122,6 +219,50 @@ public class TradeManager {
         tradeData.timeLeft = 0;
     }
 
+    private boolean checkInventoryForTradeSpace(Player player, List<ItemStack> givingItems, List<ItemStack> receivingItems) {
+        return player.getPlayerBag().takenSlots() - givingItems.size() + receivingItems.size() <= GameConstants.BAG_SIZE;
+    }
+
+    /**
+     * Used to check if the trade needs to be canceled.
+     *
+     * @param player The player were checking against.
+     */
+    public void ifTradeExistCancel(Player player, String cancelMessage) {
+        if (!tradeDataMap.containsKey(player.getTradeUUID())) return;
+        TradeData tradeData = tradeDataMap.get(player.getTradeUUID());
+
+        new ChatMessagePacketOut(tradeData.tradeStarter, cancelMessage).sendPacket();
+        new ChatMessagePacketOut(tradeData.targetPlayer, cancelMessage).sendPacket();
+        new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+        new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+
+        removeTradeData(player.getTradeUUID(), true);
+    }
+
+    /**
+     * Removes the {@link TradeData} from the tradeDataMap.
+     *
+     * @param tradeUUID      The key in the tradeDataMap.
+     * @param removeMapEntry Used to prevent {@link ConcurrentModificationException}
+     */
+    private void removeTradeData(int tradeUUID, boolean removeMapEntry) {
+        if (!tradeDataMap.containsKey(tradeUUID)) return;
+
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+        tradeData.tradeStarter.setTradeUUID(-1);
+        tradeData.targetPlayer.setTradeUUID(-1);
+
+        if (removeMapEntry) tradeDataMap.remove(tradeUUID);
+    }
+
+    /**
+     * Generates a unique tradeUUID based on both players server id.
+     *
+     * @param traderStarter The player who initialized the trade.
+     * @param targetPlayer  The player who is going to receive the trade request.
+     * @return A unique trade id.
+     */
     private int generateTradeId(Player traderStarter, Player targetPlayer) {
         int tradeUUID = traderStarter.getServerEntityId();
         tradeUUID <<= 16;
@@ -129,13 +270,11 @@ public class TradeManager {
         return tradeUUID;
     }
 
-    public boolean isTradeInProgress(Player tradeStarter) {
-        for (TradeData tradeData : tradeDataMap.values()) {
-            if (tradeData.tradeStarter == tradeStarter) return true;
-        }
-        return false;
-    }
-
+    /**
+     * Ticks the trade time out time.
+     *
+     * @param numberOfTicksPassed The number of ticks passed in the {@link com.valenguard.server.GameLoop}
+     */
     public void tickTime(float numberOfTicksPassed) {
         if (numberOfTicksPassed % 20 == 0) {
 
@@ -145,6 +284,8 @@ public class TradeManager {
 
                 tradeData.timeLeft--;
                 if (tradeData.timeLeft <= 0 && !tradeData.tradeActive) {
+
+                    removeTradeData(tradeData.tradeStarter.getTradeUUID(), false);
 
                     // Notify the trade starter that the target tradeStarter didn't respond in time.
                     new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade canceled. Trade timed out.").sendPacket();
@@ -160,54 +301,100 @@ public class TradeManager {
         }
     }
 
-    public void sendItem(Player player, int tradeUUID, byte itemSlot) {
-        if (!isValidTrade(player, tradeUUID)) return;
-        if (!slotInsideWindow(itemSlot)) return;
-
-        TradeData tradeData = tradeDataMap.get(tradeUUID);
-
-        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
-        if (itemStack == null) return;
-
-        if (tradeData.targetPlayer == player) {
-            //TODO => check if full?
-            tradeData.addItem(tradeData.tradeTargetItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
-        } else {
-            tradeData.addItem(tradeData.tradeStarterItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+    /**
+     * Test to see if a trade has already been started for the given player.
+     *
+     * @param tradeStarter The player we are going to test.
+     * @return True if they have already started a trade, false otherwise.
+     */
+    private boolean isTradeInProgress(Player tradeStarter) {
+        for (TradeData tradeData : tradeDataMap.values()) {
+            if (tradeData.tradeStarter == tradeStarter) return true;
         }
+        return false;
     }
 
-    public void removeItem(Player player, int tradeUUID, byte itemSlot) {
-        if (!isValidTrade(player, tradeUUID)) return;
-        if (!slotInsideWindow(itemSlot)) return;
-
-        TradeData tradeData = tradeDataMap.get(tradeUUID);
-
-        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
-        if (itemStack == null) return;
-
-        if (tradeData.targetPlayer == player) {
-            if (tradeData.tradeTargetItems[itemSlot] != null) return;
-            tradeData.tradeTargetItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
-        } else {
-            if (tradeData.tradeStarterItems[itemSlot] != null) return;
-            tradeData.tradeStarterItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
-        }
-    }
-
+    /**
+     * Does array bounds checking for the itemSlot in reference to the bag size.
+     *
+     * @param itemSlot The slot number to test.
+     * @return True if it is in range, false otherwise.
+     */
     private boolean slotInsideWindow(byte itemSlot) {
-        return itemSlot >= 0 && itemSlot < 5 * 9;
+        return itemSlot >= 0 && itemSlot < GameConstants.BAG_SIZE;
     }
 
+    /**
+     * Sanity check to make sure that the player who is doing a trade action is contained in the
+     * tradeDataMap.
+     *
+     * @param trader    The player we are verifying.
+     * @param tradeUUID The unique id in reference to this trade.
+     * @return True if the player passes the check, false otherwise.
+     */
     private boolean isValidTrade(Player trader, int tradeUUID) {
-        if (!tradeDataMap.containsKey(tradeUUID)) return false;
-        return tradeDataMap.get(tradeUUID).isTrader(trader);
+        boolean tradeValid = true;
+
+        // Make sure the tradeUUID exists
+        if (!tradeDataMap.containsKey(tradeUUID)) tradeValid = false;
+
+        // Make sure this player is a valid trader for this trade
+        if (tradeValid && !tradeDataMap.get(tradeUUID).isTrader(trader)) tradeValid = false;
+
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+        Player tradeStarter = tradeData.tradeStarter;
+        Player targetPlayer = tradeData.targetPlayer;
+
+        // Check for Map related issues
+        if (tradeValid && !checkMapSanity(tradeStarter, targetPlayer)) tradeValid = false;
+
+        // If trade is invalid, cancel it here.
+        if (!tradeValid) {
+            removeTradeData(tradeUUID, true);
+        }
+
+        return tradeValid;
     }
 
+    /**
+     * Checks to make sure the player is trading within map related rules.
+     *
+     * @param tradeStarter The {@link Player} that started the trade.
+     * @param targetPlayer The {@link Player} that received the trade request.
+     * @return True if passing sanity checks, false otherwise.
+     */
+    private boolean checkMapSanity(Player tradeStarter, Player targetPlayer) {
+        // Make sure the player is on the same map as the other one
+        if (!tradeStarter.getMapName().equals(targetPlayer.getMapName())) {
+            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because player left the map.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because player left the map.").sendPacket();
+            new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+            new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+
+            removeTradeData(tradeStarter.getTradeUUID(), true);
+            return false;
+        }
+
+        // Make sure the player is within the correct distance
+        if (!tradeStarter.getCurrentMapLocation().isWithinDistance(targetPlayer.getCurrentMapLocation(), MAX_TRADE_DISTANCE)) {
+            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because both players are too far apart.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because both players are too far apart.").sendPacket();
+            new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+            new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
+
+            removeTradeData(tradeStarter.getTradeUUID(), true);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Generates the {@link ItemStack}s needed to give a player.
+     *
+     * @param trader     The player that is offering items.
+     * @param tradeItems The item slots of the {@link PlayerBag}
+     * @return A list of generated {@link ItemStack}
+     */
     private List<ItemStack> generateGiveItems(Player trader, Byte[] tradeItems) {
         List<ItemStack> giveItems = new ArrayList<>();
         ItemStack[] bagItems = trader.getPlayerBag().getItems();
@@ -219,8 +406,15 @@ public class TradeManager {
         return giveItems;
     }
 
+    /**
+     * Does the final transferring of times.
+     *
+     * @param playerToUpdate The player who will have their client inventory
+     *                       and server {@link PlayerBag} updated.
+     * @param itemsToRemove  The {@link ItemStack}s we are going to remove from their bag.
+     * @param itemsToAdd     The {@link ItemStack}s we are going to add to their bag.
+     */
     private void updateInventories(Player playerToUpdate, Byte[] itemsToRemove, List<ItemStack> itemsToAdd) {
-
         // Dump items from trade starter bag
         for (Byte slotIndex : itemsToRemove) {
             if (slotIndex != null) {
@@ -232,6 +426,9 @@ public class TradeManager {
         itemsToAdd.forEach(playerToUpdate::giveItemStack);
     }
 
+    /**
+     * A container class that holds information about a trade between two {@link Player}s
+     */
     class TradeData {
         private final Player tradeStarter;
         private final Player targetPlayer;
@@ -243,18 +440,32 @@ public class TradeManager {
         private boolean tradeStarterConfirmedTrade = false;
         private boolean targetPlayerConfirmedTrade = false;
 
-        private Byte[] tradeStarterItems = new Byte[5 * 9];
-        private Byte[] tradeTargetItems = new Byte[5 * 9];
+        private Byte[] tradeStarterItems = new Byte[GameConstants.BAG_SIZE];
+        private Byte[] tradeTargetItems = new Byte[GameConstants.BAG_SIZE];
 
         TradeData(Player tradeStarter, Player targetPlayer) {
             this.tradeStarter = tradeStarter;
             this.targetPlayer = targetPlayer;
         }
 
+        /**
+         * Test to see if the player supplied is a participant in this trade
+         *
+         * @param player The player we are testing.
+         * @return True if they are a valid participant, false otherwise.
+         */
         private boolean isTrader(Player player) {
             return player == tradeStarter || player == targetPlayer;
         }
 
+        /**
+         * Adds a trade item to the trade window. The item is represented at
+         * the slot index of the bag window.
+         *
+         * @param tradeItems The trade items for a trader.
+         * @param bagSlot    The slot of the bag being reference in the trade
+         *                   window.
+         */
         private void addItem(Byte[] tradeItems, byte bagSlot) {
             for (byte i = 0; i < tradeItems.length; i++) {
                 if (tradeItems[i] == null) {

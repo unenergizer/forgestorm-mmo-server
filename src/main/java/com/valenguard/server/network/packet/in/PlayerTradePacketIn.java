@@ -84,7 +84,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
 
             // Stage 4: First Trade Confirm (items are in window, do trade or cancel)
             case TRADE_OFFER_CONFIRM:
-                tradeManager.playerConfirmedTrade(packetData.getPlayer(), packetData.tradeUUID, packetData.tradeStatusOpcode);
+                tradeManager.playerConfirmedTrade(packetData.getPlayer(), packetData.tradeUUID);
                 break;
 
             // Stage 5: Final trade confirm

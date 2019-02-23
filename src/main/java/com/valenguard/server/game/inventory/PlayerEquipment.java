@@ -1,5 +1,6 @@
 package com.valenguard.server.game.inventory;
 
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
@@ -11,10 +12,8 @@ public class PlayerEquipment {
 
     private static final boolean PRINT_DEBUG = false;
 
-    public static final int CAPACITY = 12;
-
     @Getter
-    private final EquipmentSlot[] equipmentSlots = new EquipmentSlot[CAPACITY];
+    private final EquipmentSlot[] equipmentSlots = new EquipmentSlot[GameConstants.EQUIPMENT_SIZE];
 
     private Player player;
 
@@ -69,9 +68,9 @@ public class PlayerEquipment {
         Attributes itemStackAttributes = equipItem ? bagItemStack.getAttributes() : equipItemStack.getAttributes();
 
         println(PRINT_DEBUG);
-        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), false, PRINT_DEBUG);
         println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
-        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(), false, PRINT_DEBUG);
         println(getClass(), "IS Damage: " + itemStackAttributes.getDamage(), false, PRINT_DEBUG);
 
         // TODO: Instead of manually adding the new values, we should possible loop through all equipped items and get values this way.
@@ -105,7 +104,7 @@ public class PlayerEquipment {
             }
         }
 
-        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(),  false,PRINT_DEBUG);
+        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), false, PRINT_DEBUG);
         println(getClass(), "PC Final Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
         println(PRINT_DEBUG);
 

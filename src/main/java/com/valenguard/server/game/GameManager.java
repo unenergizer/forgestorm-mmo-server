@@ -176,6 +176,7 @@ public class GameManager {
         // TODO: Save player specific data
         GameMap gameMap = player.getGameMap();
         gameMap.removePlayer(player);
+        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
         ValenguardMain.getInstance().getOutStreamManager().removeClient(player.getClientHandler());
 
         Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));

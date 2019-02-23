@@ -1,6 +1,7 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.inventory.*;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
@@ -68,15 +69,15 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
         if (fromWindow == InventoryType.BAG_1) {
-            if (packetData.fromPosition >= PlayerBag.CAPACITY || packetData.fromPosition < 0) return false;
+            if (packetData.fromPosition >= GameConstants.BAG_SIZE || packetData.fromPosition < 0) return false;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
-            if (packetData.fromPosition >= PlayerEquipment.CAPACITY || packetData.fromPosition < 0) return false;
+            if (packetData.fromPosition >= GameConstants.EQUIPMENT_SIZE || packetData.fromPosition < 0) return false;
         }
 
         if (toWindow == InventoryType.BAG_1) {
-            return packetData.toPosition < PlayerBag.CAPACITY && packetData.toPosition >= 0;
+            return packetData.toPosition < GameConstants.BAG_SIZE && packetData.toPosition >= 0;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
-            return packetData.toPosition < PlayerEquipment.CAPACITY && packetData.toPosition >= 0;
+            return packetData.toPosition < GameConstants.EQUIPMENT_SIZE && packetData.toPosition >= 0;
         }
 
         return true;

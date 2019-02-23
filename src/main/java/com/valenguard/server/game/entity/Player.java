@@ -35,6 +35,8 @@ public class Player extends MovingEntity {
 
     private PlayerEquipment playerEquipment = new PlayerEquipment();
 
+    private int tradeUUID = -1;
+
     public void addDirectionToFutureQueue(MoveDirection moveDirection) {
         latestMoveRequests.add(moveDirection);
     }
