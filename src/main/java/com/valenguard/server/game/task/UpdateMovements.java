@@ -121,11 +121,8 @@ public class UpdateMovements {
         for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
             if (movingEntity.equals(otherMovingMobs)) continue;
             if (movingEntity.getEntityType() == otherMovingMobs.getEntityType()) continue;
-
-
-
+            
             findEntityTarget(movingEntity, otherMovingMobs);
-//            findEntityTarget(otherMovingMobs, movingEntity);
         }
 
         if (movingEntity instanceof Player) {
@@ -137,50 +134,29 @@ public class UpdateMovements {
         // Find player targets
         for (Player player : gameMap.getPlayerList()) {
             if (movingEntity.equals(player)) continue;
-//            if (movingEntity.getEntityType() == player.getEntityType()) continue;
             findEntityTarget(movingEntity, player);
         }
     }
 
     private void findEntityTarget(MovingEntity movingEntity, MovingEntity targetEntity) {
-
         Location currentLocation = targetEntity.getCurrentMapLocation();
         Location targetLocation = movingEntity.getCurrentMapLocation();
 
         // This entity has no target, find one?
         if (movingEntity.getTargetEntity() == null) {
 
-            println(getClass(), "has no target", true, (targetEntity instanceof Player));
-
             // Is player within distance to target
             if (currentLocation.isWithinDistance(targetLocation, GameConstants.START_ATTACK_RADIUS)) {
-
-
-                println(getClass(), "found target within distance", true, (targetEntity instanceof Player));
-
                 if (movingEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
-
-
-                    println(getClass(), "entity is hostile", true, (targetEntity instanceof Player));
-
                     movingEntity.setTargetEntity(targetEntity);
                     findTrackingPath(movingEntity, targetEntity);
                 }
             }
-
         } else if (movingEntity.getTargetEntity().equals(targetEntity)) {
-
-            println(getClass(), "has target", true, (targetEntity instanceof Player));
-
             // We already have a target, so lets attack
             if (currentLocation.isWithinDistance(targetLocation, GameConstants.QUIT_ATTACK_RADIUS)) {
-
-                println(getClass(), "inside quit radius", true, (targetEntity instanceof Player));
-
                 findTrackingPath(movingEntity, targetEntity);
             } else {
-
-                println(getClass(), "outside quit radius", true, (targetEntity instanceof Player));
                 movingEntity.setTargetEntity(null);
             }
         }
