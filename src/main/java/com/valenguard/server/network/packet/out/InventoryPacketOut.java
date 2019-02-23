@@ -15,18 +15,14 @@ public class InventoryPacketOut extends ServerAbstractOutPacket {
 
     @Override
     protected void createPacket(ValenguardOutputStream write) {
-
         write.writeByte(inventoryAction.getInventoryActionType());
 
         if (inventoryAction.getInventoryActionType() == InventoryActions.GIVE) {
-
             write.writeInt(inventoryAction.getItemStack().getItemId());
             write.writeInt(inventoryAction.getItemStack().getAmount());
 
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
-
             write.writeByte(inventoryAction.getSlotIndex());
-
         }
     }
 }

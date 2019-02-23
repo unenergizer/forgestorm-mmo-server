@@ -43,7 +43,9 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
 
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
+            case SKILL_NODE:
             case MONSTER:
+            case ITEM_STACK:
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 break;
             case NPC:
@@ -51,8 +53,8 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
                 break;
-            case PLAYER:
             case CLIENT_PLAYER:
+            case PLAYER:
                 write.writeByte(appearance.getColorId());
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
@@ -98,8 +100,8 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
+        write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
+        write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
         write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
     }
 }

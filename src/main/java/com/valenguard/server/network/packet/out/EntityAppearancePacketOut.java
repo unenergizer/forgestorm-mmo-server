@@ -28,7 +28,7 @@ public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
         write.writeByte(appearanceBits);
         Appearance appearance = entity.getAppearance();
         if ((appearanceBits & COLOR_INDEX) != 0) {
-            write.writeShort(appearance.getColorId());
+            write.writeByte(appearance.getColorId());
         }
         if ((appearanceBits & BODY_INDEX) != 0) {
             write.writeShort(appearance.getTextureIds()[Appearance.BODY]);
