@@ -7,7 +7,7 @@ import com.valenguard.server.game.inventory.PlayerBag;
 import com.valenguard.server.game.inventory.PlayerEquipment;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
-import com.valenguard.server.game.rpg.Skills;
+import com.valenguard.server.game.rpg.skills.Skills;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.shared.ClientHandler;
@@ -36,6 +36,8 @@ public class Player extends MovingEntity {
     private PlayerEquipment playerEquipment = new PlayerEquipment();
 
     private int tradeUUID = -1;
+
+    private NPC currentShoppingEntity;
 
     public void addDirectionToFutureQueue(MoveDirection moveDirection) {
         latestMoveRequests.add(moveDirection);

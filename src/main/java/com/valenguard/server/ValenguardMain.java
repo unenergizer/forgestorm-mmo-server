@@ -9,6 +9,7 @@ import com.valenguard.server.game.entity.EntityRespawnTimer;
 import com.valenguard.server.game.inventory.DropTableManager;
 import com.valenguard.server.game.inventory.ItemStackManager;
 import com.valenguard.server.game.inventory.TradeManager;
+import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.*;
@@ -30,6 +31,7 @@ public class ValenguardMain {
     private DropTableManager dropTableManager;
     private EntityRespawnTimer entityRespawnTimer;
     private TradeManager tradeManager;
+    private EntityShopManager entityShopManager;
 
     private ValenguardMain() {
     }
@@ -57,6 +59,8 @@ public class ValenguardMain {
         entityRespawnTimer = new EntityRespawnTimer();
 
         tradeManager = new TradeManager();
+
+        entityShopManager = new EntityShopManager();
 
         registerCommands();
         initializeNetwork();
@@ -92,6 +96,7 @@ public class ValenguardMain {
             eventBus.registerListener(new InventoryPacketIn());
             eventBus.registerListener(new ClickActionPacketIn());
             eventBus.registerListener(new PlayerTradePacketIn());
+            eventBus.registerListener(new ShopPacketIn());
         });
     }
 }

@@ -45,7 +45,7 @@ public class UpdateMovements {
 
         // Start performing a movement if the entity is not moving
         if (moveDirection != MoveDirection.NONE) {
-            println(getClass(), "MOB has started moving.", false, PRINT_DEBUG);
+            println(getClass(), "NPC has started moving.", false, PRINT_DEBUG);
             performMove(movingEntity, moveDirection);
         }
     }
@@ -118,7 +118,7 @@ public class UpdateMovements {
         GameMap gameMap = movingEntity.getGameMap();
 
         // Find MovingEntity targets
-        for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
+        for (MovingEntity otherMovingMobs : gameMap.getAiEntityMap().values()) {
             if (movingEntity.equals(otherMovingMobs)) continue;
             if (movingEntity.getEntityType() == otherMovingMobs.getEntityType()) continue;
 
@@ -126,7 +126,7 @@ public class UpdateMovements {
         }
 
         if (movingEntity instanceof Player) {
-            for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
+            for (MovingEntity otherMovingMobs : gameMap.getAiEntityMap().values()) {
                 findEntityTarget(otherMovingMobs, movingEntity);
             }
         }

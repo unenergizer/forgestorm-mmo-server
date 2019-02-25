@@ -230,7 +230,7 @@ public class TmxFileParser {
 
                     AIEntity aiEntity = null;
                     if (entityType == EntityType.NPC) {
-                        aiEntity = new MOB();
+                        aiEntity = new NPC();
                         short[] appearanceTextureIds = new short[2];
                         appearanceTextureIds[Appearance.BODY] = atlasBodyId;
                         appearanceTextureIds[Appearance.HEAD] = atlasHeadId;

@@ -57,7 +57,7 @@ public class GameManager {
     private void spawnEntities() {
         MovingEntity movingEntity;
         while ((movingEntity = mobsToSpawn.poll()) != null) {
-            movingEntity.getGameMap().queueMobSpawn(movingEntity);
+            movingEntity.getGameMap().queueAiEntitySpawn(movingEntity);
         }
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntities.poll()) != null) {
@@ -258,7 +258,7 @@ public class GameManager {
     }
 
     public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<MovingEntity> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getMobList().values().stream().filter(predicate).forEach(callback));
+        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityMap().values().stream().filter(predicate).forEach(callback));
     }
 
     public void forAllStationaryEntitiesFiltered(Consumer<Entity> callback, Predicate<StationaryEntity> predicate) {

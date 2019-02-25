@@ -19,7 +19,7 @@ import static com.valenguard.server.util.Log.println;
 public class ItemStackLoader {
 
     private static final boolean PRINT_DEBUG = false;
-    private static final String FILE_PATH = "src/main/resources/data/item/items.yaml";
+    private static final String FILE_PATH = "src/main/resources/data/item/Items.yaml";
 
     public List<ItemStack> loadItems() {
         println(getClass(), "====== START LOADING ITEMS ======", false, PRINT_DEBUG);

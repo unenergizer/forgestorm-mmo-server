@@ -7,7 +7,7 @@ import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
-import com.valenguard.server.game.rpg.SkillOpcodes;
+import com.valenguard.server.game.rpg.skills.SkillOpcodes;
 import com.valenguard.server.network.packet.out.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,9 +33,9 @@ public class GameMap {
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
     @Getter
-    private final Map<Short, MovingEntity> mobList = new HashMap<>();
-    private final Queue<MovingEntity> mobSpawnQueue = new LinkedList<>();
-    private final Queue<MovingEntity> mobDespawnQueue = new LinkedList<>();
+    private final Map<Short, MovingEntity> aiEntityMap = new HashMap<>();
+    private final Queue<MovingEntity> aiEntitySpawnQueue = new LinkedList<>();
+    private final Queue<MovingEntity> aiEntityDespawnQueue = new LinkedList<>();
 
     @Getter
     private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
@@ -81,38 +81,38 @@ public class GameMap {
     }
 
     /*
-     * MOB ////////////////////////////////////////////////////////////////////////
+     * NPC ////////////////////////////////////////////////////////////////////////
      */
 
-    public void queueMobSpawn(MovingEntity movingEntity) {
-        mobSpawnQueue.add(movingEntity);
+    public void queueAiEntitySpawn(MovingEntity movingEntity) {
+        aiEntitySpawnQueue.add(movingEntity);
     }
 
-    private void queueMobDespawn(MovingEntity movingEntity) {
-        mobDespawnQueue.add(movingEntity);
+    private void queueAiEntityDespawn(MovingEntity movingEntity) {
+        aiEntityDespawnQueue.add(movingEntity);
     }
 
-    private void mobSpawnRegistration(MovingEntity movingEntity) {
-        mobList.put(movingEntity.getServerEntityId(), movingEntity);
+    private void aiEntitySpawnRegistration(MovingEntity movingEntity) {
+        aiEntityMap.put(movingEntity.getServerEntityId(), movingEntity);
     }
 
-    private void mobDespawnRegistration(MovingEntity movingEntity) {
-        mobList.remove(movingEntity.getServerEntityId());
+    private void aiEntityDespawnRegistration(MovingEntity movingEntity) {
+        aiEntityMap.remove(movingEntity.getServerEntityId());
 
         // Toggle respawns
         ValenguardMain.getInstance().getEntityRespawnTimer().addMob(movingEntity);
     }
 
     public void tickMOB() {
-        mobSpawnQueue.forEach(this::mobSpawnRegistration);
-        mobDespawnQueue.forEach(this::mobDespawnRegistration);
+        aiEntitySpawnQueue.forEach(this::aiEntitySpawnRegistration);
+        aiEntityDespawnQueue.forEach(this::aiEntityDespawnRegistration);
 
         MovingEntity mob;
-        while ((mob = mobSpawnQueue.poll()) != null) {
+        while ((mob = aiEntitySpawnQueue.poll()) != null) {
             postEntitySpawn(mob);
         }
 
-        while ((mob = mobDespawnQueue.poll()) != null) {
+        while ((mob = aiEntityDespawnQueue.poll()) != null) {
             postEntityDespawn(mob);
         }
     }
@@ -177,7 +177,7 @@ public class GameMap {
             timeTillNextHit = 0;
 
             // Now do combat
-            for (MovingEntity movingEntity : mobList.values()) {
+            for (MovingEntity movingEntity : aiEntityMap.values()) {
                 if (movingEntity.getTargetEntity() == null) continue;
 
                 MovingEntity targetEntity = movingEntity.getTargetEntity();
@@ -262,7 +262,7 @@ public class GameMap {
             new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
 
         } else {
-            queueMobDespawn(deadEntity); // A mob died, despawn them!
+            queueAiEntityDespawn(deadEntity); // A mob died, despawn them!
 
             // If a AI entity kills and AI entity, do not drop ItemStack
             if (!(killerEntity instanceof Player)) return;
@@ -285,7 +285,7 @@ public class GameMap {
     }
 
     private void releaseEntityTargets(MovingEntity targetToRemove) {
-        for (MovingEntity movingEntity : mobList.values()) {
+        for (MovingEntity movingEntity : aiEntityMap.values()) {
             if (movingEntity.getTargetEntity() != null
                     && movingEntity.getTargetEntity().equals(targetToRemove)) {
                 movingEntity.setTargetEntity(null);
@@ -312,7 +312,7 @@ public class GameMap {
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
             postEntitySpawn(playerWhoJoined);
             // Tell the player about all the mobs currently on the map.
-            mobList.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
+            aiEntityMap.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
             stationaryEntitiesList.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
             itemStackDropList.values().forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
         }

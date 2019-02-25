@@ -1,6 +1,8 @@
-package com.valenguard.server.game.rpg;
+package com.valenguard.server.game.rpg.skills;
 
 import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.rpg.skills.Skill;
+import com.valenguard.server.game.rpg.skills.SkillOpcodes;
 
 public class Skills {
 

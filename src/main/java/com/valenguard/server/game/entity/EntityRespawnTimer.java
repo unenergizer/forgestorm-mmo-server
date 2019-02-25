@@ -41,7 +41,7 @@ public class EntityRespawnTimer {
                     movingEntity.setCurrentHealth(movingEntity.getMaxHealth());
 
                     // Finally, do the respawn!l
-                    movingEntity.getCurrentMapLocation().getGameMap().queueMobSpawn(movingEntity);
+                    movingEntity.getCurrentMapLocation().getGameMap().queueAiEntitySpawn(movingEntity);
 
                     iterator.remove();
                     println(getClass(), "Respawning Entity: " + movingEntity.getName() + " " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);

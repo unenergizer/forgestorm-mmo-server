@@ -1,5 +1,6 @@
 package com.valenguard.server.game.rpg;
 
+import com.valenguard.server.game.rpg.skills.SkillOpcodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

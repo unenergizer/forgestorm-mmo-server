@@ -1,4 +1,4 @@
-package com.valenguard.server.game.rpg;
+package com.valenguard.server.game.rpg.skills;
 
 public enum SkillOpcodes {
 

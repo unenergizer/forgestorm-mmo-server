@@ -85,6 +85,7 @@ public class ServerConnection implements Runnable {
     public void run() {
         Log.println(getClass(), "Server opened on port: " + networkSettings.getPort());
         registerListeners.accept(eventBus);
+        eventBus.determineCanceling();
         listenForConnections();
     }
 
