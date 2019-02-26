@@ -121,7 +121,7 @@ public class UpdateMovements {
         for (MovingEntity otherMovingMobs : gameMap.getMobList().values()) {
             if (movingEntity.equals(otherMovingMobs)) continue;
             if (movingEntity.getEntityType() == otherMovingMobs.getEntityType()) continue;
-            
+
             findEntityTarget(movingEntity, otherMovingMobs);
         }
 

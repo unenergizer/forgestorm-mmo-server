@@ -111,6 +111,9 @@ public class TradeManager {
      * @param itemSlot  The slot the item was removed from.
      */
     public void removeItem(Player player, int tradeUUID, byte itemSlot) {
+
+        println(getClass(), "[1] Remove trade item called! Player: " + player.getName());
+
         if (!isValidTrade(player, tradeUUID)) return;
         if (!slotInsideWindow(itemSlot)) return;
 
@@ -119,14 +122,22 @@ public class TradeManager {
         ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
         if (itemStack == null) return;
 
+        println(getClass(), "[2] Remove trade item called! Player: " + player.getName());
+
         if (tradeData.targetPlayer == player) {
-            if (tradeData.tradeTargetItems[itemSlot] != null) return;
+            println(getClass(), "[3] Remove trade item called! Player: " + player.getName());
+// TODO            if (tradeData.tradeTargetItems[itemSlot] != null) return;
             tradeData.tradeTargetItems[itemSlot] = null;
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+
+            println(getClass(), "[4] Remove trade item called! Player: " + player.getName());
         } else {
-            if (tradeData.tradeStarterItems[itemSlot] != null) return;
+            println(getClass(), "[5] Remove trade item called! Player: " + player.getName());
+// TODO            if (tradeData.tradeStarterItems[itemSlot] != null) return;
             tradeData.tradeStarterItems[itemSlot] = null;
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+
+            println(getClass(), "[6] Remove trade item called! Player: " + player.getName());
         }
     }
 
