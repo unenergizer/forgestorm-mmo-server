@@ -35,8 +35,10 @@ public class TradeManager {
      * @param targetPlayer The target {@link Player}
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
-        if (isTradeInProgress(tradeStarter)) return;
-        if (isTradeInProgress(targetPlayer)) return;
+        if (isTradeInProgress(tradeStarter) || isTradeInProgress(targetPlayer)) {
+            new ChatMessagePacketOut(tradeStarter, "[Server] " + targetPlayer.getName() + " is already trading.").sendPacket();
+            return;
+        }
         if (!checkMapSanity(tradeStarter, targetPlayer)) {
             new ChatMessagePacketOut(tradeStarter, "[Server] You must be closer to begin a trade.").sendPacket();
             return;
@@ -203,6 +205,27 @@ public class TradeManager {
         }
     }
 
+    public void playerUnconfirmedTrade(Player confirmedPlayer, int tradeUUID) {
+        if (!isValidTrade(confirmedPlayer, tradeUUID)) return;
+
+        TradeData tradeData = tradeDataMap.get(tradeUUID);
+
+        // Make sure both players haven't already confirmed the trade!
+        if (tradeData.tradeStarterConfirmedTrade && tradeData.targetPlayerConfirmedTrade) return;
+
+        // Set boolean on who confirmed trade. Don't do trade until both booleans are set by both players
+        if (confirmedPlayer == tradeData.targetPlayer) {
+            tradeData.targetPlayerConfirmedTrade = false;
+        } else {
+            tradeData.tradeStarterConfirmedTrade = false;
+        }
+
+        new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] " + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
+        new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] " + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
+        new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
+        new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
+    }
+
     /**
      * One size fits all trade cancel.
      *
@@ -321,6 +344,7 @@ public class TradeManager {
     private boolean isTradeInProgress(Player tradeStarter) {
         for (TradeData tradeData : tradeDataMap.values()) {
             if (tradeData.tradeStarter == tradeStarter) return true;
+            if (tradeData.targetPlayer == tradeStarter) return true;
         }
         return false;
     }
