@@ -32,6 +32,7 @@ public class PlayerTradePacketOut extends ServerAbstractOutPacket {
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
                 break;
             case TRADE_OFFER_CONFIRM:
+            case TRADE_OFFER_UNCONFIRM:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
                 write.writeShort(tradePacketInfoOut.getPlayerUUID());
                 break;

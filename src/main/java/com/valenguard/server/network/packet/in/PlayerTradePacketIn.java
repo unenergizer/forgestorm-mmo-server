@@ -27,6 +27,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
             case TRADE_REQUEST_TARGET_ACCEPT:
             case TRADE_REQUEST_TARGET_DECLINE:
             case TRADE_OFFER_CONFIRM:
+            case TRADE_OFFER_UNCONFIRM:
             case TRADE_OFFER_COMPLETE:
             case TRADE_CANCELED:
                 tradeUUID = clientHandler.readInt();
@@ -86,6 +87,10 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
             case TRADE_OFFER_CONFIRM:
                 tradeManager.playerConfirmedTrade(packetData.getPlayer(), packetData.tradeUUID);
                 break;
+            case TRADE_OFFER_UNCONFIRM:
+                tradeManager.playerUnconfirmedTrade(packetData.getPlayer(), packetData.tradeUUID);
+                break;
+
 
             // Stage 5: Final trade confirm
             // case TRADE_OFFER_COMPLETE: -> ONLY SENT TO CLIENT
