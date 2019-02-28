@@ -1,6 +1,12 @@
 package com.valenguard.server.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Log {
+
+    private final static String DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
+    private final static DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
     private Log() {
     }
@@ -20,7 +26,7 @@ public class Log {
     }
 
     private static String buildMessage(Class clazz, String message) {
-        return "[" + clazz.getSimpleName() + "] " + message;
+        return TIME_FORMATTER.format(LocalDateTime.now()) + "  [" + clazz.getSimpleName() + "] " + message;
     }
 
     public static void println(boolean print) {
