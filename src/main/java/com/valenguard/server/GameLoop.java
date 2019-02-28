@@ -2,6 +2,7 @@ package com.valenguard.server;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.inventory.PlayerInventoryEvents;
+import com.valenguard.server.game.task.ItemTickUpdates;
 import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.game.task.WarpManager;
 import com.valenguard.server.network.ServerConnection;
@@ -24,9 +25,12 @@ public class GameLoop extends Thread {
     private PlayerInventoryEvents playerInventoryEvents = new PlayerInventoryEvents(); // TODO: MOVE
 
     @Getter
-    private UpdateMovements updateMovements = new UpdateMovements(); //TODO: MOVE
+    private final UpdateMovements updateMovements = new UpdateMovements(); //TODO: MOVE
 
     private final WarpManager warpManager = new WarpManager(); // TODO: MOVE
+
+    @Getter
+    private final ItemTickUpdates itemTickUpdates = new ItemTickUpdates();
 
 
     GameLoop() {
@@ -68,6 +72,7 @@ public class GameLoop extends Thread {
             playerInventoryEvents.processInventoryEvents();
             updateMovements.updatePlayerMovement();
             warpManager.warpPlayers();
+            itemTickUpdates.tickItemsDespawn();
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
             valenguardMain.getEntityRespawnTimer().tickRespawnTime();
             valenguardMain.getGameManager().processPlayerJoin();

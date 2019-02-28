@@ -44,14 +44,20 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
             StationaryEntity clickedOnEntity = gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID());
             if (clickedOnEntity != null) changeEntityAppearance(clickedOnEntity, gameMap);
         } else if (gameMap.getItemStackDropList().get(packetData.getENTITY_UUID()) != null) {
+
             // Click received, lets pick up the item!
             ItemStackDrop itemStackDrop = gameMap.getItemStackDropList().get(packetData.getENTITY_UUID());
+
+            if (itemStackDrop.isPickedUp()) return;
 
             // Check inventory for being full first
             if (!packetData.getPlayer().getPlayerBag().isBagFull()) {
 
                 // Despawn the item
                 gameMap.queueItemStackDropDespawn(itemStackDrop);
+
+                // Don't let others pick the item up.
+                itemStackDrop.setPickedUp(true);
 
                 // Send the player the item
                 packetData.getPlayer().giveItemStack(itemStackDrop.getItemStack());

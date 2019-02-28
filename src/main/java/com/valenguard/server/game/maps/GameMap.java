@@ -136,7 +136,8 @@ public class GameMap {
 
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = itemStackDropSpawnQueue.poll()) != null) {
-            postEntitySpawn(itemStackDrop);
+            ValenguardMain.getInstance().getGameLoop().getItemTickUpdates().addItemToGround(itemStackDrop);
+            new EntitySpawnPacketOut(itemStackDrop.getKiller(), itemStackDrop).sendPacket();
         }
 
         while ((itemStackDrop = itemStackDropDespawnQueue.poll()) != null) {
@@ -287,6 +288,7 @@ public class GameMap {
                 itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
                 itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
                 itemStackDrop.setItemStack(itemStack);
+                itemStackDrop.setKiller((Player) killerEntity);
 
                 queueItemStackDropSpawn(itemStackDrop);
             }
