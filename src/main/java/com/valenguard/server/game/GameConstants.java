@@ -13,6 +13,7 @@ public class GameConstants {
     public static final int GENERAL_RESPAWN_TIME = 60;
 
     public static final int GENERAL_ENTITY_BASE_HP = 10;
+    public static final int GENERAL_ENTITY_DAMAGE = 5;
 
     public static final int BAG_WIDTH = 5;
     public static final int BAG_HEIGHT = 6;

@@ -262,7 +262,7 @@ public class TmxFileParser {
                     // Setup basic attributes. TODO: Values here should come from file
                     Attributes attributes = new Attributes();
                     attributes.setArmor(10);
-                    attributes.setDamage(1);
+                    attributes.setDamage(GameConstants.GENERAL_ENTITY_DAMAGE);
 
                     aiEntity.setAttributes(attributes);
 

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.valenguard.server.util.Log.println;
 
 public class GameMap {
 
@@ -239,25 +240,33 @@ public class GameMap {
         if (deadEntity instanceof Player) {
             // Player Died. Lets respawn them!
 
-            // TODO: Check to see if the player needs to change maps!
-
             Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, (short) (mapHeight - PlayerConstants.RESPAWN_Y_CORD));
             MoveDirection facingDirection = MoveDirection.SOUTH;
-
-            deadEntity.setCurrentMapLocation(teleportLocation);
-            deadEntity.setFutureMapLocation(teleportLocation);
-            deadEntity.setFacingDirection(facingDirection);
 
             // Do a reheal
             Player deadPlayer = (Player) deadEntity;
             deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
 
-            // TODO: Send other players info about the reheal (if they are still on the same map)
+            // Check to see if the player needs to change maps!
+            if (!deadPlayer.getMapName().equals(PlayerConstants.STARTING_MAP)) {
+                println(getClass(), "Warping player to graveyard map!");
 
-            // Send all players in map the teleport packet
-            forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+                // Warp player to graveyard
+                deadPlayer.setWarp(new Warp(teleportLocation, facingDirection));
+            } else {
+                println(getClass(), "Teleporting player to graveyard!");
 
-            forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
+                // Teleport player
+                deadEntity.setCurrentMapLocation(teleportLocation);
+                deadEntity.setFutureMapLocation(teleportLocation);
+                deadEntity.setFacingDirection(facingDirection);
+
+                // Send all players in map the teleport packet
+                forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+
+                // Send other players info about the reheal (if they are still on the same map)
+                forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
+            }
 
             new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
 
