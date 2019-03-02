@@ -35,7 +35,7 @@ public class TradeManager {
      * @param targetPlayer The target {@link Player}
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
-        if (isTradeInProgress(tradeStarter) || isTradeInProgress(targetPlayer)) {
+        if (isTradeInProgress(tradeStarter, targetPlayer)) {
             new ChatMessagePacketOut(tradeStarter, "[Server] " + targetPlayer.getName() + " is already trading.").sendPacket();
             return;
         }
@@ -341,10 +341,10 @@ public class TradeManager {
      * @param tradeStarter The player we are going to test.
      * @return True if they have already started a trade, false otherwise.
      */
-    private boolean isTradeInProgress(Player tradeStarter) {
+    private boolean isTradeInProgress(Player tradeStarter, Player targetPlayer) {
         for (TradeData tradeData : tradeDataMap.values()) {
-            if (tradeData.tradeStarter == tradeStarter) return true;
-            if (tradeData.targetPlayer == tradeStarter) return true;
+            if (tradeData.tradeStarter == tradeStarter || tradeData.targetPlayer == tradeStarter) return true;
+            if (tradeData.tradeStarter == targetPlayer || tradeData.targetPlayer == targetPlayer) return true;
         }
         return false;
     }

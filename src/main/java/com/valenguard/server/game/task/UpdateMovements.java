@@ -20,9 +20,9 @@ public class UpdateMovements {
     private final static boolean PRINT_DEBUG = false;
 
     /**
-     * Process the list of moving players.
+     * Process the list of moving entities.
      */
-    public void updatePlayerMovement() {
+    public void updateEntityMovement() {
         ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
@@ -263,7 +263,6 @@ public class UpdateMovements {
 
         println(getClass(), "CurrentLocation: " + movingEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
         println(getClass(), "FutureLocation: " + movingEntity.getFutureMapLocation(), false, PRINT_DEBUG);
-
 
         movingEntity.getGameMap().getPlayerList().forEach(player ->
                 new EntityMovePacketOut(player, movingEntity, movingEntity.getFutureMapLocation()).sendPacket());
