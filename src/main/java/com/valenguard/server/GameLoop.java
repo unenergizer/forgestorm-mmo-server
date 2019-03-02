@@ -70,7 +70,7 @@ public class GameLoop extends Thread {
             valenguardMain.getCommandProcessor().executeCommands();
             ServerConnection.getInstance().getEventBus().gameThreadPublish();
             playerInventoryEvents.processInventoryEvents();
-            updateMovements.updatePlayerMovement();
+            updateMovements.updateEntityMovement();
             warpManager.warpPlayers();
             itemTickUpdates.tickItemsDespawn();
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);

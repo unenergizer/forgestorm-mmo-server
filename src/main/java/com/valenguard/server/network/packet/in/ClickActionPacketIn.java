@@ -1,10 +1,8 @@
 package com.valenguard.server.network.packet.in;
 
-import com.valenguard.server.game.entity.Appearance;
-import com.valenguard.server.game.entity.Entity;
-import com.valenguard.server.game.entity.ItemStackDrop;
-import com.valenguard.server.game.entity.StationaryEntity;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.GameMap;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
@@ -37,21 +35,31 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         else if (packetData.CLICK_ACTION == RIGHT) println(getClass(), "Right click action received!");
         else println(getClass(), "Some other action received??????????", true);
 
-        GameMap gameMap = packetData.getPlayer().getGameMap();
+        Player player = packetData.getPlayer();
+        GameMap gameMap = player.getGameMap();
 
-        if (gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID()) != null) {
+        if (gameMap.getAiEntityMap().get(packetData.getENTITY_UUID()) != null) {
+            MovingEntity movingEntity = gameMap.getAiEntityMap().get(packetData.getENTITY_UUID());
+            EntityAlignment entityAlignment = movingEntity.getEntityAlignment();
+
+            if (entityAlignment == EntityAlignment.HOSTILE || entityAlignment == EntityAlignment.NEUTRAL) {
+                player.setTargetEntity(movingEntity);
+                movingEntity.setTargetEntity(player);
+            }
+
+        } else if (gameMap.getStationaryEntityMap().get(packetData.getENTITY_UUID()) != null) {
             // Click received, lets perform our skill!
-            StationaryEntity clickedOnEntity = gameMap.getStationaryEntitiesList().get(packetData.getENTITY_UUID());
+            StationaryEntity clickedOnEntity = gameMap.getStationaryEntityMap().get(packetData.getENTITY_UUID());
             if (clickedOnEntity != null) changeEntityAppearance(clickedOnEntity, gameMap);
-        } else if (gameMap.getItemStackDropList().get(packetData.getENTITY_UUID()) != null) {
+        } else if (gameMap.getItemStackDropMap().get(packetData.getENTITY_UUID()) != null) {
 
             // Click received, lets pick up the item!
-            ItemStackDrop itemStackDrop = gameMap.getItemStackDropList().get(packetData.getENTITY_UUID());
+            ItemStackDrop itemStackDrop = gameMap.getItemStackDropMap().get(packetData.getENTITY_UUID());
 
             if (itemStackDrop.isPickedUp()) return;
 
             // Check inventory for being full first
-            if (!packetData.getPlayer().getPlayerBag().isBagFull()) {
+            if (!player.getPlayerBag().isBagFull()) {
 
                 // Despawn the item
                 gameMap.queueItemStackDropDespawn(itemStackDrop);
@@ -60,7 +68,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 itemStackDrop.setPickedUp(true);
 
                 // Send the player the item
-                packetData.getPlayer().giveItemStack(itemStackDrop.getItemStack());
+                player.giveItemStack(itemStackDrop.getItemStack());
             }
         }
     }

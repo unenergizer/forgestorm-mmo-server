@@ -39,12 +39,12 @@ public class GameMap {
     private final Queue<MovingEntity> aiEntityDespawnQueue = new LinkedList<>();
 
     @Getter
-    private final Map<Short, StationaryEntity> stationaryEntitiesList = new HashMap<>();
+    private final Map<Short, StationaryEntity> stationaryEntityMap = new HashMap<>();
     private final Queue<StationaryEntity> stationaryEntitiesSpawnQueue = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
 
     @Getter
-    private final Map<Short, ItemStackDrop> itemStackDropList = new HashMap<>();
+    private final Map<Short, ItemStackDrop> itemStackDropMap = new HashMap<>();
     private final Queue<ItemStackDrop> itemStackDropSpawnQueue = new LinkedList<>();
     private final Queue<ItemStackDrop> itemStackDropDespawnQueue = new LinkedList<>();
 
@@ -68,8 +68,8 @@ public class GameMap {
     }
 
     public void tickStationaryEntities() {
-        stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.put(stationaryEntity.getServerEntityId(), stationaryEntity));
-        stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntitiesList.remove(stationaryEntity.getServerEntityId()));
+        stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntityMap.put(stationaryEntity.getServerEntityId(), stationaryEntity));
+        stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntityMap.remove(stationaryEntity.getServerEntityId()));
 
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
@@ -130,9 +130,9 @@ public class GameMap {
         itemStackDropDespawnQueue.add(itemStackDrop);
     }
 
-    public void tickItemStackDrop(long numberOfTicksPassed) {
-        itemStackDropSpawnQueue.forEach(itemStackDrop -> itemStackDropList.put(itemStackDrop.getServerEntityId(), itemStackDrop));
-        itemStackDropDespawnQueue.forEach(itemStackDrop -> itemStackDropList.remove(itemStackDrop.getServerEntityId()));
+    public void tickItemStackDrop() {
+        itemStackDropSpawnQueue.forEach(itemStackDrop -> itemStackDropMap.put(itemStackDrop.getServerEntityId(), itemStackDrop));
+        itemStackDropDespawnQueue.forEach(itemStackDrop -> itemStackDropMap.remove(itemStackDrop.getServerEntityId()));
 
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = itemStackDropSpawnQueue.poll()) != null) {
@@ -142,10 +142,6 @@ public class GameMap {
 
         while ((itemStackDrop = itemStackDropDespawnQueue.poll()) != null) {
             postEntityDespawn(itemStackDrop);
-        }
-
-        if (numberOfTicksPassed % 40 == 0) {
-            // TODO : Process itemStackDrop Times
         }
     }
 
@@ -187,11 +183,17 @@ public class GameMap {
                 if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
                         || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), (short) 1)) {
 
+                    // Entity vs Target
                     Attributes movingEntityAttributes = movingEntity.getAttributes();
                     Attributes targetEntityAttributes = targetEntity.getAttributes();
-
-                    movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
                     targetEntity.setCurrentHealth(targetEntity.getCurrentHealth() - movingEntityAttributes.getDamage());
+
+                    // Target vs Entity
+                    if (targetEntity.getTargetEntity() == movingEntity && targetEntity instanceof Player) {
+                        movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                    } else {
+                        movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                    }
 
                     sendCombatMessage(movingEntity, targetEntity);
 
@@ -324,8 +326,8 @@ public class GameMap {
             postEntitySpawn(playerWhoJoined);
             // Tell the player about all the mobs currently on the map.
             aiEntityMap.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
-            stationaryEntitiesList.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
-            itemStackDropList.values().forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
+            stationaryEntityMap.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
+            itemStackDropMap.values().forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
         }
     }
 

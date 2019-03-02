@@ -198,7 +198,7 @@ public class GameManager {
         spawnEntities();
         gameMaps.values().forEach(GameMap::tickStationaryEntities);
         gameMaps.values().forEach(GameMap::tickMOB);
-        gameMaps.values().forEach(gameMap -> gameMap.tickItemStackDrop(numberOfTicksPassed));
+        gameMaps.values().forEach(GameMap::tickItemStackDrop);
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::tickCombat);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
@@ -259,9 +259,5 @@ public class GameManager {
 
     public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<MovingEntity> predicate) {
         gameMaps.values().forEach(gameMap -> gameMap.getAiEntityMap().values().stream().filter(predicate).forEach(callback));
-    }
-
-    public void forAllStationaryEntitiesFiltered(Consumer<Entity> callback, Predicate<StationaryEntity> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntitiesList().values().stream().filter(predicate).forEach(callback));
     }
 }
