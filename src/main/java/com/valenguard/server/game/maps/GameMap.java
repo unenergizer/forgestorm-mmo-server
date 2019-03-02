@@ -63,10 +63,6 @@ public class GameMap {
         stationaryEntitiesSpawnQueue.add(stationaryEntity);
     }
 
-    public void queueStationaryDespawn(StationaryEntity stationaryEntity) {
-        stationaryEntitiesDespawnQueue.add(stationaryEntity);
-    }
-
     public void tickStationaryEntities() {
         stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntityMap.put(stationaryEntity.getServerEntityId(), stationaryEntity));
         stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntityMap.remove(stationaryEntity.getServerEntityId()));
@@ -327,7 +323,19 @@ public class GameMap {
             // Tell the player about all the mobs currently on the map.
             aiEntityMap.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
             stationaryEntityMap.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
-            itemStackDropMap.values().forEach(itemStackDrop -> postEntitySpawn(playerWhoJoined, itemStackDrop));
+
+            // Spawn itemStack drops!
+            for (ItemStackDrop itemStackDrop : itemStackDropMap.values()) {
+                if (playerWhoJoined == itemStackDrop.getKiller()) {
+                    // Edge case where the player killed something, disconnected and reconnected.
+                    // TODO: When player logs out, send them their dropped items...
+                    // TODO: right now because real UUID's aren't set, this will never be true!
+                    postEntitySpawn(playerWhoJoined, itemStackDrop);
+                } else if (itemStackDrop.isSpawnedForAll()) {
+                    // Spawn items for joined players, only if the item has been spawned for all players.
+                    postEntitySpawn(playerWhoJoined, itemStackDrop);
+                }
+            }
         }
     }
 

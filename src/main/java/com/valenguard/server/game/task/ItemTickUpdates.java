@@ -1,41 +1,46 @@
 package com.valenguard.server.game.task;
 
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.ItemStackDrop;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.valenguard.server.util.Log.println;
+
 public class ItemTickUpdates {
 
-    private static final int TIME_TO_DESPAWN = 20 * 25;
-    private static final int TIME_TO_SPAWN_TO_ALL = 20 * 10;
+    private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
+    private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min
 
     private List<GroundItemTimer> groundItemTimers = new ArrayList<>();
 
     public void tickItemsDespawn() {
         Iterator<GroundItemTimer> itemTimerIterator = groundItemTimers.iterator();
-        if (itemTimerIterator.hasNext()) {
+        while (itemTimerIterator.hasNext()) {
 
             GroundItemTimer groundItemTimer = itemTimerIterator.next();
 
             if (groundItemTimer.itemStackDrop.isPickedUp()) {
                 itemTimerIterator.remove();
+                println(getClass(), "ItemPickup : Size: " + groundItemTimers.size());
             } else {
                 if (groundItemTimer.timePassed > TIME_TO_DESPAWN) {
                     groundItemTimer.itemStackDrop.getGameMap().queueItemStackDropDespawn(groundItemTimer.itemStackDrop);
                     itemTimerIterator.remove();
+                    println(getClass(), "ItemDespawn : Size: " + groundItemTimers.size());
                 }
 
-                if (!groundItemTimer.hasSpawnedForAll && groundItemTimer.timePassed > TIME_TO_SPAWN_TO_ALL) {
+                if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed > TIME_TO_SPAWN_TO_ALL) {
                     for (Player player : groundItemTimer.itemStackDrop.getGameMap().getPlayerList()) {
                         if (player.equals(groundItemTimer.itemStackDrop.getKiller())) continue;
                         new EntitySpawnPacketOut(player, groundItemTimer.itemStackDrop).sendPacket();
+                        println(getClass(), "ItemSpawnForAll : Size: " + groundItemTimers.size());
                     }
-                    groundItemTimer.hasSpawnedForAll = true;
+                    groundItemTimer.itemStackDrop.setSpawnedForAll(true);
                 }
                 groundItemTimer.timePassed++;
             }
@@ -43,13 +48,17 @@ public class ItemTickUpdates {
     }
 
     public void addItemToGround(ItemStackDrop itemStackDrop) {
-        groundItemTimers.add(new GroundItemTimer(itemStackDrop, 0, false));
+        groundItemTimers.add(new GroundItemTimer(itemStackDrop));
+        println(getClass(), "ItemSpawnForKiller : Size: " + groundItemTimers.size());
     }
 
-    @AllArgsConstructor
     private class GroundItemTimer {
-        private ItemStackDrop itemStackDrop;
-        private int timePassed;
-        private boolean hasSpawnedForAll;
+
+        private final ItemStackDrop itemStackDrop;
+        private int timePassed = 0;
+
+        GroundItemTimer(final ItemStackDrop itemStackDrop) {
+            this.itemStackDrop = itemStackDrop;
+        }
     }
 }
