@@ -3,6 +3,7 @@ package com.valenguard.server;
 import com.valenguard.server.commands.CommandProcessor;
 import com.valenguard.server.commands.ConsoleCommandManager;
 import com.valenguard.server.commands.listeners.InventoryCommands;
+import com.valenguard.server.commands.listeners.PlayerCommands;
 import com.valenguard.server.commands.listeners.TicksPerSecondCommand;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.EntityRespawnTimer;
@@ -82,6 +83,7 @@ public class ValenguardMain {
         commandProcessor = new CommandProcessor();
         commandProcessor.addListener(new TicksPerSecondCommand());
         commandProcessor.addListener(new InventoryCommands());
+        commandProcessor.addListener(new PlayerCommands());
         new ConsoleCommandManager().start();
     }
 
