@@ -28,12 +28,12 @@ public class DropTableLoader {
             e.printStackTrace();
         }
 
-        Map<String, Map<String, Object>> root = yaml.load(inputStream);
+        Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
 
         List<DropTable> dropTables = new ArrayList<>();
 
-        for (Map.Entry<String, Map<String, Object>> entry : root.entrySet()) {
-            int dropTableID = Integer.parseInt(entry.getKey());
+        for (Map.Entry<Integer, Map<String, Object>> entry : root.entrySet()) {
+            int dropTableID = entry.getKey();
             Map<String, Object> itemNode = entry.getValue();
 
             DropTable dropTable = new DropTable(dropTableID);

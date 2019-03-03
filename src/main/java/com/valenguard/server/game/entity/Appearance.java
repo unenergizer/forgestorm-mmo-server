@@ -6,10 +6,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Appearance {
 
-    public static final int BODY = 0;
-    public static final int HEAD = 1;
-    public static final int ARMOR = 2;
-    public static final int HELM = 3;
+    public static final int BODY = 0; // Base ID
+    public static final int HEAD = 1; // Base ID
+    public static final int ARMOR = 2; // Cover Base ID
+    public static final int HELM = 3; // Cover Base ID
 
     @Getter
     private byte colorId;

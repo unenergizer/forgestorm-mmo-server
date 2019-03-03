@@ -6,6 +6,7 @@ import com.valenguard.server.commands.listeners.InventoryCommands;
 import com.valenguard.server.commands.listeners.PlayerCommands;
 import com.valenguard.server.commands.listeners.TicksPerSecondCommand;
 import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.entity.AiEntityDataManager;
 import com.valenguard.server.game.entity.EntityRespawnTimer;
 import com.valenguard.server.game.inventory.DropTableManager;
 import com.valenguard.server.game.inventory.ItemStackManager;
@@ -23,15 +24,22 @@ import lombok.Getter;
 public class ValenguardMain {
 
     private static ValenguardMain instance = null;
-    private PingManager pingManager;
-    private GameManager gameManager;
-    private CommandProcessor commandProcessor;
+
+    // Framework
     private GameLoop gameLoop;
     private OutputStreamManager outStreamManager;
+    private CommandProcessor commandProcessor;
+
+    // System
+    private PingManager pingManager;
+    private TradeManager tradeManager;
+    private EntityRespawnTimer entityRespawnTimer;
+    private GameManager gameManager;
+
+    // Data Loaders
+    private AiEntityDataManager aiEntityDataManager;
     private ItemStackManager itemStackManager;
     private DropTableManager dropTableManager;
-    private EntityRespawnTimer entityRespawnTimer;
-    private TradeManager tradeManager;
     private EntityShopManager entityShopManager;
 
     private ValenguardMain() {
@@ -49,27 +57,24 @@ public class ValenguardMain {
     private void start() {
         Log.println(getClass(), "Booting Valenguard Server!");
 
+        // Boot data loaders
+        aiEntityDataManager = new AiEntityDataManager();
         itemStackManager = new ItemStackManager();
         dropTableManager = new DropTableManager();
+        entityShopManager = new EntityShopManager();
 
+        // Start systems
+        pingManager = new PingManager();
+        tradeManager = new TradeManager();
+        entityRespawnTimer = new EntityRespawnTimer();
         gameManager = new GameManager();
         getGameManager().init();
 
-        pingManager = new PingManager();
-
-        entityRespawnTimer = new EntityRespawnTimer();
-
-        tradeManager = new TradeManager();
-
-        entityShopManager = new EntityShopManager();
-
+        // Framework
         registerCommands();
         initializeNetwork();
-
         gameLoop = new GameLoop();
         gameLoop.start();
-
-        outStreamManager = new OutputStreamManager();
     }
 
     public void stop() {
@@ -100,5 +105,6 @@ public class ValenguardMain {
             eventBus.registerListener(new PlayerTradePacketIn());
             eventBus.registerListener(new ShopPacketIn());
         });
+        outStreamManager = new OutputStreamManager();
     }
 }

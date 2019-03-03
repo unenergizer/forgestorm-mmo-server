@@ -1,0 +1,204 @@
+0:
+  name: "Happy Crab"
+  type: MONSTER
+  alignment: FRIENDLY
+  atlasBodyID: 16
+  health: 14
+  damage: 1
+  expDrop: 7
+  dropTable: 0
+  walkSpeed: 0.7
+  probabilityStill: 0.1
+  probabilityWalkStart: 0.5
+1:
+  name: "Angry Crab"
+  type: MONSTER
+  alignment: HOSTILE
+  atlasBodyID: 26
+  health: 24
+  damage: 3
+  expDrop: 15
+  dropTable: 0
+  walkSpeed: 0.6
+  probabilityStill: 0.1
+  probabilityWalkStart: 0.5
+2:
+  name: "Fishing Master"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 0
+  atlasBodyID: 52
+  atlasHeadID: 30
+  health: 80
+  damage: 10
+  expDrop: 28
+  dropTable: 0
+  walkSpeed: 0.5
+  probabilityStill: 1.0
+  probabilityWalkStart: 0.0
+3:
+  name: "Old Man"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 1
+  atlasBodyID: 18
+  atlasHeadID: 40
+  health: 80
+  damage: 15
+  expDrop: 28
+  dropTable: 0
+  walkSpeed: 0.5
+  probabilityStill: 1.0
+  probabilityWalkStart: 0.0
+4:
+  name: "Unseen Eye"
+  type: MONSTER
+  alignment: NEUTRAL
+  atlasBodyID: 30
+  health: 50
+  damage: 11
+  expDrop: 38
+  dropTable: 0
+  walkSpeed: 0.3
+  probabilityStill: 1.0
+  probabilityWalkStart: 0.0
+5:
+  name: "Little Joseph"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 2
+  atlasBodyID: 55
+  atlasHeadID: 3
+  health: 9
+  damage: 1
+  expDrop: 1
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+6:
+  name: "Angry Mother"
+  type: NPC
+  alignment: HOSTILE
+  colorID: 3
+  atlasBodyID: 48
+  atlasHeadID: 36
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+7:
+  name: "Passive Father"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 4
+  atlasBodyID: 48
+  atlasHeadID: 36
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+8:
+  name: "Kenny"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 5
+  atlasBodyID: 4
+  atlasHeadID: 40
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+9:
+  name: "Niels"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 6
+  atlasBodyID: 1
+  atlasHeadID: 63
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+10:
+  name: "Busy Waiter"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 7
+  atlasBodyID: 1
+  atlasHeadID: 1
+  health: 65
+  damage: 20
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.2
+  probabilityStill: 0.0
+  probabilityWalkStart: 1.0
+11:
+  name: "Tohmer"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 8
+  atlasBodyID: 52
+  atlasHeadID: 30
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+12:
+  name: "Elevator Man"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 9
+  atlasBodyID: 41
+  atlasHeadID: 38
+  health: 45
+  damage: 7
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+13:
+  name: "Inn Keeper"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 10
+  atlasBodyID: 1
+  atlasHeadID: 1
+  health: 65
+  damage: 20
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.6
+  probabilityStill: 0.0
+  probabilityWalkStart: 1.0
+14:
+  name: "Frantic Cook"
+  type: NPC
+  alignment: NEUTRAL
+  colorID: 11
+  atlasBodyID: 48
+  atlasHeadID: 35
+  health: 65
+  damage: 20
+  expDrop: 11
+  dropTable: 0
+  walkSpeed: 0.2
+  probabilityStill: 0.0
+  probabilityWalkStart: 1.0

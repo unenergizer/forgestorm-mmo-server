@@ -33,12 +33,12 @@ public class ItemStackLoader {
             e.printStackTrace();
         }
 
-        Map<String, Map<String, Object>> root = yaml.load(inputStream);
+        Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
 
         List<ItemStack> itemStacks = new ArrayList<>();
 
-        for (Map.Entry<String, Map<String, Object>> entry : root.entrySet()) {
-            int itemId = Integer.parseInt(entry.getKey());
+        for (Map.Entry<Integer, Map<String, Object>> entry : root.entrySet()) {
+            int itemId = entry.getKey();
             Map<String, Object> itemNode = entry.getValue();
 
             ItemStack itemStack = new ItemStack(itemId);

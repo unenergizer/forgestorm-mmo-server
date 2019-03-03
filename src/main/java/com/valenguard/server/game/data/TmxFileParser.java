@@ -1,11 +1,9 @@
 package com.valenguard.server.game.data;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.*;
 import com.valenguard.server.game.rpg.Attributes;
-import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.util.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,7 +21,7 @@ public class TmxFileParser {
 
     private static final short TILE_SIZE = 16;
     private static final boolean PRINT_DEBUG = false;
-    private static final boolean SHOW_ID_IN_NAME = false;
+    private static final boolean SHOW_ID_IN_NAME = true;
 
     /**
      * This takes in a TMX map and gets the collision elements from it and builds a collision
@@ -155,58 +153,28 @@ public class TmxFileParser {
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
                 NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
                 for (int j = 0; j < objectTag.getLength(); j++) {
-
-                    //System.out.println("NodeType: " + objectTag.item(j).getNodeType());
                     if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element objectTagElement = (Element) objectTag.item(j);
 
-                    String name = objectTagElement.getAttribute("name");
-                    if (SHOW_ID_IN_NAME) name = name + " " + j;
-
+                    // Initialize AiEntity vars
                     short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
                     short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1);
-                    EntityType entityType = EntityType.valueOf(objectTagElement.getAttribute("type"));
-
-                    float speed = 1f;
                     short bounds1x = -2;
                     short bounds1y = -2;
                     short bounds2x = -2;
                     short bounds2y = -2;
                     MoveDirection direction = MoveDirection.SOUTH;
-                    short atlasHeadId = 0;
-                    short atlasBodyId = 0;
-                    float probabilityStill = -2f;
-                    float probabilityWalkStart = -2f;
-
-                    Integer dropTable = null;
-                    EntityAlignment entityAlignment = null;
-
-                    NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
-
+                    int aiEntityDataID = -1;
 
                     // Get custom properties
+                    NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
                     for (int k = 0; k < properties.getLength(); k++) {
                         if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
                         Element propertyElement = (Element) properties.item(k);
 
-                        if (propertyElement.getAttribute("name").equals("atlasHeadId")) {
-                            atlasHeadId = Short.parseShort(propertyElement.getAttribute("value"));
-                        }
-                        if (propertyElement.getAttribute("name").equals("atlasBodyId")) {
-                            atlasBodyId = Short.parseShort(propertyElement.getAttribute("value"));
-                        }
-                        if (propertyElement.getAttribute("name").equals("probabilityStill")) {
-                            probabilityStill = Float.parseFloat(propertyElement.getAttribute("value"));
-                        }
-                        if (propertyElement.getAttribute("name").equals("probabilityWalkStart")) {
-                            probabilityWalkStart = Float.parseFloat(propertyElement.getAttribute("value"));
-                        }
                         if (propertyElement.getAttribute("name").equals("direction")) {
                             direction = MoveDirection.valueOf(propertyElement.getAttribute("value"));
-                        }
-                        if (propertyElement.getAttribute("name").equals("speed")) {
-                            speed = Float.parseFloat(propertyElement.getAttribute("value"));
                         }
                         if (propertyElement.getAttribute("name").equals("bounds1x")) {
                             bounds1x = Short.parseShort(propertyElement.getAttribute("value"));
@@ -220,61 +188,67 @@ public class TmxFileParser {
                         if (propertyElement.getAttribute("name").equals("bounds2y")) {
                             bounds2y = Short.parseShort(propertyElement.getAttribute("value"));
                         }
-                        if (propertyElement.getAttribute("name").equals("dropTable")) {
-                            dropTable = Integer.parseInt(propertyElement.getAttribute("value"));
-                        }
-                        if (propertyElement.getAttribute("name").equals("alignment")) {
-                            entityAlignment = EntityAlignment.valueOf(propertyElement.getAttribute("value"));
+                        if (propertyElement.getAttribute("name").equals("aiEntityDataID")) {
+                            aiEntityDataID = Integer.parseInt(propertyElement.getAttribute("value"));
                         }
                     }
+
+                    // Build the entity!
+                    AiEntityData aiEntityData = ValenguardMain.getInstance().getAiEntityDataManager().getEntityData(aiEntityDataID);
 
                     AIEntity aiEntity = null;
-                    if (entityType == EntityType.NPC) {
-                        aiEntity = new NPC();
-                        short[] appearanceTextureIds = new short[2];
-                        appearanceTextureIds[Appearance.BODY] = atlasBodyId;
-                        appearanceTextureIds[Appearance.HEAD] = atlasHeadId;
-                        aiEntity.setAppearance(new Appearance((byte) 0, appearanceTextureIds));
-                    } else if (entityType == EntityType.MONSTER) {
-                        aiEntity = new Monster();
-                        short[] appearanceTextureIds = new short[1];
-                        appearanceTextureIds[Appearance.BODY] = atlasBodyId;
-                        aiEntity.setAppearance(new Appearance((byte) 0, appearanceTextureIds));
-                    }
 
-                    if (bounds1x == -2 || bounds1x == -1) {
-                        aiEntity.setDefaultMovement();
-                    } else if (probabilityStill != -2f && probabilityStill != -1f) {
-                        aiEntity.setMovementInfo(probabilityStill, probabilityWalkStart, bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
-                    } else {
-                        aiEntity.setMovementBounds(bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
+                    if (aiEntityData.getEntityType() == EntityType.MONSTER) {
+                        aiEntity = new Monster();
+                    } else if (aiEntityData.getEntityType() == EntityType.NPC) {
+                        aiEntity = new NPC();
                     }
 
                     aiEntity.setServerEntityId((short) entityUUID++);
-                    aiEntity.setEntityType(entityType);
-                    aiEntity.setName(name);
-                    aiEntity.setMoveSpeed(speed);
+                    if (SHOW_ID_IN_NAME) {
+                        aiEntity.setName(aiEntityData.getName() + " " + entityUUID);
+                    } else {
+                        aiEntity.setName(aiEntityData.getName());
+                    }
+                    aiEntity.setEntityType(aiEntityData.getEntityType());
+                    aiEntity.setEntityAlignment(aiEntityData.getEntityAlignment());
+                    aiEntity.setCurrentHealth(aiEntityData.getHealth());
+                    aiEntity.setMaxHealth(aiEntityData.getHealth());
+                    aiEntity.setExpDrop(aiEntityData.getExpDrop());
+                    aiEntity.setDropTable(aiEntityData.getDropTable());
+                    aiEntity.setMoveSpeed(aiEntityData.getWalkSpeed());
+
+                    aiEntity.setMovementInfo(aiEntityData.getProbabilityStill(), aiEntityData.getProbabilityWalkStart(), bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
                     aiEntity.setSpawnWarp(new Warp(new Location(fileName, x, y), direction));
                     aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
-                    if (dropTable != null) aiEntity.setDropTableID(dropTable);
+                    // Setup appearance
+                    byte colorID = 0;
+                    if (aiEntityData.getColorID() != null) {
+                        colorID = (byte) aiEntityDataID;
+                    }
 
-                    // Setup basic attributes. TODO: Values here should come from file
+                    short[] appearanceTextureIds;
+                    if (aiEntityData.getAtlasHeadID() != null) {
+                        appearanceTextureIds = new short[2];
+                        appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
+                        appearanceTextureIds[Appearance.HEAD] = (short) (int) aiEntityData.getAtlasHeadID();
+                        aiEntity.setAppearance(new Appearance(colorID, appearanceTextureIds));
+                    } else {
+                        appearanceTextureIds = new short[1];
+                        appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
+                        aiEntity.setAppearance(new Appearance(colorID, appearanceTextureIds));
+                    }
+
+                    // Setup basic attributes.
                     Attributes attributes = new Attributes();
-                    attributes.setArmor(10);
-                    attributes.setDamage(GameConstants.GENERAL_ENTITY_DAMAGE);
-
+                    attributes.setDamage(aiEntityData.getDamage());
                     aiEntity.setAttributes(attributes);
 
-                    // Setup health
-                    aiEntity.setCurrentHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
-                    aiEntity.setMaxHealth(GameConstants.GENERAL_ENTITY_BASE_HP);
-
-                    aiEntity.setEntityAlignment(entityAlignment);
-
+                    // Queue Mob Spawn
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 
-                    Log.println(TmxFileParser.class, "[Entity] ID: " + entityUUID + ", name: " + name + ", probabilityStill: " + probabilityStill + ", probabilityWalkStart: " + probabilityWalkStart + ", speed: " + speed + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
+                    Log.println(TmxFileParser.class, "[Entity] UUID: " + entityUUID + ", AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
                 }
             }
 
