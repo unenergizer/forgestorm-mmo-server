@@ -16,5 +16,6 @@ public class EntityDespawnPacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(despawnTarget.getServerEntityId());
+        write.writeByte(despawnTarget.getEntityType().getEntityTypeByte());
     }
 }
