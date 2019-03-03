@@ -2,7 +2,6 @@ package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
@@ -13,63 +12,81 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.CLICK_ACTION)
 public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.ClickActionPacket> {
 
-    private static final byte LEFT = 0x01;
-    private static final byte RIGHT = 0x02;
-
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         byte clickAction = clientHandler.readByte();
+        byte entityType = clientHandler.readByte();
         short entityUUID = clientHandler.readShort();
-        return new ClickActionPacket(clickAction, entityUUID);
+        return new ClickActionPacket(clickAction, EntityType.getEntityType(entityType), entityUUID);
     }
 
     @Override
     public boolean sanitizePacket(ClickActionPacket packetData) {
-        return packetData.CLICK_ACTION <= 0x02;
+        return packetData.clickAction <= 0x02;
     }
 
     @Override
     public void onEvent(ClickActionPacket packetData) {
         // TODO: Anti-Hack Check: Check that player is close.
-        if (packetData.CLICK_ACTION == LEFT) println(getClass(), "Left click action received!");
-        else if (packetData.CLICK_ACTION == RIGHT) println(getClass(), "Right click action received!");
-        else println(getClass(), "Some other action received??????????", true);
 
         Player player = packetData.getPlayer();
         GameMap gameMap = player.getGameMap();
+        EntityType entityType = packetData.getEntityType();
 
-        if (gameMap.getAiEntityMap().get(packetData.getENTITY_UUID()) != null) {
-            MovingEntity movingEntity = gameMap.getAiEntityMap().get(packetData.getENTITY_UUID());
-            EntityAlignment entityAlignment = movingEntity.getEntityAlignment();
+        switch (entityType) {
+            case CLIENT_PLAYER:
+            case PLAYER:
+                // TODO
+                break;
+            case MONSTER:
+            case NPC:
+                aiEntityClick(player, gameMap, packetData);
+                break;
+            case ITEM_STACK:
+                itemStackDropClick(player, gameMap, packetData);
+                break;
+            case SKILL_NODE:
+                stationaryEntityClick(gameMap, packetData);
+                break;
+        }
+    }
 
-            if (entityAlignment == EntityAlignment.HOSTILE || entityAlignment == EntityAlignment.NEUTRAL) {
-                player.setTargetEntity(movingEntity);
-                movingEntity.setTargetEntity(player);
-            }
+    private void aiEntityClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
+        if (!gameMap.getAiEntityMap().containsKey(packetData.getEntityUUID())) return;
 
-        } else if (gameMap.getStationaryEntityMap().get(packetData.getENTITY_UUID()) != null) {
-            // Click received, lets perform our skill!
-            StationaryEntity clickedOnEntity = gameMap.getStationaryEntityMap().get(packetData.getENTITY_UUID());
-            if (clickedOnEntity != null) changeEntityAppearance(clickedOnEntity, gameMap);
-        } else if (gameMap.getItemStackDropMap().get(packetData.getENTITY_UUID()) != null) {
+        MovingEntity movingEntity = gameMap.getAiEntityMap().get(packetData.getEntityUUID());
 
-            // Click received, lets pick up the item!
-            ItemStackDrop itemStackDrop = gameMap.getItemStackDropMap().get(packetData.getENTITY_UUID());
+        player.setTargetEntity(movingEntity);
+        movingEntity.setTargetEntity(player);
+    }
 
-            if (itemStackDrop.isPickedUp()) return;
+    private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {
+        if (!gameMap.getStationaryEntityMap().containsKey(packetData.getEntityUUID())) return;
+        StationaryEntity clickedOnEntity = gameMap.getStationaryEntityMap().get(packetData.getEntityUUID());
+        changeEntityAppearance(clickedOnEntity, gameMap);
+    }
 
-            // Check inventory for being full first
-            if (!player.getPlayerBag().isBagFull()) {
+    private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
+        if (!gameMap.getItemStackDropMap().containsKey(packetData.getEntityUUID())) return;
 
-                // Despawn the item
-                gameMap.queueItemStackDropDespawn(itemStackDrop);
+        // Click received, lets pick up the item!
+        println(getClass(), "Incoming ItemStack click!");
+        ItemStackDrop itemStackDrop = gameMap.getItemStackDropMap().get(packetData.getEntityUUID());
 
-                // Don't let others pick the item up.
-                itemStackDrop.setPickedUp(true);
+        if (itemStackDrop.isPickedUp()) return;
 
-                // Send the player the item
-                player.giveItemStack(itemStackDrop.getItemStack());
-            }
+        // Check inventory for being full first
+        if (!player.getPlayerBag().isBagFull()) {
+
+            println(getClass(), "Sending player ItemStack and removing from map & list!");
+            // Despawn the item
+            gameMap.queueItemStackDropDespawn(itemStackDrop);
+
+            // Don't let others pick the item up.
+            itemStackDrop.setPickedUp(true);
+
+            // Send the player the item
+            player.giveItemStack(itemStackDrop.getItemStack());
         }
     }
 
@@ -88,7 +105,8 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     @Getter
     @AllArgsConstructor
     class ClickActionPacket extends PacketData {
-        private final byte CLICK_ACTION;
-        private final short ENTITY_UUID;
+        private final byte clickAction;
+        private final EntityType entityType;
+        private final short entityUUID;
     }
 }
