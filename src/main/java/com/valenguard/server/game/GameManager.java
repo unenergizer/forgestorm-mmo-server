@@ -200,7 +200,6 @@ public class GameManager {
         gameMaps.values().forEach(GameMap::tickMOB);
         gameMaps.values().forEach(GameMap::tickItemStackDrop);
         gameMaps.values().forEach(GameMap::tickPlayer);
-        gameMaps.values().forEach(GameMap::tickCombat);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
         gameMaps.values().forEach(gameMap -> gameMap.tickPlayerShuffle(numberOfTicksPassed));
     }
@@ -259,5 +258,16 @@ public class GameManager {
 
     public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<MovingEntity> predicate) {
         gameMaps.values().forEach(gameMap -> gameMap.getAiEntityMap().values().stream().filter(predicate).forEach(callback));
+    }
+
+    public Player findPlayer(short playerId) {
+        for (GameMap gameMap : gameMaps.values()) {
+            for (Player player : gameMap.getPlayerList()) {
+                if (player.getServerEntityId() == playerId) {
+                    return player;
+                }
+            }
+        }
+        return null;
     }
 }
