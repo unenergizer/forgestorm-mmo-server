@@ -368,27 +368,24 @@ public class TradeManager {
      * @return True if the player passes the check, false otherwise.
      */
     private boolean isValidTrade(Player trader, int tradeUUID) {
-        boolean tradeValid = true;
 
         // Make sure the tradeUUID exists
-        if (!tradeDataMap.containsKey(tradeUUID)) tradeValid = false;
+        if (!tradeDataMap.containsKey(tradeUUID)) return false;
 
         // Make sure this player is a valid trader for this trade
-        if (tradeValid && !tradeDataMap.get(tradeUUID).isTrader(trader)) tradeValid = false;
+        if (!tradeDataMap.get(tradeUUID).isTrader(trader)) return false;
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
         Player tradeStarter = tradeData.tradeStarter;
         Player targetPlayer = tradeData.targetPlayer;
 
         // Check for Map related issues
-        if (tradeValid && !checkMapSanity(tradeStarter, targetPlayer)) tradeValid = false;
-
-        // If trade is invalid, cancel it here.
-        if (!tradeValid) {
+        if (!checkMapSanity(tradeStarter, targetPlayer)) {
             removeTradeData(tradeUUID, true);
+            return false;
         }
 
-        return tradeValid;
+        return true;
     }
 
     /**
