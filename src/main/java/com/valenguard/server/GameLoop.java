@@ -2,6 +2,7 @@ package com.valenguard.server;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.inventory.PlayerInventoryEvents;
+import com.valenguard.server.game.task.CombatTickUpdates;
 import com.valenguard.server.game.task.ItemTickUpdates;
 import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.game.task.WarpManager;
@@ -31,6 +32,8 @@ public class GameLoop extends Thread {
 
     @Getter
     private final ItemTickUpdates itemTickUpdates = new ItemTickUpdates();
+
+    private final CombatTickUpdates combatTickUpdates = new CombatTickUpdates();
 
 
     GameLoop() {
@@ -73,6 +76,7 @@ public class GameLoop extends Thread {
             updateMovements.updateEntityMovement();
             warpManager.warpPlayers();
             itemTickUpdates.tickItemsDespawn();
+            combatTickUpdates.tickCombat(numberOfTicksPassed);
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
             valenguardMain.getEntityRespawnTimer().tickRespawnTime();
             valenguardMain.getGameManager().processPlayerJoin();
@@ -80,10 +84,10 @@ public class GameLoop extends Thread {
             valenguardMain.getTradeManager().tickTime(numberOfTicksPassed);
 
             // Update ping every X ticks
-            if (numberOfTicksPassed % 100 == 0) {
-                // TODO: Fix PingManager
-                //ValenguardMain.getInstance().getPingManager().tick();
-            }
+//            if (numberOfTicksPassed % 100 == 0) {
+//                // TODO: Fix PingManager
+//                //ValenguardMain.getInstance().getPingManager().tick();
+//            }
 
             /* ***********************
              * !! Update End !!

@@ -164,6 +164,7 @@ public class UpdateMovements {
 
     private void findTrackingPath(MovingEntity movingEntity, MovingEntity targetPlayer) {
         if (movingEntity.isEntityMoving()) return;
+        if (movingEntity instanceof Player) return; // Do not generate AI movements for players
 
         GameMap gameMap = movingEntity.getGameMap();
         Location currentLocation = movingEntity.getCurrentMapLocation();
