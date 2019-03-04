@@ -2,10 +2,7 @@ package com.valenguard.server;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.inventory.PlayerInventoryEvents;
-import com.valenguard.server.game.task.CombatTickUpdates;
-import com.valenguard.server.game.task.ItemTickUpdates;
-import com.valenguard.server.game.task.UpdateMovements;
-import com.valenguard.server.game.task.WarpManager;
+import com.valenguard.server.game.task.*;
 import com.valenguard.server.network.ServerConnection;
 import lombok.Getter;
 
@@ -34,6 +31,8 @@ public class GameLoop extends Thread {
     private final ItemTickUpdates itemTickUpdates = new ItemTickUpdates();
 
     private final CombatTickUpdates combatTickUpdates = new CombatTickUpdates();
+
+    private final EntityRehealTask entityRehealTask = new EntityRehealTask();
 
 
     GameLoop() {
@@ -77,6 +76,7 @@ public class GameLoop extends Thread {
             warpManager.warpPlayers();
             itemTickUpdates.tickItemsDespawn();
             combatTickUpdates.tickCombat(numberOfTicksPassed);
+            entityRehealTask.tickEntityReheal(numberOfTicksPassed);
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
             valenguardMain.getAiEntityRespawnTimer().tickRespawnTime();
             valenguardMain.getGameManager().processPlayerJoin();

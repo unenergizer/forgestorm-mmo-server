@@ -86,6 +86,7 @@ public class CombatTickUpdates {
         // Remove the deadEntity from all entities target!
         gameMap.releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
+        killerEntity.setTargetEntity(null);
 
         if (deadEntity instanceof Player) {
             /*

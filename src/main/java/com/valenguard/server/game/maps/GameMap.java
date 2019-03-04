@@ -228,6 +228,7 @@ public class GameMap {
     }
 
     private void playerQuitGameMap(Player player) {
+        player.setTargetEntity(null);
         releaseEntityTargets(player);
         playerList.remove(player);
         player.gameMapDeregister();

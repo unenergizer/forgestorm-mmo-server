@@ -18,6 +18,7 @@ public class EntityHealPacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(healingEntity.getServerEntityId());
+        write.writeByte(healingEntity.getEntityType().getEntityTypeByte());
         write.writeInt(healthGiven);
     }
 }
