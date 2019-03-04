@@ -67,7 +67,7 @@ public class CombatTickUpdates {
     private void sendCombatMessage(GameMap gameMap, AiEntity attackerEntity, MovingEntity targetEntity, boolean aiTookDamage) {
         Attributes attackerEntityAttributes = attackerEntity.getAttributes();
         Attributes targetEntityAttributes = targetEntity.getAttributes();
-        
+
         if (targetEntity instanceof Player) {
             new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
             new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
@@ -112,7 +112,7 @@ public class CombatTickUpdates {
                 gameMap.forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
 
                 // Send other players info about the reheal (if they are still on the same map)
-                gameMap.forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
+                gameMap.forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
             }
 
             // Reheal Player
