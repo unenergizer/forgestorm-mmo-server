@@ -34,7 +34,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
     @Override
     public boolean sanitizePacket(ShopPacket packetData) {
 
-        // The player cannot move and shop at the same time.
+        // The packetReceiver cannot move and shop at the same time.
         if (packetData.getPlayer().isEntityMoving()) {
             packetData.getPlayer().setCurrentShoppingEntity(null);
             return false;
@@ -47,7 +47,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         }
 
         if (packetData.shopOpcode == ShopOpcodes.BUY || packetData.shopOpcode == ShopOpcodes.SELL) {
-            if (packetData.getPlayer().getCurrentShoppingEntity() == null) return false;
+            return packetData.getPlayer().getCurrentShoppingEntity() != null;
         }
 
         return true;

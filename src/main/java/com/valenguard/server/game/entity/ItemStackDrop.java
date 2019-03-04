@@ -14,7 +14,7 @@ public class ItemStackDrop extends Entity {
     private ItemStack itemStack;
 
     /**
-     * The player that is first to see the item drop.
+     * The packetReceiver that is first to see the item drop.
      */
     private Player killer;
 

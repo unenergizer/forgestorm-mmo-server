@@ -17,7 +17,7 @@ public class ItemStack implements Cloneable {
 
     public ItemStack(int itemId) {
         this.itemId = itemId;
-        // TODO get isStackable based on the item type / inventory type such as bank/player inventory ect..
+        // TODO get isStackable based on the item type / inventory type such as bank/packetReceiver inventory ect..
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod")

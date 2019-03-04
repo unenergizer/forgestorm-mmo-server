@@ -11,7 +11,7 @@ import static com.valenguard.server.util.Log.println;
 public class PlayerCommands {
 
     @Command(base = "heal", argLenReq = 1)
-    @IncompleteCommand(missing = "heal <player>")
+    @IncompleteCommand(missing = "heal <packetReceiver>")
     public void healPlayer(String[] args) {
 
         short playerId;
@@ -21,17 +21,17 @@ public class PlayerCommands {
             playerId = Short.parseShort(args[0]);
 
         } catch (NumberFormatException e) {
-            println(getClass(), "The player must be specified by id.", true);
+            println(getClass(), "The packetReceiver must be specified by id.", true);
             return;
         }
 
         Player player = ValenguardMain.getInstance().getGameManager().findPlayer(playerId);
 
         if (player == null) {
-            println(getClass(), "Could not find a player for id: " + playerId, true);
+            println(getClass(), "Could not find a packetReceiver for id: " + playerId, true);
             return;
         } else {
-            println(getClass(), "Healed player " + player.getName());
+            println(getClass(), "Healed packetReceiver " + player.getName());
         }
 
         player.getGameMap().forAllPlayers(anyPlayer ->

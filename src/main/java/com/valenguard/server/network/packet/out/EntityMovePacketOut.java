@@ -1,5 +1,6 @@
 package com.valenguard.server.network.packet.out;
 
+import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
@@ -16,8 +17,8 @@ public class EntityMovePacketOut extends ServerAbstractOutPacket {
     private final MovingEntity movingEntity;
     private final Location attemptLocation;
 
-    public EntityMovePacketOut(Player sendTo, MovingEntity movingEntity, Location attemptLocation) {
-        super(Opcodes.ENTITY_MOVE_UPDATE, sendTo);
+    public EntityMovePacketOut(Player packetReceiver, MovingEntity movingEntity, Location attemptLocation) {
+        super(Opcodes.ENTITY_MOVE_UPDATE, packetReceiver);
         this.movingEntity = movingEntity;
         this.attemptLocation = attemptLocation;
     }
@@ -27,6 +28,11 @@ public class EntityMovePacketOut extends ServerAbstractOutPacket {
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
 
         write.writeShort(movingEntity.getServerEntityId());
+        if (packetReceiver.equals(movingEntity)) {
+            write.writeByte(EntityType.CLIENT_PLAYER.getEntityTypeByte());
+        } else {
+            write.writeByte(movingEntity.getEntityType().getEntityTypeByte());
+        }
         write.writeShort(attemptLocation.getX());
         write.writeShort(attemptLocation.getY());
 

@@ -1,6 +1,9 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.inventory.ItemStack;
+import com.valenguard.server.game.inventory.ItemStackSlotData;
+import com.valenguard.server.game.inventory.ItemStackType;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.shared.*;
@@ -27,7 +30,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
     @Override
     public void onEvent(ClickActionPacket packetData) {
-        // TODO: Anti-Hack Check: Check that player is close.
+        // TODO: Anti-Hack Check: Check that packetReceiver is close.
 
         Player player = packetData.getPlayer();
         GameMap gameMap = player.getGameMap();
@@ -78,15 +81,31 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         // Check inventory for being full first
         if (!player.getPlayerBag().isBagFull()) {
 
-            println(getClass(), "Sending player ItemStack and removing from map & list!");
+            println(getClass(), "Sending packetReceiver ItemStack and removing from map & list!");
             // Despawn the item
             gameMap.queueItemStackDropDespawn(itemStackDrop);
 
             // Don't let others pick the item up.
             itemStackDrop.setPickedUp(true);
 
-            // Send the player the item
-            player.giveItemStack(itemStackDrop.getItemStack());
+            ItemStack itemStack = itemStackDrop.getItemStack();
+
+            if (itemStack.getItemStackType() == ItemStackType.GOLD) {
+                ItemStackSlotData itemStackSlotData = player.getGold();
+                if (itemStackSlotData != null) {
+                    ItemStack goldItemStack = itemStackSlotData.getItemStack();
+                    goldItemStack.setAmount(goldItemStack.getAmount() + itemStack.getAmount());
+
+                    // Removing their previous gold stack.
+                    player.removeItemStack(itemStackSlotData.getBagIndex());
+
+                    itemStack = goldItemStack;
+                }
+            }
+
+
+            // Send the packetReceiver the item
+            player.giveItemStack(itemStack);
         }
     }
 

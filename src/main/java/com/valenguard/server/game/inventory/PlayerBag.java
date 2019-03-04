@@ -28,14 +28,14 @@ public class PlayerBag {
         items[slotIndex] = null;
     }
 
-    public void moveItemStacks(byte fromPosition, byte toPosition) {
+    void moveItemStacks(byte fromPosition, byte toPosition) {
         ItemStack fromItemStack = items[fromPosition];
         ItemStack toItemStack = items[toPosition];
         items[toPosition] = fromItemStack;
         items[fromPosition] = toItemStack;
     }
 
-    public int takenSlots() {
+    int takenSlots() {
         int takenSlots = 0;
         for (int i = 0; i < GameConstants.BAG_SIZE; i++) {
             if (items[i] != null) takenSlots++;
@@ -43,11 +43,21 @@ public class PlayerBag {
         return takenSlots;
     }
 
-    public void setItemStack(byte index, ItemStack itemStack) {
+    public ItemStackSlotData getGold() {
+        for (byte i = 0; i < GameConstants.BAG_SIZE; i++) {
+            if (items[i] == null) continue;
+            if (items[i].getItemStackType() == ItemStackType.GOLD) {
+                return new ItemStackSlotData(items[i], i);
+            }
+        }
+        return null;
+    }
+
+    void setItemStack(byte index, ItemStack itemStack) {
         items[index] = itemStack;
     }
 
-    public ItemStack getItemStack(byte index) {
+    ItemStack getItemStack(byte index) {
         return items[index];
     }
 }

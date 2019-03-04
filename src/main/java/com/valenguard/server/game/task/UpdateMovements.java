@@ -237,7 +237,7 @@ public class UpdateMovements {
         // Makes sure they are not trying to move to where they already are located.
         if (!playerIsMoving) {
             if (attemptLocation.equals(player.getCurrentMapLocation())) {
-                println(getClass(), "A player tried to request a movement to the tile they are already on.", true);
+                println(getClass(), "A packetReceiver tried to request a movement to the tile they are already on.", true);
                 return false;
             }
         } else {
@@ -245,13 +245,13 @@ public class UpdateMovements {
             if (moveQueueEmpty) {
                 // We compare the incoming request up against where they will be in the future.
                 if (attemptLocation.equals(player.getFutureMapLocation())) {
-                    println(getClass(), "The player tried to request movement to where their future move already is.", true);
+                    println(getClass(), "The packetReceiver tried to request movement to where their future move already is.", true);
                     return false;
                 }
             } else {
                 // We compare the incoming request up against the last element in the queue.
                 if (attemptLocation.equals(player.getLatestMoveRequests().getLast())) {
-                    println(getClass(), "The player tried to request a move to where they will eventually end up at the end of their movements.", true);
+                    println(getClass(), "The packetReceiver tried to request a move to where they will eventually end up at the end of their movements.", true);
                     return false;
                 }
             }
@@ -259,9 +259,9 @@ public class UpdateMovements {
 
         // Trying to make sure they move to a tile beside themselves.
         // Cases:
-        // 1. The player is not moving -> the tile beside them is the tile beside their current location
-        // 2. The player is moving and the movement queue is empty -> the tile beside them is the tile next to where their future location is
-        // 3. The player is moving and the movement is is not empty -> the tile beside them is where they will be at the end of their queue
+        // 1. The packetReceiver is not moving -> the tile beside them is the tile beside their current location
+        // 2. The packetReceiver is moving and the movement queue is empty -> the tile beside them is the tile next to where their future location is
+        // 3. The packetReceiver is moving and the movement is is not empty -> the tile beside them is where they will be at the end of their queue
 
         if (!playerIsMoving) {
             if (!player.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
@@ -282,9 +282,9 @@ public class UpdateMovements {
             }
         }
 
-        if (player.getWarp() != null) return false; // Stop player moving during warp init
+        if (player.getWarp() != null) return false; // Stop packetReceiver moving during warp init
 
-        // Prevents the player from moving places they are not allowed to go.
+        // Prevents the packetReceiver from moving places they are not allowed to go.
         if (!player.getGameMap().isMovable(attemptLocation)) return false;
 
         if (player.isEntityMoving()) {
@@ -303,9 +303,9 @@ public class UpdateMovements {
      */
     public void performPlayerMove(Player player, Location attemptLocation) {
 
-//        println(getClass(), "some debug", false, player.getServerEntityId() == 30000);
+//        println(getClass(), "some debug", false, packetReceiver.getServerEntityId() == 30000);
 
-        // Canceling trade for the player.
+        // Canceling trade for the packetReceiver.
         ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
 
         if (player.getGameMap().locationHasWarp(attemptLocation)) {

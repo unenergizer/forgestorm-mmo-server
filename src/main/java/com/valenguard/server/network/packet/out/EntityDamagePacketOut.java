@@ -1,5 +1,6 @@
 package com.valenguard.server.network.packet.out;
 
+import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
@@ -20,6 +21,11 @@ public class EntityDamagePacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(damagedEntity.getServerEntityId());
+        if (packetReceiver.equals(damagedEntity)) {
+            write.writeByte(EntityType.CLIENT_PLAYER.getEntityTypeByte());
+        } else {
+            write.writeByte(damagedEntity.getEntityType().getEntityTypeByte());
+        }
         write.writeInt(health);
         write.writeInt(damageTaken);
     }

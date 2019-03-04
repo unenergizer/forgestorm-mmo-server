@@ -30,7 +30,7 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
     }
 
     private void spawnMovingEntity(ValenguardOutputStream write) {
-        write.writeByte(entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER.getEntityTypeByte() : entityToSpawn.getEntityType().getEntityTypeByte());
+        write.writeByte(entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER.getEntityTypeByte() : entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
 
@@ -72,7 +72,7 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeByte(movingEntity.getEntityAlignment().getEntityAlignmentByte());
 
         Log.println(getClass(), "===================================", false, PRINT_DEBUG);
-        Log.println(getClass(), "entityType: " + (entityToSpawn.equals(player) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
+        Log.println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         Log.println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
         Log.println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
         Log.println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);

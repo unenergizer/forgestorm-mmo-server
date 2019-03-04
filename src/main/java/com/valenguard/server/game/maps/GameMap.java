@@ -189,18 +189,18 @@ public class GameMap {
 
         for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
-            // Tell everyone already online about the player and the player about everyone online.
+            // Tell everyone already online about the packetReceiver and the packetReceiver about everyone online.
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
             postEntitySpawn(playerWhoJoined);
-            // Tell the player about all the mobs currently on the map.
+            // Tell the packetReceiver about all the mobs currently on the map.
             aiEntityMap.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
             stationaryEntityMap.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
 
             // Spawn itemStack drops!
             for (ItemStackDrop itemStackDrop : itemStackDropMap.values()) {
                 if (playerWhoJoined == itemStackDrop.getKiller()) {
-                    // Edge case where the player killed something, disconnected and reconnected.
-                    // TODO: When player logs out, send them their dropped items...
+                    // Edge case where the packetReceiver killed something, disconnected and reconnected.
+                    // TODO: When packetReceiver logs out, send them their dropped items...
                     // TODO: right now because real UUID's aren't set, this will never be true!
                     postEntitySpawn(playerWhoJoined, itemStackDrop);
                 } else if (itemStackDrop.isSpawnedForAll()) {
@@ -242,7 +242,7 @@ public class GameMap {
                 new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
             }
 
-            // Send joined player to all online players
+            // Send joined packetReceiver to all online players
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
                 new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
                 new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();

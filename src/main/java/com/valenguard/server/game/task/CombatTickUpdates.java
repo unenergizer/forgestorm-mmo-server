@@ -96,16 +96,16 @@ public class CombatTickUpdates {
             Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, (short) (gameMap.getMapHeight() - PlayerConstants.RESPAWN_Y_CORD));
             MoveDirection facingDirection = MoveDirection.SOUTH;
 
-            // Check to see if the player needs to change maps!
+            // Check to see if the packetReceiver needs to change maps!
             if (!isGraveYardMap(deadPlayer.getCurrentMapLocation())) {
-                println(getClass(), "Warping player to graveyard map!");
+                println(getClass(), "Warping packetReceiver to graveyard map!");
 
-                // Warp player to graveyard
+                // Warp packetReceiver to graveyard
                 deadPlayer.setWarp(new Warp(teleportLocation, facingDirection));
             } else {
-                println(getClass(), "Teleporting player to graveyard!");
+                println(getClass(), "Teleporting packetReceiver to graveyard!");
 
-                // Teleport player
+                // Teleport packetReceiver
                 deadPlayer.getLatestMoveRequests().clear();
                 deadPlayer.gameMapRegister(new Warp(teleportLocation, facingDirection));
 
@@ -135,7 +135,7 @@ public class CombatTickUpdates {
             new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
             new SkillExperiencePacketOut((Player) killerEntity, new ExperiencePacketInfo(SkillOpcodes.MELEE, aiEntity.getExpDrop())).sendPacket();
 
-            // Give player drop table item
+            // Give packetReceiver drop table item
             if (aiEntity.getDropTable() != null) {
                 ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
 

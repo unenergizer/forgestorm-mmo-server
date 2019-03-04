@@ -31,7 +31,7 @@ public class MovingEntity extends Entity {
     private float moveSpeed;
 
     /**
-     * Current X and Y of the player (this is the interpolated values)
+     * Current X and Y of the packetReceiver (this is the interpolated values)
      */
     private float realX, realY;
 

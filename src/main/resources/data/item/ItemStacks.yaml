@@ -65,7 +65,7 @@
    armor: 3
 9:
    name: "Iron Helm"
-   desc: "Made from player sourced iron."
+   desc: "Made from packetReceiver sourced iron."
    type: HELM
    atlas: ITEMS
    region: helmet_07

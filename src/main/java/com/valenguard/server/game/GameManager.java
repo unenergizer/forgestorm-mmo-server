@@ -3,6 +3,8 @@ package com.valenguard.server.game;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.data.TmxFileParser;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.inventory.ItemStack;
+import com.valenguard.server.game.inventory.ItemStackType;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
@@ -92,7 +94,7 @@ public class GameManager {
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(PlayerConstants.STARTING_MAP);
 
-        // Below we create a starting currentMapLocation for a new player.
+        // Below we create a starting currentMapLocation for a new packetReceiver.
         // The Y cord is subtracted from the height of the map.
         // The reason for this is because on the Tiled Editor
         // the Y cord is reversed.  This just makes our job
@@ -113,8 +115,14 @@ public class GameManager {
 
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
+        // Give test items
         for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemStackManager().numberOfItems() - 1; itemId++) {
-            player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
+            ItemStack itemStack = ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1);
+
+            if (itemStack.getItemStackType() == ItemStackType.GOLD) itemStack.setAmount(111);
+
+            player.giveItemStack(itemStack);
+
         }
 
         tempColor++;
@@ -147,7 +155,7 @@ public class GameManager {
         player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
         player.initEquipment();
 
-        // Setup base player attributes
+        // Setup base packetReceiver attributes
         Attributes baseAttributes = new Attributes();
         baseAttributes.setArmor(PlayerConstants.BASE_ARMOR);
         baseAttributes.setDamage(PlayerConstants.BASE_DAMAGE);
@@ -160,7 +168,7 @@ public class GameManager {
 
         player.setEntityAlignment(EntityAlignment.FRIENDLY);
 
-        player.getSkills().MINING.addExperience(50); // Initializes the player with 50 mining experience.
+        player.getSkills().MINING.addExperience(50); // Initializes the packetReceiver with 50 mining experience.
         player.getSkills().MELEE.addExperience(170);
 
         return player;
@@ -173,7 +181,7 @@ public class GameManager {
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
             }
         }
-        // TODO: Save player specific data
+        // TODO: Save packetReceiver specific data
         GameMap gameMap = player.getGameMap();
         gameMap.removePlayer(player);
         ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
@@ -187,7 +195,7 @@ public class GameManager {
         Warp warp = player.getWarp();
         Log.println(getClass(), "ToMap: " + warp.getLocation().getMapName() + ", FromMap: " + player.getMapName(), true, PRINT_DEBUG);
         checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
-                "The player is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
+                "The packetReceiver is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 
         gameMaps.get(currentMapName).removePlayer(player);
         gameMaps.get(warp.getLocation().getMapName()).addPlayer(player, warp);

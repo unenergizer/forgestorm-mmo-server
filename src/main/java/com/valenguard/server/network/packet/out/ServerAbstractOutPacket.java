@@ -13,17 +13,17 @@ public abstract class ServerAbstractOutPacket {
     private final byte opcode;
 
     /**
-     * The player who will receive the packet.
+     * The packetReceiver who will receive the packet.
      */
-    final Player player;
+    protected final Player packetReceiver;
 
-    ServerAbstractOutPacket(byte opcode, Player player) {
+    ServerAbstractOutPacket(byte opcode, Player packetReceiver) {
         this.opcode = opcode;
-        this.player = player;
+        this.packetReceiver = packetReceiver;
     }
 
     /**
-     * Sends the packet to the player.
+     * Sends the packet to the packetReceiver.
      */
     public void sendPacket() {
         ValenguardMain.getInstance().getOutStreamManager().addServerOutPacket(this);

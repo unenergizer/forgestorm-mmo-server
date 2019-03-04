@@ -1,10 +1,7 @@
 package com.valenguard.server.game.entity;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.inventory.InventoryActions;
-import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.inventory.PlayerBag;
-import com.valenguard.server.game.inventory.PlayerEquipment;
+import com.valenguard.server.game.inventory.*;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.skills.Skills;
@@ -61,6 +58,10 @@ public class Player extends MovingEntity {
     public void removeItemStack(byte slotIndex) {
         playerBag.removeItemStack(slotIndex);
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.REMOVE, slotIndex)).sendPacket();
+    }
+
+    public ItemStackSlotData getGold() {
+        return playerBag.getGold();
     }
 
     public void setHeadAppearance(short headTextureId) {

@@ -80,9 +80,9 @@ public class TradeManager {
 
     /**
      * Stage 3:
-     * Called when we need to send the target player an update about an item they added to the trade window.
+     * Called when we need to send the target packetReceiver an update about an item they added to the trade window.
      *
-     * @param player    The player who added the item.
+     * @param player    The packetReceiver who added the item.
      * @param tradeUUID The unique id for this trade.
      * @param itemSlot  The slot the item was contained in.
      */
@@ -108,7 +108,7 @@ public class TradeManager {
      * Stage 3:
      * Called when we need to remove an item from the trade menu.
      *
-     * @param player    The player who removed the item.
+     * @param player    The packetReceiver who removed the item.
      * @param tradeUUID The unique id for this trade.
      * @param itemSlot  The slot the item was removed from.
      */
@@ -147,7 +147,7 @@ public class TradeManager {
      * Stage 4:
      * Called when a trade confirmation has been received.
      *
-     * @param confirmedPlayer The player who confirmed the item trade
+     * @param confirmedPlayer The packetReceiver who confirmed the item trade
      * @param tradeUUID       The trade window unique reference id.
      */
     public void playerConfirmedTrade(Player confirmedPlayer, int tradeUUID) {
@@ -174,23 +174,23 @@ public class TradeManager {
             // Trade finished, clear data
             removeTradeData(tradeUUID, true);
 
-            // Update player inventories
+            // Update packetReceiver inventories
             List<ItemStack> starterGiveItems = generateGiveItems(tradeData.tradeStarter, tradeData.tradeStarterItems);
             List<ItemStack> targetGiveItems = generateGiveItems(tradeData.targetPlayer, tradeData.tradeTargetItems);
 
-            // Check to make sure the player has room for the traded items
+            // Check to make sure the packetReceiver has room for the traded items
             if (!checkInventoryForTradeSpace(tradeData.tradeStarter, starterGiveItems, targetGiveItems)) {
                 new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] You don't have enough inventory space.").sendPacket();
-                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Other player didn't have enough inventory space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Other packetReceiver didn't have enough inventory space.").sendPacket();
                 return;
             }
             if (!checkInventoryForTradeSpace(tradeData.targetPlayer, targetGiveItems, starterGiveItems)) {
-                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Other player didn't have enough inventory space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Other packetReceiver didn't have enough inventory space.").sendPacket();
                 new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] You don't have enough inventory space.").sendPacket();
                 return;
             }
 
-            // Finally update player inventories
+            // Finally update packetReceiver inventories
             updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, targetGiveItems);
             updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, starterGiveItems);
 
@@ -229,7 +229,7 @@ public class TradeManager {
     /**
      * One size fits all trade cancel.
      *
-     * @param canceler          The player who canceled the trade.
+     * @param canceler          The packetReceiver who canceled the trade.
      * @param tradeUUID         The trade window unique reference id.
      * @param tradeStatusOpcode The type of trade cancel.
      */
@@ -260,7 +260,7 @@ public class TradeManager {
     /**
      * Used to check if the trade needs to be canceled.
      *
-     * @param player The player were checking against.
+     * @param player The packetReceiver were checking against.
      */
     public void ifTradeExistCancel(Player player, String cancelMessage) {
         if (!tradeDataMap.containsKey(player.getTradeUUID())) return;
@@ -293,8 +293,8 @@ public class TradeManager {
     /**
      * Generates a unique tradeUUID based on both players server id.
      *
-     * @param traderStarter The player who initialized the trade.
-     * @param targetPlayer  The player who is going to receive the trade request.
+     * @param traderStarter The packetReceiver who initialized the trade.
+     * @param targetPlayer  The packetReceiver who is going to receive the trade request.
      * @return A unique trade id.
      */
     private int generateTradeId(Player traderStarter, Player targetPlayer) {
@@ -336,9 +336,9 @@ public class TradeManager {
     }
 
     /**
-     * Test to see if a trade has already been started for the given player.
+     * Test to see if a trade has already been started for the given packetReceiver.
      *
-     * @param tradeStarter The player we are going to test.
+     * @param tradeStarter The packetReceiver we are going to test.
      * @return True if they have already started a trade, false otherwise.
      */
     private boolean isTradeInProgress(Player tradeStarter, Player targetPlayer) {
@@ -360,19 +360,19 @@ public class TradeManager {
     }
 
     /**
-     * Sanity check to make sure that the player who is doing a trade action is contained in the
+     * Sanity check to make sure that the packetReceiver who is doing a trade action is contained in the
      * tradeDataMap.
      *
-     * @param trader    The player we are verifying.
+     * @param trader    The packetReceiver we are verifying.
      * @param tradeUUID The unique id in reference to this trade.
-     * @return True if the player passes the check, false otherwise.
+     * @return True if the packetReceiver passes the check, false otherwise.
      */
     private boolean isValidTrade(Player trader, int tradeUUID) {
 
         // Make sure the tradeUUID exists
         if (!tradeDataMap.containsKey(tradeUUID)) return false;
 
-        // Make sure this player is a valid trader for this trade
+        // Make sure this packetReceiver is a valid trader for this trade
         if (!tradeDataMap.get(tradeUUID).isTrader(trader)) return false;
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
@@ -389,17 +389,17 @@ public class TradeManager {
     }
 
     /**
-     * Checks to make sure the player is trading within map related rules.
+     * Checks to make sure the packetReceiver is trading within map related rules.
      *
      * @param tradeStarter The {@link Player} that started the trade.
      * @param targetPlayer The {@link Player} that received the trade request.
      * @return True if passing sanity checks, false otherwise.
      */
     private boolean checkMapSanity(Player tradeStarter, Player targetPlayer) {
-        // Make sure the player is on the same map as the other one
+        // Make sure the packetReceiver is on the same map as the other one
         if (!tradeStarter.getMapName().equals(targetPlayer.getMapName())) {
-            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because player left the map.").sendPacket();
-            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because player left the map.").sendPacket();
+            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because packetReceiver left the map.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because packetReceiver left the map.").sendPacket();
             new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
             new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
 
@@ -407,7 +407,7 @@ public class TradeManager {
             return false;
         }
 
-        // Make sure the player is within the correct distance
+        // Make sure the packetReceiver is within the correct distance
         if (!tradeStarter.getCurrentMapLocation().isWithinDistance(targetPlayer.getCurrentMapLocation(), MAX_TRADE_DISTANCE)) {
             new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because both players are too far apart.").sendPacket();
             new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because both players are too far apart.").sendPacket();
@@ -421,9 +421,9 @@ public class TradeManager {
     }
 
     /**
-     * Generates the {@link ItemStack}s needed to give a player.
+     * Generates the {@link ItemStack}s needed to give a packetReceiver.
      *
-     * @param trader     The player that is offering items.
+     * @param trader     The packetReceiver that is offering items.
      * @param tradeItems The item slots of the {@link PlayerBag}
      * @return A list of generated {@link ItemStack}
      */
@@ -441,7 +441,7 @@ public class TradeManager {
     /**
      * Does the final transferring of times.
      *
-     * @param playerToUpdate The player who will have their client inventory
+     * @param playerToUpdate The packetReceiver who will have their client inventory
      *                       and server {@link PlayerBag} updated.
      * @param itemsToRemove  The {@link ItemStack}s we are going to remove from their bag.
      * @param itemsToAdd     The {@link ItemStack}s we are going to add to their bag.
@@ -454,7 +454,7 @@ public class TradeManager {
             }
         }
 
-        // Send the trade starter the target player items
+        // Send the trade starter the target packetReceiver items
         itemsToAdd.forEach(playerToUpdate::giveItemStack);
     }
 
@@ -481,9 +481,9 @@ public class TradeManager {
         }
 
         /**
-         * Test to see if the player supplied is a participant in this trade
+         * Test to see if the packetReceiver supplied is a participant in this trade
          *
-         * @param player The player we are testing.
+         * @param player The packetReceiver we are testing.
          * @return True if they are a valid participant, false otherwise.
          */
         private boolean isTrader(Player player) {
