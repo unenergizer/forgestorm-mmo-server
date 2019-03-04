@@ -16,7 +16,7 @@
   alignment: HOSTILE
   atlasBodyID: 26
   health: 5
-  damage: 1
+  damage: 15
   expDrop: 15
   dropTable: 0
   walkSpeed: 0.6

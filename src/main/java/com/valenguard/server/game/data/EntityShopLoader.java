@@ -1,11 +1,14 @@
 package com.valenguard.server.game.data;
 
+import com.valenguard.server.game.inventory.ShopItemStackInfo;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +16,7 @@ public class EntityShopLoader {
 
     private static final String FILE_PATH = "src/main/resources/data/item/ShopItems.yaml";
 
-    @SuppressWarnings("unchecked")
-    public static Map<Short, List<Integer>> loadFromFile() {
+    public static Map<Short, List<ShopItemStackInfo>> loadFromFile() {
 
         Yaml yaml = new Yaml();
 
@@ -25,11 +27,22 @@ public class EntityShopLoader {
             e.printStackTrace();
         }
 
-        Iterable<Object> iterable = yaml.loadAll(inputStream);
+        Map<Integer, Map<Integer, Map<String, Object>>> root = yaml.load(inputStream);
 
-        Map<Short, List<Integer>> map = null;
+        Map<Short, List<ShopItemStackInfo>> map = new HashMap<>();
 
-        for (Object object : iterable) map = (Map<Short, List<Integer>>) object;
+        short count = 0;
+        for (Map<Integer, Map<String, Object>> shopObject : root.values()) {
+            List<ShopItemStackInfo> shopItemStackInfos = new ArrayList<>();
+            for (Map<String, Object> shopItemObject : shopObject.values()) {
+                ShopItemStackInfo itemStackInfo = new ShopItemStackInfo(
+                        (Integer) shopItemObject.get("id"),
+                        (Integer) shopItemObject.get("price"));
+                shopItemStackInfos.add(itemStackInfo);
+            }
+            map.put(count++, shopItemStackInfos);
+        }
+
         return map;
     }
 }
