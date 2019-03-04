@@ -8,10 +8,11 @@ import com.valenguard.server.network.packet.out.EntityHealPacketOut;
 
 public class EntityRehealTask {
 
+    private static final long REHEAL_INTERVAL = 120;
     private static final int REHEAL_AMOUNT = 1;
 
     public void tickEntityReheal(long numberOfTicksPassed) {
-        if (numberOfTicksPassed % 60 == 0) {
+        if (numberOfTicksPassed % REHEAL_INTERVAL == 0) {
             for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerList()) {
