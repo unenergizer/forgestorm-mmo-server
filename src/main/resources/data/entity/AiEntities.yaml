@@ -15,8 +15,8 @@
   type: MONSTER
   alignment: HOSTILE
   atlasBodyID: 26
-  health: 24
-  damage: 15
+  health: 5
+  damage: 1
   expDrop: 15
   dropTable: 0
   walkSpeed: 0.6

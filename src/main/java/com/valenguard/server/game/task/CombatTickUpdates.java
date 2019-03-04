@@ -41,13 +41,16 @@ public class CombatTickUpdates {
                     targetEntity.setCurrentHealth(targetEntity.getCurrentHealth() - movingEntityAttributes.getDamage());
 
                     // Target vs Entity
+                    boolean aiTookDamage = true;
                     if (targetEntity.getTargetEntity() == aiEntity && targetEntity instanceof Player) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
-                    } else {
+                    } else if (!(targetEntity instanceof Player)) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                    } else {
+                        aiTookDamage = false;
                     }
 
-                    sendCombatMessage(gameMap, aiEntity, targetEntity);
+                    sendCombatMessage(gameMap, aiEntity, targetEntity, aiTookDamage);
 
                     if (aiEntity.getCurrentHealth() <= 0) {
                         finishCombat(gameMap, targetEntity, aiEntity);
@@ -61,21 +64,19 @@ public class CombatTickUpdates {
         }
     }
 
-    private void sendCombatMessage(GameMap gameMap, MovingEntity attackerEntity, MovingEntity targetEntity) {
+    private void sendCombatMessage(GameMap gameMap, AiEntity attackerEntity, MovingEntity targetEntity, boolean aiTookDamage) {
         Attributes attackerEntityAttributes = attackerEntity.getAttributes();
         Attributes targetEntityAttributes = targetEntity.getAttributes();
-
-        if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, "Your HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) attackerEntity, "Enemy HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
-        }
+        
         if (targetEntity instanceof Player) {
             new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
             new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
         }
 
         gameMap.forAllPlayers(player -> {
-            new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            if (aiTookDamage) {
+                new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
+            }
             new EntityDamagePacketOut(player, targetEntity, targetEntity.getCurrentHealth(), attackerEntityAttributes.getDamage()).sendPacket();
         });
     }
