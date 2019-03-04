@@ -173,7 +173,7 @@ public class ServerConnection implements Runnable {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        ValenguardMain.getInstance().getGameManager().playerQuitServer(clientHandler.getPlayer());
+                        ValenguardMain.getInstance().getGameManager().queueClientQuitServer(clientHandler);
                     }
                 } else {
                     e.printStackTrace();

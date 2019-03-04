@@ -17,6 +17,8 @@ import static com.valenguard.server.util.Log.println;
 
 public class CombatTickUpdates {
 
+    private static final int IDLE_COMBAT_TIMEOUT = 13;
+
     public void tickCombat(long numberOfTicksPassed) {
         for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
             tickGameMapCombat(gameMap, numberOfTicksPassed);
@@ -59,9 +61,26 @@ public class CombatTickUpdates {
                     if (targetEntity.getCurrentHealth() <= 0) {
                         finishCombat(gameMap, aiEntity, targetEntity);
                     }
+                } else {
+
+                    if (targetEntity instanceof Player) {
+                        idleTooLong((Player) targetEntity);
+                    }
+
                 }
             }
         }
+    }
+
+    private void idleTooLong(Player player) {
+
+        if (player.getCombatIdleTime() > IDLE_COMBAT_TIMEOUT) {
+            println(getClass(), "The player is no longer in combat!");
+            player.setTargetEntity(null);
+            return;
+        }
+
+        player.setCombatIdleTime(player.getCombatIdleTime() + 1);
     }
 
     private void sendCombatMessage(GameMap gameMap, AiEntity attackerEntity, MovingEntity targetEntity, boolean aiTookDamage) {

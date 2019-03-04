@@ -41,12 +41,18 @@ public class GameManager {
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
 
+    private final Queue<ClientHandler> syncClientQuitQueue = new ConcurrentLinkedQueue<>();
+
     /**
      * This queue is needed because the entities need to be queued to spawn before
      * the map object is created.
      */
     private final Queue<AiEntity> aiEntitiesToSpawn = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntities = new LinkedList<>();
+
+    public void queueClientQuitServer(ClientHandler clientHandler) {
+        syncClientQuitQueue.add(clientHandler);
+    }
 
     public void queueMobSpawn(AiEntity aiEntity) {
         aiEntitiesToSpawn.add(aiEntity);
@@ -174,7 +180,12 @@ public class GameManager {
         return player;
     }
 
-    public void playerQuitServer(Player player) {
+    public void processPlayerQuit() {
+        syncClientQuitQueue.forEach(clientHandler -> playerQuitServer(clientHandler.getPlayer()));
+        syncClientQuitQueue.clear();
+    }
+
+    private void playerQuitServer(Player player) {
         for (GameMap mapSearch : gameMaps.values()) {
             for (Player playerSearch : mapSearch.getPlayerList()) {
                 if (playerSearch == player) continue;

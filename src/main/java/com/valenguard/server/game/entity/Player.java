@@ -36,6 +36,22 @@ public class Player extends MovingEntity {
 
     private NPC currentShoppingEntity;
 
+    /**
+     * The amount of time that has progressed since the player
+     * has been out of combat.
+     */
+    private int combatIdleTime;
+
+    /**
+     * If the player is assigned or designed (null) an entity
+     * then their combatIdleTime needs to be reset.
+     */
+    @Override
+    public void setTargetEntity(MovingEntity movingEntity) {
+        super.setTargetEntity(movingEntity);
+        combatIdleTime = 0;
+    }
+
     public void addFutureMoveToQueue(Location moveLocation) {
         latestMoveRequests.add(moveLocation);
     }

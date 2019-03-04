@@ -79,6 +79,7 @@ public class GameLoop extends Thread {
             entityRehealTask.tickEntityReheal(numberOfTicksPassed);
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
             valenguardMain.getAiEntityRespawnTimer().tickRespawnTime();
+            valenguardMain.getGameManager().processPlayerQuit();
             valenguardMain.getGameManager().processPlayerJoin();
             valenguardMain.getOutStreamManager().sendPackets();
             valenguardMain.getTradeManager().tickTime(numberOfTicksPassed);
