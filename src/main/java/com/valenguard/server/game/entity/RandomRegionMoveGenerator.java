@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class RandomRegionMoveGenerator {
 
-    private final MovingEntity movingEntity;
+    private final AiEntity aiEntity;
 
     private final float probabilityStill;
     private final float probabilityWalkStart;
@@ -19,9 +19,9 @@ public class RandomRegionMoveGenerator {
     private final int regionEndX;
     private final int regionEndY;
 
-    RandomRegionMoveGenerator(MovingEntity movingEntity, float probabilityStill, float probabilityWalkStart,
+    RandomRegionMoveGenerator(AiEntity aiEntity, float probabilityStill, float probabilityWalkStart,
                               int regionStartX, int regionStartY, int regionEndX, int regionEndY) {
-        this.movingEntity = movingEntity;
+        this.aiEntity = aiEntity;
         this.probabilityStill = probabilityStill;
         this.probabilityWalkStart = probabilityWalkStart;
         this.regionStartX = Math.min(regionStartX, regionEndX);
@@ -79,11 +79,11 @@ public class RandomRegionMoveGenerator {
     private MoveDirection getMoveDirection() {
         MoveDirection moveDirection;
 
-        GameMap gameMap = movingEntity.getGameMap();
+        GameMap gameMap = aiEntity.getGameMap();
 
         // Generates a number between 0-3
         MoveDirection possibleMoveDirection = MoveDirection.getDirection((byte) new Random().nextInt(4));
-        Location attemptLocation = new Location(gameMap.getLocation(possibleMoveDirection)).add(movingEntity.getCurrentMapLocation());
+        Location attemptLocation = new Location(gameMap.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentMapLocation());
 
         if (!gameMap.isMovable(attemptLocation)) {
             moveDirection = MoveDirection.NONE;

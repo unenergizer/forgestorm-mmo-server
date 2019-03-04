@@ -9,12 +9,12 @@ import java.util.List;
 
 import static com.valenguard.server.util.Log.println;
 
-public class EntityRespawnTimer {
+public class AiEntityRespawnTimer {
 
     private static final boolean PRINT_DEBUG = false;
     private final List<RespawnTimer> respawnTimers = new ArrayList<>();
 
-    public void addMob(MovingEntity movingEntity) {
+    public void addAiEntity(AiEntity movingEntity) {
         respawnTimers.add(new RespawnTimer(movingEntity, GameConstants.GENERAL_RESPAWN_TIME));
     }
 
@@ -32,19 +32,19 @@ public class EntityRespawnTimer {
 
                 timer.respawnTime--;
                 if (timer.respawnTime <= 0) {
-                    MovingEntity movingEntity = timer.movingEntity;
+                    AiEntity aiEntity = timer.movingEntity;
 
                     // Spawn to original location
-                    movingEntity.gameMapRegister(movingEntity.getSpawnWarp());
+                    aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
                     // Reset health
-                    movingEntity.setCurrentHealth(movingEntity.getMaxHealth());
+                    aiEntity.setCurrentHealth(aiEntity.getMaxHealth());
 
-                    // Finally, do the respawn!l
-                    movingEntity.getCurrentMapLocation().getGameMap().queueAiEntitySpawn(movingEntity);
+                    // Finally, do the respawn!
+                    aiEntity.getCurrentMapLocation().getGameMap().queueAiEntitySpawn(aiEntity);
 
                     iterator.remove();
-                    println(getClass(), "Respawning Entity: " + movingEntity.getName() + " " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
+                    println(getClass(), "Respawning Entity: " + aiEntity.getName() + " " + aiEntity.getServerEntityId(), false, PRINT_DEBUG);
                 }
             }
         }
@@ -52,7 +52,7 @@ public class EntityRespawnTimer {
 
     @AllArgsConstructor
     private class RespawnTimer {
-        private final MovingEntity movingEntity;
+        private final AiEntity movingEntity;
         private int respawnTime;
     }
 

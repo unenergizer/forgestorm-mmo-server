@@ -7,7 +7,7 @@ import com.valenguard.server.commands.listeners.PlayerCommands;
 import com.valenguard.server.commands.listeners.TicksPerSecondCommand;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.AiEntityDataManager;
-import com.valenguard.server.game.entity.EntityRespawnTimer;
+import com.valenguard.server.game.entity.AiEntityRespawnTimer;
 import com.valenguard.server.game.inventory.DropTableManager;
 import com.valenguard.server.game.inventory.ItemStackManager;
 import com.valenguard.server.game.inventory.TradeManager;
@@ -33,7 +33,7 @@ public class ValenguardMain {
     // System
     private PingManager pingManager;
     private TradeManager tradeManager;
-    private EntityRespawnTimer entityRespawnTimer;
+    private AiEntityRespawnTimer aiEntityRespawnTimer;
     private GameManager gameManager;
 
     // Data Loaders
@@ -66,7 +66,7 @@ public class ValenguardMain {
         // Start systems
         pingManager = new PingManager();
         tradeManager = new TradeManager();
-        entityRespawnTimer = new EntityRespawnTimer();
+        aiEntityRespawnTimer = new AiEntityRespawnTimer();
         gameManager = new GameManager();
         getGameManager().init();
 

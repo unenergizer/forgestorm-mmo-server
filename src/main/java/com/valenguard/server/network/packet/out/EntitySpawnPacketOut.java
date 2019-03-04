@@ -43,9 +43,7 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
 
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
-            case SKILL_NODE:
             case MONSTER:
-            case ITEM_STACK:
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 break;
             case NPC:
@@ -93,7 +91,7 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeString(entityToSpawn.getName());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
-        write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
+        write.writeShort(entityToSpawn.getAppearance().getTextureId(Appearance.BODY));
     }
 
     private void spawnItemStackDrop(ValenguardOutputStream write) {
@@ -102,6 +100,6 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
         write.writeString(entityToSpawn.getName());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
-        write.writeShort(entityToSpawn.getAppearance().getTextureId(0));
+        write.writeShort(entityToSpawn.getAppearance().getTextureId(Appearance.BODY));
     }
 }

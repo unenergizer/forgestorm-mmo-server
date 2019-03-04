@@ -5,9 +5,9 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
-import com.valenguard.server.util.Log;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.valenguard.server.util.Log.println;
 
 public class EntityMovePacketOut extends ServerAbstractOutPacket {
 
@@ -25,13 +25,12 @@ public class EntityMovePacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
-        checkArgument(!movingEntity.getCurrentMapLocation().equals(movingEntity.getFutureMapLocation()), "FutureLocation and CurrentLocation should not be equal!");
 
         write.writeShort(movingEntity.getServerEntityId());
         write.writeShort(attemptLocation.getX());
         write.writeShort(attemptLocation.getY());
 
-        Log.println(getClass(), "EntityName: " + movingEntity.getName() + ", ServerID: " + movingEntity.getServerEntityId() + ", " + attemptLocation, false, PRINT_DEBUG);
+        println(getClass(), "EntityName: " + movingEntity.getName() + ", ServerID: " + movingEntity.getServerEntityId() + ", " + attemptLocation, false, PRINT_DEBUG);
 
     }
 }

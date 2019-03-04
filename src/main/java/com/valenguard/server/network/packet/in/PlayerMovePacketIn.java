@@ -1,7 +1,8 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.maps.MoveDirection;
+import com.valenguard.server.game.maps.Location;
+import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -10,22 +11,29 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
-        return new MovePacket(clientHandler.readByte());
+        final short x = clientHandler.readShort();
+        final short y = clientHandler.readShort();
+        return new MovePacket(x, y);
     }
 
     @Override
     public boolean sanitizePacket(MovePacket packetData) {
-        MoveDirection direction = MoveDirection.getDirection(packetData.directionalByte);
-        return !(direction == null || direction == MoveDirection.NONE);
+        return true;
     }
 
     @Override
     public void onEvent(MovePacket packetData) {
-        ValenguardMain.getInstance().getGameLoop().getUpdateMovements().performMove(packetData.getPlayer(), MoveDirection.getDirection(packetData.directionalByte));
+        UpdateMovements updateMovements = ValenguardMain.getInstance().getGameLoop().getUpdateMovements();
+        Location location = new Location(packetData.getPlayer().getMapName(), packetData.x, packetData.y);
+
+        if (!updateMovements.preMovementChecks(packetData.getPlayer(), location)) return;
+
+        updateMovements.performPlayerMove(packetData.getPlayer(), location);
     }
 
     @AllArgsConstructor
     class MovePacket extends PacketData {
-        byte directionalByte;
+        short x;
+        short y;
     }
 }

@@ -60,6 +60,19 @@ public class Location {
         return (short) Math.floor(realDifference);
     }
 
+    public MoveDirection getMoveDirectionFromLocation(Location targetLocation) {
+        if (targetLocation.getX() > x) {
+            return MoveDirection.EAST;
+        } else if (targetLocation.getX() < x) {
+            return MoveDirection.WEST;
+        } else if (targetLocation.getY() > y) {
+            return MoveDirection.NORTH;
+        } else if (targetLocation.getY() < y) {
+            return MoveDirection.SOUTH;
+        }
+        return MoveDirection.NONE;
+    }
+
     @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object obj) {

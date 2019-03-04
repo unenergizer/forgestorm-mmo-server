@@ -54,10 +54,10 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     private void aiEntityClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
         if (!gameMap.getAiEntityMap().containsKey(packetData.getEntityUUID())) return;
 
-        MovingEntity movingEntity = gameMap.getAiEntityMap().get(packetData.getEntityUUID());
+        AiEntity aiEntity = gameMap.getAiEntityMap().get(packetData.getEntityUUID());
 
-        player.setTargetEntity(movingEntity);
-        movingEntity.setTargetEntity(player);
+        player.setTargetEntity(aiEntity);
+        aiEntity.setTargetEntity(player);
     }
 
     private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {

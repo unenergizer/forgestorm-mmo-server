@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AIEntity extends MovingEntity {
+public class AiEntity extends MovingEntity {
 
     private int aiEntityDataID = -1;
     private int expDrop = 0;

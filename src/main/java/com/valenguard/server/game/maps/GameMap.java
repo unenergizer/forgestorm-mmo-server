@@ -32,9 +32,9 @@ public class GameMap {
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
     @Getter
-    private final Map<Short, MovingEntity> aiEntityMap = new HashMap<>();
-    private final Queue<MovingEntity> aiEntitySpawnQueue = new LinkedList<>();
-    private final Queue<MovingEntity> aiEntityDespawnQueue = new LinkedList<>();
+    private final Map<Short, AiEntity> aiEntityMap = new HashMap<>();
+    private final Queue<AiEntity> aiEntitySpawnQueue = new LinkedList<>();
+    private final Queue<AiEntity> aiEntityDespawnQueue = new LinkedList<>();
 
     @Getter
     private final Map<Short, StationaryEntity> stationaryEntityMap = new HashMap<>();
@@ -84,36 +84,36 @@ public class GameMap {
      * NPC ////////////////////////////////////////////////////////////////////////
      */
 
-    public void queueAiEntitySpawn(MovingEntity movingEntity) {
-        aiEntitySpawnQueue.add(movingEntity);
+    public void queueAiEntitySpawn(AiEntity aiEntity) {
+        aiEntitySpawnQueue.add(aiEntity);
     }
 
-    public void queueAiEntityDespawn(MovingEntity movingEntity) {
-        aiEntityDespawnQueue.add(movingEntity);
+    public void queueAiEntityDespawn(AiEntity aiEntity) {
+        aiEntityDespawnQueue.add(aiEntity);
     }
 
-    private void aiEntitySpawnRegistration(MovingEntity movingEntity) {
-        aiEntityMap.put(movingEntity.getServerEntityId(), movingEntity);
+    private void aiEntitySpawnRegistration(AiEntity aiEntity) {
+        aiEntityMap.put(aiEntity.getServerEntityId(), aiEntity);
     }
 
-    private void aiEntityDespawnRegistration(MovingEntity movingEntity) {
-        aiEntityMap.remove(movingEntity.getServerEntityId());
+    private void aiEntityDespawnRegistration(AiEntity aiEntity) {
+        aiEntityMap.remove(aiEntity.getServerEntityId());
 
         // Toggle respawns
-        ValenguardMain.getInstance().getEntityRespawnTimer().addMob(movingEntity);
+        ValenguardMain.getInstance().getAiEntityRespawnTimer().addAiEntity(aiEntity);
     }
 
-    public void tickMOB() {
+    public void tickAiEntity() {
         aiEntitySpawnQueue.forEach(this::aiEntitySpawnRegistration);
         aiEntityDespawnQueue.forEach(this::aiEntityDespawnRegistration);
 
-        MovingEntity mob;
-        while ((mob = aiEntitySpawnQueue.poll()) != null) {
-            postEntitySpawn(mob);
+        AiEntity aiEntity;
+        while ((aiEntity = aiEntitySpawnQueue.poll()) != null) {
+            postEntitySpawn(aiEntity);
         }
 
-        while ((mob = aiEntityDespawnQueue.poll()) != null) {
-            postEntityDespawn(mob);
+        while ((aiEntity = aiEntityDespawnQueue.poll()) != null) {
+            postEntityDespawn(aiEntity);
         }
     }
 
@@ -167,10 +167,9 @@ public class GameMap {
     }
 
     public void releaseEntityTargets(MovingEntity targetToRemove) {
-        for (MovingEntity movingEntity : aiEntityMap.values()) {
-            if (movingEntity.getTargetEntity() != null
-                    && movingEntity.getTargetEntity().equals(targetToRemove)) {
-                movingEntity.setTargetEntity(null);
+        for (AiEntity aiEntity : aiEntityMap.values()) {
+            if (aiEntity.getTargetEntity() != null && aiEntity.getTargetEntity().equals(targetToRemove)) {
+                aiEntity.setTargetEntity(null);
             }
         }
     }

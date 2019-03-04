@@ -64,6 +64,7 @@ public class MovingEntity extends Entity {
         setFutureMapLocation(new Location(warp.getLocation()));
         setRealX(warp.getLocation().getX() * GameConstants.TILE_SIZE);
         setRealY(warp.getLocation().getY() * GameConstants.TILE_SIZE);
+        walkTime = 0f;
         setFacingDirection(warp.getFacingDirection());
     }
 

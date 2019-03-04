@@ -3,7 +3,7 @@ package com.valenguard.server.game.task;
 import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.AIEntity;
+import com.valenguard.server.game.entity.AiEntity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.MovingEntity;
 import com.valenguard.server.game.entity.Player;
@@ -26,27 +26,27 @@ public class UpdateMovements {
         ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
-        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> generateNewAIMovements((MovingEntity) entity),
+        ValenguardMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> generateNewAIMovements((AiEntity) aiEntity),
                 entity -> !entity.isEntityMoving());
 
         // Continue entity movement
-        ValenguardMain.getInstance().getGameManager().forAllMobsFiltered(entity -> updateEntitiesPosition((MovingEntity) entity),
+        ValenguardMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> updateEntitiesPosition((AiEntity) aiEntity),
                 MovingEntity::isEntityMoving);
     }
 
-    private void generateNewAIMovements(MovingEntity movingEntity) {
-        if (movingEntity.getEntityType() != EntityType.NPC && movingEntity.getEntityType() != EntityType.MONSTER)
+    private void generateNewAIMovements(AiEntity aiEntity) {
+        if (aiEntity.getEntityType() != EntityType.NPC && aiEntity.getEntityType() != EntityType.MONSTER)
             return;
 
         // We have a target to follow, so no random movements
-        if (movingEntity.getTargetEntity() != null) return;
+        if (aiEntity.getTargetEntity() != null) return;
 
-        MoveDirection moveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
+        MoveDirection moveDirection = (aiEntity).getRandomRegionMoveGenerator().generateMoveDirection(false);
 
         // Start performing a movement if the entity is not moving
         if (moveDirection != MoveDirection.NONE) {
             println(getClass(), "NPC has started moving.", false, PRINT_DEBUG);
-            performMove(movingEntity, moveDirection);
+            performAiEntityMove(aiEntity, moveDirection);
         }
     }
 
@@ -62,26 +62,30 @@ public class UpdateMovements {
             finishMove(movingEntity);
 
             if (!player.getLatestMoveRequests().isEmpty()) {
-                performMove(player, player.getLatestMoveRequests().remove());
+
+                Location newAttemptLocation = player.getLatestMoveRequests().remove();
+
+                if (player.getWarp() != null) return;
+
+                performPlayerMove(player, newAttemptLocation);
             }
         } else {
 
-            finishMove(movingEntity);
+            AiEntity aiEntity = (AiEntity) movingEntity;
+            finishMove(aiEntity);
 
-            if (movingEntity.getEntityType() == EntityType.NPC || movingEntity.getEntityType() == EntityType.MONSTER) {
+            println(getClass(), "Generating a new move.", false, PRINT_DEBUG);
 
-                println(getClass(), "Generating a new move.", false, PRINT_DEBUG);
+            aiEntity.getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
 
-                ((AIEntity) movingEntity).getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
+            if (aiEntity.getTargetEntity() != null) return;
 
-                if (movingEntity.getTargetEntity() != null) return;
+            MoveDirection predictedMoveDirection = aiEntity.getRandomRegionMoveGenerator().generateMoveDirection(true);
 
-                MoveDirection predictedMoveDirection = ((AIEntity) movingEntity).getRandomRegionMoveGenerator().generateMoveDirection(true);
-
-                if (predictedMoveDirection != MoveDirection.NONE) {
-                    performMove(movingEntity, predictedMoveDirection);
-                }
+            if (predictedMoveDirection != MoveDirection.NONE) {
+                performAiEntityMove(aiEntity, predictedMoveDirection);
             }
+
         }
     }
 
@@ -117,60 +121,71 @@ public class UpdateMovements {
     private void initEntityTargeting(MovingEntity movingEntity) {
         GameMap gameMap = movingEntity.getGameMap();
 
-        // Find MovingEntity targets
-        for (MovingEntity otherMovingMobs : gameMap.getAiEntityMap().values()) {
-            if (movingEntity.equals(otherMovingMobs)) continue;
-            if (movingEntity.getEntityType() == otherMovingMobs.getEntityType()) continue;
-
-            findEntityTarget(movingEntity, otherMovingMobs);
-        }
-
         if (movingEntity instanceof Player) {
-            for (MovingEntity otherMovingMobs : gameMap.getAiEntityMap().values()) {
-                findEntityTarget(otherMovingMobs, movingEntity);
-            }
-        }
+            /*
+             * PLAYER FINISHED MOVE
+             */
 
-        // Find player targets
-        for (Player player : gameMap.getPlayerList()) {
-            if (movingEntity.equals(player)) continue;
-            findEntityTarget(movingEntity, player);
+            // AiEntity find Player targets
+            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+                findEntityTarget(aiEntity, movingEntity);
+            }
+        } else if (movingEntity instanceof AiEntity) {
+            /*
+             * AiENTITY FINISHED MOVE
+             */
+            AiEntity aiEntityFindTarget = (AiEntity) movingEntity;
+
+            // AiEntity find AiEntity targets
+            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+                if (movingEntity.equals(aiEntity)) continue;
+                if (movingEntity.getEntityType() == aiEntity.getEntityType()) continue;
+                findEntityTarget(aiEntityFindTarget, aiEntity);
+            }
+
+            // AiEntity find Player targets
+            for (Player player : gameMap.getPlayerList()) {
+                findEntityTarget(aiEntityFindTarget, player);
+            }
         }
     }
 
-    private void findEntityTarget(MovingEntity movingEntity, MovingEntity targetEntity) {
-        Location currentLocation = targetEntity.getCurrentMapLocation();
-        Location targetLocation = movingEntity.getCurrentMapLocation();
+    private void findEntityTarget(AiEntity attackerEntity, MovingEntity targetEntity) {
+        Location attackerLocation = attackerEntity.getCurrentMapLocation();
+        Location targetLocation = targetEntity.getCurrentMapLocation();
 
-        // This entity has no target, find one?
-        if (movingEntity.getTargetEntity() == null) {
+        // The attacker has no assigned target.
+        if (attackerEntity.getTargetEntity() == null) {
 
-            // Is player within distance to target
-            if (currentLocation.isWithinDistance(targetLocation, GameConstants.START_ATTACK_RADIUS)) {
-                if (movingEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
-                    movingEntity.setTargetEntity(targetEntity);
-                    findTrackingPath(movingEntity, targetEntity);
+            // Is attacker within distance to target
+            if (attackerLocation.isWithinDistance(targetLocation, GameConstants.START_ATTACK_RADIUS)) {
+
+                // If the attacker is hostile, then we assign the target.
+                if (attackerEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
+                    attackerEntity.setTargetEntity(targetEntity);
+                    findTrackingPath(attackerEntity, targetEntity);
                 }
             }
-        } else if (movingEntity.getTargetEntity().equals(targetEntity)) {
-            // We already have a target, so lets attack
-            if (currentLocation.isWithinDistance(targetLocation, GameConstants.QUIT_ATTACK_RADIUS)) {
-                findTrackingPath(movingEntity, targetEntity);
+        } else if (attackerEntity.getTargetEntity().equals(targetEntity)) {
+
+            // Target already assigned
+            if (attackerLocation.isWithinDistance(targetLocation, GameConstants.QUIT_ATTACK_RADIUS)) {
+                findTrackingPath(attackerEntity, targetEntity);
             } else {
-                movingEntity.setTargetEntity(null);
+                // The target is too far away, so remove their target.
+                attackerEntity.setTargetEntity(null);
             }
         }
     }
 
-    private void findTrackingPath(MovingEntity movingEntity, MovingEntity targetPlayer) {
-        if (movingEntity.isEntityMoving()) return;
-        if (movingEntity instanceof Player) return; // Do not generate AI movements for players
+    private void findTrackingPath(AiEntity aiEntity, MovingEntity targetEntity) {
+        if (aiEntity.isEntityMoving()) return;
 
-        GameMap gameMap = movingEntity.getGameMap();
-        Location currentLocation = movingEntity.getCurrentMapLocation();
-        Location targetLocation = targetPlayer.getCurrentMapLocation();
+        GameMap gameMap = aiEntity.getGameMap();
+        Location currentLocation = aiEntity.getCurrentMapLocation();
+        Location targetLocation = targetEntity.getCurrentMapLocation();
 
-        movingEntity.setTargetEntity(targetPlayer);
+        aiEntity.setTargetEntity(targetEntity);
 
         Location northLocation = currentLocation.add(gameMap.getLocation(MoveDirection.NORTH));
         Location southLocation = currentLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
@@ -180,63 +195,115 @@ public class UpdateMovements {
         if (targetLocation.getX() > currentLocation.getX()) {
             if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(eastLocation))
-                    performMove(movingEntity, MoveDirection.EAST);
+                    performAiEntityMove(aiEntity, MoveDirection.EAST);
             }
         } else if (targetLocation.getX() < currentLocation.getX()) {
             if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(westLocation))
-                    performMove(movingEntity, MoveDirection.WEST);
+                    performAiEntityMove(aiEntity, MoveDirection.WEST);
             }
         } else if (targetLocation.getY() > currentLocation.getY()) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(northLocation))
-                    performMove(movingEntity, MoveDirection.NORTH);
+                    performAiEntityMove(aiEntity, MoveDirection.NORTH);
             }
         } else if (targetLocation.getY() < currentLocation.getY()) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(southLocation))
-                    performMove(movingEntity, MoveDirection.SOUTH);
+                    performAiEntityMove(aiEntity, MoveDirection.SOUTH);
             }
         } else {
             // on top of each other
             if (gameMap.isMovable(northLocation)) {
-                performMove(movingEntity, MoveDirection.NORTH);
+                performAiEntityMove(aiEntity, MoveDirection.NORTH);
             } else if (gameMap.isMovable(southLocation)) {
-                performMove(movingEntity, MoveDirection.SOUTH);
+                performAiEntityMove(aiEntity, MoveDirection.SOUTH);
             } else if (gameMap.isMovable(westLocation)) {
-                performMove(movingEntity, MoveDirection.WEST);
+                performAiEntityMove(aiEntity, MoveDirection.WEST);
             } else if (gameMap.isMovable(eastLocation)) {
-                performMove(movingEntity, MoveDirection.EAST);
+                performAiEntityMove(aiEntity, MoveDirection.EAST);
             } else {
                 println(getClass(), "Setting target null??");
-                movingEntity.setTargetEntity(null);
+                aiEntity.setTargetEntity(null);
             }
         }
     }
+
+    public boolean preMovementChecks(Player player, Location attemptLocation) {
+
+        boolean playerIsMoving = player.isEntityMoving();
+        boolean moveQueueEmpty = player.getLatestMoveRequests().isEmpty();
+
+        // Makes sure they are not trying to move to where they already are located.
+        if (!playerIsMoving) {
+            if (attemptLocation.equals(player.getCurrentMapLocation())) {
+                println(getClass(), "A player tried to request a movement to the tile they are already on.", true);
+                return false;
+            }
+        } else {
+
+            if (moveQueueEmpty) {
+                // We compare the incoming request up against where they will be in the future.
+                if (attemptLocation.equals(player.getFutureMapLocation())) {
+                    println(getClass(), "The player tried to request movement to where their future move already is.", true);
+                    return false;
+                }
+            } else {
+                // We compare the incoming request up against the last element in the queue.
+                if (attemptLocation.equals(player.getLatestMoveRequests().getLast())) {
+                    println(getClass(), "The player tried to request a move to where they will eventually end up at the end of their movements.", true);
+                    return false;
+                }
+            }
+        }
+
+        // Trying to make sure they move to a tile beside themselves.
+        // Cases:
+        // 1. The player is not moving -> the tile beside them is the tile beside their current location
+        // 2. The player is moving and the movement queue is empty -> the tile beside them is the tile next to where their future location is
+        // 3. The player is moving and the movement is is not empty -> the tile beside them is where they will be at the end of their queue
+
+        if (!playerIsMoving) {
+            if (!player.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
+                new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                return false;
+            }
+        } else {
+            if (moveQueueEmpty) {
+                if (!player.getFutureMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
+                    new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                    return false;
+                }
+            } else {
+                if (!player.getLatestMoveRequests().getLast().isWithinDistance(attemptLocation, (short) 1)) {
+                    new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                    return false;
+                }
+            }
+        }
+
+        if (player.getWarp() != null) return false; // Stop player moving during warp init
+
+        // Prevents the player from moving places they are not allowed to go.
+        if (!player.getGameMap().isMovable(attemptLocation)) return false;
+
+        if (player.isEntityMoving()) {
+            player.addFutureMoveToQueue(attemptLocation);
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * Adds a entity to the list of entities that need to be processed.
      *
      * @param player The entity ot add.
      */
-    public void performMove(Player player, MoveDirection direction) {
-        if (player.getWarp() != null) return; // Stop player moving during warp init
+    public void performPlayerMove(Player player, Location attemptLocation) {
 
-        if (isEntityMoving(player)) {
-            player.addDirectionToFutureQueue(direction);
-            return;
-        }
-
-        Location addToLocation = player.getGameMap().getLocation(direction);
-        Location attemptLocation = new Location(player.getCurrentMapLocation()).add(addToLocation);
-
-        if (attemptLocation.equals(player.getCurrentMapLocation())) {
-            println(getClass(), "A player tried request a movement to the tile they are already on.", true);
-            return;
-        }
-
-        // Prevents the player from moving places they are not allowed to go.
-        if (!player.getGameMap().isMovable(attemptLocation)) return;
+//        println(getClass(), "some debug", false, player.getServerEntityId() == 30000);
 
         // Canceling trade for the player.
         ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
@@ -245,32 +312,26 @@ public class UpdateMovements {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
         }
 
-        player.setFutureMapLocation(attemptLocation);
+        player.setFutureMapLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
-        player.setFacingDirection(direction);
+        player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));
 
         ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 
-    private void performMove(MovingEntity movingEntity, MoveDirection moveDirection) {
-
+    private void performAiEntityMove(AiEntity aiEntity, MoveDirection moveDirection) {
         Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
 
-        Location futureLocation = new Location(movingEntity.getCurrentMapLocation()).add(movingEntity.getGameMap().getLocation(moveDirection));
-        movingEntity.setFutureMapLocation(futureLocation);
-        movingEntity.setWalkTime(0f);
-        movingEntity.setFacingDirection(moveDirection);
+        Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
+        aiEntity.setFutureMapLocation(futureLocation);
+        aiEntity.setWalkTime(0f);
+        aiEntity.setFacingDirection(moveDirection);
 
-        println(getClass(), "CurrentLocation: " + movingEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
-        println(getClass(), "FutureLocation: " + movingEntity.getFutureMapLocation(), false, PRINT_DEBUG);
+        println(getClass(), "CurrentLocation: " + aiEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
+        println(getClass(), "FutureLocation: " + aiEntity.getFutureMapLocation(), false, PRINT_DEBUG);
 
-        movingEntity.getGameMap().getPlayerList().forEach(player ->
-                new EntityMovePacketOut(player, movingEntity, movingEntity.getFutureMapLocation()).sendPacket());
-    }
-
-    private boolean isEntityMoving(MovingEntity movingEntity) {
-        return movingEntity.getCurrentMapLocation().getX() != movingEntity.getFutureMapLocation().getX()
-                || movingEntity.getCurrentMapLocation().getY() != movingEntity.getFutureMapLocation().getY();
+        aiEntity.getGameMap().getPlayerList().forEach(player ->
+                new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureMapLocation()).sendPacket());
     }
 }

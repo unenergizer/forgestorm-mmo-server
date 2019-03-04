@@ -196,7 +196,7 @@ public class TmxFileParser {
                     // Build the entity!
                     AiEntityData aiEntityData = ValenguardMain.getInstance().getAiEntityDataManager().getEntityData(aiEntityDataID);
 
-                    AIEntity aiEntity = null;
+                    AiEntity aiEntity = null;
 
                     if (aiEntityData.getEntityType() == EntityType.MONSTER) {
                         aiEntity = new Monster();

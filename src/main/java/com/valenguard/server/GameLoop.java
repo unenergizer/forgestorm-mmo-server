@@ -78,23 +78,17 @@ public class GameLoop extends Thread {
             itemTickUpdates.tickItemsDespawn();
             combatTickUpdates.tickCombat(numberOfTicksPassed);
             valenguardMain.getGameManager().gameMapTick(numberOfTicksPassed);
-            valenguardMain.getEntityRespawnTimer().tickRespawnTime();
+            valenguardMain.getAiEntityRespawnTimer().tickRespawnTime();
             valenguardMain.getGameManager().processPlayerJoin();
             valenguardMain.getOutStreamManager().sendPackets();
             valenguardMain.getTradeManager().tickTime(numberOfTicksPassed);
 
-            // Update ping every X ticks
-//            if (numberOfTicksPassed % 100 == 0) {
-//                // TODO: Fix PingManager
-//                //ValenguardMain.getInstance().getPingManager().tick();
-//            }
 
             /* ***********************
              * !! Update End !!
              ***********************/
 
             sync(GameConstants.TICKS_PER_SECOND);
-            //Log.println(getClass(),ConsoleLogger.INFO.toString() + "TPS: " + getCurrentTPS());
 
             endTime = System.nanoTime();
 

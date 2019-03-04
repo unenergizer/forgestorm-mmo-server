@@ -43,11 +43,11 @@ public class GameManager {
      * This queue is needed because the entities need to be queued to spawn before
      * the map object is created.
      */
-    private final Queue<MovingEntity> mobsToSpawn = new LinkedList<>();
+    private final Queue<AiEntity> aiEntitiesToSpawn = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntities = new LinkedList<>();
 
-    public void queueMobSpawn(MovingEntity movingEntity) {
-        mobsToSpawn.add(movingEntity);
+    public void queueMobSpawn(AiEntity aiEntity) {
+        aiEntitiesToSpawn.add(aiEntity);
     }
 
     public void queueStationarySpawn(StationaryEntity stationaryEntity) {
@@ -55,9 +55,9 @@ public class GameManager {
     }
 
     private void spawnEntities() {
-        MovingEntity movingEntity;
-        while ((movingEntity = mobsToSpawn.poll()) != null) {
-            movingEntity.getGameMap().queueAiEntitySpawn(movingEntity);
+        AiEntity aiEntity;
+        while ((aiEntity = aiEntitiesToSpawn.poll()) != null) {
+            aiEntity.getGameMap().queueAiEntitySpawn(aiEntity);
         }
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntities.poll()) != null) {
@@ -137,7 +137,7 @@ public class GameManager {
         player.setServerEntityId(playerSessionData.getServerID());
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
-        player.setName(Short.toString(playerSessionData.getServerID()));
+        player.setName("Player " + Short.toString(playerSessionData.getServerID()));
         playerSessionData.getClientHandler().setPlayer(player);
         short[] initialPlayerTextureIds = new short[4];
         initialPlayerTextureIds[Appearance.BODY] = 0;
@@ -197,7 +197,7 @@ public class GameManager {
     public void gameMapTick(long numberOfTicksPassed) {
         spawnEntities();
         gameMaps.values().forEach(GameMap::tickStationaryEntities);
-        gameMaps.values().forEach(GameMap::tickMOB);
+        gameMaps.values().forEach(GameMap::tickAiEntity);
         gameMaps.values().forEach(GameMap::tickItemStackDrop);
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
@@ -256,7 +256,7 @@ public class GameManager {
         gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
-    public void forAllMobsFiltered(Consumer<Entity> callback, Predicate<MovingEntity> predicate) {
+    public void forAllAiEntitiesFiltered(Consumer<Entity> callback, Predicate<AiEntity> predicate) {
         gameMaps.values().forEach(gameMap -> gameMap.getAiEntityMap().values().stream().filter(predicate).forEach(callback));
     }
 

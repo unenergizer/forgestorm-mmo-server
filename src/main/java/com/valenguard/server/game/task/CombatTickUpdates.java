@@ -23,38 +23,38 @@ public class CombatTickUpdates {
         }
     }
 
-    public void tickGameMapCombat(GameMap gameMap, long numberOfTicksPassed) {
+    private void tickGameMapCombat(GameMap gameMap, long numberOfTicksPassed) {
         if (numberOfTicksPassed % 60 == 0) {
 
             // Now do combat
-            for (MovingEntity movingEntity : gameMap.getAiEntityMap().values()) {
-                if (movingEntity.getTargetEntity() == null) continue;
+            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+                if (aiEntity.getTargetEntity() == null) continue;
 
-                MovingEntity targetEntity = movingEntity.getTargetEntity();
+                MovingEntity targetEntity = aiEntity.getTargetEntity();
                 // Check for distance
-                if (movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
-                        || movingEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), (short) 1)) {
+                if (aiEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
+                        || aiEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), (short) 1)) {
 
                     // Entity vs Target
-                    Attributes movingEntityAttributes = movingEntity.getAttributes();
+                    Attributes movingEntityAttributes = aiEntity.getAttributes();
                     Attributes targetEntityAttributes = targetEntity.getAttributes();
                     targetEntity.setCurrentHealth(targetEntity.getCurrentHealth() - movingEntityAttributes.getDamage());
 
                     // Target vs Entity
-                    if (targetEntity.getTargetEntity() == movingEntity && targetEntity instanceof Player) {
-                        movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                    if (targetEntity.getTargetEntity() == aiEntity && targetEntity instanceof Player) {
+                        aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
                     } else {
-                        movingEntity.setCurrentHealth(movingEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
+                        aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() - targetEntityAttributes.getDamage());
                     }
 
-                    sendCombatMessage(gameMap, movingEntity, targetEntity);
+                    sendCombatMessage(gameMap, aiEntity, targetEntity);
 
-                    if (movingEntity.getCurrentHealth() <= 0) {
-                        finishCombat(gameMap, targetEntity, movingEntity);
+                    if (aiEntity.getCurrentHealth() <= 0) {
+                        finishCombat(gameMap, targetEntity, aiEntity);
                     }
 
                     if (targetEntity.getCurrentHealth() <= 0) {
-                        finishCombat(gameMap, movingEntity, targetEntity);
+                        finishCombat(gameMap, aiEntity, targetEntity);
                     }
                 }
             }
@@ -86,23 +86,16 @@ public class CombatTickUpdates {
         gameMap.releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
 
-        if (killerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
-            new SkillExperiencePacketOut((Player) killerEntity, new ExperiencePacketInfo(SkillOpcodes.MELEE, 10)).sendPacket();
-        }
-
         if (deadEntity instanceof Player) {
-            // Player Died. Lets respawn them!
-
+            /*
+             * A PLAYER DEATH -------------------------------------------------
+             */
+            Player deadPlayer = (Player) deadEntity;
             Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, (short) (gameMap.getMapHeight() - PlayerConstants.RESPAWN_Y_CORD));
             MoveDirection facingDirection = MoveDirection.SOUTH;
 
-            // Do a reheal
-            Player deadPlayer = (Player) deadEntity;
-            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
-
             // Check to see if the player needs to change maps!
-            if (!deadPlayer.getMapName().equals(PlayerConstants.STARTING_MAP)) {
+            if (!isGraveYardMap(deadPlayer.getCurrentMapLocation())) {
                 println(getClass(), "Warping player to graveyard map!");
 
                 // Warp player to graveyard
@@ -111,9 +104,8 @@ public class CombatTickUpdates {
                 println(getClass(), "Teleporting player to graveyard!");
 
                 // Teleport player
-                deadEntity.setCurrentMapLocation(teleportLocation);
-                deadEntity.setFutureMapLocation(teleportLocation);
-                deadEntity.setFacingDirection(facingDirection);
+                deadPlayer.getLatestMoveRequests().clear();
+                deadPlayer.gameMapRegister(new Warp(teleportLocation, facingDirection));
 
                 // Send all players in map the teleport packet
                 gameMap.forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
@@ -122,17 +114,28 @@ public class CombatTickUpdates {
                 gameMap.forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth()).sendPacket());
             }
 
-            new ChatMessagePacketOut((Player) deadEntity, "You died! Respawning you in graveyard!").sendPacket();
+            // Reheal Player
+            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
+
+            new ChatMessagePacketOut(deadPlayer, "You died! Respawning you in graveyard!").sendPacket();
 
         } else {
-            gameMap.queueAiEntityDespawn(deadEntity); // A mob died, despawn them!
+            /*
+             * A NON PLAYER DEATH -------------------------------------------------
+             */
+            AiEntity aiEntity = (AiEntity) deadEntity;
+            gameMap.queueAiEntityDespawn(aiEntity); // A mob died, despawn them!
 
             // If a AI entity kills and AI entity, do not drop ItemStack
             if (!(killerEntity instanceof Player)) return;
 
+            // Give experience
+            new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
+            new SkillExperiencePacketOut((Player) killerEntity, new ExperiencePacketInfo(SkillOpcodes.MELEE, aiEntity.getExpDrop())).sendPacket();
+
             // Give player drop table item
-            if (((AIEntity) deadEntity).getDropTableID() != null) {
-                ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(((AIEntity) deadEntity).getDropTableID(), 1);
+            if (aiEntity.getDropTable() != null) {
+                ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
 
                 ItemStackDrop itemStackDrop = new ItemStackDrop();
                 itemStackDrop.setEntityType(EntityType.ITEM_STACK);
@@ -143,12 +146,14 @@ public class CombatTickUpdates {
                 itemStackDrop.setKiller((Player) killerEntity);
                 itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());
 
-                println(getClass(), "<creation> ItemStackDrop ID: " + itemStackDrop.getServerEntityId());
-
                 gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
 
                 gameMap.queueItemStackDropSpawn(itemStackDrop);
             }
         }
+    }
+
+    private boolean isGraveYardMap(Location location) {
+        return location.getMapName().equals(PlayerConstants.STARTING_MAP);
     }
 }

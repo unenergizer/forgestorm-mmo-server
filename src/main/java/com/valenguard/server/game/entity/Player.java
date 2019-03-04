@@ -5,7 +5,7 @@ import com.valenguard.server.game.inventory.InventoryActions;
 import com.valenguard.server.game.inventory.ItemStack;
 import com.valenguard.server.game.inventory.PlayerBag;
 import com.valenguard.server.game.inventory.PlayerEquipment;
-import com.valenguard.server.game.maps.MoveDirection;
+import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.skills.Skills;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
@@ -14,8 +14,8 @@ import com.valenguard.server.network.shared.ClientHandler;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class Player extends MovingEntity {
     private Skills skills = new Skills(this);
 
     private ClientHandler clientHandler;
-    private Queue<MoveDirection> latestMoveRequests = new LinkedList<>();
+    private Deque<Location> latestMoveRequests = new LinkedList<>();
 
     private Warp warp;
 
@@ -39,8 +39,8 @@ public class Player extends MovingEntity {
 
     private NPC currentShoppingEntity;
 
-    public void addDirectionToFutureQueue(MoveDirection moveDirection) {
-        latestMoveRequests.add(moveDirection);
+    public void addFutureMoveToQueue(Location moveLocation) {
+        latestMoveRequests.add(moveLocation);
     }
 
     public void initEquipment() {
