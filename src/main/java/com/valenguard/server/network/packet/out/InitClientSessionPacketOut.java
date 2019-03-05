@@ -3,7 +3,7 @@ package com.valenguard.server.network.packet.out;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
-public class InitClientSessionPacketOut extends ServerAbstractOutPacket {
+public class InitClientSessionPacketOut extends AbstractServerOutPacket {
 
     private final boolean loginSuccess;
     private final short clientPlayerId;

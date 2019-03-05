@@ -4,7 +4,7 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 import com.valenguard.server.util.Log;
 
-public class ChatMessagePacketOut extends ServerAbstractOutPacket {
+public class ChatMessagePacketOut extends AbstractServerOutPacket {
 
     private static final boolean PRINT_DEBUG = false;
     private final String message;

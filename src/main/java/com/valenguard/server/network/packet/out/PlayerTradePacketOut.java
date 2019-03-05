@@ -6,7 +6,7 @@ import com.valenguard.server.network.shared.Opcodes;
 
 import static com.valenguard.server.util.Log.println;
 
-public class PlayerTradePacketOut extends ServerAbstractOutPacket {
+public class PlayerTradePacketOut extends AbstractServerOutPacket {
 
     private TradePacketInfoOut tradePacketInfoOut;
 

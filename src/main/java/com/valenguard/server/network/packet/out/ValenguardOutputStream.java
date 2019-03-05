@@ -80,12 +80,12 @@ public class ValenguardOutputStream {
         return opcodePacketData.isInitialized();
     }
 
-    boolean doOpcodesMatch(ServerAbstractOutPacket serverAbstractOutPacket) {
-        return opcodePacketData.getOpcode() == serverAbstractOutPacket.getOpcode();
+    boolean doOpcodesMatch(AbstractServerOutPacket abstractServerOutPacket) {
+        return opcodePacketData.getOpcode() == abstractServerOutPacket.getOpcode();
     }
 
-    void createNewBuffers(ServerAbstractOutPacket serverAbstractOutPacket) {
-        opcodePacketData.setOpcode(serverAbstractOutPacket.getOpcode());
+    void createNewBuffers(AbstractServerOutPacket abstractServerOutPacket) {
+        opcodePacketData.setOpcode(abstractServerOutPacket.getOpcode());
         opcodePacketData.getBuffers().add(createNewBuffer());
         opcodePacketData.setInitialized(true);
         opcodePacketData.setNumberOfRepeats(1);
@@ -96,8 +96,8 @@ public class ValenguardOutputStream {
         opcodePacketData.setNumberOfRepeats(opcodePacketData.getNumberOfRepeats() + 1);
     }
 
-    public int fillCurrentBuffer(ServerAbstractOutPacket serverAbstractOutPacket) {
-        serverAbstractOutPacket.createPacket(this);
+    public int fillCurrentBuffer(AbstractServerOutPacket abstractServerOutPacket) {
+        abstractServerOutPacket.createPacket(this);
         return bytePosition;
     }
 

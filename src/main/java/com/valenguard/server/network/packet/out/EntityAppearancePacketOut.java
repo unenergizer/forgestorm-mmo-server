@@ -5,7 +5,7 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
-public class EntityAppearancePacketOut extends ServerAbstractOutPacket {
+public class EntityAppearancePacketOut extends AbstractServerOutPacket {
 
     public static final byte COLOR_INDEX = 0x01;
     public static final byte BODY_INDEX = 0x02;

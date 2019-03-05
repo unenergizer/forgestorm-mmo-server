@@ -6,22 +6,21 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class OutputStreamManager {
 
     private static final int MAX_BUFFER_SIZE = 500;
 
-    private final Map<ClientHandler, Queue<ServerAbstractOutPacket>> outputContexts = new HashMap<>();
+    private final Map<ClientHandler, Queue<AbstractServerOutPacket>> outputContexts = new HashMap<>();
 
     public void sendPackets() {
         outputContexts.forEach((clientHandler, serverAbstractOutPackets) -> {
             int bufferOffsetCheck = 0;
-            ServerAbstractOutPacket serverAbstractOutPacket;
+            AbstractServerOutPacket abstractServerOutPacket;
 
-            while ((serverAbstractOutPacket = serverAbstractOutPackets.poll()) != null) {
+            while ((abstractServerOutPacket = serverAbstractOutPackets.poll()) != null) {
 
-                int thisBufferSize = clientHandler.fillCurrentBuffer(serverAbstractOutPacket);
+                int thisBufferSize = clientHandler.fillCurrentBuffer(abstractServerOutPacket);
                 bufferOffsetCheck += thisBufferSize;
 
                 if (bufferOffsetCheck > MAX_BUFFER_SIZE) { // exceeds buffer limit so we should flush what we have written so far
@@ -32,7 +31,7 @@ public class OutputStreamManager {
 
                     bufferOffsetCheck = thisBufferSize;
 
-                    clientHandler.getValenguardOutputStream().createNewBuffers(serverAbstractOutPacket);
+                    clientHandler.getValenguardOutputStream().createNewBuffers(abstractServerOutPacket);
                     // This happened to be the last packet so we should add the
                     // to be written. Write and flush it.
                     if (serverAbstractOutPackets.peek() == null) {
@@ -45,15 +44,15 @@ public class OutputStreamManager {
                     ValenguardOutputStream valenguardOutputStream = clientHandler.getValenguardOutputStream();
 
                     if (!valenguardOutputStream.currentBuffersInitialized()) {
-                        valenguardOutputStream.createNewBuffers(serverAbstractOutPacket);
+                        valenguardOutputStream.createNewBuffers(abstractServerOutPacket);
                     } else {
 
-                        boolean opcodesMatch = valenguardOutputStream.doOpcodesMatch(serverAbstractOutPacket);
+                        boolean opcodesMatch = valenguardOutputStream.doOpcodesMatch(abstractServerOutPacket);
                         if (opcodesMatch) {
                             valenguardOutputStream.appendBewBuffer();
                         } else {
                             clientHandler.writeBuffers();
-                            valenguardOutputStream.createNewBuffers(serverAbstractOutPacket);
+                            valenguardOutputStream.createNewBuffers(abstractServerOutPacket);
                         }
                     }
 
@@ -74,8 +73,8 @@ public class OutputStreamManager {
         outputContexts.remove(clientHandler);
     }
 
-    void addServerOutPacket(ServerAbstractOutPacket serverAbstractOutPacket) {
-        Queue<ServerAbstractOutPacket> clientHandler = outputContexts.get(serverAbstractOutPacket.packetReceiver.getClientHandler());
-        if (clientHandler != null) clientHandler.add(serverAbstractOutPacket);
+    void addServerOutPacket(AbstractServerOutPacket abstractServerOutPacket) {
+        Queue<AbstractServerOutPacket> clientHandler = outputContexts.get(abstractServerOutPacket.packetReceiver.getClientHandler());
+        if (clientHandler != null) clientHandler.add(abstractServerOutPacket);
     }
 }

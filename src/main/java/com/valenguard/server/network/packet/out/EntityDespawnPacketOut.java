@@ -4,7 +4,7 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.shared.Opcodes;
 
-public class EntityDespawnPacketOut extends ServerAbstractOutPacket {
+public class EntityDespawnPacketOut extends AbstractServerOutPacket {
 
     private final Entity despawnTarget;
 

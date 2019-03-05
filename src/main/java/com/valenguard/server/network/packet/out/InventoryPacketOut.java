@@ -4,7 +4,7 @@ import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.inventory.InventoryActions;
 import com.valenguard.server.network.shared.Opcodes;
 
-public class InventoryPacketOut extends ServerAbstractOutPacket {
+public class InventoryPacketOut extends AbstractServerOutPacket {
 
     private final InventoryActions inventoryAction;
 

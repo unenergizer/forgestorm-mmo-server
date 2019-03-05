@@ -1,7 +1,7 @@
 package com.valenguard.server.network.shared;
 
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.ServerAbstractOutPacket;
+import com.valenguard.server.network.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.packet.out.ValenguardOutputStream;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
@@ -101,8 +101,8 @@ public class ClientHandler {
         return null;
     }
 
-    public int fillCurrentBuffer(ServerAbstractOutPacket serverAbstractOutPacket) {
-        return valenguardOutputStream.fillCurrentBuffer(serverAbstractOutPacket);
+    public int fillCurrentBuffer(AbstractServerOutPacket abstractServerOutPacket) {
+        return valenguardOutputStream.fillCurrentBuffer(abstractServerOutPacket);
     }
 
     public void writeBuffers() {

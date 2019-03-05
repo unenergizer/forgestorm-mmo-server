@@ -8,13 +8,13 @@ import com.valenguard.server.network.shared.Opcodes;
 
 import static com.valenguard.server.util.Log.println;
 
-public class PlayerTeleportPacketOut extends ServerAbstractOutPacket {
+public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
 
     private final MovingEntity teleportedEntity;
     private final Location teleportLocation;
     private final MoveDirection facingDirection;
 
-    public PlayerTeleportPacketOut(Player receiver, MovingEntity teleportedEntity, Location teleportLocation, MoveDirection facingDirection) {
+    public MovingEntityTeleportPacketOut(Player receiver, MovingEntity teleportedEntity, Location teleportLocation, MoveDirection facingDirection) {
         super(Opcodes.PLAYER_TELEPORT, receiver);
         this.teleportedEntity = teleportedEntity;
         this.teleportLocation = teleportLocation;
@@ -24,6 +24,7 @@ public class PlayerTeleportPacketOut extends ServerAbstractOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(teleportedEntity.getServerEntityId());
+        write.writeByte(isClientPlayerType(teleportedEntity).getEntityTypeByte());
         write.writeString(teleportLocation.getMapName());
         write.writeShort(teleportLocation.getX());
         write.writeShort(teleportLocation.getY());

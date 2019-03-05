@@ -7,7 +7,7 @@ import com.valenguard.server.util.Log;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
+public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
     private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
@@ -30,7 +30,7 @@ public class EntitySpawnPacketOut extends ServerAbstractOutPacket {
     }
 
     private void spawnMovingEntity(ValenguardOutputStream write) {
-        write.writeByte(entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER.getEntityTypeByte() : entityToSpawn.getEntityType().getEntityTypeByte());
+        write.writeByte(isClientPlayerType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
 

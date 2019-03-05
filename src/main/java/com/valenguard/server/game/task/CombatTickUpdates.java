@@ -129,7 +129,7 @@ public class CombatTickUpdates {
                 deadPlayer.gameMapRegister(new Warp(teleportLocation, facingDirection));
 
                 // Send all players in map the teleport packet
-                gameMap.forAllPlayers(player -> new PlayerTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+                gameMap.forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
 
                 // Send other players info about the reheal (if they are still on the same map)
                 gameMap.forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
