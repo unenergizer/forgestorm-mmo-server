@@ -20,6 +20,15 @@ public class ItemStack implements Cloneable {
         // TODO get isStackable based on the item type / inventory type such as bank/packetReceiver inventory ect..
     }
 
+    public ItemStack(ItemStack itemStack) {
+        this.itemId = itemStack.getItemId();
+        this.name = itemStack.getName();
+        this.description = itemStack.getDescription();
+        this.itemStackType = itemStack.getItemStackType();
+        this.isStackable = itemStack.isStackable();
+        this.amount = itemStack.getAmount();
+    }
+
     @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public Object clone() {

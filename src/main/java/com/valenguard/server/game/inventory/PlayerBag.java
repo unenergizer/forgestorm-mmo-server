@@ -53,7 +53,7 @@ public class PlayerBag {
         return null;
     }
 
-    void setItemStack(byte index, ItemStack itemStack) {
+    public void setItemStack(byte index, ItemStack itemStack) {
         items[index] = itemStack;
     }
 

@@ -23,6 +23,10 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
 
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
             write.writeByte(inventoryAction.getSlotIndex());
+        } else if (inventoryAction.getInventoryActionType() == InventoryActions.SET) {
+            write.writeByte(inventoryAction.getSlotIndex());
+            write.writeInt(inventoryAction.getItemStack().getItemId());
+            write.writeInt(inventoryAction.getItemStack().getAmount());
         }
     }
 }

@@ -41,9 +41,8 @@ public class EntityShopManager {
 
         // Only adding the gold stack back if it is greater than zero.
         if (newGoldStack.getAmount() > 0) {
-            player.giveItemStack(newGoldStack);
+            player.setItemStack(itemStackSlotData.getBagIndex(), newGoldStack);
         }
-
     }
 
     public void sellItem(short shopID, Player player) {

@@ -75,38 +75,43 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         // Click received, lets pick up the item!
         println(getClass(), "Incoming ItemStack click!");
         ItemStackDrop itemStackDrop = gameMap.getItemStackDropMap().get(packetData.getEntityUUID());
+        ItemStack itemStack = itemStackDrop.getItemStack();
 
         if (itemStackDrop.isPickedUp()) return;
 
-        // Check inventory for being full first
-        if (!player.getPlayerBag().isBagFull()) {
-
-            println(getClass(), "Sending packetReceiver ItemStack and removing from map & list!");
-            // Despawn the item
-            gameMap.queueItemStackDropDespawn(itemStackDrop);
-
-            // Don't let others pick the item up.
-            itemStackDrop.setPickedUp(true);
-
-            ItemStack itemStack = itemStackDrop.getItemStack();
-
-            if (itemStack.getItemStackType() == ItemStackType.GOLD) {
-                ItemStackSlotData itemStackSlotData = player.getGold();
-                if (itemStackSlotData != null) {
-                    ItemStack goldItemStack = itemStackSlotData.getItemStack();
-                    goldItemStack.setAmount(goldItemStack.getAmount() + itemStack.getAmount());
-
-                    // Removing their previous gold stack.
-                    player.removeItemStack(itemStackSlotData.getBagIndex());
-
-                    itemStack = goldItemStack;
-                }
+        // TODO: generalize for other
+        if (itemStack.getItemStackType() == ItemStackType.GOLD) {
+            if (player.getGold() == null && player.getPlayerBag().isBagFull()) {
+                return;
             }
+        } else {
+            if (player.getPlayerBag().isBagFull()) {
+                return;
+            }
+        }
 
+        // Despawn the item
+        gameMap.queueItemStackDropDespawn(itemStackDrop);
 
+        // Don't let others pick the item up.
+        itemStackDrop.setPickedUp(true);
+
+        if (itemStack.getItemStackType() == ItemStackType.GOLD) {
+            ItemStackSlotData itemStackSlotData = player.getGold();
+            if (itemStackSlotData != null) {
+                ItemStack goldItemStack = itemStackSlotData.getItemStack();
+                goldItemStack.setAmount(goldItemStack.getAmount() + itemStack.getAmount());
+
+                // Removing their previous gold stack.
+                player.removeItemStack(itemStackSlotData.getBagIndex());
+
+                player.setItemStack(itemStackSlotData.getBagIndex(), goldItemStack);
+            }
+        } else {
             // Send the packetReceiver the item
             player.giveItemStack(itemStack);
         }
+
     }
 
     private void changeEntityAppearance(Entity entity, GameMap gameMap) {

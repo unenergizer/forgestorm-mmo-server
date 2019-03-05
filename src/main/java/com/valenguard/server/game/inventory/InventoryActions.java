@@ -16,6 +16,7 @@ public class InventoryActions {
      */
     public static final byte GIVE = 0x03;
     public static final byte REMOVE = 0x04;
+    public static final byte SET = 0x05;
 
     @Getter
     private byte inventoryActionType;
@@ -28,7 +29,13 @@ public class InventoryActions {
 
     public InventoryActions(byte inventoryActionType, ItemStack itemStack) {
         this.inventoryActionType = inventoryActionType;
-        this.itemStack = itemStack;
+        this.itemStack = new ItemStack(itemStack);
+    }
+
+    public InventoryActions(byte inventoryActionType, byte slotIndex, ItemStack itemStack) {
+        this.inventoryActionType = inventoryActionType;
+        this.itemStack = new ItemStack(itemStack);
+        this.slotIndex = slotIndex;
     }
 
     public InventoryActions(byte inventoryActionType, byte slotIndex) {
