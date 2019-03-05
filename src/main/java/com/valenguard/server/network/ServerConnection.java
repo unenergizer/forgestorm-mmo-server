@@ -30,7 +30,7 @@ public class ServerConnection implements Runnable {
 
     private NetworkSettings networkSettings;
 
-    private short tempID = 30000;
+    private short tempID = 0;
 
     // Used to handle closing down all threads associated with
     // the server. Volatile allows the variable to exist
