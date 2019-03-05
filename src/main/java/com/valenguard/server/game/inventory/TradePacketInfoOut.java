@@ -7,7 +7,9 @@ public class TradePacketInfoOut {
 
     private TradeStatusOpcode tradeOpcode;
     private int tradeUUID;
-    private short playerUUID;
+    private short tradeStarterUUID;
+    private short tradeTargetUUID;
+    private short confirmedPlayerUUID;
     private ItemStack itemStack;
     private byte tradeSlot;
 
@@ -20,10 +22,17 @@ public class TradePacketInfoOut {
         this.tradeUUID = tradeUUID;
     }
 
-    public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, short playerUUID) {
+    public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, short tradeStarterUUID, short tradeTargetUUID) {
         this.tradeOpcode = tradeStatusOpcode;
         this.tradeUUID = tradeUUID;
-        this.playerUUID = playerUUID;
+        this.tradeStarterUUID = tradeStarterUUID;
+        this.tradeTargetUUID = tradeTargetUUID;
+    }
+
+    public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, short confirmedPlayerUUID) {
+        this.tradeOpcode = tradeStatusOpcode;
+        this.tradeUUID = tradeUUID;
+        this.confirmedPlayerUUID = confirmedPlayerUUID;
     }
 
     public TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, byte tradeSlot) {

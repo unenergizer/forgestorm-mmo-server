@@ -24,6 +24,14 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
         switch (tradePacketInfoOut.getTradeOpcode()) {
             case TRADE_REQUEST_INIT_SENDER:
             case TRADE_REQUEST_INIT_TARGET:
+                write.writeInt(tradePacketInfoOut.getTradeUUID());
+                // Write the traders Target
+                if (packetReceiver.getServerEntityId() == tradePacketInfoOut.getTradeStarterUUID()) {
+                    write.writeShort(tradePacketInfoOut.getTradeTargetUUID());
+                } else {
+                    write.writeShort(tradePacketInfoOut.getTradeStarterUUID());
+                }
+                break;
             case TRADE_REQUEST_TARGET_ACCEPT:
             case TRADE_REQUEST_TARGET_DECLINE:
             case TRADE_REQUEST_SERVER_TIMED_OUT:
@@ -34,7 +42,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
             case TRADE_OFFER_CONFIRM:
             case TRADE_OFFER_UNCONFIRM:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
-                write.writeShort(tradePacketInfoOut.getPlayerUUID());
+                write.writeShort(tradePacketInfoOut.getConfirmedPlayerUUID());
                 break;
             case TRADE_ITEM_ADD:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());

@@ -44,15 +44,15 @@ public class TradeManager {
             return;
         }
 
-        final int UUID = generateTradeId(tradeStarter, targetPlayer);
+        final int tradeUUID = generateTradeId(tradeStarter, targetPlayer);
 
-        tradeStarter.setTradeUUID(UUID);
-        tradeDataMap.put(UUID, new TradeData(tradeStarter, targetPlayer));
+        tradeStarter.setTradeUUID(tradeUUID);
+        tradeDataMap.put(tradeUUID, new TradeData(tradeStarter, targetPlayer));
 
         new ChatMessagePacketOut(tradeStarter, "[Server] Trade request received. Waiting on " + targetPlayer.getName() + "...").sendPacket();
         new ChatMessagePacketOut(targetPlayer, "[Server] Trade request received from " + tradeStarter.getName() + ".").sendPacket();
-        new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_SENDER, UUID)).sendPacket();
-        new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_TARGET, UUID)).sendPacket();
+        new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_SENDER, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
+        new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_TARGET, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
     }
 
     /**
