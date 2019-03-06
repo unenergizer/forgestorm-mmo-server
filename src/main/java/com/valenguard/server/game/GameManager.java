@@ -4,7 +4,6 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.data.TmxFileParser;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.inventory.ItemStackType;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
@@ -117,19 +116,15 @@ public class GameManager {
         new InitClientSessionPacketOut(player, true, playerSessionData.getServerID()).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
-
-
+        
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         // Give test items
-        for (int itemId = 0; itemId <= ValenguardMain.getInstance().getItemStackManager().numberOfItems() - 1; itemId++) {
-            ItemStack itemStack = ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1);
+        ItemStack starterGold = ValenguardMain.getInstance().getItemStackManager().makeItemStack(0, 100);
+        player.giveItemStack(starterGold);
 
-            if (itemStack.getItemStackType() == ItemStackType.GOLD) itemStack.setAmount(111);
-
-            player.giveItemStack(itemStack);
-
-        }
+        ItemStack starterSword = ValenguardMain.getInstance().getItemStackManager().makeItemStack(4, 1);
+        player.giveItemStack(starterSword);
 
         tempColor++;
         if (tempColor > 15) tempColor = 0;

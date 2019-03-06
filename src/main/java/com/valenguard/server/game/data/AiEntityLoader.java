@@ -17,7 +17,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class AiEntityLoader {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
     private static final String FILE_PATH = "src/main/resources/data/entity/AiEntities.yaml";
 
     public List<AiEntityData> loadMovingEntities() {
