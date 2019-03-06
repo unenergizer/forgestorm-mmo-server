@@ -17,7 +17,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class AiEntityLoader {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
     private static final String FILE_PATH = "src/main/resources/data/entity/AiEntities.yaml";
 
     public List<AiEntityData> loadMovingEntities() {
@@ -55,6 +55,7 @@ public class AiEntityLoader {
             double walkSpeed = (Double) entityDataNode.get("walkSpeed");
             double probabilityStill = (Double) entityDataNode.get("probabilityStill");
             double probabilityWalkStart = (Double) entityDataNode.get("probabilityWalkStart");
+            Integer shopID = (Integer) entityDataNode.get("shopID");
 
             // Create EntityData
             AiEntityData aiEntityData = new AiEntityData(entityDataID);
@@ -71,6 +72,7 @@ public class AiEntityLoader {
             aiEntityData.setWalkSpeed((float) walkSpeed);
             aiEntityData.setProbabilityStill((float) probabilityStill);
             aiEntityData.setProbabilityWalkStart((float) probabilityWalkStart);
+            aiEntityData.setShopID(shopID);
 
             // Loading Finished & Creation Finished! Save me!
             aiEntityDataList.add(aiEntityData);
@@ -90,6 +92,7 @@ public class AiEntityLoader {
             println(getClass(), "WalkSpeed: " + walkSpeed, false, PRINT_DEBUG);
             println(getClass(), "ProbabilityStill: " + probabilityStill, false, PRINT_DEBUG);
             println(getClass(), "ProbabilityWalkStart: " + probabilityWalkStart, false, PRINT_DEBUG);
+            println(getClass(), "ShopID: " + shopID, false, PRINT_DEBUG);
             println(PRINT_DEBUG);
         }
 

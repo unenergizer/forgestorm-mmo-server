@@ -34,7 +34,7 @@ public class Player extends MovingEntity {
 
     private int tradeUUID = -1;
 
-    private NPC currentShoppingEntity;
+    private AiEntity currentShoppingEntity;
 
     /**
      * The amount of time that has progressed since the player

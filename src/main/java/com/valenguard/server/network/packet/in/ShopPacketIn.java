@@ -1,9 +1,7 @@
 package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.NPC;
+import com.valenguard.server.game.entity.AiEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.ShopOpcodes;
 import com.valenguard.server.network.shared.*;
@@ -12,7 +10,9 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Opcode(getOpcode = Opcodes.NPC_SHOPS)
+import static com.valenguard.server.util.Log.println;
+
+@Opcode(getOpcode = Opcodes.ENTITY_SHOPS)
 public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, PacketInCancelable {
 
 
@@ -21,6 +21,8 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         ShopOpcodes npcShopOpcode = ShopOpcodes.getShopOpcode(clientHandler.readByte());
         short entityId = 0;
         short shopSlot = 0;
+
+        println(getClass(), "Incoming shop packet!");
 
         if (npcShopOpcode == ShopOpcodes.START_SHOPPING) {
             entityId = clientHandler.readShort();
@@ -36,19 +38,29 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
 
         // The packetReceiver cannot move and shop at the same time.
         if (packetData.getPlayer().isEntityMoving()) {
+            println(getClass(), "Tried to send shop packet but was moving.");
             packetData.getPlayer().setCurrentShoppingEntity(null);
             return false;
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            MovingEntity movingEntity = packetData.getPlayer().getGameMap().getAiEntityMap().get(packetData.entityId);
-            if (movingEntity.getEntityType() != EntityType.NPC) return false;
-            if (((NPC) movingEntity).getShopId() == -1) return false;
+            if (!packetData.getPlayer().getGameMap().getAiEntityMap().containsKey(packetData.entityId)) return false;
         }
+
+        println(getClass(), "1");
+
+        if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
+            AiEntity aiEntity = packetData.getPlayer().getGameMap().getAiEntityMap().get(packetData.entityId);
+            if (aiEntity.getShopId() == -1) return false;
+        }
+
+        println(getClass(), "2");
 
         if (packetData.shopOpcode == ShopOpcodes.BUY || packetData.shopOpcode == ShopOpcodes.SELL) {
             return packetData.getPlayer().getCurrentShoppingEntity() != null;
         }
+
+        println(getClass(), "Passed sanatize checks");
 
         return true;
     }
@@ -59,7 +71,8 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         Player player = packetData.getPlayer();
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            player.setCurrentShoppingEntity((NPC) player.getGameMap().getAiEntityMap().get(packetData.entityId));
+            println(getClass(), "Started Shopping!");
+            player.setCurrentShoppingEntity(player.getGameMap().getAiEntityMap().get(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
             ValenguardMain.getInstance().getEntityShopManager()
                     .buyItem(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);

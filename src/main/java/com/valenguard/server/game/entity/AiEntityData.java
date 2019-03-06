@@ -23,6 +23,7 @@ public class AiEntityData {
     private float walkSpeed;
     private float probabilityStill;
     private float probabilityWalkStart;
+    private Integer shopID;
 
     public AiEntityData(final int entityDataID) {
         this.entityDataID = entityDataID;

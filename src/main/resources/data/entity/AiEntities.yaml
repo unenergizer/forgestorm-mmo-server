@@ -188,6 +188,7 @@
   walkSpeed: 0.6
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
+  shopID: 2
 14:
   name: "Frantic Cook"
   type: NPC
@@ -202,3 +203,17 @@
   walkSpeed: 0.2
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
+15:
+  name: "Sea Watcher"
+  type: NPC
+  alignment: FRIENDLY
+  colorID: 1
+  atlasBodyID: 47
+  atlasHeadID: 35
+  health: 80
+  damage: 10
+  expDrop: 28
+  dropTable: 0
+  walkSpeed: 0.5
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5

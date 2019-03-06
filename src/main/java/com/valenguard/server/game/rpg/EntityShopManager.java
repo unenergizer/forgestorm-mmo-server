@@ -1,5 +1,6 @@
 package com.valenguard.server.game.rpg;
 
+import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.data.EntityShopLoader;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.inventory.ItemStack;
@@ -26,7 +27,11 @@ public class EntityShopManager {
         ItemStackSlotData itemStackSlotData = player.getGold();
         if (itemStackSlotData == null) return; // The player has no gold.
 
-        int buyPrice = map.get(shopID).get(shopSlot).getPrice();
+        if (shopSlot >= map.get(shopID).size() || shopSlot < 0) return;
+
+        ShopItemStackInfo shopItemStackInfo = map.get(shopID).get(shopSlot);
+        int buyPrice = shopItemStackInfo.getPrice();
+        int itemId = shopItemStackInfo.getItemId();
 
         // The player cannot buy items if they don't have the space for the item.
         if (player.getPlayerBag().isBagFull()) return;
@@ -43,6 +48,8 @@ public class EntityShopManager {
         if (newGoldStack.getAmount() > 0) {
             player.setItemStack(itemStackSlotData.getBagIndex(), newGoldStack);
         }
+
+        player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
     }
 
     public void sellItem(short shopID, Player player) {

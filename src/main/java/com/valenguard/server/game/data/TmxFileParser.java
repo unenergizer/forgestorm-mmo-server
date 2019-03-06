@@ -204,7 +204,7 @@ public class TmxFileParser {
                         aiEntity = new NPC();
                     }
 
-                    aiEntity.setServerEntityId((short) entityUUID++);
+                    aiEntity.setServerEntityId((short) entityUUID);
                     if (SHOW_ID_IN_NAME) {
                         aiEntity.setName(aiEntityData.getName() + " " + entityUUID);
                     } else {
@@ -245,10 +245,13 @@ public class TmxFileParser {
                     attributes.setDamage(aiEntityData.getDamage());
                     aiEntity.setAttributes(attributes);
 
+                    if (aiEntityData.getShopID() != null) aiEntity.setShopId((short) (int) aiEntityData.getShopID());
+
                     // Queue Mob Spawn
                     ValenguardMain.getInstance().getGameManager().queueMobSpawn(aiEntity);
 
                     Log.println(TmxFileParser.class, "[Entity] UUID: " + entityUUID + ", AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
+                    entityUUID++;
                 }
             }
 
