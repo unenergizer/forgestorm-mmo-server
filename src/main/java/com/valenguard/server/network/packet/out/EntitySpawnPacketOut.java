@@ -3,9 +3,9 @@ package com.valenguard.server.network.packet.out;
 import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.network.shared.Opcodes;
-import com.valenguard.server.util.Log;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.valenguard.server.util.Log.println;
 
 public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
@@ -34,6 +34,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
 
+
         MovingEntity movingEntity = (MovingEntity) entityToSpawn;
 
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
@@ -45,11 +46,13 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         switch (entityToSpawn.getEntityType()) {
             case MONSTER:
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
+                write.writeShort(((AiEntity) entityToSpawn).getShopId());
                 break;
             case NPC:
                 write.writeByte(appearance.getColorId());
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
+                write.writeShort(((AiEntity) entityToSpawn).getShopId());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:
@@ -71,17 +74,17 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         // send alignment
         write.writeByte(movingEntity.getEntityAlignment().getEntityAlignmentByte());
 
-        Log.println(getClass(), "===================================", false, PRINT_DEBUG);
-        Log.println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
-        Log.println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
-        Log.println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
-        Log.println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
-        Log.println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
-        Log.println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
-        Log.println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
+        println(getClass(), "===================================", false, PRINT_DEBUG);
+        println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
+        println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
+        println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
+        println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
+        println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
+        println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
+        println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
 
         for (int i = 0; i < entityToSpawn.getAppearance().getTextureIds().length; i++) {
-            Log.println(getClass(), "textureIds #" + i + ": " + entityToSpawn.getAppearance().getTextureIds()[i], false, PRINT_DEBUG);
+            println(getClass(), "textureIds #" + i + ": " + entityToSpawn.getAppearance().getTextureIds()[i], false, PRINT_DEBUG);
         }
     }
 

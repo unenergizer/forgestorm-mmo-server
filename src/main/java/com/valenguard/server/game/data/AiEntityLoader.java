@@ -72,27 +72,31 @@ public class AiEntityLoader {
             aiEntityData.setWalkSpeed((float) walkSpeed);
             aiEntityData.setProbabilityStill((float) probabilityStill);
             aiEntityData.setProbabilityWalkStart((float) probabilityWalkStart);
-            aiEntityData.setShopID(shopID);
+            if (shopID == null) {
+                aiEntityData.setShopID(-1);
+            } else {
+                aiEntityData.setShopID(shopID);
+            }
 
             // Loading Finished & Creation Finished! Save me!
             aiEntityDataList.add(aiEntityData);
 
             // Debug print
-            println(getClass(), "EntityDataID: " + entityDataID, false, PRINT_DEBUG);
-            println(getClass(), "Name: " + name, false, PRINT_DEBUG);
-            println(getClass(), "Type: " + type, false, PRINT_DEBUG);
-            println(getClass(), "Alignment: " + alignment, false, PRINT_DEBUG);
-            println(getClass(), "ColorID: " + colorID, false, PRINT_DEBUG);
-            println(getClass(), "AtlasBodyID: " + atlasBodyID, false, PRINT_DEBUG);
-            println(getClass(), "AtlasHeadID: " + atlasHeadID, false, PRINT_DEBUG);
-            println(getClass(), "Health: " + health, false, PRINT_DEBUG);
-            println(getClass(), "Damage: " + damage, false, PRINT_DEBUG);
-            println(getClass(), "ExpDrop: " + expDrop, false, PRINT_DEBUG);
-            println(getClass(), "DropTable: " + dropTable, false, PRINT_DEBUG);
-            println(getClass(), "WalkSpeed: " + walkSpeed, false, PRINT_DEBUG);
-            println(getClass(), "ProbabilityStill: " + probabilityStill, false, PRINT_DEBUG);
-            println(getClass(), "ProbabilityWalkStart: " + probabilityWalkStart, false, PRINT_DEBUG);
-            println(getClass(), "ShopID: " + shopID, false, PRINT_DEBUG);
+            println(getClass(), "EntityDataID: " + aiEntityData.getEntityDataID(), false, PRINT_DEBUG);
+            println(getClass(), "Name: " + aiEntityData.getName(), false, PRINT_DEBUG);
+            println(getClass(), "Type: " + aiEntityData.getEntityType(), false, PRINT_DEBUG);
+            println(getClass(), "Alignment: " + aiEntityData.getEntityAlignment(), false, PRINT_DEBUG);
+            println(getClass(), "ColorID: " + aiEntityData.getColorID(), false, PRINT_DEBUG);
+            println(getClass(), "AtlasBodyID: " + aiEntityData.getAtlasBodyID(), false, PRINT_DEBUG);
+            println(getClass(), "AtlasHeadID: " + aiEntityData.getAtlasHeadID(), false, PRINT_DEBUG);
+            println(getClass(), "Health: " + aiEntityData.getHealth(), false, PRINT_DEBUG);
+            println(getClass(), "Damage: " + aiEntityData.getDamage(), false, PRINT_DEBUG);
+            println(getClass(), "ExpDrop: " + aiEntityData.getExpDrop(), false, PRINT_DEBUG);
+            println(getClass(), "DropTable: " + aiEntityData.getDropTable(), false, PRINT_DEBUG);
+            println(getClass(), "WalkSpeed: " + aiEntityData.getWalkSpeed(), false, PRINT_DEBUG);
+            println(getClass(), "ProbabilityStill: " + aiEntityData.getProbabilityStill(), false, PRINT_DEBUG);
+            println(getClass(), "ProbabilityWalkStart: " + aiEntityData.getProbabilityWalkStart(), false, PRINT_DEBUG);
+            println(getClass(), "ShopID: " + aiEntityData.getShopID(), false, PRINT_DEBUG);
             println(PRINT_DEBUG);
         }
 
