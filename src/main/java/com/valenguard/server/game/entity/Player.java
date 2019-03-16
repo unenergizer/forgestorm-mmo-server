@@ -86,6 +86,16 @@ public class Player extends MovingEntity {
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.SET, slotIndex, itemStack)).sendPacket();
     }
 
+    public void moveItemStackInBag(byte fromPosition, byte toPosition) {
+        playerBag.moveItemStacks(fromPosition, toPosition);
+        new InventoryPacketOut(this, new InventoryActions(
+                InventoryActions.MOVE,
+                InventoryType.BAG_1,
+                InventoryType.BAG_1,
+                fromPosition,
+                toPosition)).sendPacket();
+    }
+
     public ItemStackSlotData getGold() {
         return playerBag.getGold();
     }

@@ -28,7 +28,7 @@ public class PlayerBag {
         items[slotIndex] = null;
     }
 
-    void moveItemStacks(byte fromPosition, byte toPosition) {
+    public void moveItemStacks(byte fromPosition, byte toPosition) {
         ItemStack fromItemStack = items[fromPosition];
         ItemStack toItemStack = items[toPosition];
         items[toPosition] = fromItemStack;

@@ -61,8 +61,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         WindowMovementInfo windowMovementInfo = determineWindowMovementInfo(fromWindow, toWindow);
 
-        PlayerInventoryEvents playerInventoryEvents = ValenguardMain.getInstance().getGameLoop().getPlayerInventoryEvents();
-        playerInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementInfo));
+        PlayerMoveInventoryEvents playerMoveInventoryEvents = ValenguardMain.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
+        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementInfo));
 
     }
 

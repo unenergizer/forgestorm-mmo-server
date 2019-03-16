@@ -38,7 +38,7 @@ public class PlayerEquipment {
         equipmentSlots[11] = new EquipmentSlot(EquipmentSlotTypes.AMMO);
     }
 
-    void swapBagAndEquipmentWindow(PlayerBag playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
+    boolean swapBagAndEquipmentWindow(PlayerBag playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
         ItemStack bagItemStack = playerBag.getItemStack(bagIndex);
         ItemStack equipmentItemStack = getItemStack(equipmentIndex);
 
@@ -49,7 +49,7 @@ public class PlayerEquipment {
             for (ItemStackType itemStackType : equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()) {
                 if (itemStackType == bagItemStack.getItemStackType()) foundType = true;
             }
-            if (!foundType) return;
+            if (!foundType) return false;
         }
 
         playerBag.setItemStack(bagIndex, equipmentItemStack);
@@ -57,6 +57,8 @@ public class PlayerEquipment {
 
         updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem);
         updateAppearance(equipmentIndex);
+
+        return true;
     }
 
     /**

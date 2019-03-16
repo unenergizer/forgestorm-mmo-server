@@ -1,11 +1,12 @@
 package com.valenguard.server.game.inventory;
 
 import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.network.packet.out.InventoryPacketOut;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PlayerInventoryEvents {
+public class PlayerMoveInventoryEvents {
 
     private final Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
 
@@ -44,17 +45,39 @@ public class PlayerInventoryEvents {
     }
 
     private void bagMove(InventoryEvent inventoryEvent) {
-        inventoryEvent.getPlayer().getPlayerBag().moveItemStacks(inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
+        inventoryEvent.getPlayer().moveItemStackInBag(inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
     }
 
     private void fromBagToEquipment(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
-        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPosition(), inventoryEvent.getToPosition(), true);
+
+        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPosition(), inventoryEvent.getToPosition(), true)) {
+            return;
+        }
+
+        new InventoryPacketOut(player, new InventoryActions(
+                InventoryActions.MOVE,
+                InventoryType.BAG_1,
+                InventoryType.EQUIPMENT,
+                inventoryEvent.getFromPosition(),
+                inventoryEvent.getToPosition()
+        )).sendPacket();
     }
 
     private void fromEquipmentToBag(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
-        player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPosition(), inventoryEvent.getFromPosition(), false);
+
+        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPosition(), inventoryEvent.getFromPosition(), false)) {
+            return;
+        }
+
+        new InventoryPacketOut(player, new InventoryActions(
+                InventoryActions.MOVE,
+                InventoryType.EQUIPMENT,
+                InventoryType.BAG_1,
+                inventoryEvent.getFromPosition(),
+                inventoryEvent.getToPosition()
+        )).sendPacket();
     }
 
     private void fromEquipmentToEquipment(InventoryEvent inventoryEvent) {

@@ -1,7 +1,7 @@
 package com.valenguard.server;
 
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.inventory.PlayerInventoryEvents;
+import com.valenguard.server.game.inventory.PlayerMoveInventoryEvents;
 import com.valenguard.server.game.task.*;
 import com.valenguard.server.network.ServerConnection;
 import lombok.Getter;
@@ -20,12 +20,12 @@ public class GameLoop extends Thread {
     private long variableYieldTime, lastTime;
 
     @Getter
-    private PlayerInventoryEvents playerInventoryEvents = new PlayerInventoryEvents(); // TODO: MOVE
+    private PlayerMoveInventoryEvents playerMoveInventoryEvents = new PlayerMoveInventoryEvents();
 
     @Getter
-    private final UpdateMovements updateMovements = new UpdateMovements(); //TODO: MOVE
+    private final UpdateMovements updateMovements = new UpdateMovements();
 
-    private final WarpManager warpManager = new WarpManager(); // TODO: MOVE
+    private final WarpManager warpManager = new WarpManager();
 
     @Getter
     private final ItemTickUpdates itemTickUpdates = new ItemTickUpdates();
@@ -71,7 +71,7 @@ public class GameLoop extends Thread {
 
             valenguardMain.getCommandProcessor().executeCommands();
             ServerConnection.getInstance().getEventBus().gameThreadPublish();
-            playerInventoryEvents.processInventoryEvents();
+            playerMoveInventoryEvents.processInventoryEvents();
             updateMovements.updateEntityMovement();
             warpManager.warpPlayers();
             itemTickUpdates.tickItemsDespawn();

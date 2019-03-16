@@ -20,13 +20,19 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
         if (inventoryAction.getInventoryActionType() == InventoryActions.GIVE) {
             write.writeInt(inventoryAction.getItemStack().getItemId());
             write.writeInt(inventoryAction.getItemStack().getAmount());
-
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
             write.writeByte(inventoryAction.getSlotIndex());
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.SET) {
             write.writeByte(inventoryAction.getSlotIndex());
             write.writeInt(inventoryAction.getItemStack().getItemId());
             write.writeInt(inventoryAction.getItemStack().getAmount());
+        } else if (inventoryAction.getInventoryActionType() == InventoryActions.MOVE) {
+            write.writeByte(inventoryAction.getFromPosition());
+            write.writeByte(inventoryAction.getToPosition());
+
+            // Combining the windows into a single byte.
+            byte windowsBytes = (byte) ((inventoryAction.getFromWindow() << 4) | inventoryAction.getToWindow());
+            write.writeByte(windowsBytes);
         }
     }
 }
