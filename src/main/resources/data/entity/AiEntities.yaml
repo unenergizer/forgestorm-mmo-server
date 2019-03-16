@@ -25,7 +25,7 @@
 2:
   name: "Fishing Master"
   type: NPC
-  alignment: FRIENDLY
+  faction: THE_EMPIRE
   colorID: 0
   atlasBodyID: 52
   atlasHeadID: 30
@@ -39,7 +39,7 @@
 3:
   name: "Old Man"
   type: NPC
-  alignment: FRIENDLY
+  faction: THE_EMPIRE
   colorID: 1
   atlasBodyID: 18
   atlasHeadID: 40
@@ -63,9 +63,9 @@
   probabilityStill: 1.0
   probabilityWalkStart: 0.0
 5:
-  name: "Little Joseph"
+  name: "Big Joseph"
   type: NPC
-  alignment: FRIENDLY
+  faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
   colorID: 2
   atlasBodyID: 55
   atlasHeadID: 3
@@ -79,7 +79,7 @@
 6:
   name: "Angry Mother"
   type: NPC
-  alignment: HOSTILE
+  faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
   colorID: 3
   atlasBodyID: 48
   atlasHeadID: 36
@@ -93,7 +93,7 @@
 7:
   name: "Passive Father"
   type: NPC
-  alignment: NEUTRAL
+  faction: THE_EMPIRE
   colorID: 4
   atlasBodyID: 48
   atlasHeadID: 36
@@ -107,7 +107,7 @@
 8:
   name: "Kenny"
   type: NPC
-  alignment: NEUTRAL
+  faction: THE_EMPIRE
   colorID: 5
   atlasBodyID: 4
   atlasHeadID: 40
@@ -121,7 +121,7 @@
 9:
   name: "Niels"
   type: NPC
-  alignment: NEUTRAL
+  faction: THE_EMPIRE
   colorID: 6
   atlasBodyID: 1
   atlasHeadID: 63
@@ -135,7 +135,7 @@
 10:
   name: "Busy Waiter"
   type: NPC
-  alignment: FRIENDLY
+  faction: THE_EMPIRE
   colorID: 7
   atlasBodyID: 1
   atlasHeadID: 1
@@ -149,7 +149,7 @@
 11:
   name: "Tohmer"
   type: NPC
-  alignment: NEUTRAL
+  faction: FROZEN_THRONE
   colorID: 8
   atlasBodyID: 52
   atlasHeadID: 30
@@ -163,7 +163,7 @@
 12:
   name: "Elevator Man"
   type: NPC
-  alignment: NEUTRAL
+  faction: FROZEN_THRONE
   colorID: 9
   atlasBodyID: 41
   atlasHeadID: 38
@@ -177,7 +177,7 @@
 13:
   name: "Inn Keeper"
   type: NPC
-  alignment: FRIENDLY
+  faction: THE_EMPIRE
   colorID: 10
   atlasBodyID: 1
   atlasHeadID: 1
@@ -192,7 +192,7 @@
 14:
   name: "Frantic Cook"
   type: NPC
-  alignment: NEUTRAL
+  faction: THE_EMPIRE
   colorID: 11
   atlasBodyID: 48
   atlasHeadID: 35
@@ -206,7 +206,7 @@
 15:
   name: "Sea Watcher"
   type: NPC
-  alignment: FRIENDLY
+  faction: THE_EMPIRE
   colorID: 1
   atlasBodyID: 47
   atlasHeadID: 35

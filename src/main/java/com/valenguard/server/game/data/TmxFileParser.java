@@ -200,8 +200,10 @@ public class TmxFileParser {
 
                     if (aiEntityData.getEntityType() == EntityType.MONSTER) {
                         aiEntity = new Monster();
+                        ((Monster) aiEntity).setAlignment(aiEntityData.getEntityAlignment());
                     } else if (aiEntityData.getEntityType() == EntityType.NPC) {
                         aiEntity = new NPC();
+                        ((NPC) aiEntity).setFaction(ValenguardMain.getInstance().getFactionManager().getFactionByName(aiEntityData.getFaction()));
                     }
 
                     aiEntity.setServerEntityId((short) entityUUID);
@@ -211,7 +213,6 @@ public class TmxFileParser {
                         aiEntity.setName(aiEntityData.getName());
                     }
                     aiEntity.setEntityType(aiEntityData.getEntityType());
-                    aiEntity.setEntityAlignment(aiEntityData.getEntityAlignment());
                     aiEntity.setCurrentHealth(aiEntityData.getHealth());
                     aiEntity.setMaxHealth(aiEntityData.getHealth());
                     aiEntity.setExpDrop(aiEntityData.getExpDrop());

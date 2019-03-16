@@ -13,6 +13,7 @@ public class AiEntityData {
     private String name;
     private EntityType entityType;
     private EntityAlignment entityAlignment;
+    private String faction;
     private Integer colorID;
     private short atlasBodyID;
     private Integer atlasHeadID;

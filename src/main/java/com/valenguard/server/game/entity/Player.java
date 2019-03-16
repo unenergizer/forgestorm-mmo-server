@@ -4,6 +4,7 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.inventory.*;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.rpg.skills.Skills;
 import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.packet.out.InventoryPacketOut;
@@ -35,6 +36,10 @@ public class Player extends MovingEntity {
     private int tradeUUID = -1;
 
     private AiEntity currentShoppingEntity;
+
+    private byte faction;
+
+    private Reputation reputation = new Reputation();
 
     /**
      * The amount of time that has progressed since the player

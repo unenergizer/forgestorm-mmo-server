@@ -3,10 +3,7 @@ package com.valenguard.server.game.task;
 import com.google.common.base.Preconditions;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.AiEntity;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.entity.*;
 import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
@@ -161,9 +158,31 @@ public class UpdateMovements {
             if (attackerLocation.isWithinDistance(targetLocation, GameConstants.START_ATTACK_RADIUS)) {
 
                 // If the attacker is hostile, then we assign the target.
-                if (attackerEntity.getEntityAlignment() == EntityAlignment.HOSTILE) {
-                    attackerEntity.setTargetEntity(targetEntity);
-                    findTrackingPath(attackerEntity, targetEntity);
+                if (attackerEntity.getEntityType() == EntityType.MONSTER) {
+                    if (((Monster) attackerEntity).getAlignment() == EntityAlignment.HOSTILE) {
+                        attackerEntity.setTargetEntity(targetEntity);
+                        findTrackingPath(attackerEntity, targetEntity);
+                    }
+                } else if (attackerEntity.getEntityType() == EntityType.NPC) {
+
+                    // Test to see if the target is a player
+                    if (targetEntity.getEntityType() == EntityType.PLAYER) {
+
+                        Player player = (Player) targetEntity;
+                        NPC npc = (NPC) attackerEntity;
+                        EntityAlignment attackerAlignment = player.getReputation().getAlignment(npc.getFaction());
+
+                        if (attackerAlignment == EntityAlignment.HOSTILE) {
+                            attackerEntity.setTargetEntity(targetEntity);
+                            findTrackingPath(attackerEntity, targetEntity);
+                        }
+                    } else {
+                        // The target is a Monster, do regular attack.
+                        if (((Monster) targetEntity).getAlignment() == EntityAlignment.HOSTILE) {
+                            attackerEntity.setTargetEntity(targetEntity);
+                            findTrackingPath(attackerEntity, targetEntity);
+                        }
+                    }
                 }
             }
         } else if (attackerEntity.getTargetEntity().equals(targetEntity)) {

@@ -19,7 +19,6 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(ValenguardOutputStream write) {
-
         if (entityToSpawn instanceof MovingEntity) {
             spawnMovingEntity(write);
         } else if (entityToSpawn instanceof StationaryEntity) {
@@ -34,7 +33,6 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
 
-
         MovingEntity movingEntity = (MovingEntity) entityToSpawn;
 
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
@@ -47,12 +45,15 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
             case MONSTER:
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
+                write.writeByte(((Monster) entityToSpawn).getAlignment().getEntityAlignmentByte());
                 break;
             case NPC:
                 write.writeByte(appearance.getColorId());
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
+                write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
+                write.writeByte(((NPC) entityToSpawn).getFaction());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:
@@ -70,9 +71,6 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         // send hp
         write.writeInt(movingEntity.getMaxHealth());
         write.writeInt(movingEntity.getCurrentHealth());
-
-        // send alignment
-        write.writeByte(movingEntity.getEntityAlignment().getEntityAlignmentByte());
 
         println(getClass(), "===================================", false, PRINT_DEBUG);
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);

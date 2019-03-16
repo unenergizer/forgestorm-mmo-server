@@ -12,6 +12,7 @@ import com.valenguard.server.game.inventory.DropTableManager;
 import com.valenguard.server.game.inventory.ItemStackManager;
 import com.valenguard.server.game.inventory.TradeManager;
 import com.valenguard.server.game.rpg.EntityShopManager;
+import com.valenguard.server.game.rpg.FactionManager;
 import com.valenguard.server.network.PingManager;
 import com.valenguard.server.network.ServerConnection;
 import com.valenguard.server.network.packet.in.*;
@@ -37,6 +38,7 @@ public class ValenguardMain {
     private GameManager gameManager;
 
     // Data Loaders
+    private FactionManager factionManager;
     private AiEntityDataManager aiEntityDataManager;
     private ItemStackManager itemStackManager;
     private DropTableManager dropTableManager;
@@ -58,6 +60,7 @@ public class ValenguardMain {
         Log.println(getClass(), "Booting Valenguard Server!");
 
         // Boot data loaders
+        factionManager = new FactionManager();
         aiEntityDataManager = new AiEntityDataManager();
         itemStackManager = new ItemStackManager();
         dropTableManager = new DropTableManager();

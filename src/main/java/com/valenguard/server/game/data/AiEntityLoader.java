@@ -45,6 +45,7 @@ public class AiEntityLoader {
             String name = (String) entityDataNode.get("name");
             String type = (String) entityDataNode.get("type");
             String alignment = (String) entityDataNode.get("alignment");
+            String faction = (String) entityDataNode.get("faction");
             Integer colorID = (Integer) entityDataNode.get("colorID");
             int atlasBodyID = (Integer) entityDataNode.get("atlasBodyID");
             Integer atlasHeadID = (Integer) entityDataNode.get("atlasHeadID");
@@ -61,7 +62,8 @@ public class AiEntityLoader {
             AiEntityData aiEntityData = new AiEntityData(entityDataID);
             aiEntityData.setName(name);
             aiEntityData.setEntityType(EntityType.valueOf(type));
-            aiEntityData.setEntityAlignment(EntityAlignment.valueOf(alignment));
+            if (alignment != null) aiEntityData.setEntityAlignment(EntityAlignment.valueOf(alignment));
+            aiEntityData.setFaction(faction);
             aiEntityData.setColorID(colorID);
             aiEntityData.setAtlasBodyID((short) atlasBodyID);
             aiEntityData.setAtlasHeadID(atlasHeadID);
@@ -72,11 +74,7 @@ public class AiEntityLoader {
             aiEntityData.setWalkSpeed((float) walkSpeed);
             aiEntityData.setProbabilityStill((float) probabilityStill);
             aiEntityData.setProbabilityWalkStart((float) probabilityWalkStart);
-            if (shopID == null) {
-                aiEntityData.setShopID(-1);
-            } else {
-                aiEntityData.setShopID(shopID);
-            }
+            aiEntityData.setShopID(shopID == null ? -1 : shopID);
 
             // Loading Finished & Creation Finished! Save me!
             aiEntityDataList.add(aiEntityData);
@@ -86,6 +84,7 @@ public class AiEntityLoader {
             println(getClass(), "Name: " + aiEntityData.getName(), false, PRINT_DEBUG);
             println(getClass(), "Type: " + aiEntityData.getEntityType(), false, PRINT_DEBUG);
             println(getClass(), "Alignment: " + aiEntityData.getEntityAlignment(), false, PRINT_DEBUG);
+            println(getClass(), "Faction: " + aiEntityData, false, PRINT_DEBUG);
             println(getClass(), "ColorID: " + aiEntityData.getColorID(), false, PRINT_DEBUG);
             println(getClass(), "AtlasBodyID: " + aiEntityData.getAtlasBodyID(), false, PRINT_DEBUG);
             println(getClass(), "AtlasHeadID: " + aiEntityData.getAtlasHeadID(), false, PRINT_DEBUG);

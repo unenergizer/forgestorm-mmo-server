@@ -9,7 +9,7 @@ import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
-import com.valenguard.server.game.rpg.EntityAlignment;
+import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.network.PlayerSessionData;
 import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
@@ -116,7 +116,7 @@ public class GameManager {
         new InitClientSessionPacketOut(player, true, playerSessionData.getServerID()).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
-        
+
         gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         // Give test items
@@ -167,7 +167,14 @@ public class GameManager {
 
         player.setAttributes(baseAttributes);
 
-        player.setEntityAlignment(EntityAlignment.FRIENDLY);
+        player.setFaction(ValenguardMain.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
+
+        // TODO: Setup faction rep here
+        short setThisFactionRep = -3000;
+        Reputation reputation = player.getReputation();
+        for (int i = 0; i < reputation.getReputationData().length; i++) {
+            reputation.getReputationData()[i] = setThisFactionRep;
+        }
 
         player.getSkills().MINING.addExperience(50); // Initializes the packetReceiver with 50 mining experience.
         player.getSkills().MELEE.addExperience(170);
