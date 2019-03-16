@@ -29,7 +29,7 @@ public class CombatTickUpdates {
         if (numberOfTicksPassed % 60 == 0) {
 
             // Now do combat
-            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+            for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                 if (aiEntity.getTargetEntity() == null) continue;
 
                 MovingEntity targetEntity = aiEntity.getTargetEntity();
@@ -103,7 +103,7 @@ public class CombatTickUpdates {
     private void finishCombat(GameMap gameMap, MovingEntity killerEntity, MovingEntity deadEntity) {
 
         // Remove the deadEntity from all entities target!
-        gameMap.releaseEntityTargets(deadEntity);
+        gameMap.getAiEntityController().releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
         killerEntity.setTargetEntity(null);
 
@@ -145,7 +145,7 @@ public class CombatTickUpdates {
              * A NON PLAYER DEATH -------------------------------------------------
              */
             AiEntity aiEntity = (AiEntity) deadEntity;
-            gameMap.queueAiEntityDespawn(aiEntity); // A mob died, despawn them!
+            gameMap.getAiEntityController().queueEntityDespawn(aiEntity); // A mob died, despawn them!
 
             // If a AI entity kills and AI entity, do not drop ItemStack
             if (!(killerEntity instanceof Player)) return;
@@ -169,7 +169,7 @@ public class CombatTickUpdates {
 
                 gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
 
-                gameMap.queueItemStackDropSpawn(itemStackDrop);
+                gameMap.getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
             }
         }
     }

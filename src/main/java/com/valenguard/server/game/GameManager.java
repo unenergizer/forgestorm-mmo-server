@@ -64,11 +64,11 @@ public class GameManager {
     private void spawnEntities() {
         AiEntity aiEntity;
         while ((aiEntity = aiEntitiesToSpawn.poll()) != null) {
-            aiEntity.getGameMap().queueAiEntitySpawn(aiEntity);
+            aiEntity.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
         }
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntities.poll()) != null) {
-            stationaryEntity.getGameMap().queueStationarySpawn(stationaryEntity);
+            stationaryEntity.getGameMap().getStationaryEntityController().queueEntitySpawn(stationaryEntity);
         }
     }
 
@@ -217,9 +217,9 @@ public class GameManager {
 
     public void gameMapTick(long numberOfTicksPassed) {
         spawnEntities();
-        gameMaps.values().forEach(GameMap::tickStationaryEntities);
-        gameMaps.values().forEach(GameMap::tickAiEntity);
-        gameMaps.values().forEach(GameMap::tickItemStackDrop);
+        gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
+        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().tick());
+        gameMaps.values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
         gameMaps.values().forEach(GameMap::tickPlayer);
         gameMaps.values().forEach(GameMap::sendPlayersPacket);
         gameMaps.values().forEach(gameMap -> gameMap.tickPlayerShuffle(numberOfTicksPassed));
@@ -278,7 +278,7 @@ public class GameManager {
     }
 
     public void forAllAiEntitiesFiltered(Consumer<Entity> callback, Predicate<AiEntity> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityMap().values().stream().filter(predicate).forEach(callback));
+        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
     }
 
     public Player findPlayer(short playerId) {

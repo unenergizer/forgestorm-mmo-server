@@ -44,13 +44,14 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            if (!packetData.getPlayer().getGameMap().getAiEntityMap().containsKey(packetData.entityId)) return false;
+            if (!packetData.getPlayer().getGameMap().getAiEntityController().containsKey(packetData.entityId))
+                return false;
         }
 
         println(getClass(), "1");
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            AiEntity aiEntity = packetData.getPlayer().getGameMap().getAiEntityMap().get(packetData.entityId);
+            AiEntity aiEntity = (AiEntity) packetData.getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityId);
             if (aiEntity.getShopId() == -1) return false;
         }
 
@@ -72,7 +73,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
             println(getClass(), "Started Shopping!");
-            player.setCurrentShoppingEntity(player.getGameMap().getAiEntityMap().get(packetData.entityId));
+            player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
             ValenguardMain.getInstance().getEntityShopManager()
                     .buyItem(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);

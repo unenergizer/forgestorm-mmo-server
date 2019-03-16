@@ -55,26 +55,26 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     }
 
     private void aiEntityClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getAiEntityMap().containsKey(packetData.getEntityUUID())) return;
+        if (!gameMap.getAiEntityController().containsKey(packetData.getEntityUUID())) return;
 
-        AiEntity aiEntity = gameMap.getAiEntityMap().get(packetData.getEntityUUID());
+        AiEntity aiEntity = (AiEntity) gameMap.getAiEntityController().getEntity(packetData.getEntityUUID());
 
         player.setTargetEntity(aiEntity);
         aiEntity.setTargetEntity(player);
     }
 
     private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getStationaryEntityMap().containsKey(packetData.getEntityUUID())) return;
-        StationaryEntity clickedOnEntity = gameMap.getStationaryEntityMap().get(packetData.getEntityUUID());
+        if (!gameMap.getStationaryEntityController().containsKey(packetData.getEntityUUID())) return;
+        StationaryEntity clickedOnEntity = (StationaryEntity) gameMap.getStationaryEntityController().getEntity(packetData.getEntityUUID());
         changeEntityAppearance(clickedOnEntity, gameMap);
     }
 
     private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getItemStackDropMap().containsKey(packetData.getEntityUUID())) return;
+        if (!gameMap.getItemStackDropEntityController().containsKey(packetData.getEntityUUID())) return;
 
         // Click received, lets pick up the item!
         println(getClass(), "Incoming ItemStack click!");
-        ItemStackDrop itemStackDrop = gameMap.getItemStackDropMap().get(packetData.getEntityUUID());
+        ItemStackDrop itemStackDrop = (ItemStackDrop) gameMap.getItemStackDropEntityController().getEntity(packetData.getEntityUUID());
         ItemStack itemStack = itemStackDrop.getItemStack();
 
         if (itemStackDrop.isPickedUp()) return;
@@ -91,7 +91,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         }
 
         // Despawn the item
-        gameMap.queueItemStackDropDespawn(itemStackDrop);
+        gameMap.getItemStackDropEntityController().queueEntityDespawn(itemStackDrop);
 
         // Don't let others pick the item up.
         itemStackDrop.setPickedUp(true);

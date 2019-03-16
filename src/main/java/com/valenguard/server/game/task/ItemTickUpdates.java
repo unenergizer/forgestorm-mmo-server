@@ -26,7 +26,7 @@ public class ItemTickUpdates {
                 itemTimerIterator.remove();
             } else {
                 if (groundItemTimer.timePassed > TIME_TO_DESPAWN) {
-                    groundItemTimer.itemStackDrop.getGameMap().queueItemStackDropDespawn(groundItemTimer.itemStackDrop);
+                    groundItemTimer.itemStackDrop.getGameMap().getItemStackDropEntityController().queueEntityDespawn(groundItemTimer.itemStackDrop);
                     itemTimerIterator.remove();
                 }
 

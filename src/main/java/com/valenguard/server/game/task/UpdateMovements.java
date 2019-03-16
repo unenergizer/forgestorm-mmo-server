@@ -124,7 +124,7 @@ public class UpdateMovements {
              */
 
             // AiEntity find Player targets
-            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+            for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                 findEntityTarget(aiEntity, movingEntity);
             }
         } else if (movingEntity instanceof AiEntity) {
@@ -134,7 +134,7 @@ public class UpdateMovements {
             AiEntity aiEntityFindTarget = (AiEntity) movingEntity;
 
             // AiEntity find AiEntity targets
-            for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+            for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                 if (movingEntity.equals(aiEntity)) continue;
                 findEntityTarget(aiEntityFindTarget, aiEntity);
             }
@@ -215,7 +215,6 @@ public class UpdateMovements {
                 attackerEntity.setTargetEntity(null);
             }
         }
-
     }
 
     private void findTrackingPath(AiEntity aiEntity, MovingEntity targetEntity) {

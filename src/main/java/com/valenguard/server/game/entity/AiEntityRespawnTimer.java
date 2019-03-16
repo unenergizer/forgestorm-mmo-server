@@ -41,7 +41,7 @@ public class AiEntityRespawnTimer {
                     aiEntity.setCurrentHealth(aiEntity.getMaxHealth());
 
                     // Finally, do the respawn!
-                    aiEntity.getCurrentMapLocation().getGameMap().queueAiEntitySpawn(aiEntity);
+                    aiEntity.getCurrentMapLocation().getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
 
                     iterator.remove();
                     println(getClass(), "Respawning Entity: " + aiEntity.getName() + " " + aiEntity.getServerEntityId(), false, PRINT_DEBUG);

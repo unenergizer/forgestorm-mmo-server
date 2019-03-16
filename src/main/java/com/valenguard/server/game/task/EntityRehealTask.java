@@ -33,7 +33,7 @@ public class EntityRehealTask {
                 }
 
                 // Reheal Entities
-                for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
+                for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                     if (aiEntity.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
                     if (aiEntity.getCurrentHealth() < aiEntity.getMaxHealth()) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() + REHEAL_AMOUNT);

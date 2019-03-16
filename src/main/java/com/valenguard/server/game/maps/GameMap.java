@@ -1,9 +1,10 @@
 package com.valenguard.server.game.maps;
 
-import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameManager;
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.task.UpdateMovements;
+import com.valenguard.server.game.entity.Entity;
+import com.valenguard.server.game.entity.EntityType;
+import com.valenguard.server.game.entity.ItemStackDrop;
+import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
 import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
 import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
@@ -33,19 +34,11 @@ public class GameMap {
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
     @Getter
-    private final Map<Short, AiEntity> aiEntityMap = new HashMap<>();
-    private final Queue<AiEntity> aiEntitySpawnQueue = new LinkedList<>();
-    private final Queue<AiEntity> aiEntityDespawnQueue = new LinkedList<>();
-
+    private final AiEntityController aiEntityController = new AiEntityController(this);
     @Getter
-    private final Map<Short, StationaryEntity> stationaryEntityMap = new HashMap<>();
-    private final Queue<StationaryEntity> stationaryEntitiesSpawnQueue = new LinkedList<>();
-    private final Queue<StationaryEntity> stationaryEntitiesDespawnQueue = new LinkedList<>();
-
+    private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
     @Getter
-    private final Map<Short, ItemStackDrop> itemStackDropMap = new HashMap<>();
-    private final Queue<ItemStackDrop> itemStackDropSpawnQueue = new LinkedList<>();
-    private final Queue<ItemStackDrop> itemStackDropDespawnQueue = new LinkedList<>();
+    private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
 
     // TODO: generate the id from a pool of free ids
     @Getter
@@ -58,99 +51,6 @@ public class GameMap {
         this.mapHeight = mapHeight;
         this.map = map;
     }
-
-    /*
-     * STATIONARY ENTITY ////////////////////////////////////////////////////////////////////////
-     */
-
-    public void queueStationarySpawn(StationaryEntity stationaryEntity) {
-        stationaryEntitiesSpawnQueue.add(stationaryEntity);
-    }
-
-    public void tickStationaryEntities() {
-        stationaryEntitiesSpawnQueue.forEach(stationaryEntity -> stationaryEntityMap.put(stationaryEntity.getServerEntityId(), stationaryEntity));
-        stationaryEntitiesDespawnQueue.forEach(stationaryEntity -> stationaryEntityMap.remove(stationaryEntity.getServerEntityId()));
-
-        StationaryEntity stationaryEntity;
-        while ((stationaryEntity = stationaryEntitiesSpawnQueue.poll()) != null) {
-            postEntitySpawn(stationaryEntity);
-        }
-
-        while ((stationaryEntity = stationaryEntitiesDespawnQueue.poll()) != null) {
-            postEntityDespawn(stationaryEntity);
-        }
-    }
-
-    /*
-     * NPC ////////////////////////////////////////////////////////////////////////
-     */
-
-    public void queueAiEntitySpawn(AiEntity aiEntity) {
-        aiEntitySpawnQueue.add(aiEntity);
-    }
-
-    public void queueAiEntityDespawn(AiEntity aiEntity) {
-        aiEntityDespawnQueue.add(aiEntity);
-    }
-
-    private void aiEntitySpawnRegistration(AiEntity aiEntity) {
-        aiEntityMap.put(aiEntity.getServerEntityId(), aiEntity);
-    }
-
-    private void aiEntityDespawnRegistration(AiEntity aiEntity) {
-        aiEntityMap.remove(aiEntity.getServerEntityId());
-
-        // Toggle respawns
-        ValenguardMain.getInstance().getAiEntityRespawnTimer().addAiEntity(aiEntity);
-    }
-
-    public void tickAiEntity() {
-        aiEntitySpawnQueue.forEach(this::aiEntitySpawnRegistration);
-        aiEntityDespawnQueue.forEach(this::aiEntityDespawnRegistration);
-
-        AiEntity aiEntity;
-        while ((aiEntity = aiEntitySpawnQueue.poll()) != null) {
-            postEntitySpawn(aiEntity);
-            // Find AiEntity a combat target
-            UpdateMovements updateMovements = ValenguardMain.getInstance().getGameLoop().getUpdateMovements();
-            updateMovements.initEntityTargeting(aiEntity);
-        }
-
-        while ((aiEntity = aiEntityDespawnQueue.poll()) != null) {
-            postEntityDespawn(aiEntity);
-        }
-    }
-
-    /*
-     * ItemStackDrop //////////////////////////////////////////////////////////////////////////
-     */
-
-    public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
-        itemStackDropSpawnQueue.add(itemStackDrop);
-    }
-
-    public void queueItemStackDropDespawn(ItemStackDrop itemStackDrop) {
-        itemStackDropDespawnQueue.add(itemStackDrop);
-    }
-
-    public void tickItemStackDrop() {
-        itemStackDropSpawnQueue.forEach(itemStackDrop -> itemStackDropMap.put(itemStackDrop.getServerEntityId(), itemStackDrop));
-        itemStackDropDespawnQueue.forEach(itemStackDrop -> itemStackDropMap.remove(itemStackDrop.getServerEntityId()));
-
-        ItemStackDrop itemStackDrop;
-        while ((itemStackDrop = itemStackDropSpawnQueue.poll()) != null) {
-            ValenguardMain.getInstance().getGameLoop().getItemTickUpdates().addItemToGround(itemStackDrop);
-            new EntitySpawnPacketOut(itemStackDrop.getKiller(), itemStackDrop).sendPacket();
-        }
-
-        while ((itemStackDrop = itemStackDropDespawnQueue.poll()) != null) {
-            postEntityDespawn(itemStackDrop);
-        }
-    }
-
-    /*
-     * Player ////////////////////////////////////////////////////////////////////////////////
-     */
 
     public void tickPlayer() {
         // Remove players
@@ -170,14 +70,6 @@ public class GameMap {
         }
     }
 
-    public void releaseEntityTargets(MovingEntity targetToRemove) {
-        for (AiEntity aiEntity : aiEntityMap.values()) {
-            if (aiEntity.getTargetEntity() != null && aiEntity.getTargetEntity().equals(targetToRemove)) {
-                aiEntity.setTargetEntity(null);
-            }
-        }
-    }
-
     public void tickPlayerShuffle(long numberOfTicksPassed) {
         if (numberOfTicksPassed % 40 == 0) {
             Collections.shuffle(playerList);
@@ -188,28 +80,28 @@ public class GameMap {
 
         for (int quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
             if (playerQuitQueue.isEmpty()) break;
-            postEntityDespawn(playerQuitQueue.remove());
+            postPlayerDespawn(playerQuitQueue.remove());
         }
 
         for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
             // Tell everyone already online about the packetReceiver and the packetReceiver about everyone online.
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
-            postEntitySpawn(playerWhoJoined);
+            postPlayerSpawn(playerWhoJoined);
             // Tell the packetReceiver about all the mobs currently on the map.
-            aiEntityMap.values().forEach(mob -> postEntitySpawn(playerWhoJoined, mob));
-            stationaryEntityMap.values().forEach(stationaryEntity -> postEntitySpawn(playerWhoJoined, stationaryEntity));
+            aiEntityController.getEntities().forEach(mob -> postPlayerSpawn(playerWhoJoined, mob));
+            stationaryEntityController.getEntities().forEach(stationaryEntity -> postPlayerSpawn(playerWhoJoined, stationaryEntity));
 
             // Spawn itemStack drops!
-            for (ItemStackDrop itemStackDrop : itemStackDropMap.values()) {
+            for (ItemStackDrop itemStackDrop : itemStackDropEntityController.getEntities()) {
                 if (playerWhoJoined == itemStackDrop.getKiller()) {
                     // Edge case where the packetReceiver killed something, disconnected and reconnected.
                     // TODO: When packetReceiver logs out, send them their dropped items...
                     // TODO: right now because real UUID's aren't set, this will never be true!
-                    postEntitySpawn(playerWhoJoined, itemStackDrop);
+                    postPlayerSpawn(playerWhoJoined, itemStackDrop);
                 } else if (itemStackDrop.isSpawnedForAll()) {
                     // Spawn items for joined players, only if the item has been spawned for all players.
-                    postEntitySpawn(playerWhoJoined, itemStackDrop);
+                    postPlayerSpawn(playerWhoJoined, itemStackDrop);
                 }
             }
         }
@@ -233,12 +125,12 @@ public class GameMap {
 
     private void playerQuitGameMap(Player player) {
         player.setTargetEntity(null);
-        releaseEntityTargets(player);
+        getAiEntityController().releaseEntityTargets(player);
         playerList.remove(player);
         player.gameMapDeregister();
     }
 
-    private void postEntitySpawn(Entity entityToSpawn) {
+    private void postPlayerSpawn(Entity entityToSpawn) {
         for (Player packetReceiver : playerList) {
 
             // Send all online players, the entity that just spawned.
@@ -254,11 +146,11 @@ public class GameMap {
         }
     }
 
-    private void postEntitySpawn(Player receiver, Entity entityToSpawn) {
+    private void postPlayerSpawn(Player receiver, Entity entityToSpawn) {
         new EntitySpawnPacketOut(receiver, entityToSpawn).sendPacket();
     }
 
-    private void postEntityDespawn(Entity entityToDespawn) {
+    private void postPlayerDespawn(Entity entityToDespawn) {
         for (Player packetReceiver : playerList) {
             if (packetReceiver == entityToDespawn) continue;
             new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
