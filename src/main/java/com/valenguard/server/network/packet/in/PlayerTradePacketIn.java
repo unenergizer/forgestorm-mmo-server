@@ -63,7 +63,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
 
             // Stage 1: Init trade
             case TRADE_REQUEST_INIT_TARGET:
-                tradeManager.requestTradeInitialized(packetData.getPlayer(), packetData.getPlayer().getGameMap().findPlayer(packetData.entityUUID));
+                tradeManager.requestTradeInitialized(packetData.getPlayer(), packetData.getPlayer().getGameMap().getPlayerController().findPlayer(packetData.entityUUID));
                 break;
 
             // Stage 2: Wait for TargetPlayer response or time out

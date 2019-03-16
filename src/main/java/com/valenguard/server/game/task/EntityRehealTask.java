@@ -22,12 +22,12 @@ public class EntityRehealTask {
 
             for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
                 // Reheal players
-                for (Player player : gameMap.getPlayerList()) {
+                for (Player player : gameMap.getPlayerController().getPlayerList()) {
                     if (player.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
                     if (player.getCurrentHealth() < player.getMaxHealth()) {
                         println(getClass(), "Rehealing player: " + player.getName(), false, DEBUG_PRINT);
                         player.setCurrentHealth(player.getCurrentHealth() + REHEAL_AMOUNT);
-                        gameMap.forAllPlayers(anyPlayer ->
+                        gameMap.getPlayerController().forAllPlayers(anyPlayer ->
                                 new EntityHealPacketOut(anyPlayer, player, REHEAL_AMOUNT).sendPacket());
                     }
                 }
@@ -37,7 +37,7 @@ public class EntityRehealTask {
                     if (aiEntity.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
                     if (aiEntity.getCurrentHealth() < aiEntity.getMaxHealth()) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() + REHEAL_AMOUNT);
-                        gameMap.forAllPlayers(anyPlayer ->
+                        gameMap.getPlayerController().forAllPlayers(anyPlayer ->
                                 new EntityHealPacketOut(anyPlayer, aiEntity, REHEAL_AMOUNT).sendPacket());
                     }
                 }

@@ -8,7 +8,7 @@ import com.valenguard.server.network.packet.out.PingPacketOut;
 public class PingManager {
     public void tick() {
         for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
-            for (Player player : gameMap.getPlayerList()) new PingPacketOut(player).sendPacket();
+            for (Player player : gameMap.getPlayerController().getPlayerList()) new PingPacketOut(player).sendPacket();
         }
     }
 }

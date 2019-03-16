@@ -34,7 +34,7 @@ public class PlayerCommands {
             println(getClass(), "Healed packetReceiver " + player.getName());
         }
 
-        player.getGameMap().forAllPlayers(anyPlayer ->
+        player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
                 new EntityHealPacketOut(anyPlayer, player, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
         player.setCurrentHealth(player.getMaxHealth());
     }

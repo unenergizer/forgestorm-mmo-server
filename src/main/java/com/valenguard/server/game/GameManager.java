@@ -117,7 +117,7 @@ public class GameManager {
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 
-        gameMap.addPlayer(player, new Warp(location, MoveDirection.SOUTH));
+        gameMap.getPlayerController().addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         // Give test items
         ItemStack starterGold = ValenguardMain.getInstance().getItemStackManager().makeItemStack(0, 100);
@@ -130,7 +130,7 @@ public class GameManager {
         if (tempColor > 15) tempColor = 0;
 
         for (GameMap mapSearch : gameMaps.values()) {
-            for (Player playerSearch : mapSearch.getPlayerList()) {
+            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has joined the server.").sendPacket();
             }
@@ -170,7 +170,7 @@ public class GameManager {
         player.setFaction(ValenguardMain.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
 
         // TODO: Setup faction rep here
-        short setThisFactionRep = -3000;
+        short setThisFactionRep = 3000;
         Reputation reputation = player.getReputation();
         for (int i = 0; i < reputation.getReputationData().length; i++) {
             reputation.getReputationData()[i] = setThisFactionRep;
@@ -189,14 +189,14 @@ public class GameManager {
 
     private void playerQuitServer(Player player) {
         for (GameMap mapSearch : gameMaps.values()) {
-            for (Player playerSearch : mapSearch.getPlayerList()) {
+            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
             }
         }
         // TODO: Save packetReceiver specific data
         GameMap gameMap = player.getGameMap();
-        gameMap.removePlayer(player);
+        gameMap.getPlayerController().removePlayer(player);
         ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
         ValenguardMain.getInstance().getOutStreamManager().removeClient(player.getClientHandler());
 
@@ -210,8 +210,8 @@ public class GameManager {
         checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
                 "The packetReceiver is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 
-        gameMaps.get(currentMapName).removePlayer(player);
-        gameMaps.get(warp.getLocation().getMapName()).addPlayer(player, warp);
+        gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
+        gameMaps.get(warp.getLocation().getMapName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
     }
 
@@ -220,14 +220,15 @@ public class GameManager {
         gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
         gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().tick());
         gameMaps.values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
-        gameMaps.values().forEach(GameMap::tickPlayer);
-        gameMaps.values().forEach(GameMap::sendPlayersPacket);
-        gameMaps.values().forEach(gameMap -> gameMap.tickPlayerShuffle(numberOfTicksPassed));
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().tickPlayer());
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().sendPlayersPacket());
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(numberOfTicksPassed));
     }
 
     private int getTotalPlayersOnline() {
         int onlinePlayers = 0;
-        for (GameMap gameMap : gameMaps.values()) onlinePlayers = onlinePlayers + gameMap.getPlayerCount();
+        for (GameMap gameMap : gameMaps.values())
+            onlinePlayers = onlinePlayers + gameMap.getPlayerController().getPlayerCount();
         return onlinePlayers;
     }
 
@@ -263,18 +264,18 @@ public class GameManager {
     }
 
     public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
-        player.getGameMap().getPlayerList().forEach(playerOnMap -> {
+        player.getGameMap().getPlayerController().getPlayerList().forEach(playerOnMap -> {
             if (player.equals(playerOnMap)) return;
             callback.accept(playerOnMap.getClientHandler());
         });
     }
 
     public void forAllPlayers(Consumer<Player> callback) {
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().forEach(callback));
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
     }
 
     public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerList().stream().filter(predicate).forEach(callback));
+        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
     public void forAllAiEntitiesFiltered(Consumer<Entity> callback, Predicate<AiEntity> predicate) {
@@ -283,7 +284,7 @@ public class GameManager {
 
     public Player findPlayer(short playerId) {
         for (GameMap gameMap : gameMaps.values()) {
-            for (Player player : gameMap.getPlayerList()) {
+            for (Player player : gameMap.getPlayerController().getPlayerList()) {
                 if (player.getServerEntityId() == playerId) {
                     return player;
                 }

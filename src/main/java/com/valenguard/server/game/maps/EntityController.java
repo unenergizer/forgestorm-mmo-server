@@ -12,12 +12,12 @@ import java.util.*;
 
 public abstract class EntityController<T extends Entity> {
 
+    private final GameMap gameMap;
+
     @Getter
     protected final Map<Short, T> entityHashMap = new HashMap<>();
     final Queue<T> entitySpawnQueue = new LinkedList<>();
     final Queue<T> entityDespawnQueue = new LinkedList<>();
-
-    private final GameMap gameMap;
 
     EntityController(GameMap gameMap) {
         this.gameMap = gameMap;
@@ -57,7 +57,7 @@ public abstract class EntityController<T extends Entity> {
     }
 
     void entitySpawn(Entity entityToSpawn) {
-        for (Player packetReceiver : gameMap.getPlayerList()) {
+        for (Player packetReceiver : gameMap.getPlayerController().getPlayerList()) {
 
             // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
@@ -73,7 +73,7 @@ public abstract class EntityController<T extends Entity> {
     }
 
     void entityDespawn(Entity entityToDespawn) {
-        for (Player packetReceiver : gameMap.getPlayerList()) {
+        for (Player packetReceiver : gameMap.getPlayerController().getPlayerList()) {
             if (packetReceiver == entityToDespawn) continue;
             new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
         }

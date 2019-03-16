@@ -92,7 +92,7 @@ public class CombatTickUpdates {
             new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
         }
 
-        gameMap.forAllPlayers(player -> {
+        gameMap.getPlayerController().forAllPlayers(player -> {
             if (aiTookDamage) {
                 new EntityDamagePacketOut(player, attackerEntity, attackerEntity.getCurrentHealth(), targetEntityAttributes.getDamage()).sendPacket();
             }
@@ -129,10 +129,10 @@ public class CombatTickUpdates {
                 deadPlayer.gameMapRegister(new Warp(teleportLocation, facingDirection));
 
                 // Send all players in map the teleport packet
-                gameMap.forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
+                gameMap.getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
 
                 // Send other players info about the reheal (if they are still on the same map)
-                gameMap.forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
+                gameMap.getPlayerController().forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
             }
 
             // Reheal Player

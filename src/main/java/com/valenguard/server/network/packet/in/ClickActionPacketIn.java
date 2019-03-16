@@ -122,7 +122,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
         entity.setAppearance(new Appearance((byte) 0, new short[]{appearanceID}));
 
-        gameMap.forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
+        gameMap.getPlayerController().forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
 
     }
 

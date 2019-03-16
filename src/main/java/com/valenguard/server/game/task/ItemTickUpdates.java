@@ -31,7 +31,7 @@ public class ItemTickUpdates {
                 }
 
                 if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed > TIME_TO_SPAWN_TO_ALL) {
-                    for (Player player : groundItemTimer.itemStackDrop.getGameMap().getPlayerList()) {
+                    for (Player player : groundItemTimer.itemStackDrop.getGameMap().getPlayerController().getPlayerList()) {
                         if (player.equals(groundItemTimer.itemStackDrop.getKiller())) continue;
                         new EntitySpawnPacketOut(player, groundItemTimer.itemStackDrop).sendPacket();
                     }

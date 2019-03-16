@@ -140,7 +140,7 @@ public class UpdateMovements {
             }
 
             // AiEntity find Player targets
-            for (Player player : gameMap.getPlayerList()) {
+            for (Player player : gameMap.getPlayerController().getPlayerList()) {
                 findEntityTarget(aiEntityFindTarget, player);
             }
         }
@@ -371,7 +371,7 @@ public class UpdateMovements {
         println(getClass(), "CurrentLocation: " + aiEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
         println(getClass(), "FutureLocation: " + aiEntity.getFutureMapLocation(), false, PRINT_DEBUG);
 
-        aiEntity.getGameMap().getPlayerList().forEach(player ->
+        aiEntity.getGameMap().getPlayerController().getPlayerList().forEach(player ->
                 new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureMapLocation()).sendPacket());
     }
 }
