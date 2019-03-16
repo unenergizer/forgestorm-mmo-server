@@ -3,6 +3,7 @@ package com.valenguard.server.game.maps;
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
 import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
 import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
@@ -110,6 +111,9 @@ public class GameMap {
         AiEntity aiEntity;
         while ((aiEntity = aiEntitySpawnQueue.poll()) != null) {
             postEntitySpawn(aiEntity);
+            // Find AiEntity a combat target
+            UpdateMovements updateMovements = ValenguardMain.getInstance().getGameLoop().getUpdateMovements();
+            updateMovements.initEntityTargeting(aiEntity);
         }
 
         while ((aiEntity = aiEntityDespawnQueue.poll()) != null) {

@@ -19,7 +19,7 @@ public class Reputation {
 
         reputationData[faction] = (short) Math.min(reputationData[faction] + amount, 7500);
 
-        byte[] enemyTypes = ValenguardMain.getInstance().getFactionManager().getFactionEnimies(faction);
+        byte[] enemyTypes = ValenguardMain.getInstance().getFactionManager().getFactionEnemies(faction);
         for (byte index = 0; index < reputationData.length; index++) {
             if (index == faction) continue;
             for (byte enemyType : enemyTypes) {

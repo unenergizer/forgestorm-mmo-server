@@ -28,7 +28,7 @@ public class FactionManager {
         return null;
     }
 
-    public byte[] getFactionEnimies(byte b) {
+    public byte[] getFactionEnemies(byte b) {
         return factionDataMap.get(b).getEnemyFactions();
     }
 

@@ -115,7 +115,7 @@ public class UpdateMovements {
         initEntityTargeting(movingEntity);
     }
 
-    private void initEntityTargeting(MovingEntity movingEntity) {
+    public void initEntityTargeting(MovingEntity movingEntity) {
         GameMap gameMap = movingEntity.getGameMap();
 
         if (movingEntity instanceof Player) {
@@ -136,7 +136,6 @@ public class UpdateMovements {
             // AiEntity find AiEntity targets
             for (AiEntity aiEntity : gameMap.getAiEntityMap().values()) {
                 if (movingEntity.equals(aiEntity)) continue;
-                if (movingEntity.getEntityType() == aiEntity.getEntityType()) continue;
                 findEntityTarget(aiEntityFindTarget, aiEntity);
             }
 
@@ -160,24 +159,45 @@ public class UpdateMovements {
                 // If the attacker is hostile, then we assign the target.
                 if (attackerEntity.getEntityType() == EntityType.MONSTER) {
                     if (((Monster) attackerEntity).getAlignment() == EntityAlignment.HOSTILE) {
+                        if (attackerEntity.getEntityType() == targetEntity.getEntityType()) return;
                         attackerEntity.setTargetEntity(targetEntity);
                         findTrackingPath(attackerEntity, targetEntity);
                     }
                 } else if (attackerEntity.getEntityType() == EntityType.NPC) {
+                    byte attackerFaction = ((NPC) attackerEntity).getFaction();
 
-                    // Test to see if the target is a player
+                    /*
+                     * NPC vs PLAYER
+                     */
                     if (targetEntity.getEntityType() == EntityType.PLAYER) {
 
                         Player player = (Player) targetEntity;
-                        NPC npc = (NPC) attackerEntity;
-                        EntityAlignment attackerAlignment = player.getReputation().getAlignment(npc.getFaction());
+                        EntityAlignment attackerAlignment = player.getReputation().getAlignment(attackerFaction);
 
                         if (attackerAlignment == EntityAlignment.HOSTILE) {
                             attackerEntity.setTargetEntity(targetEntity);
                             findTrackingPath(attackerEntity, targetEntity);
                         }
-                    } else {
-                        // The target is a Monster, do regular attack.
+                    } else if (targetEntity.getEntityType() == EntityType.NPC) {
+                        /*
+                         * NPC vs NPC
+                         */
+
+                        byte[] factionEnemies = ValenguardMain.getInstance().getFactionManager().getFactionEnemies(attackerFaction);
+                        byte targetEntityFaction = ((NPC) targetEntity).getFaction();
+
+                        for (byte enemy : factionEnemies) {
+                            if (enemy == targetEntityFaction) {
+                                attackerEntity.setTargetEntity(targetEntity);
+                                findTrackingPath(attackerEntity, targetEntity);
+                                break;
+                            }
+                        }
+                    } else if (targetEntity.getEntityType() == EntityType.MONSTER) {
+                        /*
+                         * NPC vs MONSTER
+                         */
+
                         if (((Monster) targetEntity).getAlignment() == EntityAlignment.HOSTILE) {
                             attackerEntity.setTargetEntity(targetEntity);
                             findTrackingPath(attackerEntity, targetEntity);
@@ -195,6 +215,7 @@ public class UpdateMovements {
                 attackerEntity.setTargetEntity(null);
             }
         }
+
     }
 
     private void findTrackingPath(AiEntity aiEntity, MovingEntity targetEntity) {
@@ -231,7 +252,7 @@ public class UpdateMovements {
                 if (gameMap.isMovable(southLocation))
                     performAiEntityMove(aiEntity, MoveDirection.SOUTH);
             }
-        } else {
+        } else if (targetLocation.getX() == currentLocation.getX() && targetLocation.getY() == currentLocation.getY()) {
             // on top of each other
             if (gameMap.isMovable(northLocation)) {
                 performAiEntityMove(aiEntity, MoveDirection.NORTH);
@@ -341,6 +362,7 @@ public class UpdateMovements {
 
     private void performAiEntityMove(AiEntity aiEntity, MoveDirection moveDirection) {
         Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
+
 
         Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
         aiEntity.setFutureMapLocation(futureLocation);
