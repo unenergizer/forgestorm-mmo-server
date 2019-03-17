@@ -103,7 +103,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 goldItemStack.setAmount(goldItemStack.getAmount() + itemStack.getAmount());
 
                 // Removing their previous gold stack.
-                player.removeItemStack(itemStackSlotData.getBagIndex());
+                player.removeItemStackFromBag(itemStackSlotData.getBagIndex());
 
                 player.setItemStack(itemStackSlotData.getBagIndex(), goldItemStack);
             }

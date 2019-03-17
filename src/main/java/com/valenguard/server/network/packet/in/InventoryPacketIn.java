@@ -2,7 +2,12 @@ package com.valenguard.server.network.packet.in;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.entity.Appearance;
+import com.valenguard.server.game.entity.EntityType;
+import com.valenguard.server.game.entity.ItemStackDrop;
 import com.valenguard.server.game.inventory.*;
+import com.valenguard.server.game.maps.GameMap;
+import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.network.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -17,27 +22,35 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         byte fromWindow = -1;
         byte toWindow = -1;
 
+        byte dropInventory = -1;
+        byte slotIndex = -1;
+
         if (inventoryAction == InventoryActions.MOVE) {
             fromPosition = clientHandler.readByte();
             toPosition = clientHandler.readByte();
             byte windowsByte = clientHandler.readByte();
             fromWindow = (byte) (windowsByte >> 4);
             toWindow = (byte) (windowsByte & 0x0F);
+        } else if (inventoryAction == InventoryActions.DROP) {
+            dropInventory = clientHandler.readByte();
+            slotIndex = clientHandler.readByte();
         }
 
-        return new InventoryActionsPacket(inventoryAction, fromPosition, toPosition, fromWindow, toWindow);
+        return new InventoryActionsPacket(inventoryAction, fromPosition, toPosition, fromWindow, toWindow, dropInventory, slotIndex);
     }
 
     @Override
     public boolean sanitizePacket(InventoryActionsPacket packetData) {
-        // Making sure they are sending correct window types.
-        if (packetData.toWindow >= InventoryType.values().length || packetData.fromWindow >= InventoryType.values().length) {
-            return false;
-        }
 
-        // The client is simply picking up and placing down the ItemStack in the same position.
-        if (packetData.fromWindow == packetData.toWindow && packetData.fromPosition == packetData.toPosition) {
-            return false;
+        if (packetData.inventoryAction == InventoryActions.MOVE) {
+            // Making sure they are sending correct window types.
+            if (packetData.toWindow >= InventoryType.values().length || packetData.fromWindow >= InventoryType.values().length) {
+                return false;
+            }
+        } else if (packetData.inventoryAction == InventoryActions.DROP) {
+            if (packetData.dropInventory >= InventoryType.values().length) {
+                return false;
+            }
         }
 
         // TODO this should be cleaner
@@ -49,6 +62,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         if (packetData.inventoryAction == InventoryActions.MOVE) {
             moveItemStack(packetData);
+        } else if (packetData.inventoryAction == InventoryActions.DROP) {
+            dropItemStack(packetData);
         }
 
     }
@@ -64,6 +79,43 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         PlayerMoveInventoryEvents playerMoveInventoryEvents = ValenguardMain.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
         playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementInfo));
 
+    }
+
+    private void dropItemStack(InventoryActionsPacket packetData) {
+
+        InventoryType inventoryType = InventoryType.values()[packetData.dropInventory];
+        if (inventoryType == InventoryType.BAG_1) {
+
+            if (packetData.slotIndex < 0 || packetData.slotIndex >= GameConstants.BAG_SIZE) {
+                return;
+            }
+
+            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getItems()[packetData.slotIndex];
+            packetData.getPlayer().removeItemStackFromBag(packetData.slotIndex);
+
+            GameMap gameMap = packetData.getPlayer().getGameMap();
+
+            ItemStackDrop itemStackDrop = new ItemStackDrop();
+            itemStackDrop.setEntityType(EntityType.ITEM_STACK);
+            itemStackDrop.setName(itemStack.getName());
+            itemStackDrop.setCurrentMapLocation(new Location(packetData.getPlayer().getCurrentMapLocation()));
+            itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
+            itemStackDrop.setItemStack(itemStack);
+            itemStackDrop.setDropOwner(packetData.getPlayer());
+            itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());
+
+            gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
+
+            gameMap.getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
+
+        } else if (inventoryType == InventoryType.EQUIPMENT) {
+
+            if (packetData.slotIndex < 0 || packetData.slotIndex >= GameConstants.EQUIPMENT_SIZE) {
+                return;
+            }
+
+            // TODO: remove this later
+        }
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
@@ -103,5 +155,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         private byte toPosition;
         private byte fromWindow;
         private byte toWindow;
+
+        private byte dropInventory;
+        private byte slotIndex;
     }
 }

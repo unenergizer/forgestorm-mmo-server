@@ -450,7 +450,7 @@ public class TradeManager {
         // Dump items from trade starter bag
         for (Byte slotIndex : itemsToRemove) {
             if (slotIndex != null) {
-                playerToUpdate.removeItemStack(slotIndex);
+                playerToUpdate.removeItemStackFromBag(slotIndex);
             }
         }
 

@@ -171,7 +171,7 @@ public class CombatTickUpdates {
                 itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
                 itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
                 itemStackDrop.setItemStack(itemStack);
-                itemStackDrop.setKiller((Player) killerEntity);
+                itemStackDrop.setDropOwner((Player) killerEntity);
                 itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());
 
                 gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));

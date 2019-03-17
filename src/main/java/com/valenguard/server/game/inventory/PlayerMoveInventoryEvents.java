@@ -71,6 +71,15 @@ public class PlayerMoveInventoryEvents {
             return;
         }
 
+        // 1, 2, 3, 4
+        // ^...
+
+        // Problems
+        // 1. At the moment we don't respond to failed movements
+        // 2. Player moves an item to a new inventory spot then from that new inventory
+        // spot they move the item again before receiving a response <- How do we know the state of the inventory to resolve this?
+
+
         new InventoryPacketOut(player, new InventoryActions(
                 InventoryActions.MOVE,
                 InventoryType.EQUIPMENT,

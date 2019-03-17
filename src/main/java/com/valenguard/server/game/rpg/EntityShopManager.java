@@ -42,7 +42,7 @@ public class EntityShopManager {
         ItemStack newGoldStack = itemStackSlotData.getItemStack();
         newGoldStack.setAmount(newGoldStack.getAmount() - buyPrice);
 
-        player.removeItemStack(itemStackSlotData.getBagIndex());
+        player.removeItemStackFromBag(itemStackSlotData.getBagIndex());
 
         // Only adding the gold stack back if it is greater than zero.
         if (newGoldStack.getAmount() > 0) {

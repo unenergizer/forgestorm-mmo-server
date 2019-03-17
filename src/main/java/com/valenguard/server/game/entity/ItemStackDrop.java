@@ -16,7 +16,7 @@ public class ItemStackDrop extends Entity {
     /**
      * The packetReceiver that is first to see the item drop.
      */
-    private Player killer;
+    private Player dropOwner;
 
     /**
      * Determines if the item was picked up or not.

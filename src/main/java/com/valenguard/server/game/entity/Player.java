@@ -76,7 +76,7 @@ public class Player extends MovingEntity {
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
     }
 
-    public void removeItemStack(byte slotIndex) {
+    public void removeItemStackFromBag(byte slotIndex) {
         playerBag.removeItemStack(slotIndex);
         new InventoryPacketOut(this, new InventoryActions(InventoryActions.REMOVE, slotIndex)).sendPacket();
     }

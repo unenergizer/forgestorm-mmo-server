@@ -22,7 +22,7 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = entitySpawnQueue.poll()) != null) {
             ValenguardMain.getInstance().getGameLoop().getItemTickUpdates().addItemToGround(itemStackDrop);
-            new EntitySpawnPacketOut(itemStackDrop.getKiller(), itemStackDrop).sendPacket();
+            new EntitySpawnPacketOut(itemStackDrop.getDropOwner(), itemStackDrop).sendPacket();
         }
 
         while ((itemStackDrop = entityDespawnQueue.poll()) != null) {
