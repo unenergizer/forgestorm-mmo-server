@@ -24,7 +24,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(teleportedEntity.getServerEntityId());
-        write.writeByte(isClientPlayerType(teleportedEntity).getEntityTypeByte());
+        write.writeByte(getEntityType(teleportedEntity).getEntityTypeByte());
         write.writeString(teleportLocation.getMapName());
         write.writeShort(teleportLocation.getX());
         write.writeShort(teleportLocation.getY());

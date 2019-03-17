@@ -39,7 +39,7 @@ public class Player extends MovingEntity {
 
     private byte faction;
 
-    private Reputation reputation = new Reputation();
+    private Reputation reputation = new Reputation(this);
 
     /**
      * The amount of time that has progressed since the player

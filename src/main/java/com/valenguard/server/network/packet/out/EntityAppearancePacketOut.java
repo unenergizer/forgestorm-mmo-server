@@ -25,7 +25,7 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
     @Override
     protected void createPacket(ValenguardOutputStream write) {
         write.writeShort(entity.getServerEntityId());
-        write.writeByte(isClientPlayerType(entity).getEntityTypeByte());
+        write.writeByte(getEntityType(entity).getEntityTypeByte());
         write.writeByte(appearanceBits);
         Appearance appearance = entity.getAppearance();
         if ((appearanceBits & COLOR_INDEX) != 0) {

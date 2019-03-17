@@ -148,11 +148,18 @@ public class CombatTickUpdates {
             gameMap.getAiEntityController().queueEntityDespawn(aiEntity); // A mob died, despawn them!
 
             // If a AI entity kills and AI entity, do not drop ItemStack
-            if (!(killerEntity instanceof Player)) return;
+            if (killerEntity.getEntityType() != EntityType.PLAYER) return;
+
+            Player killerPlayer = (Player) killerEntity;
 
             // Give experience
-            new ChatMessagePacketOut((Player) killerEntity, "You killed the enemy").sendPacket();
-            new SkillExperiencePacketOut((Player) killerEntity, new ExperiencePacketInfo(SkillOpcodes.MELEE, aiEntity.getExpDrop())).sendPacket();
+            new ChatMessagePacketOut(killerPlayer, "You killed the enemy").sendPacket();
+            new SkillExperiencePacketOut(killerPlayer, new ExperiencePacketInfo(SkillOpcodes.MELEE, aiEntity.getExpDrop())).sendPacket();
+
+            // Adding/Subtracting reputation
+            if (aiEntity.getEntityType() == EntityType.NPC) {
+                killerPlayer.getReputation().addReputation(((NPC) aiEntity).getFaction(), (short) 1000);
+            }
 
             // Give packetReceiver drop table item
             if (aiEntity.getDropTable() != null) {

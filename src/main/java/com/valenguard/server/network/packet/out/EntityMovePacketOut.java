@@ -27,7 +27,7 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
 
         write.writeShort(movingEntity.getServerEntityId());
-        write.writeByte(isClientPlayerType(movingEntity).getEntityTypeByte());
+        write.writeByte(getEntityType(movingEntity).getEntityTypeByte());
         write.writeShort(attemptLocation.getX());
         write.writeShort(attemptLocation.getY());
 

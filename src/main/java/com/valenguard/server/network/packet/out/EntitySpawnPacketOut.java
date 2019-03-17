@@ -29,7 +29,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     }
 
     private void spawnMovingEntity(ValenguardOutputStream write) {
-        write.writeByte(isClientPlayerType(entityToSpawn).getEntityTypeByte());
+        write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
 

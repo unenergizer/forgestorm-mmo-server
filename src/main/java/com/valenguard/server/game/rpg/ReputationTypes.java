@@ -3,6 +3,8 @@ package com.valenguard.server.game.rpg;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import static com.valenguard.server.util.Log.println;
+
 @Getter
 @AllArgsConstructor
 public enum ReputationTypes {
@@ -18,10 +20,14 @@ public enum ReputationTypes {
 
     public static ReputationTypes getReputationType(short reputation) {
         for (ReputationTypes reputationTypes : values()) {
-            if ((reputation > reputationTypes.minRange && reputation < reputationTypes.maxRange) ||
-                    (reputation < reputationTypes.minRange && reputation > reputationTypes.maxRange))
-                return reputationTypes;
+            // Check positive range
+            if (reputation > reputationTypes.minRange && reputation < reputationTypes.maxRange) return reputationTypes;
+            // Check negative range
+            if (reputation < reputationTypes.minRange && reputation > reputationTypes.maxRange) return reputationTypes;
+            // Check for equals
+            if (reputation == reputationTypes.minRange || reputation == reputationTypes.maxRange) return reputationTypes;
         }
+        println(ReputationTypes.class, "Returning null for reputation = " + reputation, true, true);
         return null;
     }
 

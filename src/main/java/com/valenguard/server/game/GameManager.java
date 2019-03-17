@@ -170,7 +170,7 @@ public class GameManager {
         player.setFaction(ValenguardMain.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
 
         // TODO: Setup faction rep here
-        short setThisFactionRep = 3000;
+        short setThisFactionRep = 0;
         Reputation reputation = player.getReputation();
         for (int i = 0; i < reputation.getReputationData().length; i++) {
             reputation.getReputationData()[i] = setThisFactionRep;

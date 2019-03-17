@@ -22,7 +22,7 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
     protected void createPacket(ValenguardOutputStream write) {
         Attributes attributes = movingEntity.getAttributes();
         write.writeShort(movingEntity.getServerEntityId());
-        write.writeByte(isClientPlayerType(movingEntity).getEntityTypeByte());
+        write.writeByte(getEntityType(movingEntity).getEntityTypeByte());
         write.writeInt(attributes.getArmor());
         write.writeInt(attributes.getDamage());
 

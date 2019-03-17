@@ -39,7 +39,7 @@ public abstract class AbstractServerOutPacket {
     /**
      *
      */
-    protected EntityType isClientPlayerType(Entity entity) {
+    EntityType getEntityType(Entity entity) {
         if (packetReceiver.equals(entity)) return EntityType.CLIENT_PLAYER;
         return entity.getEntityType();
     }
