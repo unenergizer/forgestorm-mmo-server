@@ -1,4 +1,4 @@
-package com.valenguard.server.network.shared;
+package com.valenguard.server.game.mysql;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -8,18 +8,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
 
-import static com.valenguard.server.util.Log.println;
+public class DatabaseSettingsLoader {
 
-public class NetworkSettingsLoader {
-
-    private static final boolean PRINT_DEBUG = true;
-
-    public NetworkSettings loadNetworkSettings() {
+    public DatabaseSettings loadNetworkSettings() {
         Yaml yaml = new Yaml();
 
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(new File("src/main/resources/data/Network.yaml"));
+            inputStream = new FileInputStream(new File("src/main/resources/data/Database.yaml"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -27,10 +23,11 @@ public class NetworkSettingsLoader {
         Map<String, Object> root = yaml.load(inputStream);
         String IP = (String) root.get("ip");
         int port = (Integer) root.get("port");
+        String database = (String) root.get("database");
+        String username = (String) root.get("username");
+        String password = (String) root.get("password");
 
-        println(getClass(), IP + ":" + port, false, PRINT_DEBUG);
-
-        return new NetworkSettings(IP, port);
+        return new DatabaseSettings(IP, port, database, username, password);
     }
 
 }

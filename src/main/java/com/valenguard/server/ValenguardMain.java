@@ -11,6 +11,8 @@ import com.valenguard.server.game.entity.AiEntityRespawnTimer;
 import com.valenguard.server.game.inventory.DropTableManager;
 import com.valenguard.server.game.inventory.ItemStackManager;
 import com.valenguard.server.game.inventory.TradeManager;
+import com.valenguard.server.game.mysql.DatabaseConnection;
+import com.valenguard.server.game.mysql.DatabaseSettingsLoader;
 import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.game.rpg.FactionManager;
 import com.valenguard.server.network.PingManager;
@@ -75,6 +77,7 @@ public class ValenguardMain {
 
         // Framework
         registerCommands();
+        initializeDatabase();
         initializeNetwork();
         gameLoop = new GameLoop();
         gameLoop.start();
@@ -83,6 +86,7 @@ public class ValenguardMain {
     public void stop() {
         Log.println(getClass(), "ServerConnection shutdown initialized!");
         ServerConnection.getInstance().close();
+        DatabaseConnection.getInstance().close();
         Log.println(getClass(), "ServerConnection shutdown complete!");
     }
 
@@ -93,6 +97,12 @@ public class ValenguardMain {
         commandProcessor.addListener(new InventoryCommands());
         commandProcessor.addListener(new PlayerCommands());
         new ConsoleCommandManager().start();
+    }
+
+    private void initializeDatabase() {
+        Log.println(getClass(), "Initializing database...");
+        DatabaseSettingsLoader databaseSettingsLoader = new DatabaseSettingsLoader();
+        DatabaseConnection.getInstance().openDatabase(databaseSettingsLoader.loadNetworkSettings());
     }
 
     private void initializeNetwork() {
