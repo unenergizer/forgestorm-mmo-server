@@ -141,12 +141,6 @@ public class GameManager {
 
         // todo load this stuff from the database as well
 
-        short[] initialPlayerTextureIds = new short[4];
-        initialPlayerTextureIds[Appearance.BODY] = 0;
-        initialPlayerTextureIds[Appearance.HEAD] = 0;
-        initialPlayerTextureIds[Appearance.ARMOR] = -1;
-        initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance((byte) tempColor, initialPlayerTextureIds));
         player.initEquipment();
 
         // Setup base packetReceiver attributes
