@@ -101,7 +101,7 @@ public class LoginServerConnection {
 
                     // Setup future connection in auth manager
                     networkManager.getAuthenticationManager().addLoginUser(uuid,
-                            new AuthenticatedUser(clientSocket.getInetAddress().getHostAddress(), loginState.getUserId(), username));
+                            new AuthenticatedUser(clientSocket.getInetAddress().getHostAddress(), loginState.getUserId(), loginState.getUsername()));
 
                     println(getClass(), "User username: " + username);
                     println(getClass(), "User UUID: " + uuid.toString());

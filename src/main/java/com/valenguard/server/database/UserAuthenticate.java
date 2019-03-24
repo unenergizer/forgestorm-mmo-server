@@ -11,7 +11,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class UserAuthenticate {
 
-    private static final String GET_USER_ID = "SELECT user_id FROM xf_user WHERE username=?";
+    private static final String GET_USER_ID = "SELECT user_id, username FROM xf_user WHERE username=?";
     private static final String GET_USER_HASH = "SELECT data FROM xf_user_authenticate WHERE user_id=?";
 
     private UserAuthenticate() {
@@ -23,6 +23,11 @@ public class UserAuthenticate {
         PreparedStatement getUserIdStatement = null;
         PreparedStatement getHashStatement = null;
         int databaseUserId;
+        String databaseUsername = null;
+        if (Server.getInstance().getGameManager().findPlayer(username) != null) {
+            return new LoginState().failState("User already logged in.");
+        }
+
         try {
             Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
 
@@ -34,6 +39,7 @@ public class UserAuthenticate {
             if (userIdResult.next()) {
 
                 databaseUserId = userIdResult.getInt("user_id");
+                databaseUsername = userIdResult.getString("username");
 
                 getHashStatement = connection.prepareStatement(GET_USER_HASH);
                 getHashStatement.setInt(1, databaseUserId);
@@ -83,6 +89,6 @@ public class UserAuthenticate {
                 e.printStackTrace();
             }
         }
-        return new LoginState().successState(databaseUserId);
+        return new LoginState().successState(databaseUserId, databaseUsername);
     }
 }

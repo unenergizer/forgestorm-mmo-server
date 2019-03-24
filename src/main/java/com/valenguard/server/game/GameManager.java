@@ -273,4 +273,15 @@ public class GameManager {
         }
         return null;
     }
+
+    public Player findPlayer(String username) {
+        for (GameMap gameMap : gameMaps.values()) {
+            for (Player player : gameMap.getPlayerController().getPlayerList()) {
+                if (player.getName().toLowerCase().equals(username.toLowerCase())) {
+                    return player;
+                }
+            }
+        }
+        return null;
+    }
 }
