@@ -1,7 +1,7 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.maps.MoveDirection;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 import static com.google.common.base.Preconditions.checkArgument;

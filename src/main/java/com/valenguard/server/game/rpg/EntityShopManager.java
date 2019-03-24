@@ -1,27 +1,17 @@
 package com.valenguard.server.game.rpg;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.data.EntityShopLoader;
-import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.inventory.ItemStackSlotData;
-import com.valenguard.server.game.inventory.ShopItemStackInfo;
+import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.ItemStackSlotData;
+import com.valenguard.server.io.EntityShopLoader;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EntityShopManager {
 
-    private Map<Short, List<ShopItemStackInfo>> map = new HashMap<>();
-
-    public EntityShopManager() {
-        init();
-    }
-
-    private void init() {
-        map = EntityShopLoader.loadFromFile();
-    }
+    private Map<Short, List<EntityShopLoader.ShopItemStackInfo>> map = new EntityShopLoader().loadFromFile();
 
     public void buyItem(short shopID, short shopSlot, Player player) {
         ItemStackSlotData itemStackSlotData = player.getGold();
@@ -29,7 +19,7 @@ public class EntityShopManager {
 
         if (shopSlot >= map.get(shopID).size() || shopSlot < 0) return;
 
-        ShopItemStackInfo shopItemStackInfo = map.get(shopID).get(shopSlot);
+        EntityShopLoader.ShopItemStackInfo shopItemStackInfo = map.get(shopID).get(shopSlot);
         int buyPrice = shopItemStackInfo.getPrice();
         int itemId = shopItemStackInfo.getItemId();
 
@@ -49,7 +39,7 @@ public class EntityShopManager {
             player.setItemStack(itemStackSlotData.getBagIndex(), newGoldStack);
         }
 
-        player.giveItemStack(ValenguardMain.getInstance().getItemStackManager().makeItemStack(itemId, 1));
+        player.giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1));
     }
 
     public void sellItem(short shopID, Player player) {

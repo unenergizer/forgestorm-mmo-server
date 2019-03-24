@@ -25,7 +25,7 @@ public class OutputStreamManager {
 
                 if (bufferOffsetCheck > MAX_BUFFER_SIZE) { // exceeds buffer limit so we should flush what we have written so far
 
-                    // Writing any left over data that was not already written.
+                    // Writing any left over io that was not already written.
                     clientHandler.writeBuffers();
                     clientHandler.flushBuffer();
 

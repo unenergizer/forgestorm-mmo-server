@@ -1,10 +1,10 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.inventory.ItemStackSlotData;
-import com.valenguard.server.game.inventory.ItemStackType;
-import com.valenguard.server.game.maps.GameMap;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.ItemStackSlotData;
+import com.valenguard.server.game.world.item.ItemStackType;
+import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
     @Override
     public void onEvent(ClickActionPacket packetData) {
-        // TODO: Anti-Hack Check: Check that packetReceiver is close.
+        // TODO: Anti-Hack Check: Check that packetReceiver is exitServer.
 
         Player player = packetData.getPlayer();
         GameMap gameMap = player.getGameMap();

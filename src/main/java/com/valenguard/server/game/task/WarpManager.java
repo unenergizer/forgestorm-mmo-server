@@ -1,7 +1,7 @@
 package com.valenguard.server.game.task;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.util.Log;
 
 public class WarpManager {
@@ -9,7 +9,7 @@ public class WarpManager {
     private static final boolean PRINT_DEBUG = false;
 
     public void warpPlayers() {
-        ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::warpPlayer, player ->
+        Server.getInstance().getGameManager().forAllPlayersFiltered(this::warpPlayer, player ->
                 player.getWarp() != null && !player.isEntityMoving());
     }
 
@@ -23,7 +23,7 @@ public class WarpManager {
         Log.println(getClass(), "DRx: " + player.getRealX(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
 
-        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player warping.");
-        ValenguardMain.getInstance().getGameManager().playerSwitchGameMap(player);
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player warping.");
+        Server.getInstance().getGameManager().playerSwitchGameMap(player);
     }
 }

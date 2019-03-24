@@ -1,6 +1,6 @@
 package com.valenguard.server.network;
 
-import com.valenguard.server.game.mysql.AuthenticatedUser;
+import com.valenguard.server.database.AuthenticatedUser;
 
 import java.util.Map;
 import java.util.UUID;
@@ -35,4 +35,5 @@ public class AuthenticationManager {
     public String getUsername(UUID uuid) {
         return authenticatedUserMap.get(uuid).getUsername();
     }
+
 }

@@ -1,9 +1,9 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.entity.AiEntity;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.Server;
 import com.valenguard.server.game.rpg.ShopOpcodes;
+import com.valenguard.server.game.world.entity.AiEntity;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -61,7 +61,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
             return packetData.getPlayer().getCurrentShoppingEntity() != null;
         }
 
-        println(getClass(), "Passed sanatize checks");
+        println(getClass(), "Passed sanitize checks");
 
         return true;
     }
@@ -75,7 +75,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
             println(getClass(), "Started Shopping!");
             player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
-            ValenguardMain.getInstance().getEntityShopManager()
+            Server.getInstance().getEntityShopManager()
                     .buyItem(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);
         } else if (packetData.shopOpcode == ShopOpcodes.STOP_SHOPPING) {
             player.setCurrentShoppingEntity(null);

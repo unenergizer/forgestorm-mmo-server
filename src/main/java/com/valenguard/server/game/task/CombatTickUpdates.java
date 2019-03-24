@@ -1,16 +1,16 @@
 package com.valenguard.server.game.task;
 
-import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.Server;
 import com.valenguard.server.game.PlayerConstants;
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.maps.Location;
-import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
 import com.valenguard.server.game.rpg.skills.SkillOpcodes;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.game.world.maps.MoveDirection;
+import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.packet.out.*;
 
 import static com.valenguard.server.util.Log.println;
@@ -20,7 +20,7 @@ public class CombatTickUpdates {
     private static final int IDLE_COMBAT_TIMEOUT = 13;
 
     public void tickCombat(long numberOfTicksPassed) {
-        for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
+        for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
             tickGameMapCombat(gameMap, numberOfTicksPassed);
         }
     }
@@ -88,8 +88,8 @@ public class CombatTickUpdates {
         Attributes targetEntityAttributes = targetEntity.getAttributes();
 
         if (targetEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Delt: " + targetEntityAttributes.getDamage()).sendPacket();
-            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Delt: " + attackerEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Enemy HP: " + attackerEntity.getCurrentHealth() + " Damage Dealt: " + targetEntityAttributes.getDamage()).sendPacket();
+            new ChatMessagePacketOut((Player) targetEntity, "Your HP: " + targetEntity.getCurrentHealth() + " Damage Dealt: " + attackerEntityAttributes.getDamage()).sendPacket();
         }
 
         gameMap.getPlayerController().forAllPlayers(player -> {
@@ -163,7 +163,7 @@ public class CombatTickUpdates {
 
             // Give packetReceiver drop table item
             if (aiEntity.getDropTable() != null) {
-                ItemStack itemStack = ValenguardMain.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
+                ItemStack itemStack = Server.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
 
                 ItemStackDrop itemStackDrop = new ItemStackDrop();
                 itemStackDrop.setEntityType(EntityType.ITEM_STACK);

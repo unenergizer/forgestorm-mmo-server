@@ -1,8 +1,8 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.inventory.TradeManager;
-import com.valenguard.server.game.inventory.TradeStatusOpcode;
+import com.valenguard.server.Server;
+import com.valenguard.server.game.world.item.trade.TradeManager;
+import com.valenguard.server.game.world.item.trade.TradeStatusOpcode;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,7 +57,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
 
     @Override
     public void onEvent(TradePacketIn packetData) {
-        TradeManager tradeManager = ValenguardMain.getInstance().getTradeManager();
+        TradeManager tradeManager = Server.getInstance().getTradeManager();
 
         switch (packetData.tradeStatusOpcode) {
 

@@ -1,9 +1,9 @@
 package com.valenguard.server.game.task;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.entity.AiEntity;
-import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.maps.GameMap;
+import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.AiEntity;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
 
 import static com.valenguard.server.util.Log.println;
@@ -20,7 +20,7 @@ public class EntityRehealTask {
 
             println(getClass(), "Rehealing entities!", false, DEBUG_PRINT);
 
-            for (GameMap gameMap : ValenguardMain.getInstance().getGameManager().getGameMaps().values()) {
+            for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerController().getPlayerList()) {
                     if (player.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.

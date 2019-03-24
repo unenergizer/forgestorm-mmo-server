@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.*;
+import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
@@ -11,7 +11,7 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
     private byte dataBits;
 
     public AiEntityDataUpdatePacketOut(Player packetReceiver, AiEntity aiEntity, byte dataBits) {
-        super(Opcodes.AIENTITY_UPDATE_OUT, packetReceiver);
+        super(Opcodes.AI_ENTITY_UPDATE_OUT, packetReceiver);
         this.aiEntity = aiEntity;
         this.dataBits = dataBits;
     }

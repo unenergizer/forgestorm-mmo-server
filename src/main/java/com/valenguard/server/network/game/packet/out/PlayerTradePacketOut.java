@@ -1,7 +1,7 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.inventory.TradePacketInfoOut;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.trade.TradePacketInfoOut;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 import static com.valenguard.server.util.Log.println;
@@ -47,7 +47,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
             case TRADE_ITEM_ADD:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
                 write.writeInt(tradePacketInfoOut.getItemStack().getItemId());
-                // TODO : send other itemstack information
+                // TODO : send other ItemStack information
                 break;
             case TRADE_ITEM_REMOVE:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());

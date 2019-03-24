@@ -1,13 +1,13 @@
 package com.valenguard.server.game.task;
 
 import com.google.common.base.Preconditions;
-import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.maps.Location;
-import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.rpg.EntityAlignment;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
 
 import static com.valenguard.server.util.Log.println;
@@ -20,14 +20,14 @@ public class UpdateMovements {
      * Process the list of moving entities.
      */
     public void updateEntityMovement() {
-        ValenguardMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
+        Server.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
-        ValenguardMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> generateNewAIMovements((AiEntity) aiEntity),
+        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> generateNewAIMovements((AiEntity) aiEntity),
                 entity -> !entity.isEntityMoving());
 
         // Continue entity movement
-        ValenguardMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> updateEntitiesPosition((AiEntity) aiEntity),
+        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> updateEntitiesPosition((AiEntity) aiEntity),
                 MovingEntity::isEntityMoving);
     }
 
@@ -183,7 +183,7 @@ public class UpdateMovements {
                          * NPC vs NPC
                          */
 
-                        byte[] factionEnemies = ValenguardMain.getInstance().getFactionManager().getFactionEnemies(attackerFaction);
+                        byte[] factionEnemies = Server.getInstance().getFactionManager().getFactionEnemies(attackerFaction);
                         byte targetEntityFaction = ((NPC) targetEntity).getFaction();
 
                         for (byte enemy : factionEnemies) {
@@ -321,7 +321,7 @@ public class UpdateMovements {
             }
         }
 
-        if (player.getWarp() != null) return false; // Stop packetReceiver moving during warp init
+        if (player.getWarp() != null) return false; // Stop packetReceiver moving during warp start
 
         // Prevents the packetReceiver from moving places they are not allowed to go.
         if (!player.getGameMap().isMovable(attemptLocation)) return false;
@@ -345,7 +345,7 @@ public class UpdateMovements {
 //        println(getClass(), "some debug", false, packetReceiver.getServerEntityId() == 30000);
 
         // Canceling trade for the packetReceiver.
-        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
 
         if (player.getGameMap().locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
@@ -355,7 +355,7 @@ public class UpdateMovements {
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));
 
-        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+        Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 

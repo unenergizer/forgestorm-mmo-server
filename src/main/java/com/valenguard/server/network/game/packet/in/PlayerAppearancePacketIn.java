@@ -1,8 +1,8 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.Appearance;
+import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class PlayerAppearancePacketIn implements PacketListener<PlayerAppearance
 
         final byte appearanceByte = EntityAppearancePacketOut.BODY_INDEX | EntityAppearancePacketOut.HEAD_INDEX;
 
-        ValenguardMain.getInstance().getGameManager().sendToAllButPlayer(packetData.getPlayer(), clientHandler ->
+        Server.getInstance().getGameManager().sendToAllButPlayer(packetData.getPlayer(), clientHandler ->
                 new EntityAppearancePacketOut(clientHandler.getPlayer(), packetData.getPlayer(), appearanceByte).sendPacket());
     }
 

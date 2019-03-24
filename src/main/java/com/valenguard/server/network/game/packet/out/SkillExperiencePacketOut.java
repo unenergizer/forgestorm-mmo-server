@@ -1,7 +1,7 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 public class SkillExperiencePacketOut extends AbstractServerOutPacket {

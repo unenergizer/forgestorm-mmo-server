@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.shared;
 
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.world.entity.Player;
 import lombok.Getter;
 import lombok.Setter;
 

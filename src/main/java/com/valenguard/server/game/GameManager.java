@@ -1,15 +1,16 @@
 package com.valenguard.server.game;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.data.TmxFileParser;
-import com.valenguard.server.game.entity.*;
-import com.valenguard.server.game.inventory.ItemStack;
-import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.maps.Location;
-import com.valenguard.server.game.maps.MoveDirection;
-import com.valenguard.server.game.maps.Warp;
+import com.valenguard.server.Server;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.Reputation;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.game.world.maps.MoveDirection;
+import com.valenguard.server.game.world.maps.Warp;
+import com.valenguard.server.io.FilePaths;
+import com.valenguard.server.io.TmxFileParser;
 import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
@@ -34,12 +35,10 @@ public class GameManager {
 
     private static final boolean PRINT_DEBUG = false;
     public static final int PLAYERS_TO_PROCESS = 50;
-    private static final String MAP_DIRECTORY = "src/main/resources/data/maps/";
 
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
-
     private final Queue<ClientHandler> syncClientQuitQueue = new ConcurrentLinkedQueue<>();
 
     /**
@@ -72,7 +71,7 @@ public class GameManager {
         }
     }
 
-    public void init() {
+    public void start() {
         loadAllMaps();
     }
 
@@ -83,7 +82,7 @@ public class GameManager {
     /**
      * Ran on the game thread. Dump players from network.
      */
-    public void processPlayerJoin() {
+    void processPlayerJoin() {
         PlayerSessionData playerSessionData;
         while ((playerSessionData = playerSessionDataQueue.poll()) != null) {
             playerJoinServer(playerSessionData);
@@ -94,11 +93,10 @@ public class GameManager {
 
     private void playerJoinServer(PlayerSessionData playerSessionData) {
 
-        ValenguardMain.getInstance().getOutStreamManager().addClient(playerSessionData.getClientHandler());
+        Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
 
-
-        //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
+        //TODO: GET LAST LOGIN INFO FROM DATABASE_SETTINGS, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(PlayerConstants.STARTING_MAP);
 
         // Below we create a starting currentMapLocation for a new packetReceiver.
@@ -122,10 +120,10 @@ public class GameManager {
         gameMap.getPlayerController().addPlayer(player, new Warp(location, MoveDirection.SOUTH));
 
         // Give test items
-        ItemStack starterGold = ValenguardMain.getInstance().getItemStackManager().makeItemStack(0, 100);
+        ItemStack starterGold = Server.getInstance().getItemStackManager().makeItemStack(0, 100);
         player.giveItemStack(starterGold);
 
-        ItemStack starterSword = ValenguardMain.getInstance().getItemStackManager().makeItemStack(4, 1);
+        ItemStack starterSword = Server.getInstance().getItemStackManager().makeItemStack(4, 1);
         player.giveItemStack(starterSword);
 
         tempColor++;
@@ -142,7 +140,7 @@ public class GameManager {
     }
 
     private Player initializePlayer(final PlayerSessionData playerSessionData) {
-        // todo this big chunk of data needs to be read from a database
+        // todo this big chunk of io needs to be read from a database
         Player player = new Player();
         player.setEntityType(EntityType.PLAYER);
         player.setServerEntityId(playerSessionData.getServerID());
@@ -169,7 +167,7 @@ public class GameManager {
 
         player.setAttributes(baseAttributes);
 
-        player.setFaction(ValenguardMain.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
+        player.setFaction(Server.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
 
         // TODO: Setup faction rep here
         short setThisFactionRep = 0;
@@ -184,7 +182,7 @@ public class GameManager {
         return player;
     }
 
-    public void processPlayerQuit() {
+    void processPlayerQuit() {
         syncClientQuitQueue.forEach(clientHandler -> playerQuitServer(clientHandler.getPlayer()));
         syncClientQuitQueue.clear();
     }
@@ -196,11 +194,11 @@ public class GameManager {
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
             }
         }
-        // TODO: Save packetReceiver specific data
+        // TODO: Save packetReceiver specific io
         GameMap gameMap = player.getGameMap();
         gameMap.getPlayerController().removePlayer(player);
-        ValenguardMain.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
-        ValenguardMain.getInstance().getOutStreamManager().removeClient(player.getClientHandler());
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
+        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
 
         Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));
     }
@@ -217,7 +215,7 @@ public class GameManager {
         player.setWarp(null);
     }
 
-    public void gameMapTick(long numberOfTicksPassed) {
+    void gameMapTick(long numberOfTicksPassed) {
         spawnEntities();
         gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
         gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().tick());
@@ -235,12 +233,12 @@ public class GameManager {
     }
 
     private void loadAllMaps() {
-        File[] files = new File(MAP_DIRECTORY).listFiles((d, name) -> name.endsWith(".tmx"));
+        File[] files = new File(FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(".tmx"));
         checkNotNull(files, "No game maps were loaded.");
 
         for (File file : files) {
             String mapName = file.getName().replace(".tmx", "");
-            gameMaps.put(mapName, TmxFileParser.parseGameMap(MAP_DIRECTORY, mapName));
+            gameMaps.put(mapName, TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
         }
 
         Log.println(getClass(), "Tmx Maps Loaded: " + files.length);

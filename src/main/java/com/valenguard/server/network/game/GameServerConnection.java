@@ -1,8 +1,9 @@
 package com.valenguard.server.network.game;
 
-import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.Server;
+import com.valenguard.server.io.NetworkSettingsLoader;
 import com.valenguard.server.network.AuthenticationManager;
-import com.valenguard.server.network.NetworkSettings;
+import com.valenguard.server.network.NetworkManager;
 import com.valenguard.server.network.game.packet.out.ValenguardOutputStream;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.network.game.shared.EventBus;
@@ -24,35 +25,29 @@ import static com.valenguard.server.util.Log.println;
 
 public class GameServerConnection {
 
-    private static GameServerConnection instance;
+    private final NetworkManager networkManager;
 
     @Getter
     private final EventBus eventBus = new EventBus();
     private ServerSocket serverSocket;
-    private Consumer<EventBus> registerListeners;
 
-    private NetworkSettings networkSettings;
-
+    /**
+     * A temporary server ID assigned to players. This is
+     * is different than the one stored in the database.
+     */
     private short tempID = 0;
 
-    // Used to handle closing down all threads associated with
-    // the server. Volatile allows the variable to exist
-    // between threads
+    /**
+     * Used to handle closing down all threads associated with
+     * the server. Volatile allows the variable to exist
+     * between threads
+     */
     @Setter
     @Getter
     private volatile boolean running = false;
 
-    private GameServerConnection() {
-    }
-
-    /**
-     * Gets the main instance of this class.
-     *
-     * @return A singleton instance of this class.
-     */
-    public static GameServerConnection getInstance() {
-        if (instance == null) instance = new GameServerConnection();
-        return instance;
+    public GameServerConnection(final NetworkManager networkManager) {
+        this.networkManager = networkManager;
     }
 
     /**
@@ -60,21 +55,16 @@ public class GameServerConnection {
      *
      * @param registerListeners Listeners to listen to.
      */
-    public void openServer(NetworkSettings networkSettings, Consumer<EventBus> registerListeners) {
-        this.networkSettings = networkSettings;
+    public void openServer(NetworkSettingsLoader.NetworkSettings networkSettings, Consumer<EventBus> registerListeners) {
 
         // Creates a socket to allow for communication between clients and the server.
         try {
             serverSocket = new ServerSocket(networkSettings.getGamePort());
+            println(getClass(), "Port Opened: " + networkSettings.getGamePort());
         } catch (IOException e) {
             e.printStackTrace();
             return;
         }
-
-        // A callback for registering the listeners at a later time
-        this.registerListeners = registerListeners;
-
-        println(getClass(), "Port Opened: " + networkSettings.getGamePort());
 
         running = true;
         registerListeners.accept(eventBus);
@@ -118,20 +108,20 @@ public class GameServerConnection {
      * @param clientSocket A new client connection.
      */
     private void receivePackets(Socket clientSocket) {
-        AuthenticationManager authenticationManager = ValenguardMain.getInstance().getAuthenticationManager();
+        AuthenticationManager authenticationManager = networkManager.getAuthenticationManager();
 
         // This thread listens for incoming packets from the socket passed
         // to the method
         new Thread(() -> {
             ClientHandler clientHandler = null;
             // Using a new implementation in java that handles closing the streams
-            // upon initialization. These streams are for sending and receiving data
+            // upon initialization. These streams are for sending and receiving io
             try (
                     DataOutputStream outStream = new DataOutputStream(clientSocket.getOutputStream());
                     DataInputStream inStream = new DataInputStream(clientSocket.getInputStream())
             ) {
 
-                // Grab player specific data from auth manager
+                // Grab player specific io from auth manager
                 UUID uuid;
                 try {
                     uuid = UUID.fromString(inStream.readUTF());
@@ -149,7 +139,7 @@ public class GameServerConnection {
                 }
 
                 // Creating a new client handle that contains the necessary components for
-                // sending and receiving data
+                // sending and receiving io
                 clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new ValenguardOutputStream(outStream), inStream);
 
                 String username = authenticationManager.getUsername(uuid);
@@ -158,7 +148,7 @@ public class GameServerConnection {
                 authenticationManager.removeEntry(uuid);
 
                 // Adding the client handle to a list of current client handles
-                ValenguardMain.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, username, clientHandler));
+                Server.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, username, clientHandler));
                 tempID++;
 
                 // Reading in a byte which represents an opcode that the client sent to the
@@ -175,9 +165,9 @@ public class GameServerConnection {
                         numberOfRepeats = inStream.readByte();
                     }
 
-                    for (byte i = 0; i < numberOfRepeats; i++)
+                    for (byte i = 0; i < numberOfRepeats; i++) {
                         eventBus.decodeListenerOnNetworkThread(opcodeByte, clientHandler);
-
+                    }
                 }
 
             } catch (IOException e) {
@@ -187,7 +177,7 @@ public class GameServerConnection {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        ValenguardMain.getInstance().getGameManager().queueClientQuitServer(clientHandler);
+                        Server.getInstance().getGameManager().queueClientQuitServer(clientHandler);
                     }
                 } else {
                     e.printStackTrace();
@@ -211,8 +201,8 @@ public class GameServerConnection {
      * be handled
      */
     public void close() {
-        running = false;
         println(getClass(), "Closing down game connection...");
+        running = false;
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException e) {

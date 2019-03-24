@@ -1,13 +1,13 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.entity.Appearance;
-import com.valenguard.server.game.entity.EntityType;
-import com.valenguard.server.game.entity.ItemStackDrop;
-import com.valenguard.server.game.inventory.*;
-import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.game.maps.Location;
+import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.Appearance;
+import com.valenguard.server.game.world.entity.EntityType;
+import com.valenguard.server.game.world.entity.ItemStackDrop;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.inventory.*;
+import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -74,10 +74,10 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         if (!doesNotExceedInventoryLimit(fromWindow, toWindow, packetData)) return;
 
-        WindowMovementInfo windowMovementInfo = determineWindowMovementInfo(fromWindow, toWindow);
+        WindowMovementType windowMovementType = determineWindowMovementInfo(fromWindow, toWindow);
 
-        PlayerMoveInventoryEvents playerMoveInventoryEvents = ValenguardMain.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
-        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementInfo));
+        PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
+        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementType));
 
     }
 
@@ -86,7 +86,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         InventoryType inventoryType = InventoryType.values()[packetData.dropInventory];
         if (inventoryType == InventoryType.BAG_1) {
 
-            if (packetData.slotIndex < 0 || packetData.slotIndex >= GameConstants.BAG_SIZE) {
+            if (packetData.slotIndex < 0 || packetData.slotIndex >= InventoryConstants.BAG_SIZE) {
                 return;
             }
 
@@ -110,7 +110,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         } else if (inventoryType == InventoryType.EQUIPMENT) {
 
-            if (packetData.slotIndex < 0 || packetData.slotIndex >= GameConstants.EQUIPMENT_SIZE) {
+            if (packetData.slotIndex < 0 || packetData.slotIndex >= InventoryConstants.EQUIPMENT_SIZE) {
                 return;
             }
 
@@ -121,29 +121,30 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
         if (fromWindow == InventoryType.BAG_1) {
-            if (packetData.fromPosition >= GameConstants.BAG_SIZE || packetData.fromPosition < 0) return false;
+            if (packetData.fromPosition >= InventoryConstants.BAG_SIZE || packetData.fromPosition < 0) return false;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
-            if (packetData.fromPosition >= GameConstants.EQUIPMENT_SIZE || packetData.fromPosition < 0) return false;
+            if (packetData.fromPosition >= InventoryConstants.EQUIPMENT_SIZE || packetData.fromPosition < 0)
+                return false;
         }
 
         if (toWindow == InventoryType.BAG_1) {
-            return packetData.toPosition < GameConstants.BAG_SIZE && packetData.toPosition >= 0;
+            return packetData.toPosition < InventoryConstants.BAG_SIZE && packetData.toPosition >= 0;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
-            return packetData.toPosition < GameConstants.EQUIPMENT_SIZE && packetData.toPosition >= 0;
+            return packetData.toPosition < InventoryConstants.EQUIPMENT_SIZE && packetData.toPosition >= 0;
         }
 
         return true;
     }
 
-    private WindowMovementInfo determineWindowMovementInfo(InventoryType fromWindow, InventoryType toWindow) {
+    private WindowMovementType determineWindowMovementInfo(InventoryType fromWindow, InventoryType toWindow) {
         if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.BAG_1) {
-            return WindowMovementInfo.FROM_EQUIPMENT_TO_BAG;
+            return WindowMovementType.FROM_EQUIPMENT_TO_BAG;
         } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.EQUIPMENT) {
-            return WindowMovementInfo.FROM_BAG_TO_EQUIPMENT;
+            return WindowMovementType.FROM_BAG_TO_EQUIPMENT;
         } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.BAG_1) {
-            return WindowMovementInfo.FROM_BAG_TO_BAG;
+            return WindowMovementType.FROM_BAG_TO_BAG;
         } else if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.EQUIPMENT) {
-            return WindowMovementInfo.FROM_EQUIPMENT_TO_EQUIPMENT;
+            return WindowMovementType.FROM_EQUIPMENT_TO_EQUIPMENT;
         }
         throw new RuntimeException("The sanitization should have already checked for this.");
     }

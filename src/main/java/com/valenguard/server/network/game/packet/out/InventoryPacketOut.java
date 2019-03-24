@@ -1,7 +1,7 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.inventory.InventoryActions;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 public class InventoryPacketOut extends AbstractServerOutPacket {

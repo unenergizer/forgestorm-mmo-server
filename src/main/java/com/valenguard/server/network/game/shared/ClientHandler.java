@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.shared;
 
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.ValenguardOutputStream;
 import com.valenguard.server.util.Log;

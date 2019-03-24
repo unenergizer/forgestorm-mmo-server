@@ -1,15 +1,14 @@
 package com.valenguard.server.network.login;
 
-import com.valenguard.server.ValenguardMain;
-import com.valenguard.server.game.mysql.AuthenticatedUser;
-import com.valenguard.server.game.mysql.LoginState;
-import com.valenguard.server.game.mysql.UserAuthenticate;
-import com.valenguard.server.network.NetworkSettings;
+import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.database.LoginState;
+import com.valenguard.server.database.UserAuthenticate;
+import com.valenguard.server.io.NetworkSettingsLoader;
+import com.valenguard.server.network.NetworkManager;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -26,7 +25,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class LoginServerConnection {
 
-    private static LoginServerConnection instance;
+    private final NetworkManager networkManager;
 
     //    private SSLServerSocket serverSocket;
     private ServerSocket serverSocket;
@@ -38,21 +37,15 @@ public class LoginServerConnection {
     @Getter
     private volatile boolean running = false;
 
-    /**
-     * Gets the main instance of this class.
-     *
-     * @return A singleton instance of this class.
-     */
-    public static LoginServerConnection getInstance() {
-        if (instance == null) instance = new LoginServerConnection();
-        return instance;
+    public LoginServerConnection(final NetworkManager networkManager) {
+        this.networkManager = networkManager;
     }
 
-    public void openServer(NetworkSettings networkSettings) {
+    public void openServer(NetworkSettingsLoader.NetworkSettings networkSettings) {
         try {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, null, null);
-            SSLServerSocketFactory factory = context.getServerSocketFactory();
+//            SSLServerSocketFactory factory = context.getServerSocketFactory();
 //            serverSocket = (SSLServerSocket) factory.createServerSocket(networkSettings.getLoginPort());
             serverSocket = new ServerSocket(networkSettings.getLoginPort());
 
@@ -107,17 +100,17 @@ public class LoginServerConnection {
                     UUID uuid = UUID.randomUUID();
 
                     // Setup future connection in auth manager
-                    ValenguardMain.getInstance().getAuthenticationManager().addLoginUser(uuid,
+                    networkManager.getAuthenticationManager().addLoginUser(uuid,
                             new AuthenticatedUser(clientSocket.getInetAddress().getHostAddress(), loginState.getUserId(), username));
 
                     println(getClass(), "User username: " + username);
                     println(getClass(), "User UUID: " + uuid.toString());
                     println(getClass(), "User IP: " + clientSocket.getInetAddress().getHostAddress());
 
-                    // Write Success data
+                    // Write Success io
                     outputStream.writeUTF(uuid.toString());
                 } else {
-                    // Write Failure data
+                    // Write Failure io
                     outputStream.writeUTF(loginState.getFailReason());
                 }
 

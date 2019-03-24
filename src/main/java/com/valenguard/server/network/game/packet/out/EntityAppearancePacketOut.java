@@ -1,8 +1,8 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.Appearance;
-import com.valenguard.server.game.entity.Entity;
-import com.valenguard.server.game.entity.Player;
+import com.valenguard.server.game.world.entity.Appearance;
+import com.valenguard.server.game.world.entity.Entity;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 public class EntityAppearancePacketOut extends AbstractServerOutPacket {

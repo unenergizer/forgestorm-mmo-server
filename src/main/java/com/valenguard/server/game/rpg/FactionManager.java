@@ -1,25 +1,12 @@
 package com.valenguard.server.game.rpg;
 
-import com.valenguard.server.game.data.FactionLoader;
+import com.valenguard.server.io.FactionLoader;
 
 import java.util.Map;
 
 public class FactionManager {
 
-    private Map<Byte, FactionLoader.FactionData> factionDataMap;
-
-    public FactionManager() {
-        init();
-    }
-
-    private void init() {
-        FactionLoader factionLoader = new FactionLoader();
-        factionDataMap = factionLoader.loadFactionInfo();
-    }
-
-    public String getFactionName(byte b) {
-        return factionDataMap.get(b).getFactionName();
-    }
+    private final Map<Byte, FactionLoader.FactionData> factionDataMap = new FactionLoader().loadFactionInfo();
 
     public Byte getFactionByName(String factionName) {
         for (Map.Entry<Byte, FactionLoader.FactionData> entry : factionDataMap.entrySet()) {
@@ -32,7 +19,7 @@ public class FactionManager {
         return factionDataMap.get(b).getEnemyFactions();
     }
 
-    public int getNumberOfFactions() {
+    int getNumberOfFactions() {
         return factionDataMap.size();
     }
 }

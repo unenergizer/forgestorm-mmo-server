@@ -1,9 +1,9 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.game.entity.MovingEntity;
-import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.game.maps.Location;
-import com.valenguard.server.game.maps.MoveDirection;
+import com.valenguard.server.game.world.entity.MovingEntity;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.network.game.shared.Opcodes;
 
 import static com.valenguard.server.util.Log.println;

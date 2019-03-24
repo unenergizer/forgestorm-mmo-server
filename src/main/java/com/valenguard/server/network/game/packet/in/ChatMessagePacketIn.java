@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.ValenguardMain;
+import com.valenguard.server.Server;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     @Override
     public void onEvent(TextMessage packetData) {
         // TODO : Use StringBuilder
-        ValenguardMain.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
+        Server.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
                 new ChatMessagePacketOut(onlinePlayer, packetData.getPlayer().getName() + ": " + packetData.text).sendPacket());
     }
 
