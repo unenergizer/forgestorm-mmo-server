@@ -11,7 +11,7 @@ import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
 import com.valenguard.server.game.rpg.skills.SkillOpcodes;
-import com.valenguard.server.network.packet.out.*;
+import com.valenguard.server.network.game.packet.out.*;
 
 import static com.valenguard.server.util.Log.println;
 

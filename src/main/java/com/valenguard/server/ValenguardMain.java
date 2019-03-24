@@ -15,11 +15,14 @@ import com.valenguard.server.game.mysql.DatabaseConnection;
 import com.valenguard.server.game.mysql.DatabaseSettingsLoader;
 import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.game.rpg.FactionManager;
-import com.valenguard.server.network.PingManager;
-import com.valenguard.server.network.ServerConnection;
-import com.valenguard.server.network.packet.in.*;
-import com.valenguard.server.network.packet.out.OutputStreamManager;
-import com.valenguard.server.network.shared.NetworkSettingsLoader;
+import com.valenguard.server.network.AuthenticationManager;
+import com.valenguard.server.network.NetworkSettings;
+import com.valenguard.server.network.NetworkSettingsLoader;
+import com.valenguard.server.network.game.GameServerConnection;
+import com.valenguard.server.network.game.PingManager;
+import com.valenguard.server.network.game.packet.in.*;
+import com.valenguard.server.network.game.packet.out.OutputStreamManager;
+import com.valenguard.server.network.login.LoginServerConnection;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 
@@ -29,6 +32,7 @@ public class ValenguardMain {
     private static ValenguardMain instance = null;
 
     // Framework
+    private AuthenticationManager authenticationManager;
     private GameLoop gameLoop;
     private OutputStreamManager outStreamManager;
     private CommandProcessor commandProcessor;
@@ -76,6 +80,7 @@ public class ValenguardMain {
         getGameManager().init();
 
         // Framework
+        authenticationManager = new AuthenticationManager();
         registerCommands();
         initializeDatabase();
         initializeNetwork();
@@ -85,7 +90,8 @@ public class ValenguardMain {
 
     public void stop() {
         Log.println(getClass(), "ServerConnection shutdown initialized!");
-        ServerConnection.getInstance().close();
+        LoginServerConnection.getInstance().close();
+        GameServerConnection.getInstance().close();
         DatabaseConnection.getInstance().close();
         Log.println(getClass(), "ServerConnection shutdown complete!");
     }
@@ -107,8 +113,11 @@ public class ValenguardMain {
 
     private void initializeNetwork() {
         Log.println(getClass(), "Initializing network...");
-        NetworkSettingsLoader networkSettingsLoader = new NetworkSettingsLoader();
-        ServerConnection.getInstance().openServer(networkSettingsLoader.loadNetworkSettings(), (eventBus) -> {
+        NetworkSettings networkSettings = new NetworkSettingsLoader().loadNetworkSettings();
+
+        LoginServerConnection.getInstance().openServer(networkSettings);
+
+        GameServerConnection.getInstance().openServer(networkSettings, (eventBus) -> {
             eventBus.registerListener(new PlayerMovePacketIn());
             eventBus.registerListener(new PingPacketIn());
             eventBus.registerListener(new ChatMessagePacketIn());

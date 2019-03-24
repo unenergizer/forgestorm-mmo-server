@@ -3,7 +3,7 @@ package com.valenguard.server.game.task;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.ItemStackDrop;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
+import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
 
 import java.util.ArrayList;
 import java.util.Iterator;

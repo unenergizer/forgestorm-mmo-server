@@ -5,10 +5,10 @@ import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.ItemStackDrop;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
-import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
-import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
-import com.valenguard.server.network.packet.out.InitializeMapPacketOut;
+import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityDespawnPacketOut;
+import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
+import com.valenguard.server.network.game.packet.out.InitializeMapPacketOut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

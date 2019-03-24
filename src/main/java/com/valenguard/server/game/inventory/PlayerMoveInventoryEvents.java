@@ -1,7 +1,7 @@
 package com.valenguard.server.game.inventory;
 
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.InventoryPacketOut;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 
 import java.util.LinkedList;
 import java.util.Queue;

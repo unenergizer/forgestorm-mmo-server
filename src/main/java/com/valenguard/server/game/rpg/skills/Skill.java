@@ -2,7 +2,7 @@ package com.valenguard.server.game.rpg.skills;
 
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.ExperiencePacketInfo;
-import com.valenguard.server.network.packet.out.SkillExperiencePacketOut;
+import com.valenguard.server.network.game.packet.out.SkillExperiencePacketOut;
 import lombok.Getter;
 
 public class Skill {

@@ -8,7 +8,7 @@ import com.valenguard.server.game.maps.GameMap;
 import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.rpg.EntityAlignment;
-import com.valenguard.server.network.packet.out.EntityMovePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
 
 import static com.valenguard.server.util.Log.println;
 

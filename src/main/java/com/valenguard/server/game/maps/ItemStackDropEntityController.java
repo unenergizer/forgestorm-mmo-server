@@ -2,7 +2,7 @@ package com.valenguard.server.game.maps;
 
 import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.ItemStackDrop;
-import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
+import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
 
 public class ItemStackDropEntityController extends EntityController<ItemStackDrop> {
 

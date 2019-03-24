@@ -3,7 +3,7 @@ package com.valenguard.server.game.inventory;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.rpg.Attributes;
-import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;

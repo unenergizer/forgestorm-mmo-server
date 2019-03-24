@@ -10,11 +10,11 @@ import com.valenguard.server.game.maps.MoveDirection;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.Reputation;
-import com.valenguard.server.network.PlayerSessionData;
-import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
-import com.valenguard.server.network.packet.out.InitClientSessionPacketOut;
-import com.valenguard.server.network.packet.out.PingPacketOut;
-import com.valenguard.server.network.shared.ClientHandler;
+import com.valenguard.server.network.game.PlayerSessionData;
+import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
+import com.valenguard.server.network.game.packet.out.PingPacketOut;
+import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 
@@ -96,6 +96,8 @@ public class GameManager {
 
         ValenguardMain.getInstance().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
+
+
         //TODO: GET LAST LOGIN INFO FROM DATABASE, UNLESS PLAYER IS TRUE "NEW PLAYER."
         GameMap gameMap = gameMaps.get(PlayerConstants.STARTING_MAP);
 
@@ -146,7 +148,7 @@ public class GameManager {
         player.setServerEntityId(playerSessionData.getServerID());
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
-        player.setName("Player " + Short.toString(playerSessionData.getServerID()));
+        player.setName(playerSessionData.getUsername());
         playerSessionData.getClientHandler().setPlayer(player);
         short[] initialPlayerTextureIds = new short[4];
         initialPlayerTextureIds[Appearance.BODY] = 0;

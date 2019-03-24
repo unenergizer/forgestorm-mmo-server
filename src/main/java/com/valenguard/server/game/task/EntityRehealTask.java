@@ -4,7 +4,7 @@ import com.valenguard.server.ValenguardMain;
 import com.valenguard.server.game.entity.AiEntity;
 import com.valenguard.server.game.entity.Player;
 import com.valenguard.server.game.maps.GameMap;
-import com.valenguard.server.network.packet.out.EntityHealPacketOut;
+import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
 
 import static com.valenguard.server.util.Log.println;
 

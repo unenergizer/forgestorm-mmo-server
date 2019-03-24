@@ -6,9 +6,9 @@ import com.valenguard.server.game.maps.Location;
 import com.valenguard.server.game.maps.Warp;
 import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.rpg.skills.Skills;
-import com.valenguard.server.network.packet.out.EntityAppearancePacketOut;
-import com.valenguard.server.network.packet.out.InventoryPacketOut;
-import com.valenguard.server.network.shared.ClientHandler;
+import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
+import com.valenguard.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 import lombok.Setter;
 

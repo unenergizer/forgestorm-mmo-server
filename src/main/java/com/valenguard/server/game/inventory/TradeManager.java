@@ -2,8 +2,8 @@ package com.valenguard.server.game.inventory;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.ChatMessagePacketOut;
-import com.valenguard.server.network.packet.out.PlayerTradePacketOut;
+import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.game.packet.out.PlayerTradePacketOut;
 
 import java.util.*;
 

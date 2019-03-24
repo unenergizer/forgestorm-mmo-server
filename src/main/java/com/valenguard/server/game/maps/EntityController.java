@@ -3,9 +3,9 @@ package com.valenguard.server.game.maps;
 import com.valenguard.server.game.entity.Entity;
 import com.valenguard.server.game.entity.EntityType;
 import com.valenguard.server.game.entity.Player;
-import com.valenguard.server.network.packet.out.EntityAttributesUpdatePacketOut;
-import com.valenguard.server.network.packet.out.EntityDespawnPacketOut;
-import com.valenguard.server.network.packet.out.EntitySpawnPacketOut;
+import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityDespawnPacketOut;
+import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
 import lombok.Getter;
 
 import java.util.*;

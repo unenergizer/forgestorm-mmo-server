@@ -3,7 +3,7 @@ package com.valenguard.server;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.inventory.PlayerMoveInventoryEvents;
 import com.valenguard.server.game.task.*;
-import com.valenguard.server.network.ServerConnection;
+import com.valenguard.server.network.game.GameServerConnection;
 import lombok.Getter;
 
 /**
@@ -60,7 +60,7 @@ public class GameLoop extends Thread {
 
         long numberOfTicksPassed = 0;
 
-        while (ServerConnection.getInstance().isRunning()) {
+        while (GameServerConnection.getInstance().isRunning()) {
             startTime = System.nanoTime();
 
             /* ***********************
@@ -70,7 +70,7 @@ public class GameLoop extends Thread {
             ValenguardMain valenguardMain = ValenguardMain.getInstance();
 
             valenguardMain.getCommandProcessor().executeCommands();
-            ServerConnection.getInstance().getEventBus().gameThreadPublish();
+            GameServerConnection.getInstance().getEventBus().gameThreadPublish();
             playerMoveInventoryEvents.processInventoryEvents();
             updateMovements.updateEntityMovement();
             warpManager.warpPlayers();
