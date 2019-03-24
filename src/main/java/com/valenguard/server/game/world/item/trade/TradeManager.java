@@ -101,10 +101,10 @@ public class TradeManager {
 
         if (tradeData.targetPlayer == player) {
             tradeData.addItem(tradeData.tradeTargetItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(tradeUUID, itemStack)).sendPacket();
         } else {
             tradeData.addItem(tradeData.tradeStarterItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(tradeUUID, itemStack)).sendPacket();
         }
     }
 
@@ -134,14 +134,14 @@ public class TradeManager {
             println(getClass(), "[3] Remove trade item called! Player: " + player.getName());
 // TODO            if (tradeData.tradeTargetItems[itemSlot] != null) return;
             tradeData.tradeTargetItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(tradeUUID, itemSlot)).sendPacket();
 
             println(getClass(), "[4] Remove trade item called! Player: " + player.getName());
         } else {
             println(getClass(), "[5] Remove trade item called! Player: " + player.getName());
 // TODO            if (tradeData.tradeStarterItems[itemSlot] != null) return;
             tradeData.tradeStarterItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(tradeUUID, itemSlot)).sendPacket();
 
             println(getClass(), "[6] Remove trade item called! Player: " + player.getName());
         }
@@ -478,8 +478,8 @@ public class TradeManager {
         private boolean tradeStarterConfirmedTrade = false;
         private boolean targetPlayerConfirmedTrade = false;
 
-        private Byte[] tradeStarterItems = new Byte[InventoryConstants.BAG_SIZE];
-        private Byte[] tradeTargetItems = new Byte[InventoryConstants.BAG_SIZE];
+        private final Byte[] tradeStarterItems = new Byte[InventoryConstants.BAG_SIZE];
+        private final Byte[] tradeTargetItems = new Byte[InventoryConstants.BAG_SIZE];
 
         TradeData(Player tradeStarter, Player targetPlayer) {
             this.tradeStarter = tradeStarter;

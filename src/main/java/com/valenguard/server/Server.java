@@ -20,21 +20,21 @@ public class Server {
     private static Server instance = null;
 
     // Framework
-    private GameLoop gameLoop = new GameLoop();
-    private CommandManager commandManager = new CommandManager();
-    private DatabaseManager databaseManager = new DatabaseManager();
-    private NetworkManager networkManager = new NetworkManager();
+    private final GameLoop gameLoop = new GameLoop();
+    private final CommandManager commandManager = new CommandManager();
+    private final DatabaseManager databaseManager = new DatabaseManager();
+    private final NetworkManager networkManager = new NetworkManager();
 
     // System
-    private TradeManager tradeManager = new TradeManager();
-    private GameManager gameManager = new GameManager();
+    private final TradeManager tradeManager = new TradeManager();
+    private final GameManager gameManager = new GameManager();
 
     // Data Loaders
-    private FactionManager factionManager = new FactionManager();
-    private AiEntityDataManager aiEntityDataManager = new AiEntityDataManager();
-    private ItemStackManager itemStackManager = new ItemStackManager();
-    private DropTableManager dropTableManager = new DropTableManager();
-    private EntityShopManager entityShopManager = new EntityShopManager();
+    private final FactionManager factionManager = new FactionManager();
+    private final AiEntityDataManager aiEntityDataManager = new AiEntityDataManager();
+    private final ItemStackManager itemStackManager = new ItemStackManager();
+    private final DropTableManager dropTableManager = new DropTableManager();
+    private final EntityShopManager entityShopManager = new EntityShopManager();
 
     private Server() {
     }

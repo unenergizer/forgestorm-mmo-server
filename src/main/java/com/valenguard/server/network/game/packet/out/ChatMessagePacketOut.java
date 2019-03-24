@@ -9,7 +9,7 @@ public class ChatMessagePacketOut extends AbstractServerOutPacket {
     private static final boolean PRINT_DEBUG = false;
     private final String message;
 
-    public ChatMessagePacketOut(Player player, String message) {
+    public ChatMessagePacketOut(final Player player, final String message) {
         super(Opcodes.CHAT, player);
         this.message = message;
     }

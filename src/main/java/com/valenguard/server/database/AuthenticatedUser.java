@@ -7,9 +7,9 @@ public class AuthenticatedUser {
 
     private final String ip;
     private final int databaseUserId;
-    private String username;
+    private final String username;
 
-    public AuthenticatedUser(String ip, int databaseUserId, String username) {
+    public AuthenticatedUser(final String ip, final int databaseUserId, final String username) {
         this.ip = ip;
         this.databaseUserId = databaseUserId;
         this.username = username;

@@ -9,7 +9,7 @@ public class EntityHealPacketOut extends AbstractServerOutPacket {
     private final MovingEntity healingEntity;
     private final int healthGiven;
 
-    public EntityHealPacketOut(Player receiver, MovingEntity healingEntity, int healthGiven) {
+    public EntityHealPacketOut(final Player receiver, final MovingEntity healingEntity, final int healthGiven) {
         super(Opcodes.ENTITY_HEAL_OUT, receiver);
         this.healingEntity = healingEntity;
         this.healthGiven = healthGiven;

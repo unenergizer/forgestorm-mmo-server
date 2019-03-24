@@ -5,11 +5,11 @@ import com.valenguard.server.util.Log;
 
 import java.util.Scanner;
 
-public class ConsoleCommandManager implements Runnable {
+class ConsoleCommandManager implements Runnable {
 
     private final CommandManager commandManager;
 
-    public ConsoleCommandManager(CommandManager commandManager) {
+    ConsoleCommandManager(CommandManager commandManager) {
         this.commandManager = commandManager;
     }
 

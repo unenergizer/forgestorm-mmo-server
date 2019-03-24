@@ -30,7 +30,6 @@ public class Opcodes {
      * CLIENT -> SERVER
      */
     public static final byte MOVE_REQUEST = 0x01;
-    public static final byte CLIENT_LOGIN = 0x02;
-    public static final byte CLICK_ACTION = 0x03;
-    public static final byte ENTITY_SHOPS = 0x04;
+    public static final byte CLICK_ACTION = 0x02;
+    public static final byte ENTITY_SHOPS = 0x03;
 }

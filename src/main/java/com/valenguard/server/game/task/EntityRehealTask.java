@@ -18,14 +18,14 @@ public class EntityRehealTask {
     public void tickEntityReheal(long numberOfTicksPassed) {
         if (numberOfTicksPassed % REHEAL_INTERVAL == 0) {
 
-            println(getClass(), "Rehealing entities!", false, DEBUG_PRINT);
+            println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
             for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerController().getPlayerList()) {
                     if (player.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
                     if (player.getCurrentHealth() < player.getMaxHealth()) {
-                        println(getClass(), "Rehealing player: " + player.getName(), false, DEBUG_PRINT);
+                        println(getClass(), "Healing player: " + player.getName(), false, DEBUG_PRINT);
                         player.setCurrentHealth(player.getCurrentHealth() + REHEAL_AMOUNT);
                         gameMap.getPlayerController().forAllPlayers(anyPlayer ->
                                 new EntityHealPacketOut(anyPlayer, player, REHEAL_AMOUNT).sendPacket());

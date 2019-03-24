@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
+import static java.util.Objects.requireNonNull;
 
 @Opcode(getOpcode = Opcodes.PLAYER_TRADE)
 public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.TradePacketIn> {
@@ -20,7 +21,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
         short entityUUID = 0;
         byte slotId = 0;
 
-        switch (tradeStatusOpcode) {
+        switch (requireNonNull(tradeStatusOpcode)) {
             case TRADE_REQUEST_INIT_TARGET:
                 entityUUID = clientHandler.readShort();
                 break;

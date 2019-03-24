@@ -37,7 +37,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            if (!packetData.getPlayer().getGameMap().getAiEntityController().containsKey(packetData.entityId))
+            if (packetData.getPlayer().getGameMap().getAiEntityController().doesNotContainKey(packetData.entityId))
                 return false;
         }
 

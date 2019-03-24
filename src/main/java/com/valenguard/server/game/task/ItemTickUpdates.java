@@ -14,7 +14,7 @@ public class ItemTickUpdates {
     private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
     private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min
 
-    private List<GroundItemTimer> groundItemTimers = new ArrayList<>();
+    private final List<GroundItemTimer> groundItemTimers = new ArrayList<>();
 
     public void tickItemsDespawn() {
         Iterator<GroundItemTimer> itemTimerIterator = groundItemTimers.iterator();

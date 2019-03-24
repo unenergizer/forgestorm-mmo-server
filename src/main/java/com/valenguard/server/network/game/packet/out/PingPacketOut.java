@@ -5,7 +5,7 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 public class PingPacketOut extends AbstractServerOutPacket {
 
-    public PingPacketOut(Player player) {
+    public PingPacketOut(final Player player) {
         super(Opcodes.PING, player);
     }
 

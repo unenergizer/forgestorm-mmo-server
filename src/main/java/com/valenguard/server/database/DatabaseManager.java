@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import static com.valenguard.server.util.Log.println;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class DatabaseManager {
 
     @Getter

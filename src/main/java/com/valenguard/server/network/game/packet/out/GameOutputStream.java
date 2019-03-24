@@ -9,7 +9,7 @@ public class GameOutputStream {
 
     private final DataOutputStream dataOutputStream;
 
-    public GameOutputStream(DataOutputStream dataOutputStream) {
+    public GameOutputStream(final DataOutputStream dataOutputStream) {
         this.dataOutputStream = dataOutputStream;
     }
 

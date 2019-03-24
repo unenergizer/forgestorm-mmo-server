@@ -56,7 +56,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     }
 
     private void aiEntityClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getAiEntityController().containsKey(packetData.getEntityUUID())) return;
+        if (gameMap.getAiEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
 
         AiEntity aiEntity = (AiEntity) gameMap.getAiEntityController().getEntity(packetData.getEntityUUID());
 
@@ -65,13 +65,13 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     }
 
     private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getStationaryEntityController().containsKey(packetData.getEntityUUID())) return;
+        if (gameMap.getStationaryEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
         StationaryEntity clickedOnEntity = (StationaryEntity) gameMap.getStationaryEntityController().getEntity(packetData.getEntityUUID());
         changeEntityAppearance(clickedOnEntity, gameMap);
     }
 
     private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (!gameMap.getItemStackDropEntityController().containsKey(packetData.getEntityUUID())) return;
+        if (gameMap.getItemStackDropEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
 
         // Click received, lets pick up the item!
         println(getClass(), "Incoming ItemStack click!");

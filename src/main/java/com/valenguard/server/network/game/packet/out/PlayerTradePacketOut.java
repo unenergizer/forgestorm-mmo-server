@@ -8,9 +8,9 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerTradePacketOut extends AbstractServerOutPacket {
 
-    private TradePacketInfoOut tradePacketInfoOut;
+    private final TradePacketInfoOut tradePacketInfoOut;
 
-    public PlayerTradePacketOut(Player receiver, TradePacketInfoOut tradePacketInfoOut) {
+    public PlayerTradePacketOut(final Player receiver, final TradePacketInfoOut tradePacketInfoOut) {
         super(Opcodes.PLAYER_TRADE, receiver);
         this.tradePacketInfoOut = tradePacketInfoOut;
     }

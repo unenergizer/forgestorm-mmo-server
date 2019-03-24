@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class PlayerDataSQL extends AbstractSQL {
 
     @Override
-    void databaseLoad(Player player, Connection connection, ResultSet resultSet) throws SQLException {
+    void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         player.setFaction(resultSet.getByte("faction"));
         player.setCurrentHealth(resultSet.getInt("health"));
         player.setFacingDirection(MoveDirection.valueOf(resultSet.getString("facing_direction")));
@@ -86,7 +86,7 @@ public class PlayerDataSQL extends AbstractSQL {
     }
 
     @Override
-    SqlSearchData searchForData(Player player, Connection connection) {
+    SqlSearchData searchForData(Player player) {
         return new SqlSearchData("game_player", "user_id", player.getClientHandler().getDatabaseUserId());
     }
 }

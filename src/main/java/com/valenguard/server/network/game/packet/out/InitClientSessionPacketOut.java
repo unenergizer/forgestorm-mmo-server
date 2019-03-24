@@ -8,7 +8,7 @@ public class InitClientSessionPacketOut extends AbstractServerOutPacket {
     private final boolean loginSuccess;
     private final short clientPlayerId;
 
-    public InitClientSessionPacketOut(Player player, boolean loginSuccess, short clientPlayerId) {
+    public InitClientSessionPacketOut(final Player player, final boolean loginSuccess, final short clientPlayerId) {
         super(Opcodes.INIT_CLIENT_SESSION, player);
         this.loginSuccess = loginSuccess;
         this.clientPlayerId = clientPlayerId;

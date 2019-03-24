@@ -111,10 +111,9 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         } else if (inventoryType == InventoryType.EQUIPMENT) {
 
             if (packetData.slotIndex < 0 || packetData.slotIndex >= InventoryConstants.EQUIPMENT_SIZE) {
+                // TODO: remove this later
                 return;
             }
-
-            // TODO: remove this later
         }
     }
 

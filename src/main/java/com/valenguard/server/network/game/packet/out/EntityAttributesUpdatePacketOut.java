@@ -13,7 +13,7 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
 
     private final MovingEntity movingEntity;
 
-    public EntityAttributesUpdatePacketOut(Player receiver, MovingEntity movingEntity) {
+    public EntityAttributesUpdatePacketOut(final Player receiver, final MovingEntity movingEntity) {
         super(Opcodes.ATTRIBUTES_UPDATE, receiver);
         this.movingEntity = movingEntity;
     }

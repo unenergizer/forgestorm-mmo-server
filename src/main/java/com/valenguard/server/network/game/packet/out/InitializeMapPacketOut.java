@@ -7,7 +7,7 @@ public class InitializeMapPacketOut extends AbstractServerOutPacket {
 
     private final String mapName;
 
-    public InitializeMapPacketOut(Player player, String mapName) {
+    public InitializeMapPacketOut(final Player player, final String mapName) {
         super(Opcodes.INIT_MAP, player);
         this.mapName = mapName;
     }

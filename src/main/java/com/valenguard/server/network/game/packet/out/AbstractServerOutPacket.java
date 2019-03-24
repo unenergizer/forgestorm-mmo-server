@@ -17,7 +17,7 @@ public abstract class AbstractServerOutPacket {
     /**
      * The packetReceiver who will receive the packet.
      */
-    protected final Player packetReceiver;
+    final Player packetReceiver;
 
     AbstractServerOutPacket(byte opcode, Player packetReceiver) {
         this.opcode = opcode;

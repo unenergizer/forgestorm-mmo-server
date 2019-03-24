@@ -10,13 +10,13 @@ import java.sql.SQLException;
 
 public abstract class AbstractSQL {
 
-    abstract void databaseLoad(Player player, Connection connection, ResultSet resultSet) throws SQLException;
+    abstract void databaseLoad(Player player, ResultSet resultSet) throws SQLException;
 
     abstract PreparedStatement databaseSave(Player player, Connection connection) throws SQLException;
 
     abstract PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException;
 
-    abstract SqlSearchData searchForData(Player player, Connection connection);
+    abstract SqlSearchData searchForData(Player player);
 
     public void loadSQL(Player player) {
 
@@ -25,7 +25,7 @@ public abstract class AbstractSQL {
         PreparedStatement firstTimeSaveStatement = null;
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
-            SqlSearchData sqlSearchData = searchForData(player, connection);
+            SqlSearchData sqlSearchData = searchForData(player);
 
             searchStatement = connection.prepareStatement("SELECT * FROM " + sqlSearchData.getTableName() + " WHERE " + sqlSearchData.getColumnName() + "=?");
             searchStatement.setObject(1, sqlSearchData.getSetData());
@@ -35,7 +35,7 @@ public abstract class AbstractSQL {
                 firstTimeSaveStatement = firstTimeSave(player, connection);
                 firstTimeSaveStatement.execute();
             } else {
-                databaseLoad(player, connection, resultSet);
+                databaseLoad(player, resultSet);
             }
 
         } catch (SQLException e) {

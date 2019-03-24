@@ -38,7 +38,7 @@ public class PlayerBag {
             }
         }
         if (sendPacket) {
-            new InventoryPacketOut(player, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
+            new InventoryPacketOut(player, new InventoryActions(itemStack)).sendPacket();
         }
     }
 
@@ -52,7 +52,7 @@ public class PlayerBag {
     public void removeItemStack(byte slotIndex, boolean sendPacket) {
         bagSlots[slotIndex].setItemStack(null);
         if (sendPacket) {
-            new InventoryPacketOut(player, new InventoryActions(InventoryActions.REMOVE, slotIndex)).sendPacket();
+            new InventoryPacketOut(player, new InventoryActions(slotIndex)).sendPacket();
         }
     }
 
@@ -63,7 +63,6 @@ public class PlayerBag {
         bagSlots[fromPosition].setItemStack(toItemStack);
 
         new InventoryPacketOut(player, new InventoryActions(
-                InventoryActions.MOVE,
                 InventoryType.BAG_1,
                 InventoryType.BAG_1,
                 fromPosition,

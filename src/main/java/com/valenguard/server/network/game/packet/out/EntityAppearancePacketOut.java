@@ -7,7 +7,7 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 public class EntityAppearancePacketOut extends AbstractServerOutPacket {
 
-    public static final byte COLOR_INDEX = 0x01;
+    private static final byte COLOR_INDEX = 0x01;
     public static final byte BODY_INDEX = 0x02;
     public static final byte HEAD_INDEX = 0x04;
     public static final byte ARMOR_INDEX = 0x08;
@@ -16,7 +16,7 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
     private final Entity entity;
     private final byte appearanceBits;
 
-    public EntityAppearancePacketOut(Player receiver, Entity entity, byte appearanceBits) {
+    public EntityAppearancePacketOut(final Player receiver, final Entity entity, final byte appearanceBits) {
         super(Opcodes.APPEARANCE, receiver);
         this.entity = entity;
         this.appearanceBits = appearanceBits;

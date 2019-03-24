@@ -27,7 +27,7 @@ public class PlayerMoveInventoryEvents {
             } else if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_EQUIPMENT_TO_BAG) {
                 fromEquipmentToBag(inventoryEvent);
             } else if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_EQUIPMENT_TO_EQUIPMENT) {
-                fromEquipmentToEquipment(inventoryEvent);
+                fromEquipmentToEquipment();
             }
         }
     }
@@ -56,7 +56,6 @@ public class PlayerMoveInventoryEvents {
         }
 
         new InventoryPacketOut(player, new InventoryActions(
-                InventoryActions.MOVE,
                 InventoryType.BAG_1,
                 InventoryType.EQUIPMENT,
                 inventoryEvent.getFromPosition(),
@@ -81,7 +80,6 @@ public class PlayerMoveInventoryEvents {
 
 
         new InventoryPacketOut(player, new InventoryActions(
-                InventoryActions.MOVE,
                 InventoryType.EQUIPMENT,
                 InventoryType.BAG_1,
                 inventoryEvent.getFromPosition(),
@@ -89,7 +87,8 @@ public class PlayerMoveInventoryEvents {
         )).sendPacket();
     }
 
-    private void fromEquipmentToEquipment(InventoryEvent inventoryEvent) {
+    private void fromEquipmentToEquipment() {
+        // TODO: Define functionality here
         System.out.println("FROM EQUIPMENT TO EQUIPMENT");
     }
 }

@@ -12,6 +12,7 @@ import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacke
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
+import static java.util.Objects.requireNonNull;
 
 public class PlayerEquipment {
 
@@ -46,7 +47,7 @@ public class PlayerEquipment {
         // If bagItemStack == null then the equipment is being removed.
         if (bagItemStack != null) {
             boolean foundType = false;
-            for (ItemStackType itemStackType : getAcceptedItemStackTypes(equipmentIndex)) {
+            for (ItemStackType itemStackType : requireNonNull(getAcceptedItemStackTypes(equipmentIndex))) {
                 if (itemStackType == bagItemStack.getItemStackType()) foundType = true;
             }
             if (!foundType) return false;
@@ -116,7 +117,7 @@ public class PlayerEquipment {
 
     private void updateAppearance(byte slotIndex, boolean sendPacket) {
         InventorySlot inventorySlot = equipmentSlots[slotIndex];
-        ItemStackType acceptedItemStackType = getAcceptedItemStackTypes(slotIndex)[0];
+        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(slotIndex))[0];
 
         if (inventorySlot.getItemStack() != null) {
             if (inventorySlot.getItemStack() instanceof WearableItemStack) {

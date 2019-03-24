@@ -8,7 +8,7 @@ public class EntityDespawnPacketOut extends AbstractServerOutPacket {
 
     private final Entity despawnTarget;
 
-    public EntityDespawnPacketOut(Player receiver, Entity despawnTarget) {
+    public EntityDespawnPacketOut(final Player receiver, final Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver);
         this.despawnTarget = despawnTarget;
     }

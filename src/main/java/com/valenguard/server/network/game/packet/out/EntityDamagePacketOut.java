@@ -10,7 +10,7 @@ public class EntityDamagePacketOut extends AbstractServerOutPacket {
     private final int health;
     private final int damageTaken;
 
-    public EntityDamagePacketOut(Player receiver, MovingEntity damagedEntity, int health, int damageTaken) {
+    public EntityDamagePacketOut(final Player receiver, final MovingEntity damagedEntity, final int health, final int damageTaken) {
         super(Opcodes.ENTITY_DAMAGE_OUT, receiver);
         this.damagedEntity = damagedEntity;
         this.health = health;

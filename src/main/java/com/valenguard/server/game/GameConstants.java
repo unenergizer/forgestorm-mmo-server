@@ -11,7 +11,4 @@ public class GameConstants {
     public static final short QUIT_ATTACK_RADIUS = 8;
 
     public static final int GENERAL_RESPAWN_TIME = 60;
-
-    public static final int GENERAL_ENTITY_BASE_HP = 5;
-    public static final int GENERAL_ENTITY_DAMAGE = 1;
 }

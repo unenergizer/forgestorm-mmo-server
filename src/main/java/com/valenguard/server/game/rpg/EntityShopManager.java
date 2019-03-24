@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class EntityShopManager {
 
-    private Map<Short, List<EntityShopLoader.ShopItemStackInfo>> map = new EntityShopLoader().loadFromFile();
+    private final Map<Short, List<EntityShopLoader.ShopItemStackInfo>> entityShopMap = new EntityShopLoader().loadFromFile();
 
     // TODO: add playerSellItemStack functionality
 
@@ -19,9 +19,9 @@ public class EntityShopManager {
         InventorySlot inventorySlot = player.getPlayerBag().getGoldInventorySlot();
         if (inventorySlot == null) return; // The player has no gold.
 
-        if (shopSlot >= map.get(shopID).size() || shopSlot < 0) return;
+        if (shopSlot >= entityShopMap.get(shopID).size() || shopSlot < 0) return;
 
-        EntityShopLoader.ShopItemStackInfo shopItemStackInfo = map.get(shopID).get(shopSlot);
+        EntityShopLoader.ShopItemStackInfo shopItemStackInfo = entityShopMap.get(shopID).get(shopSlot);
         int buyPrice = shopItemStackInfo.getPrice();
         int itemId = shopItemStackInfo.getItemId();
 

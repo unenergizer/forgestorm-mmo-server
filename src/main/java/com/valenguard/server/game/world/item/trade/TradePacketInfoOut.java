@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class TradePacketInfoOut {
 
-    private TradeStatusOpcode tradeOpcode;
+    private final TradeStatusOpcode tradeOpcode;
     private int tradeUUID;
     private short tradeStarterUUID;
     private short tradeTargetUUID;
@@ -14,7 +14,7 @@ public class TradePacketInfoOut {
     private ItemStack itemStack;
     private byte tradeSlot;
 
-    TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode) {
+    TradePacketInfoOut(final TradeStatusOpcode tradeStatusOpcode) {
         this.tradeOpcode = tradeStatusOpcode;
     }
 
@@ -31,14 +31,14 @@ public class TradePacketInfoOut {
         this.confirmedPlayerUUID = confirmedPlayerUUID;
     }
 
-    TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, byte tradeSlot) {
-        this.tradeOpcode = tradeStatusOpcode;
+    TradePacketInfoOut(int tradeUUID, byte tradeSlot) {
+        this.tradeOpcode = TradeStatusOpcode.TRADE_ITEM_REMOVE;
         this.tradeUUID = tradeUUID;
         this.tradeSlot = tradeSlot;
     }
 
-    TradePacketInfoOut(TradeStatusOpcode tradeStatusOpcode, int tradeUUID, ItemStack itemStack) {
-        this.tradeOpcode = tradeStatusOpcode;
+    TradePacketInfoOut(int tradeUUID, ItemStack itemStack) {
+        this.tradeOpcode = TradeStatusOpcode.TRADE_ITEM_ADD;
         this.tradeUUID = tradeUUID;
         this.itemStack = itemStack;
     }

@@ -23,7 +23,7 @@ public class UserAuthenticate {
         PreparedStatement getUserIdStatement = null;
         PreparedStatement getHashStatement = null;
         int databaseUserId;
-        String databaseUsername = null;
+        String databaseUsername;
         if (Server.getInstance().getGameManager().findPlayer(username) != null) {
             return new LoginState().failState("User already logged in.");
         }

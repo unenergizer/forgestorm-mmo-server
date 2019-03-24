@@ -25,7 +25,7 @@ public class InventoryActions {
     public static final byte SET_EQUIPMENT = 0x06;
 
     @Getter
-    private byte inventoryActionType;
+    private final byte inventoryActionType;
 
     @Getter
     private ItemStack itemStack;
@@ -49,24 +49,24 @@ public class InventoryActions {
     @Getter
     private byte toWindow;
 
-    public InventoryActions(byte inventoryActionType, ItemStack itemStack) {
-        this.inventoryActionType = inventoryActionType;
+    InventoryActions(ItemStack itemStack) {
+        this.inventoryActionType = InventoryActions.GIVE;
         this.itemStack = new ItemStack(itemStack);
     }
 
-    public InventoryActions(byte inventoryActionType, byte slotIndex, ItemStack itemStack) {
+    public InventoryActions(final byte inventoryActionType, byte slotIndex, ItemStack itemStack) {
         this.inventoryActionType = inventoryActionType;
         this.itemStack = new ItemStack(itemStack);
         this.slotIndex = slotIndex;
     }
 
-    public InventoryActions(byte inventoryActionType, byte slotIndex) {
-        this.inventoryActionType = inventoryActionType;
+    InventoryActions(byte slotIndex) {
+        this.inventoryActionType = InventoryActions.REMOVE;
         this.slotIndex = slotIndex;
     }
 
-    public InventoryActions(byte inventoryActionType, InventoryType fromWindow, InventoryType toWindow, byte fromPosition, byte toPosition) {
-        this.inventoryActionType = inventoryActionType;
+    InventoryActions(InventoryType fromWindow, InventoryType toWindow, byte fromPosition, byte toPosition) {
+        this.inventoryActionType = InventoryActions.MOVE;
         this.fromWindow = fromWindow.getInventoryTypeIndex();
         this.toWindow = toWindow.getInventoryTypeIndex();
         this.fromPosition = fromPosition;

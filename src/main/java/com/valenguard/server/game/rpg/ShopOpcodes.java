@@ -15,8 +15,4 @@ public enum ShopOpcodes {
         }
         return null;
     }
-
-    public byte getShopOpcodeByte() {
-        return (byte) this.ordinal();
-    }
 }

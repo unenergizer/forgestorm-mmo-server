@@ -16,7 +16,7 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
     private final MovingEntity movingEntity;
     private final Location attemptLocation;
 
-    public EntityMovePacketOut(Player packetReceiver, MovingEntity movingEntity, Location attemptLocation) {
+    public EntityMovePacketOut(final Player packetReceiver, final MovingEntity movingEntity, final Location attemptLocation) {
         super(Opcodes.ENTITY_MOVE_UPDATE, packetReceiver);
         this.movingEntity = movingEntity;
         this.attemptLocation = attemptLocation;

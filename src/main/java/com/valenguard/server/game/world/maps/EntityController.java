@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.util.*;
 
+@SuppressWarnings("SuspiciousMethodCalls")
 public abstract class EntityController<T extends Entity> {
 
     private final GameMap gameMap;
@@ -40,12 +41,12 @@ public abstract class EntityController<T extends Entity> {
         postEntityDespawn(entity);
     }
 
-    public abstract void postEntityDespawn(T entity);
+    protected abstract void postEntityDespawn(T entity);
 
     public abstract void tick();
 
-    public boolean containsKey(Object key) {
-        return entityHashMap.containsKey(key);
+    public boolean doesNotContainKey(Object key) {
+        return !entityHashMap.containsKey(key);
     }
 
     public Collection<T> getEntities() {

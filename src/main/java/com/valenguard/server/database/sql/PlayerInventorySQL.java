@@ -17,7 +17,7 @@ public class PlayerInventorySQL extends AbstractSQL {
     private final ItemStackManager itemStackManager = Server.getInstance().getItemStackManager();
 
     @Override
-    void databaseLoad(Player player, Connection connection, ResultSet resultSet) throws SQLException {
+    void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         InventorySlot[] bagStack = (InventorySlot[]) Base64Util.deserializeObjectFromBase64(resultSet.getString("bag"));
         setPlayerBag(player, bagStack);
 
@@ -71,7 +71,7 @@ public class PlayerInventorySQL extends AbstractSQL {
     }
 
     @Override
-    SqlSearchData searchForData(Player player, Connection connection) {
+    SqlSearchData searchForData(Player player) {
         return new SqlSearchData("game_player_inventory", "user_id", player.getClientHandler().getDatabaseUserId());
     }
 }

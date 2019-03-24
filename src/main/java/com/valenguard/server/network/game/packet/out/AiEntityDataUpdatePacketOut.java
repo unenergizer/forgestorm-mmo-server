@@ -7,10 +7,10 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
 
     public static final byte ALIGNMENT_INDEX = 0x01;
 
-    private AiEntity aiEntity;
-    private byte dataBits;
+    private final AiEntity aiEntity;
+    private final byte dataBits;
 
-    public AiEntityDataUpdatePacketOut(Player packetReceiver, AiEntity aiEntity, byte dataBits) {
+    public AiEntityDataUpdatePacketOut(final Player packetReceiver, final AiEntity aiEntity, final byte dataBits) {
         super(Opcodes.AI_ENTITY_UPDATE_OUT, packetReceiver);
         this.aiEntity = aiEntity;
         this.dataBits = dataBits;

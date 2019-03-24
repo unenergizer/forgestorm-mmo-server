@@ -7,23 +7,25 @@ import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.AiEntityDataUpdatePacketOut;
 import lombok.Getter;
 
+import static java.util.Objects.requireNonNull;
+
 public class Reputation {
 
-    private Player player;
+    private final Player player;
 
-    public Reputation(Player player) {
+    public Reputation(final Player player) {
         this.player = player;
     }
 
     @Getter
-    private short[] reputationData = new short[Server.getInstance().getFactionManager().getNumberOfFactions()];
+    private final short[] reputationData = new short[Server.getInstance().getFactionManager().getNumberOfFactions()];
 
     private short getReputations(byte faction) {
         return reputationData[faction];
     }
 
     public EntityAlignment getAlignment(byte faction) {
-        return ReputationTypes.getReputationType(getReputations(faction)).getEntityAlignment();
+        return requireNonNull(ReputationTypes.getReputationType(getReputations(faction))).getEntityAlignment();
     }
 
     public void addReputation(byte faction, short amount) {

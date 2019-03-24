@@ -12,7 +12,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
 
-    public EntitySpawnPacketOut(Player player, Entity entityToSpawn) {
+    public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player);
         this.entityToSpawn = entityToSpawn;
     }
