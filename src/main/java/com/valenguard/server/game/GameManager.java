@@ -28,9 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameManager {
 
-    private static final boolean PRINT_DEBUG = false;
-    public static final int PLAYERS_TO_PROCESS = 50;
-
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
@@ -115,7 +112,6 @@ public class GameManager {
     public void playerSwitchGameMap(Player player) {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
-        Log.println(getClass(), "ToMap: " + warp.getLocation().getMapName() + ", FromMap: " + player.getMapName(), true, PRINT_DEBUG);
         checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
                 "The packetReceiver is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 

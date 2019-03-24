@@ -5,29 +5,19 @@ import lombok.Setter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+@Getter
 public class GameMap {
 
-    @Getter
     private final String mapName;
-    @Getter
     private final int mapWidth, mapHeight;
-    @Getter
     private final Tile map[][];
-
-    @Getter
     private final PlayerController playerController = new PlayerController(this);
-
-    @Getter
     private final AiEntityController aiEntityController = new AiEntityController(this);
-    @Getter
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
-    @Getter
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
 
-    // TODO: generate the id from a pool of free ids
-    @Getter
     @Setter
-    private short lastItemStackDrop = 0;
+    private short lastItemStackDrop = 0; // TODO: generate the id from a pool of free ids
 
     public GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
         this.mapName = mapName;
@@ -36,7 +26,6 @@ public class GameMap {
         this.map = map;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isMovable(Location location) {
         return !isOutOfBounds(location) && isTraversable(location);
     }

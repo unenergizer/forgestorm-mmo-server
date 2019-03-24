@@ -10,13 +10,13 @@ public class LoginState {
     private String failReason;
     private String username;
 
-    public LoginState failState(String failReason) {
+    LoginState failState(String failReason) {
         this.failReason = failReason;
         loginSuccess = false;
         return this;
     }
 
-    public LoginState successState(int userId, String username) {
+    LoginState successState(int userId, String username) {
         this.userId = userId;
         loginSuccess = true;
         this.username = username;

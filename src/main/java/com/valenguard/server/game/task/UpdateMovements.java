@@ -233,23 +233,19 @@ public class UpdateMovements {
 
         if (targetLocation.getX() > currentLocation.getX()) {
             if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
-                if (gameMap.isMovable(eastLocation))
-                    performAiEntityMove(aiEntity, MoveDirection.EAST);
+                if (gameMap.isMovable(eastLocation)) performAiEntityMove(aiEntity, MoveDirection.EAST);
             }
         } else if (targetLocation.getX() < currentLocation.getX()) {
             if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
-                if (gameMap.isMovable(westLocation))
-                    performAiEntityMove(aiEntity, MoveDirection.WEST);
+                if (gameMap.isMovable(westLocation)) performAiEntityMove(aiEntity, MoveDirection.WEST);
             }
         } else if (targetLocation.getY() > currentLocation.getY()) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
-                if (gameMap.isMovable(northLocation))
-                    performAiEntityMove(aiEntity, MoveDirection.NORTH);
+                if (gameMap.isMovable(northLocation)) performAiEntityMove(aiEntity, MoveDirection.NORTH);
             }
         } else if (targetLocation.getY() < currentLocation.getY()) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
-                if (gameMap.isMovable(southLocation))
-                    performAiEntityMove(aiEntity, MoveDirection.SOUTH);
+                if (gameMap.isMovable(southLocation)) performAiEntityMove(aiEntity, MoveDirection.SOUTH);
             }
         } else if (targetLocation.getX() == currentLocation.getX() && targetLocation.getY() == currentLocation.getY()) {
             // on top of each other

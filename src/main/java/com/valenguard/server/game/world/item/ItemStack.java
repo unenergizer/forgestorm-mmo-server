@@ -19,7 +19,6 @@ public class ItemStack implements Cloneable, Serializable {
 
     public ItemStack(int itemId) {
         this.itemId = itemId;
-        // TODO get isStackable based on the item type / item type such as bank/packetReceiver item ect..
     }
 
     public ItemStack(ItemStack itemStack) {

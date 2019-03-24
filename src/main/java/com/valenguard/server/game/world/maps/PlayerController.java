@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
-import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
@@ -33,7 +33,7 @@ public class PlayerController {
         // Remove players
         Iterator<Player> quitIterator = playerQuitQueue.iterator();
         int quitsProcessed = 0;
-        while (quitIterator.hasNext() && quitsProcessed <= GameManager.PLAYERS_TO_PROCESS) {
+        while (quitIterator.hasNext() && quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
             playerQuitGameMap(quitIterator.next());
             quitsProcessed++;
         }
@@ -41,7 +41,7 @@ public class PlayerController {
         // Add players
         Iterator<QueueData> joinIterator = playerJoinQueue.iterator();
         int joinsProcessed = 0;
-        while (joinIterator.hasNext() && joinsProcessed <= GameManager.PLAYERS_TO_PROCESS) {
+        while (joinIterator.hasNext() && joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
             playerJoinGameMap(joinIterator.next());
             joinsProcessed++;
         }
@@ -55,12 +55,12 @@ public class PlayerController {
 
     public void sendPlayersPacket() {
 
-        for (int quitsProcessed = 0; quitsProcessed <= GameManager.PLAYERS_TO_PROCESS; quitsProcessed++) {
+        for (int quitsProcessed = 0; quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS; quitsProcessed++) {
             if (playerQuitQueue.isEmpty()) break;
             postPlayerDespawn(playerQuitQueue.remove());
         }
 
-        for (int joinsProcessed = 0; joinsProcessed <= GameManager.PLAYERS_TO_PROCESS; joinsProcessed++) {
+        for (int joinsProcessed = 0; joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
             // Tell everyone already online about the packetReceiver and the packetReceiver about everyone online.
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
