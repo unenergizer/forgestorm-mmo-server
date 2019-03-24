@@ -4,11 +4,13 @@ import com.valenguard.server.game.world.item.ItemStack;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-class EquipmentSlot {
+public class EquipmentSlot implements Serializable {
 
-    private EquipmentSlotTypes equipmentSlot;
+    private transient EquipmentSlotTypes equipmentSlot;
     private ItemStack itemStack;
 
     EquipmentSlot(EquipmentSlotTypes equipmentSlot) {

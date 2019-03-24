@@ -106,6 +106,9 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 player.removeItemStackFromBag(itemStackSlotData.getBagIndex());
 
                 player.setItemStack(itemStackSlotData.getBagIndex(), goldItemStack);
+            } else {
+                // Giving the player the ItemStack of gold since they don't have any gold on them.
+                player.giveItemStack(itemStack);
             }
         } else {
             // Send the packetReceiver the item

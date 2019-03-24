@@ -4,6 +4,8 @@ import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.network.game.shared.Opcodes;
 
+import static com.valenguard.server.util.Log.println;
+
 public class InventoryPacketOut extends AbstractServerOutPacket {
 
     private final InventoryActions inventoryAction;
@@ -22,11 +24,12 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
             write.writeInt(inventoryAction.getItemStack().getAmount());
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
             write.writeByte(inventoryAction.getSlotIndex());
-        } else if (inventoryAction.getInventoryActionType() == InventoryActions.SET) {
+        } else if (inventoryAction.getInventoryActionType() == InventoryActions.SET_BAG || inventoryAction.getInventoryActionType() == InventoryActions.SET_EQUIPMENT) {
             write.writeByte(inventoryAction.getSlotIndex());
             write.writeInt(inventoryAction.getItemStack().getItemId());
             write.writeInt(inventoryAction.getItemStack().getAmount());
         } else if (inventoryAction.getInventoryActionType() == InventoryActions.MOVE) {
+            println(getClass(), "Sending an inventory move request for some dumb reason?");
             write.writeByte(inventoryAction.getFromPosition());
             write.writeByte(inventoryAction.getToPosition());
 

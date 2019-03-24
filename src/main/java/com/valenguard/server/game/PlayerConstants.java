@@ -68,5 +68,5 @@ public class PlayerConstants {
     /**
      * Player Starting Damage
      */
-    static final int BASE_DAMAGE = 1;
+    static final int BASE_DAMAGE = 10;
 }

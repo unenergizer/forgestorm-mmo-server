@@ -2,10 +2,10 @@ package com.valenguard.server.game;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.database.sql.PlayerDataSQL;
+import com.valenguard.server.database.sql.PlayerInventorySQL;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.world.entity.*;
-import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.io.FilePaths;
@@ -94,9 +94,6 @@ public class GameManager {
 
         Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
-
-        //TODO: GET LAST LOGIN INFO FROM DATABASE_SETTINGS, UNLESS PLAYER IS TRUE "NEW PLAYER."
-
         Player player = initializePlayer(playerSessionData);
 
         Log.println(getClass(), "Sending initialize server id: " + playerSessionData.getServerID(), false, PRINT_DEBUG);
@@ -108,11 +105,7 @@ public class GameManager {
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
 
         // Give test items
-        ItemStack starterGold = Server.getInstance().getItemStackManager().makeItemStack(0, 100);
-        player.giveItemStack(starterGold);
-
-        ItemStack starterSword = Server.getInstance().getItemStackManager().makeItemStack(4, 1);
-        player.giveItemStack(starterSword);
+        new PlayerInventorySQL().loadSQL(player);
 
         tempColor++;
         if (tempColor > 15) tempColor = 0;
@@ -174,6 +167,7 @@ public class GameManager {
     private void playerQuitServer(Player player) {
 
         new PlayerDataSQL().saveSQL(player);
+        new PlayerInventorySQL().saveSQL(player);
 
         for (GameMap mapSearch : gameMaps.values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {

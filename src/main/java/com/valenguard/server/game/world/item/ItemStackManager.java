@@ -21,6 +21,10 @@ public class ItemStackManager {
         return itemStack;
     }
 
+    public ItemStack makeItemStack(ItemStack itemStack) {
+        return makeItemStack(itemStack.itemId, itemStack.getAmount());
+    }
+
     public int numberOfItems() {
         return itemStacks.length;
     }

@@ -6,6 +6,7 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
 import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
@@ -40,6 +41,13 @@ public class PlayerEquipment {
         equipmentSlots[11] = new EquipmentSlot(EquipmentSlotTypes.AMMO);
     }
 
+    public void setEquipmentSlot(byte equipmentIndex, ItemStack itemStack) {
+        equipmentSlots[equipmentIndex].setItemStack(itemStack);
+         updatePlayerAttributes(itemStack, null, true, false); // todo come back to later...
+        updateAppearance(equipmentIndex);
+        new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_EQUIPMENT, equipmentIndex, itemStack)).sendPacket();
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean swapBagAndEquipmentWindow(PlayerBag playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
         ItemStack bagItemStack = playerBag.getItemStack(bagIndex);
@@ -58,7 +66,7 @@ public class PlayerEquipment {
         playerBag.setItemStack(bagIndex, equipmentItemStack);
         equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
 
-        updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem);
+        updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
         updateAppearance(equipmentIndex);
 
         return true;
@@ -67,7 +75,7 @@ public class PlayerEquipment {
     /**
      * Update the {@link Player} with the {@link Attributes} found on equipped item.
      */
-    private void updatePlayerAttributes(ItemStack bagItemStack, ItemStack equipItemStack, boolean equipItem) {
+    private void updatePlayerAttributes(ItemStack bagItemStack, ItemStack equipItemStack, boolean equipItem, boolean sendAttributePacket) {
 
         Attributes playerClientAttributes = player.getAttributes();
         Attributes itemStackAttributes = equipItem ? bagItemStack.getAttributes() : equipItemStack.getAttributes();
@@ -114,7 +122,7 @@ public class PlayerEquipment {
         println(PRINT_DEBUG);
 
         // Send attributes packet
-        new EntityAttributesUpdatePacketOut(player, player).sendPacket();
+        if (sendAttributePacket) new EntityAttributesUpdatePacketOut(player, player).sendPacket();
     }
 
     private void updateAppearance(byte equipmentIndex) {

@@ -3,17 +3,19 @@ package com.valenguard.server.game.world.item;
 import com.valenguard.server.game.rpg.Attributes;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ItemStack implements Cloneable {
+public class ItemStack implements Cloneable, Serializable {
 
     protected int itemId;
-    private String name;
-    private String description;
-    private ItemStackType itemStackType;
-    private boolean isStackable;
+    private transient String name;
+    private transient String description;
+    private transient ItemStackType itemStackType;
+    private transient boolean isStackable;
     private int amount;
 
-    private Attributes attributes;
+    private transient Attributes attributes;
 
     public ItemStack(int itemId) {
         this.itemId = itemId;
@@ -26,6 +28,7 @@ public class ItemStack implements Cloneable {
         this.description = itemStack.getDescription();
         this.itemStackType = itemStack.getItemStackType();
         this.isStackable = itemStack.isStackable();
+        this.attributes = itemStack.getAttributes();
         this.amount = itemStack.getAmount();
     }
 
@@ -47,6 +50,6 @@ public class ItemStack implements Cloneable {
 
     @Override
     public String toString() {
-        return "{ ID = " + itemId + ", Amount = " + amount + " }";
+        return "{ ID = " + itemId + ", Name = " + name + ", Amount = " + amount + " }";
     }
 }

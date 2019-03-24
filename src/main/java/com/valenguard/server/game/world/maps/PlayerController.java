@@ -71,10 +71,8 @@ public class PlayerController {
 
             // Spawn itemStack drops!
             for (ItemStackDrop itemStackDrop : gameMap.getItemStackDropEntityController().getEntities()) {
-                if (playerWhoJoined == itemStackDrop.getDropOwner()) {
-                    // Edge case where the packetReceiver killed something, disconnected and reconnected.
-                    // TODO: When packetReceiver logs out, send them their dropped items...
-                    // TODO: right now because real UUID's aren't set, this will never be true!
+                if (playerWhoJoined.getClientHandler().getDatabaseUserId() == itemStackDrop.getDropOwner().getClientHandler().getDatabaseUserId()) {
+                    // ItemStackDrop Owner killed something, disconnected and reconnected. Send them the entity again.
                     postPlayerSpawn(playerWhoJoined, itemStackDrop);
                 } else if (itemStackDrop.isSpawnedForAll()) {
                     // Spawn items for joined players, only if the item has been spawned for all players.
