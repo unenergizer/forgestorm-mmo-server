@@ -20,11 +20,13 @@ public class UserAuthenticate {
     public static LoginState authenticate(String username, String password) {
         ResultSet userIdResult = null;
         ResultSet hashResult = null;
+        PreparedStatement getUserIdStatement = null;
+        PreparedStatement getHashStatement = null;
         int databaseUserId;
         try {
             Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
 
-            PreparedStatement getUserIdStatement = connection.prepareStatement(GET_USER_ID);
+            getUserIdStatement = connection.prepareStatement(GET_USER_ID);
             getUserIdStatement.setString(1, username);
 
             userIdResult = getUserIdStatement.executeQuery();
@@ -33,7 +35,7 @@ public class UserAuthenticate {
 
                 databaseUserId = userIdResult.getInt("user_id");
 
-                PreparedStatement getHashStatement = connection.prepareStatement(GET_USER_HASH);
+                getHashStatement = connection.prepareStatement(GET_USER_HASH);
                 getHashStatement.setInt(1, databaseUserId);
 
                 hashResult = getHashStatement.executeQuery();
@@ -75,6 +77,8 @@ public class UserAuthenticate {
             try {
                 if (userIdResult != null) userIdResult.close();
                 if (hashResult != null) hashResult.close();
+                if (getUserIdStatement != null) getUserIdStatement.close();
+                if (getHashStatement != null) getHashStatement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

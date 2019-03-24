@@ -1,13 +1,12 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.database.sql.PlayerDataSQL;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.GameMap;
-import com.valenguard.server.game.world.maps.Location;
-import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
@@ -97,17 +96,6 @@ public class GameManager {
 
 
         //TODO: GET LAST LOGIN INFO FROM DATABASE_SETTINGS, UNLESS PLAYER IS TRUE "NEW PLAYER."
-        GameMap gameMap = gameMaps.get(PlayerConstants.STARTING_MAP);
-
-        // Below we create a starting currentMapLocation for a new packetReceiver.
-        // The Y cord is subtracted from the height of the map.
-        // The reason for this is because on the Tiled Editor
-        // the Y cord is reversed.  This just makes our job
-        // easier if we want to quickly grab a cord from the
-        // Tiled Editor without doing the subtraction ourselves.
-        Location location = new Location(PlayerConstants.STARTING_MAP,
-                PlayerConstants.STARTING_X_CORD,
-                (short) (gameMap.getMapHeight() - PlayerConstants.STARTING_Y_CORD));
 
         Player player = initializePlayer(playerSessionData);
 
@@ -117,7 +105,7 @@ public class GameManager {
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 
-        gameMap.getPlayerController().addPlayer(player, new Warp(location, MoveDirection.SOUTH));
+        player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
 
         // Give test items
         ItemStack starterGold = Server.getInstance().getItemStackManager().makeItemStack(0, 100);
@@ -146,8 +134,13 @@ public class GameManager {
         player.setServerEntityId(playerSessionData.getServerID());
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
         player.setClientHandler(playerSessionData.getClientHandler());
-        player.setName(playerSessionData.getUsername());
+        player.setName(playerSessionData.getUsername()); // todo get case sensitive name from database
         playerSessionData.getClientHandler().setPlayer(player);
+
+        new PlayerDataSQL().loadSQL(player);
+
+        // todo load this stuff from the database as well
+
         short[] initialPlayerTextureIds = new short[4];
         initialPlayerTextureIds[Appearance.BODY] = 0;
         initialPlayerTextureIds[Appearance.HEAD] = 0;
@@ -162,12 +155,9 @@ public class GameManager {
         baseAttributes.setDamage(PlayerConstants.BASE_DAMAGE);
 
         // Setup health
-        player.setCurrentHealth(PlayerConstants.BASE_HP);
-        player.setMaxHealth(PlayerConstants.BASE_HP);
+        player.setMaxHealth(PlayerConstants.BASE_HP); // todo this at some point will be a calculation
 
         player.setAttributes(baseAttributes);
-
-        player.setFaction(Server.getInstance().getFactionManager().getFactionByName("THE_EMPIRE"));
 
         // TODO: Setup faction rep here
         short setThisFactionRep = 0;
@@ -188,6 +178,9 @@ public class GameManager {
     }
 
     private void playerQuitServer(Player player) {
+
+        new PlayerDataSQL().saveSQL(player);
+
         for (GameMap mapSearch : gameMaps.values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
