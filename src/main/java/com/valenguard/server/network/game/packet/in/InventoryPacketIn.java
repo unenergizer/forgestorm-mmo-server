@@ -90,8 +90,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 return;
             }
 
-            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getItems()[packetData.slotIndex];
-            packetData.getPlayer().removeItemStackFromBag(packetData.slotIndex);
+            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getBagSlots()[packetData.slotIndex].getItemStack();
+            packetData.getPlayer().getPlayerBag().removeItemStack(packetData.slotIndex, true);
 
             GameMap gameMap = packetData.getPlayer().getGameMap();
 

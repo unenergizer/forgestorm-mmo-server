@@ -16,7 +16,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
 
         // Write inner opcode (TradeStatusOpcode
         write.writeByte(tradePacketInfoOut.getTradeOpcode().getTradeOpcodeByte());

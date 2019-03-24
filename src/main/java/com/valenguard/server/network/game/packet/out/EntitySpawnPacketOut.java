@@ -18,7 +18,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         if (entityToSpawn instanceof MovingEntity) {
             spawnMovingEntity(write);
         } else if (entityToSpawn instanceof StationaryEntity) {
@@ -28,7 +28,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         }
     }
 
-    private void spawnMovingEntity(ValenguardOutputStream write) {
+    private void spawnMovingEntity(GameOutputStream write) {
         write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
@@ -86,7 +86,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         }
     }
 
-    private void spawnStationaryEntity(ValenguardOutputStream write) {
+    private void spawnStationaryEntity(GameOutputStream write) {
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());
@@ -95,7 +95,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(entityToSpawn.getAppearance().getTextureId(Appearance.BODY));
     }
 
-    private void spawnItemStackDrop(ValenguardOutputStream write) {
+    private void spawnItemStackDrop(GameOutputStream write) {
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());

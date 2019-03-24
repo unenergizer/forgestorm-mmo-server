@@ -13,7 +13,7 @@ public class InitializeMapPacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeString(mapName);
     }
 }

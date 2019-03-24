@@ -4,6 +4,7 @@ import com.valenguard.server.game.GameLoop;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.inventory.InventoryConstants;
+import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.game.world.item.inventory.PlayerBag;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.PlayerTradePacketOut;
@@ -95,7 +96,7 @@ public class TradeManager {
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
-        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        ItemStack itemStack = player.getPlayerBag().getBagSlots()[itemSlot].getItemStack();
         if (itemStack == null) return;
 
         if (tradeData.targetPlayer == player) {
@@ -124,7 +125,7 @@ public class TradeManager {
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
-        ItemStack itemStack = player.getPlayerBag().getItems()[itemSlot];
+        ItemStack itemStack = player.getPlayerBag().getBagSlots()[itemSlot].getItemStack();
         if (itemStack == null) return;
 
         println(getClass(), "[2] Remove trade item called! Player: " + player.getName());
@@ -432,10 +433,10 @@ public class TradeManager {
      */
     private List<ItemStack> generateGiveItems(Player trader, Byte[] tradeItems) {
         List<ItemStack> giveItems = new ArrayList<>();
-        ItemStack[] bagItems = trader.getPlayerBag().getItems();
+        InventorySlot[] bagItems = trader.getPlayerBag().getBagSlots();
         for (Byte itemSlot : tradeItems) {
             if (itemSlot == null) continue;
-            ItemStack itemStack = bagItems[itemSlot];
+            ItemStack itemStack = bagItems[itemSlot].getItemStack();
             giveItems.add(itemStack);
         }
         return giveItems;
@@ -453,12 +454,14 @@ public class TradeManager {
         // Dump items from trade starter bag
         for (Byte slotIndex : itemsToRemove) {
             if (slotIndex != null) {
-                playerToUpdate.removeItemStackFromBag(slotIndex);
+                playerToUpdate.getPlayerBag().removeItemStack(slotIndex, true);
             }
         }
 
         // Send the trade starter the target packetReceiver items
-        itemsToAdd.forEach(playerToUpdate::giveItemStack);
+        for (ItemStack itemStack : itemsToAdd) {
+            playerToUpdate.getPlayerBag().giveItemStack(itemStack, true);
+        }
     }
 
     /**

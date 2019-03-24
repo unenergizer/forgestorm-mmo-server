@@ -45,7 +45,7 @@ public class PlayerMoveInventoryEvents {
     }
 
     private void bagMove(InventoryEvent inventoryEvent) {
-        inventoryEvent.getPlayer().moveItemStackInBag(inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
+        inventoryEvent.getPlayer().getPlayerBag().moveItemStack(inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
     }
 
     private void fromBagToEquipment(InventoryEvent inventoryEvent) {

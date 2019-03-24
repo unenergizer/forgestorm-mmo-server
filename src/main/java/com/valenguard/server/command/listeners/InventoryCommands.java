@@ -14,7 +14,7 @@ public class InventoryCommands {
         if (itemId < 0) return;
 
         Server.getInstance().getGameManager().forAllPlayers(player ->
-                player.giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1)));
+                player.getPlayerBag().giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true));
 
     }
 
@@ -34,7 +34,7 @@ public class InventoryCommands {
             }
 
             Server.getInstance().getGameManager().forAllPlayers(player ->
-                    player.giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount)));
+                    player.getPlayerBag().giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount), true));
 
         } catch (NumberFormatException e) {
             System.out.println("Must provide an itemAmount as a number.");

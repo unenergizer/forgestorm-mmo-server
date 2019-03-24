@@ -10,7 +10,7 @@ public class PingPacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         packetReceiver.setPingOutTime(System.currentTimeMillis());
         write.writeLong(packetReceiver.getLastPingTime());
     }

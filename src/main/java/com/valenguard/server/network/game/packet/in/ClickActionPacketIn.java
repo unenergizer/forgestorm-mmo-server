@@ -2,8 +2,9 @@ package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.game.world.item.ItemStackSlotData;
 import com.valenguard.server.game.world.item.ItemStackType;
+import com.valenguard.server.game.world.item.inventory.InventorySlot;
+import com.valenguard.server.game.world.item.inventory.PlayerBag;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.shared.*;
@@ -76,18 +77,17 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         println(getClass(), "Incoming ItemStack click!");
         ItemStackDrop itemStackDrop = (ItemStackDrop) gameMap.getItemStackDropEntityController().getEntity(packetData.getEntityUUID());
         ItemStack itemStack = itemStackDrop.getItemStack();
+        PlayerBag playerBag = player.getPlayerBag();
 
         if (itemStackDrop.isPickedUp()) return;
 
-        // TODO: generalize for other
+        // Stack stackable items
+        // TODO: Generalize for additional stackable item types
         if (itemStack.getItemStackType() == ItemStackType.GOLD) {
-            if (player.getGold() == null && player.getPlayerBag().isBagFull()) {
-                return;
-            }
+            if (playerBag.getGoldInventorySlot() == null && player.getPlayerBag().isBagFull()) return;
         } else {
-            if (player.getPlayerBag().isBagFull()) {
-                return;
-            }
+            // Item is not stackable
+            if (playerBag.isBagFull()) return;
         }
 
         // Despawn the item
@@ -97,22 +97,21 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         itemStackDrop.setPickedUp(true);
 
         if (itemStack.getItemStackType() == ItemStackType.GOLD) {
-            ItemStackSlotData itemStackSlotData = player.getGold();
-            if (itemStackSlotData != null) {
-                ItemStack goldItemStack = itemStackSlotData.getItemStack();
+            InventorySlot inventorySlot = playerBag.getGoldInventorySlot();
+            if (inventorySlot != null) {
+
+                ItemStack goldItemStack = new ItemStack(inventorySlot.getItemStack());
                 goldItemStack.setAmount(goldItemStack.getAmount() + itemStack.getAmount());
 
-                // Removing their previous gold stack.
-                player.removeItemStackFromBag(itemStackSlotData.getBagIndex());
+                playerBag.setItemStack(inventorySlot.getSlotIndex(), goldItemStack, true);
 
-                player.setItemStack(itemStackSlotData.getBagIndex(), goldItemStack);
             } else {
                 // Giving the player the ItemStack of gold since they don't have any gold on them.
-                player.giveItemStack(itemStack);
+                playerBag.giveItemStack(itemStack, true);
             }
         } else {
             // Send the packetReceiver the item
-            player.giveItemStack(itemStack);
+            playerBag.giveItemStack(itemStack, true);
         }
 
     }

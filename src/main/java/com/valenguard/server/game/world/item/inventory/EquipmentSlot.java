@@ -1,19 +1,17 @@
 package com.valenguard.server.game.world.item.inventory;
 
-import com.valenguard.server.game.world.item.ItemStack;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
-public class EquipmentSlot implements Serializable {
+public class EquipmentSlot {
 
-    private transient EquipmentSlotTypes equipmentSlot;
-    private ItemStack itemStack;
+    private final EquipmentSlotTypes equipmentSlotTypes;
+    private final InventorySlot inventorySlot;
 
-    EquipmentSlot(EquipmentSlotTypes equipmentSlot) {
-        this.equipmentSlot = equipmentSlot;
+    EquipmentSlot(final byte slotIndex, final EquipmentSlotTypes equipmentSlotTypes) {
+        this.inventorySlot = new InventorySlot(slotIndex);
+        this.equipmentSlotTypes = equipmentSlotTypes;
     }
 }

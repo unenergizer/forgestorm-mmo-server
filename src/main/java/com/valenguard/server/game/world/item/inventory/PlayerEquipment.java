@@ -1,12 +1,14 @@
 package com.valenguard.server.game.world.item.inventory;
 
+import com.valenguard.server.Server;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
+import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
-import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
@@ -16,36 +18,23 @@ public class PlayerEquipment {
     private static final boolean PRINT_DEBUG = false;
 
     @Getter
-    private final EquipmentSlot[] equipmentSlots = new EquipmentSlot[InventoryConstants.EQUIPMENT_SIZE];
+    private final InventorySlot[] equipmentSlots;
+    private final Player player;
 
-    private Player player;
-
-    public void init(Player player) {
+    public PlayerEquipment(final Player player) {
         this.player = player;
-        // Main Body
-        equipmentSlots[0] = new EquipmentSlot(EquipmentSlotTypes.HELM);
-        equipmentSlots[1] = new EquipmentSlot(EquipmentSlotTypes.CHEST);
-        equipmentSlots[2] = new EquipmentSlot(EquipmentSlotTypes.BOOTS);
-        equipmentSlots[3] = new EquipmentSlot(EquipmentSlotTypes.CAPE);
-        equipmentSlots[4] = new EquipmentSlot(EquipmentSlotTypes.GLOVES);
-        equipmentSlots[5] = new EquipmentSlot(EquipmentSlotTypes.BELT);
 
-        // Trinket
-        equipmentSlots[6] = new EquipmentSlot(EquipmentSlotTypes.RING_0);
-        equipmentSlots[7] = new EquipmentSlot(EquipmentSlotTypes.RING_1);
-        equipmentSlots[8] = new EquipmentSlot(EquipmentSlotTypes.NECKLACE);
-
-        // Weapon
-        equipmentSlots[9] = new EquipmentSlot(EquipmentSlotTypes.WEAPON);
-        equipmentSlots[10] = new EquipmentSlot(EquipmentSlotTypes.SHIELD);
-        equipmentSlots[11] = new EquipmentSlot(EquipmentSlotTypes.AMMO);
+        // Setup equipment slots
+        equipmentSlots = new InventorySlot[InventoryConstants.EQUIPMENT_SIZE];
+        for (byte slotIndex = 0; slotIndex < equipmentSlots.length; slotIndex++) {
+            equipmentSlots[slotIndex] = new InventorySlot(slotIndex);
+        }
     }
 
     public void setEquipmentSlot(byte equipmentIndex, ItemStack itemStack) {
         equipmentSlots[equipmentIndex].setItemStack(itemStack);
-         updatePlayerAttributes(itemStack, null, true, false); // todo come back to later...
-        updateAppearance(equipmentIndex);
-        new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_EQUIPMENT, equipmentIndex, itemStack)).sendPacket();
+        updatePlayerAttributes(itemStack, null, true, false);
+        updateAppearance(equipmentIndex, false);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -57,17 +46,17 @@ public class PlayerEquipment {
         // If bagItemStack == null then the equipment is being removed.
         if (bagItemStack != null) {
             boolean foundType = false;
-            for (ItemStackType itemStackType : equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()) {
+            for (ItemStackType itemStackType : getAcceptedItemStackTypes(equipmentIndex)) {
                 if (itemStackType == bagItemStack.getItemStackType()) foundType = true;
             }
             if (!foundType) return false;
         }
 
-        playerBag.setItemStack(bagIndex, equipmentItemStack);
+        playerBag.setItemStack(bagIndex, equipmentItemStack, false); // TODO: false or true?
         equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
 
         updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
-        updateAppearance(equipmentIndex);
+        updateAppearance(equipmentIndex, true);
 
         return true;
     }
@@ -125,22 +114,49 @@ public class PlayerEquipment {
         if (sendAttributePacket) new EntityAttributesUpdatePacketOut(player, player).sendPacket();
     }
 
-    private void updateAppearance(byte equipmentIndex) {
-        if (equipmentSlots[equipmentIndex].getItemStack() != null) {
-            if (equipmentSlots[equipmentIndex].getItemStack() instanceof WearableItemStack) {
-                WearableItemStack newAppearanceStack = (WearableItemStack) equipmentSlots[equipmentIndex].getItemStack();
+    private void updateAppearance(byte slotIndex, boolean sendPacket) {
+        InventorySlot inventorySlot = equipmentSlots[slotIndex];
+        ItemStackType acceptedItemStackType = getAcceptedItemStackTypes(slotIndex)[0];
+
+        if (inventorySlot.getItemStack() != null) {
+            if (inventorySlot.getItemStack() instanceof WearableItemStack) {
+                WearableItemStack newAppearanceStack = (WearableItemStack) inventorySlot.getItemStack();
                 if (newAppearanceStack.getItemStackType() == ItemStackType.CHEST) {
-                    player.setArmorAppearance(newAppearanceStack.getTextureId());
+                    setArmorAppearance(newAppearanceStack.getTextureId(), sendPacket);
                 } else if (newAppearanceStack.getItemStackType() == ItemStackType.HELM) {
-                    player.setHelmAppearance(newAppearanceStack.getTextureId());
+                    setHelmAppearance(newAppearanceStack.getTextureId(), sendPacket);
                 }
             }
         } else {
-            if (equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()[0] == ItemStackType.CHEST) {
-                player.setArmorAppearance((short) -1);
-            } else if (equipmentSlots[equipmentIndex].getEquipmentSlot().getAcceptedItemStackTypes()[0] == ItemStackType.HELM) {
-                player.setHelmAppearance((short) -1);
+            if (acceptedItemStackType == ItemStackType.CHEST) {
+                setArmorAppearance((short) -1, sendPacket);
+            } else if (acceptedItemStackType == ItemStackType.HELM) {
+                setHelmAppearance((short) -1, sendPacket);
             }
+        }
+    }
+
+    private ItemStackType[] getAcceptedItemStackTypes(byte slotIndex) {
+        for (EquipmentSlotTypes equipmentSlotTypes : EquipmentSlotTypes.values()) {
+            if (equipmentSlotTypes.getSlotIndex() == slotIndex) return equipmentSlotTypes.getAcceptedItemStackTypes();
+        }
+        return null;
+    }
+
+
+    private void setHelmAppearance(short helmTextureId, boolean sendPacket) {
+        player.getAppearance().getTextureIds()[Appearance.HELM] = helmTextureId;
+        if (sendPacket) {
+            Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), player, EntityAppearancePacketOut.HELM_INDEX).sendPacket());
+        }
+    }
+
+    private void setArmorAppearance(short armorTextureId, boolean sendPacket) {
+        player.getAppearance().getTextureIds()[Appearance.ARMOR] = armorTextureId;
+        if (sendPacket) {
+            Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), player, EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
         }
     }
 

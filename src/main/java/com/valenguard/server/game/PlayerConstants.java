@@ -8,7 +8,7 @@ public class PlayerConstants {
     /**
      * How fast our packetReceiver can move around the map.
      */
-    static final float DEFAULT_MOVE_SPEED = .4f;
+    public static final float DEFAULT_MOVE_SPEED = .4f;
 
     /**
      * The faction that the player begins as. This will probably be changed.
@@ -63,10 +63,10 @@ public class PlayerConstants {
     /**
      * Player starting base armor
      */
-    static final int BASE_ARMOR = 2;
+    public static final int BASE_ARMOR = 2;
 
     /**
      * Player Starting Damage
      */
-    static final int BASE_DAMAGE = 10;
+    public static final int BASE_DAMAGE = 10;
 }

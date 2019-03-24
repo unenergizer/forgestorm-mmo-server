@@ -17,7 +17,7 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeShort(aiEntity.getServerEntityId());
         write.writeByte(dataBits);
         if ((dataBits & ALIGNMENT_INDEX) != 0) {

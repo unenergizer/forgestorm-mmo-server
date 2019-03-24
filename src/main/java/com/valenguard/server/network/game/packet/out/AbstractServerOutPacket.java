@@ -34,7 +34,7 @@ public abstract class AbstractServerOutPacket {
     /**
      * Creates the packet.
      */
-    protected abstract void createPacket(ValenguardOutputStream write);
+    protected abstract void createPacket(GameOutputStream write);
 
     /**
      *

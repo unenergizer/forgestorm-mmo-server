@@ -3,7 +3,7 @@ package com.valenguard.server.game.rpg;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.game.world.item.ItemStackSlotData;
+import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.io.EntityShopLoader;
 
 import java.util.List;
@@ -13,9 +13,11 @@ public class EntityShopManager {
 
     private Map<Short, List<EntityShopLoader.ShopItemStackInfo>> map = new EntityShopLoader().loadFromFile();
 
-    public void buyItem(short shopID, short shopSlot, Player player) {
-        ItemStackSlotData itemStackSlotData = player.getGold();
-        if (itemStackSlotData == null) return; // The player has no gold.
+    // TODO: add playerSellItemStack functionality
+
+    public void playerBuyItemStack(short shopID, short shopSlot, Player player) {
+        InventorySlot inventorySlot = player.getPlayerBag().getGoldInventorySlot();
+        if (inventorySlot == null) return; // The player has no gold.
 
         if (shopSlot >= map.get(shopID).size() || shopSlot < 0) return;
 
@@ -27,22 +29,18 @@ public class EntityShopManager {
         if (player.getPlayerBag().isBagFull()) return;
 
         // The player does not have enough gold.
-        if (buyPrice > itemStackSlotData.getItemStack().getAmount()) return;
+        if (buyPrice > inventorySlot.getItemStack().getAmount()) return;
 
-        ItemStack newGoldStack = itemStackSlotData.getItemStack();
+        ItemStack newGoldStack = inventorySlot.getItemStack();
         newGoldStack.setAmount(newGoldStack.getAmount() - buyPrice);
-
-        player.removeItemStackFromBag(itemStackSlotData.getBagIndex());
 
         // Only adding the gold stack back if it is greater than zero.
         if (newGoldStack.getAmount() > 0) {
-            player.setItemStack(itemStackSlotData.getBagIndex(), newGoldStack);
+            player.getPlayerBag().setItemStack(inventorySlot.getSlotIndex(), newGoldStack, true);
+        } else {
+            player.getPlayerBag().removeItemStack(inventorySlot.getSlotIndex(), true);
         }
 
-        player.giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1));
-    }
-
-    public void sellItem(short shopID, Player player) {
-
+        player.getPlayerBag().giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true);
     }
 }

@@ -1,65 +1,96 @@
 package com.valenguard.server.game.world.item.inventory;
 
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.game.world.item.ItemStackSlotData;
 import com.valenguard.server.game.world.item.ItemStackType;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import lombok.Getter;
 
 public class PlayerBag {
 
     @Getter
-    private final ItemStack[] items = new ItemStack[InventoryConstants.BAG_SIZE];
+    private final InventorySlot[] bagSlots;
+    private final Player player;
+
+    public PlayerBag(final Player player) {
+        this.player = player;
+
+        // Setup bag slots
+        bagSlots = new InventorySlot[InventoryConstants.BAG_SIZE];
+        for (byte slotIndex = 0; slotIndex < bagSlots.length; slotIndex++) {
+            bagSlots[slotIndex] = new InventorySlot(slotIndex);
+        }
+    }
 
     public boolean isBagFull() {
-        for (int i = 0; i < InventoryConstants.BAG_SIZE; i++) if (items[i] == null) return false;
+        for (InventorySlot inventorySlot : bagSlots) {
+            if (inventorySlot.getItemStack() == null) return false;
+        }
         return true;
     }
 
-    public void addItemStack(ItemStack itemStack) {
+    public void giveItemStack(ItemStack itemStack, boolean sendPacket) {
         if (isBagFull()) return;
-        for (int i = 0; i < InventoryConstants.BAG_SIZE; i++) {
-            if (items[i] == null) {
-                items[i] = itemStack;
-                return;
+        for (InventorySlot inventorySlot : bagSlots) {
+            if (inventorySlot.getItemStack() == null) {
+                inventorySlot.setItemStack(itemStack);
+                break;
             }
         }
-        throw new RuntimeException("Tried to add an item to a full item.");
+        if (sendPacket) {
+            new InventoryPacketOut(player, new InventoryActions(InventoryActions.GIVE, itemStack)).sendPacket();
+        }
     }
 
-    public void removeItemStack(byte slotIndex) {
-        items[slotIndex] = null;
+    public void setItemStack(int slotIndex, ItemStack itemStack, boolean sendPacket) {
+        bagSlots[slotIndex].setItemStack(itemStack);
+        if (sendPacket) {
+            new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_BAG, (byte) slotIndex, itemStack)).sendPacket();
+        }
     }
 
-    public void moveItemStacks(byte fromPosition, byte toPosition) {
-        ItemStack fromItemStack = items[fromPosition];
-        ItemStack toItemStack = items[toPosition];
-        items[toPosition] = fromItemStack;
-        items[fromPosition] = toItemStack;
+    public void removeItemStack(byte slotIndex, boolean sendPacket) {
+        bagSlots[slotIndex].setItemStack(null);
+        if (sendPacket) {
+            new InventoryPacketOut(player, new InventoryActions(InventoryActions.REMOVE, slotIndex)).sendPacket();
+        }
+    }
+
+    void moveItemStack(byte fromPosition, byte toPosition) {
+        ItemStack fromItemStack = bagSlots[fromPosition].getItemStack();
+        ItemStack toItemStack = bagSlots[toPosition].getItemStack();
+        bagSlots[toPosition].setItemStack(fromItemStack);
+        bagSlots[fromPosition].setItemStack(toItemStack);
+
+        new InventoryPacketOut(player, new InventoryActions(
+                InventoryActions.MOVE,
+                InventoryType.BAG_1,
+                InventoryType.BAG_1,
+                fromPosition,
+                toPosition)).sendPacket();
+
     }
 
     public int takenSlots() {
         int takenSlots = 0;
-        for (int i = 0; i < InventoryConstants.BAG_SIZE; i++) {
-            if (items[i] != null) takenSlots++;
+        for (InventorySlot inventorySlot : bagSlots) {
+            if (inventorySlot.getItemStack() != null) takenSlots++;
         }
         return takenSlots;
     }
 
-    public ItemStackSlotData getGold() {
-        for (byte i = 0; i < InventoryConstants.BAG_SIZE; i++) {
-            if (items[i] == null) continue;
-            if (items[i].getItemStackType() == ItemStackType.GOLD) {
-                return new ItemStackSlotData(items[i], i);
+    public InventorySlot getGoldInventorySlot() {
+        for (InventorySlot inventorySlot : bagSlots) {
+            ItemStack itemStack = inventorySlot.getItemStack();
+            if (itemStack == null) continue;
+            if (itemStack.getItemStackType() == ItemStackType.GOLD) {
+                return inventorySlot;
             }
         }
         return null;
     }
 
-    public void setItemStack(byte index, ItemStack itemStack) {
-        items[index] = itemStack;
-    }
-
-    ItemStack getItemStack(byte index) {
-        return items[index];
+    ItemStack getItemStack(byte slotIndex) {
+        return bagSlots[slotIndex].getItemStack();
     }
 }

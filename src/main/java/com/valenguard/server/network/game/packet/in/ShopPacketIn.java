@@ -10,19 +10,14 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.valenguard.server.util.Log.println;
-
 @Opcode(getOpcode = Opcodes.ENTITY_SHOPS)
 public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, PacketInCancelable {
-
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         ShopOpcodes npcShopOpcode = ShopOpcodes.getShopOpcode(clientHandler.readByte());
         short entityId = 0;
         short shopSlot = 0;
-
-        println(getClass(), "Incoming shop packet!");
 
         if (npcShopOpcode == ShopOpcodes.START_SHOPPING) {
             entityId = clientHandler.readShort();
@@ -35,10 +30,8 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
 
     @Override
     public boolean sanitizePacket(ShopPacket packetData) {
-
         // The packetReceiver cannot move and shop at the same time.
         if (packetData.getPlayer().isEntityMoving()) {
-            println(getClass(), "Tried to send shop packet but was moving.");
             packetData.getPlayer().setCurrentShoppingEntity(null);
             return false;
         }
@@ -48,20 +41,14 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
                 return false;
         }
 
-        println(getClass(), "1");
-
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
             AiEntity aiEntity = (AiEntity) packetData.getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityId);
             if (aiEntity.getShopId() == -1) return false;
         }
 
-        println(getClass(), "2");
-
         if (packetData.shopOpcode == ShopOpcodes.BUY || packetData.shopOpcode == ShopOpcodes.SELL) {
             return packetData.getPlayer().getCurrentShoppingEntity() != null;
         }
-
-        println(getClass(), "Passed sanitize checks");
 
         return true;
     }
@@ -72,11 +59,10 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         Player player = packetData.getPlayer();
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            println(getClass(), "Started Shopping!");
             player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
             Server.getInstance().getEntityShopManager()
-                    .buyItem(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);
+                    .playerBuyItemStack(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);
         } else if (packetData.shopOpcode == ShopOpcodes.STOP_SHOPPING) {
             player.setCurrentShoppingEntity(null);
         }

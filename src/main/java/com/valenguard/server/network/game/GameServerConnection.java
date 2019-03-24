@@ -4,7 +4,7 @@ import com.valenguard.server.Server;
 import com.valenguard.server.io.NetworkSettingsLoader;
 import com.valenguard.server.network.AuthenticationManager;
 import com.valenguard.server.network.NetworkManager;
-import com.valenguard.server.network.game.packet.out.ValenguardOutputStream;
+import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.network.game.shared.EventBus;
 import lombok.Getter;
@@ -140,7 +140,7 @@ public class GameServerConnection {
 
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving io
-                clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new ValenguardOutputStream(outStream), inStream);
+                clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new GameOutputStream(outStream), inStream);
 
                 String username = authenticationManager.getUsername(uuid);
 

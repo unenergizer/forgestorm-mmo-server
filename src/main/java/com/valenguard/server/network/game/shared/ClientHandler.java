@@ -2,7 +2,7 @@ package com.valenguard.server.network.game.shared;
 
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
-import com.valenguard.server.network.game.packet.out.ValenguardOutputStream;
+import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,16 +19,16 @@ public class ClientHandler {
 
     private final int databaseUserId;
     private Socket socket;
-    private ValenguardOutputStream valenguardOutputStream;
+    private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
 
     @Setter
     private Player player;
 
-    public ClientHandler(int databaseUserId, Socket socket, ValenguardOutputStream valenguardOutputStream, DataInputStream inputStream) {
+    public ClientHandler(final int databaseUserId, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
         this.databaseUserId = databaseUserId;
         this.socket = socket;
-        this.valenguardOutputStream = valenguardOutputStream;
+        this.gameOutputStream = gameOutputStream;
         this.inputStream = inputStream;
     }
 
@@ -104,12 +104,12 @@ public class ClientHandler {
     }
 
     public int fillCurrentBuffer(AbstractServerOutPacket abstractServerOutPacket) {
-        return valenguardOutputStream.fillCurrentBuffer(abstractServerOutPacket);
+        return gameOutputStream.fillCurrentBuffer(abstractServerOutPacket);
     }
 
     public void writeBuffers() {
         try {
-            valenguardOutputStream.writeBuffers();
+            gameOutputStream.writeBuffers();
         } catch (IOException e) {
             // If the client is not closing their socket.
             if (!(e instanceof SocketException)) e.printStackTrace();
@@ -118,7 +118,7 @@ public class ClientHandler {
 
     public void flushBuffer() {
         try {
-            valenguardOutputStream.flush();
+            gameOutputStream.flush();
         } catch (IOException e) {
             // If the client is not closing their socket.
             if (!(e instanceof SocketException)) e.printStackTrace();
@@ -131,10 +131,10 @@ public class ClientHandler {
     public void closeConnection() {
         try {
             if (socket != null) socket.close();
-            if (valenguardOutputStream != null) valenguardOutputStream.close();
+            if (gameOutputStream != null) gameOutputStream.close();
             if (inputStream != null) inputStream.close();
             socket = null;
-            valenguardOutputStream = null;
+            gameOutputStream = null;
             inputStream = null;
         } catch (IOException e) {
             e.printStackTrace();

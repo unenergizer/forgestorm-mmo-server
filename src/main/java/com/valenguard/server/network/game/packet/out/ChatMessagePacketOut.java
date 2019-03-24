@@ -15,7 +15,7 @@ public class ChatMessagePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeString(message);
         Log.println(getClass(), message, false, PRINT_DEBUG);
     }

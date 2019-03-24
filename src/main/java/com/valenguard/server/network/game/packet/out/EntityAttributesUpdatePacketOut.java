@@ -19,7 +19,7 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         Attributes attributes = movingEntity.getAttributes();
         write.writeShort(movingEntity.getServerEntityId());
         write.writeByte(getEntityType(movingEntity).getEntityTypeByte());

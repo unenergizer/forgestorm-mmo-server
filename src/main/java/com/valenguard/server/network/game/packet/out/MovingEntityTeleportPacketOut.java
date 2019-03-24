@@ -22,7 +22,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeShort(teleportedEntity.getServerEntityId());
         write.writeByte(getEntityType(teleportedEntity).getEntityTypeByte());
         write.writeString(teleportLocation.getMapName());

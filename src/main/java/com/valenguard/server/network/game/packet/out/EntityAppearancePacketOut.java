@@ -23,7 +23,7 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeShort(entity.getServerEntityId());
         write.writeByte(getEntityType(entity).getEntityTypeByte());
         write.writeByte(appearanceBits);

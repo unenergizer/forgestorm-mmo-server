@@ -18,7 +18,7 @@ public class EntityDamagePacketOut extends AbstractServerOutPacket {
     }
 
     @Override
-    protected void createPacket(ValenguardOutputStream write) {
+    protected void createPacket(GameOutputStream write) {
         write.writeShort(damagedEntity.getServerEntityId());
         write.writeByte(getEntityType(damagedEntity).getEntityTypeByte());
         write.writeInt(health);

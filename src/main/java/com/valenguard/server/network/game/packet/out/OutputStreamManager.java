@@ -31,7 +31,7 @@ public class OutputStreamManager {
 
                     bufferOffsetCheck = thisBufferSize;
 
-                    clientHandler.getValenguardOutputStream().createNewBuffers(abstractServerOutPacket);
+                    clientHandler.getGameOutputStream().createNewBuffers(abstractServerOutPacket);
                     // This happened to be the last packet so we should add the
                     // to be written. Write and flush it.
                     if (serverAbstractOutPackets.peek() == null) {
@@ -41,18 +41,18 @@ public class OutputStreamManager {
 
                 } else { // The current buffer fits into the current packet
 
-                    ValenguardOutputStream valenguardOutputStream = clientHandler.getValenguardOutputStream();
+                    GameOutputStream gameOutputStream = clientHandler.getGameOutputStream();
 
-                    if (!valenguardOutputStream.currentBuffersInitialized()) {
-                        valenguardOutputStream.createNewBuffers(abstractServerOutPacket);
+                    if (!gameOutputStream.currentBuffersInitialized()) {
+                        gameOutputStream.createNewBuffers(abstractServerOutPacket);
                     } else {
 
-                        boolean opcodesMatch = valenguardOutputStream.doOpcodesMatch(abstractServerOutPacket);
+                        boolean opcodesMatch = gameOutputStream.doOpcodesMatch(abstractServerOutPacket);
                         if (opcodesMatch) {
-                            valenguardOutputStream.appendBewBuffer();
+                            gameOutputStream.appendBewBuffer();
                         } else {
                             clientHandler.writeBuffers();
-                            valenguardOutputStream.createNewBuffers(abstractServerOutPacket);
+                            gameOutputStream.createNewBuffers(abstractServerOutPacket);
                         }
                     }
 
