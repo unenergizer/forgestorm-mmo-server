@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PlayerInventorySQL extends AbstractSQL {
+public class PlayerInventorySQL extends AbstractSingleSQL {
 
     private final ItemStackManager itemStackManager = Server.getInstance().getItemStackManager();
 

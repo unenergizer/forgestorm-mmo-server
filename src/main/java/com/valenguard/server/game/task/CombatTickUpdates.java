@@ -3,15 +3,16 @@ package com.valenguard.server.game.task;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.rpg.Attributes;
-import com.valenguard.server.game.rpg.ExperiencePacketInfo;
-import com.valenguard.server.game.rpg.skills.SkillOpcodes;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
-import com.valenguard.server.network.game.packet.out.*;
+import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityDamagePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
+import com.valenguard.server.network.game.packet.out.MovingEntityTeleportPacketOut;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -154,7 +155,7 @@ public class CombatTickUpdates {
 
             // Give experience
             new ChatMessagePacketOut(killerPlayer, "You killed the enemy").sendPacket();
-            new SkillExperiencePacketOut(killerPlayer, new ExperiencePacketInfo(SkillOpcodes.MELEE, aiEntity.getExpDrop())).sendPacket();
+            killerPlayer.getSkills().MELEE.addExperience(aiEntity.getExpDrop());
 
             // Adding/Subtracting reputation
             if (aiEntity.getEntityType() == EntityType.NPC) {

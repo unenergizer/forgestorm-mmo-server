@@ -1,11 +1,15 @@
 package com.valenguard.server.game.world.entity;
 
+import com.valenguard.server.Server;
 import com.valenguard.server.database.sql.PlayerDataSQL;
+import com.valenguard.server.database.sql.PlayerExperienceSQL;
 import com.valenguard.server.database.sql.PlayerInventorySQL;
+import com.valenguard.server.database.sql.PlayerReputationSQL;
+import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.PlayerConstants;
-import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
+import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
@@ -13,7 +17,13 @@ import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.packet.out.PingPacketOut;
 
-public class PlayerBuilder {
+public class PlayerProcessor {
+
+    private final GameManager gameManager;
+
+    public PlayerProcessor(final GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
 
     public Player loadPlayer(final PlayerSessionData playerSessionData) {
         Player player = new Player(playerSessionData.getClientHandler());
@@ -24,28 +34,18 @@ public class PlayerBuilder {
         player.setEntityType(EntityType.PLAYER);
         player.setName(playerSessionData.getUsername());
 
+        player.getAttributes().setArmor(PlayerConstants.BASE_ARMOR);
+        player.getAttributes().setDamage(PlayerConstants.BASE_DAMAGE);
+        player.setMaxHealth(PlayerConstants.BASE_HP);
+
         // Setting MovingEntity Specific Data
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
 
         // Setting Player Specific Data
         new PlayerDataSQL().loadSQL(player);
         new PlayerInventorySQL().loadSQL(player);
-
-        // TODO: Attributes to be calculated later from character stats
-        player.getAttributes().setArmor(PlayerConstants.BASE_ARMOR);
-        player.getAttributes().setDamage(PlayerConstants.BASE_DAMAGE);
-        player.setMaxHealth(PlayerConstants.BASE_HP);
-
-        // TODO: Load faction reputation from the database
-        short setThisFactionRep = 0;
-        Reputation reputation = player.getReputation();
-        for (int i = 0; i < reputation.getReputationData().length; i++) {
-            reputation.getReputationData()[i] = setThisFactionRep;
-        }
-
-        // TODO: Load experience from the database
-        player.getSkills().MINING.addExperience(50); // Initializes the packetReceiver with 50 mining experience.
-        player.getSkills().MELEE.addExperience(170);
+        new PlayerExperienceSQL().loadSQL(player);
+        new PlayerReputationSQL().loadSQL(player);
 
         return player;
     }
@@ -71,5 +71,26 @@ public class PlayerBuilder {
                 new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
+    }
+
+    public void savePlayer(Player player) {
+        new PlayerDataSQL().saveSQL(player);
+        new PlayerInventorySQL().saveSQL(player);
+        new PlayerExperienceSQL().saveSQL(player);
+        new PlayerReputationSQL().saveSQL(player);
+    }
+
+    public void playerQuitWorld(Player player) {
+        for (GameMap mapSearch : gameManager.getGameMaps().values()) {
+            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
+                if (playerSearch == player) continue;
+                new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
+            }
+        }
+
+        GameMap gameMap = player.getGameMap();
+        gameMap.getPlayerController().removePlayer(player);
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
+        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
     }
 }

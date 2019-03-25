@@ -1,15 +1,12 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.database.sql.PlayerDataSQL;
-import com.valenguard.server.database.sql.PlayerInventorySQL;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
 import com.valenguard.server.network.game.PlayerSessionData;
-import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
@@ -32,7 +29,7 @@ public class GameManager {
     private final Map<String, GameMap> gameMaps = new HashMap<>();
     private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
     private final Queue<ClientHandler> syncClientQuitQueue = new ConcurrentLinkedQueue<>();
-    private final PlayerBuilder playerBuilder = new PlayerBuilder();
+    private final PlayerProcessor playerProcessor = new PlayerProcessor(this);
 
     /**
      * This queue is needed because the entities need to be queued to spawn before
@@ -79,34 +76,20 @@ public class GameManager {
         PlayerSessionData playerSessionData;
         while ((playerSessionData = playerSessionDataQueue.poll()) != null) {
             Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
-            Player player = playerBuilder.loadPlayer(playerSessionData);
-            playerBuilder.playerJoinWorld(player);
+            Player player = playerProcessor.loadPlayer(playerSessionData);
+            playerProcessor.playerJoinWorld(player);
         }
     }
 
     void processPlayerQuit() {
-        syncClientQuitQueue.forEach(clientHandler -> playerQuitServer(clientHandler.getPlayer()));
-        syncClientQuitQueue.clear();
-    }
+        for (ClientHandler clientHandler : syncClientQuitQueue) {
+            Player player = clientHandler.getPlayer();
+            playerProcessor.savePlayer(player);
+            playerProcessor.playerQuitWorld(player);
+            Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));
 
-    private void playerQuitServer(Player player) {
-
-        new PlayerDataSQL().saveSQL(player);
-        new PlayerInventorySQL().saveSQL(player);
-
-        for (GameMap mapSearch : gameMaps.values()) {
-            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
-                if (playerSearch == player) continue;
-                new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
-            }
         }
-
-        GameMap gameMap = player.getGameMap();
-        gameMap.getPlayerController().removePlayer(player);
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
-        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
-
-        Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));
+        syncClientQuitQueue.clear();
     }
 
     public void playerSwitchGameMap(Player player) {

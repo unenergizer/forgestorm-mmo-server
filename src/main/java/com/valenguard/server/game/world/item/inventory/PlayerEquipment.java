@@ -16,7 +16,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PlayerEquipment {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     @Getter
     private final InventorySlot[] equipmentSlots;
@@ -53,7 +53,7 @@ public class PlayerEquipment {
             if (!foundType) return false;
         }
 
-        playerBag.setItemStack(bagIndex, equipmentItemStack, false); // TODO: false or true?
+        playerBag.setItemStack(bagIndex, equipmentItemStack, false);
         equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
 
         updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
@@ -143,7 +143,6 @@ public class PlayerEquipment {
         }
         return null;
     }
-
 
     private void setHelmAppearance(short helmTextureId, boolean sendPacket) {
         player.getAppearance().getTextureIds()[Appearance.HELM] = helmTextureId;

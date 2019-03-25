@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PlayerDataSQL extends AbstractSQL {
+public class PlayerDataSQL extends AbstractSingleSQL {
 
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
