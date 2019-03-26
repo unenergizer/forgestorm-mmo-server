@@ -3,7 +3,7 @@ package com.valenguard.server.game.world.maps;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
-import com.valenguard.server.game.world.task.UpdateMovements;
+import com.valenguard.server.game.world.task.MovementUpdateTask;
 
 public class AiEntityController extends EntityController<AiEntity> {
 
@@ -34,8 +34,8 @@ public class AiEntityController extends EntityController<AiEntity> {
             entitySpawn(entity);
 
             // Find AiEntity a combat target
-            UpdateMovements updateMovements = Server.getInstance().getGameLoop().getUpdateMovements();
-            updateMovements.initEntityTargeting(entity);
+            MovementUpdateTask movementUpdateTask = Server.getInstance().getGameLoop().getMovementUpdateTask();
+            movementUpdateTask.initEntityTargeting(entity);
         }
 
         while ((entity = entityDespawnQueue.poll()) != null) {

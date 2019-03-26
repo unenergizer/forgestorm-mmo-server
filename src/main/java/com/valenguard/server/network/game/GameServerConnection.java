@@ -148,7 +148,7 @@ public class GameServerConnection {
                 authenticationManager.removeEntry(uuid);
 
                 // Adding the client handle to a list of current client handles
-                Server.getInstance().getGameManager().initializeNewPlayer(new PlayerSessionData(tempID, username, clientHandler));
+                Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(new PlayerSessionData(tempID, username, clientHandler));
                 tempID++;
 
                 // Reading in a byte which represents an opcode that the client sent to the
@@ -177,7 +177,7 @@ public class GameServerConnection {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        Server.getInstance().getGameManager().queueClientQuitServer(clientHandler);
+                        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
                     }
                 } else {
                     e.printStackTrace();

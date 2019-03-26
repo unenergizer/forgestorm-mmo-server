@@ -20,7 +20,7 @@ public class EntityRehealTask implements AbstractTask {
 
             println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
-            for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
+            for (GameMap gameMap : Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerController().getPlayerList()) {
                     if (player.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.

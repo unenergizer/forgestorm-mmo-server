@@ -28,7 +28,7 @@ public class Location {
     }
 
     public GameMap getGameMap() {
-        return Server.getInstance().getGameManager().getGameMap(mapName);
+        return Server.getInstance().getGameManager().getGameMapProcessor().getGameMap(mapName);
     }
 
     public Location add(Location location) {

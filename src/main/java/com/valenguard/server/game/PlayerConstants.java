@@ -18,42 +18,17 @@ public class PlayerConstants {
     /**
      * The facing direction that the player starts out as when they first join the server.
      */
-    public static final MoveDirection STARTING_FACING_DIRECTION = MoveDirection.SOUTH;
+    public static final MoveDirection SPAWN_FACING_DIRECTION = MoveDirection.SOUTH;
 
     /**
-     * This is the map new players with join on first login.
+     * First player join spawn location.
      */
-    @SuppressWarnings("SpellCheckingInspection")
-    public static final String STARTING_MAP = "maintown";
+    public static final Location START_SPAWN_LOCATION = new Location("maintown", (short) 43, (short) 24);
 
     /**
-     * This is the first spawn point of the packetReceiver. This coordinate is based on the coordinate system in Tiled Editor.
-     * This Tiled Editor coordinate gets translated later to in-game coordinates.
+     * Player death spawn location.
      */
-    private static final short STARTING_X_CORD = 43;
-
-    /**
-     * This is the first spawn point of the packetReceiver. This coordinate is based on the coordinate system in Tiled Editor.
-     * This Tiled Editor coordinate gets translated later to in-game coordinates.
-     */
-    private static final short STARTING_Y_CORD = 24;
-
-    /**
-     *
-     */
-    public static final Location START_SPAWN_LOCATION = new Location(STARTING_MAP, STARTING_X_CORD, STARTING_Y_CORD);
-
-    /**
-     * This is the first respawn point of the packetReceiver. This coordinate is based on the coordinate system in Tiled Editor.
-     * This Tiled Editor coordinate gets translated later to in-game coordinates.
-     */
-    public static final short RESPAWN_X_CORD = 42;
-
-    /**
-     * This is the first respawn point of the packetReceiver. This coordinate is based on the coordinate system in Tiled Editor.
-     * This Tiled Editor coordinate gets translated later to in-game coordinates.
-     */
-    public static final short RESPAWN_Y_CORD = 15;
+    public static final Location RESPAWN_LOCATION = new Location("maintown", (short) 42, (short) 39);
 
     /**
      * Player Starting health points

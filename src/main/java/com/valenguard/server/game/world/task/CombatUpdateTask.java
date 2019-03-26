@@ -16,13 +16,13 @@ import com.valenguard.server.network.game.packet.out.MovingEntityTeleportPacketO
 
 import static com.valenguard.server.util.Log.println;
 
-public class CombatTickUpdates implements AbstractTask {
+public class CombatUpdateTask implements AbstractTask {
 
     private static final int IDLE_COMBAT_TIMEOUT = 13;
 
     @Override
     public void tick(long ticksPassed) {
-        for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
+        for (GameMap gameMap : Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
             tickGameMapCombat(gameMap, ticksPassed);
         }
     }
@@ -114,8 +114,8 @@ public class CombatTickUpdates implements AbstractTask {
              * A PLAYER DEATH -------------------------------------------------
              */
             Player deadPlayer = (Player) deadEntity;
-            Location teleportLocation = new Location(PlayerConstants.STARTING_MAP, PlayerConstants.RESPAWN_X_CORD, (short) (gameMap.getMapHeight() - PlayerConstants.RESPAWN_Y_CORD));
-            MoveDirection facingDirection = MoveDirection.SOUTH;
+            Location teleportLocation = new Location(PlayerConstants.RESPAWN_LOCATION);
+            MoveDirection facingDirection = PlayerConstants.SPAWN_FACING_DIRECTION;
 
             // Check to see if the packetReceiver needs to change maps!
             if (!isGraveYardMap(deadPlayer.getCurrentMapLocation())) {
@@ -184,6 +184,6 @@ public class CombatTickUpdates implements AbstractTask {
     }
 
     private boolean isGraveYardMap(Location location) {
-        return location.getMapName().equals(PlayerConstants.STARTING_MAP);
+        return location.getMapName().equals(PlayerConstants.RESPAWN_LOCATION.getMapName());
     }
 }

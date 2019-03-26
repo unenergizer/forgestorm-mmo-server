@@ -4,7 +4,7 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.util.Log;
 
-public class WarpManager implements AbstractTask {
+public class WarpTask implements AbstractTask {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -25,6 +25,6 @@ public class WarpManager implements AbstractTask {
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
 
         Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player warping.");
-        Server.getInstance().getGameManager().playerSwitchGameMap(player);
+        Server.getInstance().getGameManager().getGameMapProcessor().playerSwitchGameMap(player);
     }
 }

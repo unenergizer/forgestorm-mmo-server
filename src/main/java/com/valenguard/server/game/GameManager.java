@@ -1,154 +1,38 @@
 package com.valenguard.server.game;
 
-import com.valenguard.server.Server;
-import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.entity.AiEntity;
+import com.valenguard.server.game.world.entity.Entity;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.entity.PlayerProcessor;
 import com.valenguard.server.game.world.maps.GameMap;
-import com.valenguard.server.game.world.maps.Warp;
-import com.valenguard.server.io.FilePaths;
-import com.valenguard.server.io.TmxFileParser;
-import com.valenguard.server.network.game.PlayerSessionData;
+import com.valenguard.server.game.world.maps.GameMapProcessor;
 import com.valenguard.server.network.game.shared.ClientHandler;
-import com.valenguard.server.util.Log;
 import lombok.Getter;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
+@Getter
 public class GameManager {
 
-    @Getter
-    private final Map<String, GameMap> gameMaps = new HashMap<>();
-    private final Queue<PlayerSessionData> playerSessionDataQueue = new ConcurrentLinkedQueue<>();
-    private final Queue<ClientHandler> syncClientQuitQueue = new ConcurrentLinkedQueue<>();
     private final PlayerProcessor playerProcessor = new PlayerProcessor(this);
-
-    /**
-     * This queue is needed because the entities need to be queued to spawn before
-     * the map object is created.
-     */
-    private final Queue<AiEntity> aiEntitiesToSpawn = new LinkedList<>();
-    private final Queue<StationaryEntity> stationaryEntities = new LinkedList<>();
-
-    public void queueClientQuitServer(ClientHandler clientHandler) {
-        syncClientQuitQueue.add(clientHandler);
-    }
-
-    public void queueMobSpawn(AiEntity aiEntity) {
-        aiEntitiesToSpawn.add(aiEntity);
-    }
-
-    public void queueStationarySpawn(StationaryEntity stationaryEntity) {
-        stationaryEntities.add(stationaryEntity);
-    }
-
-    private void spawnEntities() {
-        AiEntity aiEntity;
-        while ((aiEntity = aiEntitiesToSpawn.poll()) != null) {
-            aiEntity.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
-        }
-        StationaryEntity stationaryEntity;
-        while ((stationaryEntity = stationaryEntities.poll()) != null) {
-            stationaryEntity.getGameMap().getStationaryEntityController().queueEntitySpawn(stationaryEntity);
-        }
-    }
+    private final GameMapProcessor gameMapProcessor = new GameMapProcessor();
 
     public void start() {
-        loadAllMaps();
+        gameMapProcessor.loadAllMaps();
     }
 
-    public void initializeNewPlayer(PlayerSessionData playerSessionData) {
-        playerSessionDataQueue.add(playerSessionData);
-    }
-
-    /**
-     * Ran on the game thread. Dump players from network.
-     */
-    void processPlayerJoin() {
-        PlayerSessionData playerSessionData;
-        while ((playerSessionData = playerSessionDataQueue.poll()) != null) {
-            Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
-            Player player = playerProcessor.loadPlayer(playerSessionData);
-            playerProcessor.playerJoinWorld(player);
-        }
-    }
-
-    void processPlayerQuit() {
-        for (ClientHandler clientHandler : syncClientQuitQueue) {
-            Player player = clientHandler.getPlayer();
-            playerProcessor.savePlayer(player);
-            playerProcessor.playerQuitWorld(player);
-            Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (getTotalPlayersOnline() - 1));
-
-        }
-        syncClientQuitQueue.clear();
-    }
-
-    public void playerSwitchGameMap(Player player) {
-        String currentMapName = player.getMapName();
-        Warp warp = player.getWarp();
-        checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
-                "The packetReceiver is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
-
-        gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
-        gameMaps.get(warp.getLocation().getMapName()).getPlayerController().addPlayer(player, warp);
-        player.setWarp(null);
-    }
-
-    void gameMapTick(long numberOfTicksPassed) {
-        spawnEntities();
-        gameMaps.values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
-        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().tick());
-        gameMaps.values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().tickPlayer());
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().sendPlayersPacket());
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(numberOfTicksPassed));
-    }
-
-    private int getTotalPlayersOnline() {
-        int onlinePlayers = 0;
-        for (GameMap gameMap : gameMaps.values())
-            onlinePlayers = onlinePlayers + gameMap.getPlayerController().getPlayerCount();
-        return onlinePlayers;
-    }
-
-    private void loadAllMaps() {
-        File[] files = new File(FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(".tmx"));
-        checkNotNull(files, "No game maps were loaded.");
-
-        for (File file : files) {
-            String mapName = file.getName().replace(".tmx", "");
-            gameMaps.put(mapName, TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
-        }
-
-        Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
-        fixWarpHeights();
-    }
-
-    private void fixWarpHeights() {
-        for (GameMap gameMap : gameMaps.values()) {
-            for (short i = 0; i < gameMap.getMapWidth(); i++) {
-                for (short j = 0; j < gameMap.getMapHeight(); j++) {
-                    if (gameMap.isOutOfBounds(i, j)) continue;
-                    Warp warp = gameMap.getMap()[i][j].getWarp();
-                    if (warp == null) continue;
-                    warp.getLocation().setY((short) (gameMaps.get(warp.getLocation().getMapName()).getMapHeight() - warp.getLocation().getY() - 1));
-                }
-            }
-        }
-    }
-
-    public GameMap getGameMap(String mapName) throws RuntimeException {
-        checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
-        return gameMaps.get(mapName);
+    void tickWorld(long ticksPassed) {
+        // WARNING: Maintain tickWorld order!
+        gameMapProcessor.spawnEntities();
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayer());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().sendPlayersPacket());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
+        playerProcessor.processPlayerQuit();
+        playerProcessor.processPlayerJoin();
     }
 
     public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
@@ -159,19 +43,19 @@ public class GameManager {
     }
 
     public void forAllPlayers(Consumer<Player> callback) {
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
     }
 
     public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
     public void forAllAiEntitiesFiltered(Consumer<Entity> callback, Predicate<AiEntity> predicate) {
-        gameMaps.values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
     }
 
     public Player findPlayer(short playerId) {
-        for (GameMap gameMap : gameMaps.values()) {
+        for (GameMap gameMap : gameMapProcessor.getGameMaps().values()) {
             for (Player player : gameMap.getPlayerController().getPlayerList()) {
                 if (player.getServerEntityId() == playerId) {
                     return player;
@@ -182,7 +66,7 @@ public class GameManager {
     }
 
     public Player findPlayer(String username) {
-        for (GameMap gameMap : gameMaps.values()) {
+        for (GameMap gameMap : gameMapProcessor.getGameMaps().values()) {
             for (Player player : gameMap.getPlayerController().getPlayerList()) {
                 if (player.getName().toLowerCase().equals(username.toLowerCase())) {
                     return player;
@@ -190,5 +74,12 @@ public class GameManager {
             }
         }
         return null;
+    }
+
+    public int getTotalPlayersOnline() {
+        int onlinePlayers = 0;
+        for (GameMap gameMap : gameMapProcessor.getGameMaps().values())
+            onlinePlayers = onlinePlayers + gameMap.getPlayerController().getPlayerCount();
+        return onlinePlayers;
     }
 }

@@ -249,7 +249,7 @@ public class TmxFileParser {
                     if (aiEntityData.getShopID() != null) aiEntity.setShopId((short) (int) aiEntityData.getShopID());
 
                     // Queue Mob Spawn
-                    Server.getInstance().getGameManager().queueMobSpawn(aiEntity);
+                    Server.getInstance().getGameManager().getGameMapProcessor().queueAiEntitySpawn(aiEntity);
 
                     Log.println(TmxFileParser.class, "[Entity] UUID: " + entityUUID + ", AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
                     entityUUID++;
@@ -292,7 +292,7 @@ public class TmxFileParser {
                     stationaryEntity.setEntityType(EntityType.SKILL_NODE);
                     stationaryEntity.setAppearance(new Appearance((byte) 0, new short[]{0})); // todo determine texture id
                     stationaryEntity.setName(""); // todo will these even have names?
-                    Server.getInstance().getGameManager().queueStationarySpawn(stationaryEntity);
+                    Server.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);
 
                     // Making it's associated tile non-traversable
                     map[x][y].setTraversable(false);

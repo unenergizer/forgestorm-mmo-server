@@ -79,7 +79,6 @@ public class EventBus {
         }
     }
 
-
     @SuppressWarnings("unchecked")
     private void publishOnGameThread(PacketData packetData) {
         PacketListener packetListener = getPacketListener(packetData.getOpcode());

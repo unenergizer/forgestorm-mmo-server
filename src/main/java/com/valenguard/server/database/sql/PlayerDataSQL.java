@@ -60,7 +60,7 @@ public class PlayerDataSQL extends AbstractSingleSQL {
 
         player.setFaction(Server.getInstance().getFactionManager().getFactionByName(PlayerConstants.STARTING_FACTION));
         player.setCurrentHealth(PlayerConstants.BASE_HP);
-        player.setFacingDirection(PlayerConstants.STARTING_FACING_DIRECTION);
+        player.setFacingDirection(PlayerConstants.SPAWN_FACING_DIRECTION);
         player.setCurrentMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
         player.setFutureMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
 

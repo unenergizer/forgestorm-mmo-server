@@ -21,7 +21,7 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
 
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = entitySpawnQueue.poll()) != null) {
-            Server.getInstance().getGameLoop().getItemTickUpdates().addItemToGround(itemStackDrop);
+            Server.getInstance().getGameLoop().getGroundItemTimerTask().addItemToGround(itemStackDrop);
             new EntitySpawnPacketOut(itemStackDrop.getDropOwner(), itemStackDrop).sendPacket();
         }
 

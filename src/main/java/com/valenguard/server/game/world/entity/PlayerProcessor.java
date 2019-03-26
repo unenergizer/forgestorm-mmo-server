@@ -16,16 +16,36 @@ import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.packet.out.PingPacketOut;
+import com.valenguard.server.network.game.shared.ClientHandler;
+import com.valenguard.server.util.Log;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PlayerProcessor {
 
     private final GameManager gameManager;
+    private final Queue<PlayerSessionData> playerJoinServerQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<ClientHandler> playerQuitServerQueue = new ConcurrentLinkedQueue<>();
 
     public PlayerProcessor(final GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
-    public Player loadPlayer(final PlayerSessionData playerSessionData) {
+    public void queuePlayerJoinServer(PlayerSessionData playerSessionData) {
+        playerJoinServerQueue.add(playerSessionData);
+    }
+
+    public void processPlayerJoin() {
+        PlayerSessionData playerSessionData;
+        while ((playerSessionData = playerJoinServerQueue.poll()) != null) {
+            Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
+            Player player = playerLoad(playerSessionData);
+            playerWorldJoin(player);
+        }
+    }
+
+    private Player playerLoad(final PlayerSessionData playerSessionData) {
         Player player = new Player(playerSessionData.getClientHandler());
         playerSessionData.getClientHandler().setPlayer(player);
 
@@ -50,7 +70,7 @@ public class PlayerProcessor {
         return player;
     }
 
-    public void playerJoinWorld(Player player) {
+    private void playerWorldJoin(Player player) {
         new InitClientSessionPacketOut(player, true, player.getServerEntityId()).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
@@ -73,15 +93,30 @@ public class PlayerProcessor {
         }
     }
 
-    public void savePlayer(Player player) {
+    public void queuePlayerQuitServer(ClientHandler clientHandler) {
+        playerQuitServerQueue.add(clientHandler);
+    }
+
+    public void processPlayerQuit() {
+        for (ClientHandler clientHandler : playerQuitServerQueue) {
+            Player player = clientHandler.getPlayer();
+            savePlayer(player);
+            playerWorldQuit(player);
+            Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (gameManager.getTotalPlayersOnline() - 1));
+
+        }
+        playerQuitServerQueue.clear();
+    }
+
+    private void savePlayer(Player player) {
         new PlayerDataSQL().saveSQL(player);
         new PlayerInventorySQL().saveSQL(player);
         new PlayerExperienceSQL().saveSQL(player);
         new PlayerReputationSQL().saveSQL(player);
     }
 
-    public void playerQuitWorld(Player player) {
-        for (GameMap mapSearch : gameManager.getGameMaps().values()) {
+    private void playerWorldQuit(Player player) {
+        for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();

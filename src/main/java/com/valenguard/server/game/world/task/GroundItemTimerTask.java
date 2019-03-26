@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ItemTickUpdates implements AbstractTask {
+public class GroundItemTimerTask implements AbstractTask {
 
     private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
     private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min

@@ -17,8 +17,8 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
 
     private int timerTick = 0; // combat speed
 
-    public void addAiEntity(AiEntity movingEntity) {
-        respawnTimers.add(new RespawnTimer(movingEntity, GameConstants.GENERAL_RESPAWN_TIME));
+    public void addAiEntity(AiEntity aiEntity) {
+        respawnTimers.add(new RespawnTimer(aiEntity, GameConstants.GENERAL_RESPAWN_TIME));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
 
                 timer.respawnTime--;
                 if (timer.respawnTime <= 0) {
-                    AiEntity aiEntity = timer.movingEntity;
+                    AiEntity aiEntity = timer.aiEntity;
 
                     // Spawn to original location
                     aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
@@ -53,7 +53,7 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
 
     @AllArgsConstructor
     private class RespawnTimer {
-        private final AiEntity movingEntity;
+        private final AiEntity aiEntity;
         private int respawnTime;
     }
 }

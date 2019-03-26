@@ -12,7 +12,7 @@ import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
 
 import static com.valenguard.server.util.Log.println;
 
-public class UpdateMovements implements AbstractTask {
+public class MovementUpdateTask implements AbstractTask {
 
     private final static boolean PRINT_DEBUG = false;
 

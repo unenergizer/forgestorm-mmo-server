@@ -16,10 +16,10 @@ import lombok.Getter;
 public class GameLoop extends Thread {
 
     private final PlayerMoveInventoryEvents playerMoveInventoryEvents = new PlayerMoveInventoryEvents();
-    private final UpdateMovements updateMovements = new UpdateMovements();
-    private final WarpManager warpManager = new WarpManager();
-    private final ItemTickUpdates itemTickUpdates = new ItemTickUpdates();
-    private final CombatTickUpdates combatTickUpdates = new CombatTickUpdates();
+    private final MovementUpdateTask movementUpdateTask = new MovementUpdateTask();
+    private final WarpTask warpTask = new WarpTask();
+    private final GroundItemTimerTask groundItemTimerTask = new GroundItemTimerTask();
+    private final CombatUpdateTask combatUpdateTask = new CombatUpdateTask();
     private final EntityRehealTask entityRehealTask = new EntityRehealTask();
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
 
@@ -57,28 +57,21 @@ public class GameLoop extends Thread {
         while (server.getNetworkManager().getGameServerConnection().isRunning()) {
             startTime = System.nanoTime();
 
-            /* ***********************
-             *  !! Update Start !!
-             ***********************/
-
+            // WARNING: Maintain tickWorld order!
+            // Update Start
             server.getCommandManager().getCommandProcessor().executeCommands();
             server.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();
             playerMoveInventoryEvents.processInventoryEvents();
-            updateMovements.tick(numberOfTicksPassed);
-            warpManager.tick(numberOfTicksPassed);
-            itemTickUpdates.tick(numberOfTicksPassed);
-            combatTickUpdates.tick(numberOfTicksPassed);
+            movementUpdateTask.tick(numberOfTicksPassed);
+            warpTask.tick(numberOfTicksPassed);
+            groundItemTimerTask.tick(numberOfTicksPassed);
+            combatUpdateTask.tick(numberOfTicksPassed);
             entityRehealTask.tick(numberOfTicksPassed);
-            server.getGameManager().gameMapTick(numberOfTicksPassed);
             aiEntityRespawnTimerTask.tick(numberOfTicksPassed);
-            server.getGameManager().processPlayerQuit();
-            server.getGameManager().processPlayerJoin();
+            server.getGameManager().tickWorld(numberOfTicksPassed);
             server.getNetworkManager().getOutStreamManager().sendPackets();
             server.getTradeManager().tickTime(numberOfTicksPassed);
-
-            /* ***********************
-             * !! Update End !!
-             ***********************/
+            // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);
 
