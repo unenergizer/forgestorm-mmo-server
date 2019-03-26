@@ -1,8 +1,8 @@
 package com.valenguard.server.game;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.task.*;
 import com.valenguard.server.game.world.item.inventory.PlayerMoveInventoryEvents;
+import com.valenguard.server.game.world.task.*;
 import lombok.Getter;
 
 /**
@@ -15,10 +15,6 @@ import lombok.Getter;
 @Getter
 public class GameLoop extends Thread {
 
-    /* UPDATES PER SECOND */
-    private int currentTPS;
-    private long variableYieldTime, lastTime;
-
     private final PlayerMoveInventoryEvents playerMoveInventoryEvents = new PlayerMoveInventoryEvents();
     private final UpdateMovements updateMovements = new UpdateMovements();
     private final WarpManager warpManager = new WarpManager();
@@ -26,6 +22,10 @@ public class GameLoop extends Thread {
     private final CombatTickUpdates combatTickUpdates = new CombatTickUpdates();
     private final EntityRehealTask entityRehealTask = new EntityRehealTask();
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
+
+    /* UPDATES PER SECOND */
+    private int currentTPS;
+    private long variableYieldTime, lastTime;
 
     public GameLoop() {
         super("GameThread");
@@ -64,18 +64,17 @@ public class GameLoop extends Thread {
             server.getCommandManager().getCommandProcessor().executeCommands();
             server.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();
             playerMoveInventoryEvents.processInventoryEvents();
-            updateMovements.updateEntityMovement();
-            warpManager.warpPlayers();
-            itemTickUpdates.tickItemsDespawn();
-            combatTickUpdates.tickCombat(numberOfTicksPassed);
-            entityRehealTask.tickEntityReheal(numberOfTicksPassed);
+            updateMovements.tick(numberOfTicksPassed);
+            warpManager.tick(numberOfTicksPassed);
+            itemTickUpdates.tick(numberOfTicksPassed);
+            combatTickUpdates.tick(numberOfTicksPassed);
+            entityRehealTask.tick(numberOfTicksPassed);
             server.getGameManager().gameMapTick(numberOfTicksPassed);
-            aiEntityRespawnTimerTask.tickRespawnTime();
+            aiEntityRespawnTimerTask.tick(numberOfTicksPassed);
             server.getGameManager().processPlayerQuit();
             server.getGameManager().processPlayerJoin();
             server.getNetworkManager().getOutStreamManager().sendPackets();
             server.getTradeManager().tickTime(numberOfTicksPassed);
-
 
             /* ***********************
              * !! Update End !!

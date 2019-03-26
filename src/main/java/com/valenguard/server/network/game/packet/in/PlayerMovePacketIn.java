@@ -1,8 +1,8 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.game.world.task.UpdateMovements;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 

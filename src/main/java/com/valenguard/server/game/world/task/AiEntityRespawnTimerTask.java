@@ -1,4 +1,4 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.AiEntity;
@@ -10,19 +10,19 @@ import java.util.List;
 
 import static com.valenguard.server.util.Log.println;
 
-public class AiEntityRespawnTimerTask {
+public class AiEntityRespawnTimerTask implements AbstractTask {
 
     private static final boolean PRINT_DEBUG = false;
     private final List<RespawnTimer> respawnTimers = new ArrayList<>();
+
+    private int timerTick = 0; // combat speed
 
     public void addAiEntity(AiEntity movingEntity) {
         respawnTimers.add(new RespawnTimer(movingEntity, GameConstants.GENERAL_RESPAWN_TIME));
     }
 
-    private int timerTick = 0; // combat speed
-
-    public void tickRespawnTime() {
-
+    @Override
+    public void tick(long ticksPassed) {
         timerTick++;
         if (timerTick >= 20) {
             timerTick = 0;
@@ -56,5 +56,4 @@ public class AiEntityRespawnTimerTask {
         private final AiEntity movingEntity;
         private int respawnTime;
     }
-
 }

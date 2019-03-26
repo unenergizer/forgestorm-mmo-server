@@ -1,4 +1,4 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.AiEntity;
@@ -8,15 +8,15 @@ import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
 
 import static com.valenguard.server.util.Log.println;
 
-public class EntityRehealTask {
+public class EntityRehealTask implements AbstractTask {
 
     private static final boolean DEBUG_PRINT = false;
-
     private static final long REHEAL_INTERVAL = 120;
     private static final int REHEAL_AMOUNT = 1;
 
-    public void tickEntityReheal(long numberOfTicksPassed) {
-        if (numberOfTicksPassed % REHEAL_INTERVAL == 0) {
+    @Override
+    public void tick(long ticksPassed) {
+        if (ticksPassed % REHEAL_INTERVAL == 0) {
 
             println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
@@ -44,5 +44,4 @@ public class EntityRehealTask {
             }
         }
     }
-
 }

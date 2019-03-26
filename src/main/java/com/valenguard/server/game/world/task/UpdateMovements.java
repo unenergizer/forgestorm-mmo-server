@@ -1,4 +1,4 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.google.common.base.Preconditions;
 import com.valenguard.server.Server;
@@ -12,14 +12,12 @@ import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
 
 import static com.valenguard.server.util.Log.println;
 
-public class UpdateMovements {
+public class UpdateMovements implements AbstractTask {
 
     private final static boolean PRINT_DEBUG = false;
 
-    /**
-     * Process the list of moving entities.
-     */
-    public void updateEntityMovement() {
+    @Override
+    public void tick(long ticksPassed) {
         Server.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
@@ -337,8 +335,6 @@ public class UpdateMovements {
      * @param player The entity ot add.
      */
     public void performPlayerMove(Player player, Location attemptLocation) {
-
-//        println(getClass(), "some debug", false, packetReceiver.getServerEntityId() == 30000);
 
         // Canceling trade for the packetReceiver.
         Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");

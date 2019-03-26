@@ -1,9 +1,9 @@
 package com.valenguard.server.game.world.maps;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.task.UpdateMovements;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
+import com.valenguard.server.game.world.task.UpdateMovements;
 
 public class AiEntityController extends EntityController<AiEntity> {
 

@@ -1,4 +1,4 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.PlayerConstants;
@@ -16,13 +16,14 @@ import com.valenguard.server.network.game.packet.out.MovingEntityTeleportPacketO
 
 import static com.valenguard.server.util.Log.println;
 
-public class CombatTickUpdates {
+public class CombatTickUpdates implements AbstractTask {
 
     private static final int IDLE_COMBAT_TIMEOUT = 13;
 
-    public void tickCombat(long numberOfTicksPassed) {
+    @Override
+    public void tick(long ticksPassed) {
         for (GameMap gameMap : Server.getInstance().getGameManager().getGameMaps().values()) {
-            tickGameMapCombat(gameMap, numberOfTicksPassed);
+            tickGameMapCombat(gameMap, ticksPassed);
         }
     }
 

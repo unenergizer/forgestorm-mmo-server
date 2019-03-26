@@ -1,14 +1,15 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.util.Log;
 
-public class WarpManager {
+public class WarpManager implements AbstractTask {
 
     private static final boolean PRINT_DEBUG = false;
 
-    public void warpPlayers() {
+    @Override
+    public void tick(long ticksPassed) {
         Server.getInstance().getGameManager().forAllPlayersFiltered(this::warpPlayer, player ->
                 player.getWarp() != null && !player.isEntityMoving());
     }

@@ -1,4 +1,4 @@
-package com.valenguard.server.game.task;
+package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
@@ -9,14 +9,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ItemTickUpdates {
+public class ItemTickUpdates implements AbstractTask {
 
     private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
     private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min
 
     private final List<GroundItemTimer> groundItemTimers = new ArrayList<>();
 
-    public void tickItemsDespawn() {
+    @Override
+    public void tick(long ticksPassed) {
         Iterator<GroundItemTimer> itemTimerIterator = groundItemTimers.iterator();
         while (itemTimerIterator.hasNext()) {
 
