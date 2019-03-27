@@ -2,6 +2,7 @@ package com.valenguard.server.database;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.valenguard.server.Server;
+import com.valenguard.server.network.login.LoginState;
 
 import java.io.IOException;
 import java.io.InputStream;

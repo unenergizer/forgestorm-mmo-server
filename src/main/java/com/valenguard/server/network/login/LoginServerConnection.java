@@ -1,7 +1,6 @@
 package com.valenguard.server.network.login;
 
 import com.valenguard.server.database.AuthenticatedUser;
-import com.valenguard.server.database.LoginState;
 import com.valenguard.server.database.UserAuthenticate;
 import com.valenguard.server.io.NetworkSettingsLoader;
 import com.valenguard.server.network.NetworkManager;

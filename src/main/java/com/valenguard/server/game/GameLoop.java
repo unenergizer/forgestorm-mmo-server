@@ -57,7 +57,7 @@ public class GameLoop extends Thread {
         while (server.getNetworkManager().getGameServerConnection().isRunning()) {
             startTime = System.nanoTime();
 
-            // WARNING: Maintain tickWorld order!
+            // WARNING: Maintain tick order!
             // Update Start
             server.getCommandManager().getCommandProcessor().executeCommands();
             server.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();

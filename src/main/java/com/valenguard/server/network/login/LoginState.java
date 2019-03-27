@@ -1,4 +1,4 @@
-package com.valenguard.server.database;
+package com.valenguard.server.network.login;
 
 import lombok.Getter;
 
@@ -10,13 +10,13 @@ public class LoginState {
     private String failReason;
     private String username;
 
-    LoginState failState(String failReason) {
+    public LoginState failState(String failReason) {
         this.failReason = failReason;
         loginSuccess = false;
         return this;
     }
 
-    LoginState successState(int userId, String username) {
+    public LoginState successState(int userId, String username) {
         this.userId = userId;
         loginSuccess = true;
         this.username = username;

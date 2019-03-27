@@ -23,7 +23,7 @@ public class GameManager {
     }
 
     void tickWorld(long ticksPassed) {
-        // WARNING: Maintain tickWorld order!
+        // WARNING: Maintain tick order!
         gameMapProcessor.spawnEntities();
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
