@@ -16,7 +16,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PlayerEquipment {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Getter
     private final InventorySlot[] equipmentSlots;

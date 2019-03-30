@@ -17,10 +17,11 @@ import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.packet.out.PingPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
-import com.valenguard.server.util.Log;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static com.valenguard.server.util.Log.println;
 
 public class PlayerProcessor {
 
@@ -94,16 +95,19 @@ public class PlayerProcessor {
     }
 
     public void queuePlayerQuitServer(ClientHandler clientHandler) {
+        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
+        clientHandler.setPlayerQuitProcessed(true);
         playerQuitServerQueue.add(clientHandler);
     }
 
     public void processPlayerQuit() {
         for (ClientHandler clientHandler : playerQuitServerQueue) {
             Player player = clientHandler.getPlayer();
+
+            println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (gameManager.getTotalPlayersOnline() - 1));
+
             savePlayer(player);
             playerWorldQuit(player);
-            Log.println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (gameManager.getTotalPlayersOnline() - 1));
-
         }
         playerQuitServerQueue.clear();
     }
@@ -127,5 +131,6 @@ public class PlayerProcessor {
         gameMap.getPlayerController().removePlayer(player);
         Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
         Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
+        player.getClientHandler().closeConnection();
     }
 }

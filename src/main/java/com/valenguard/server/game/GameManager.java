@@ -12,6 +12,8 @@ import lombok.Getter;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static com.valenguard.server.util.Log.println;
+
 @Getter
 public class GameManager {
 
@@ -81,5 +83,23 @@ public class GameManager {
         for (GameMap gameMap : gameMapProcessor.getGameMaps().values())
             onlinePlayers = onlinePlayers + gameMap.getPlayerController().getPlayerCount();
         return onlinePlayers;
+    }
+
+    public void kickPlayer(String username) {
+        kickPlayer(findPlayer(username));
+    }
+
+    private void kickPlayer(Player player) {
+        println(getClass(), "CALLED 1");
+        playerProcessor.queuePlayerQuitServer(player.getClientHandler());
+    }
+
+    public void exit() {
+        // Kick all players
+        for (GameMap gameMap : getGameMapProcessor().getGameMaps().values()) {
+            for (Player player : gameMap.getPlayerController().getPlayerList()) {
+                kickPlayer(player);
+            }
+        }
     }
 }

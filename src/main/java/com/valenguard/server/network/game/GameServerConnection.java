@@ -99,7 +99,7 @@ public class GameServerConnection {
                     e.printStackTrace();
                 }
             }
-        }, "GameConnectionListener").start();
+        }, "[" + getClass().getSimpleName() + "] GameConnectionListener").start();
     }
 
     /**
@@ -125,8 +125,9 @@ public class GameServerConnection {
                 UUID uuid;
                 try {
                     uuid = UUID.fromString(inStream.readUTF());
-                } catch (NumberFormatException e) {
+                } catch (IllegalArgumentException e) {
                     // The client sent a string that was not a UUID.
+                    println(getClass(), e.getMessage(), true);
                     return;
                 }
                 boolean canConnect = authenticationManager.authGameUser(uuid, clientSocket.getInetAddress().getHostAddress());
@@ -177,7 +178,9 @@ public class GameServerConnection {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
+                        if (!clientHandler.isPlayerQuitProcessed()) {
+                            Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
+                        }
                     }
                 } else {
                     e.printStackTrace();
@@ -193,7 +196,7 @@ public class GameServerConnection {
                     }
                 }
             } // Starting a new thread for the client in the format of address:port for the client and then starting the tread
-        }, clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()).start();
+        }, "[" + getClass().getSimpleName() + "] " + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()).start();
     }
 
     /**

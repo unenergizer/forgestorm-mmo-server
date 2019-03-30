@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-@SuppressWarnings("unused")
 @Getter
 public class ClientHandler {
 
@@ -21,6 +20,9 @@ public class ClientHandler {
     private Socket socket;
     private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
+
+    @Setter
+    private boolean playerQuitProcessed = false;
 
     @Setter
     private Player player;
@@ -130,7 +132,7 @@ public class ClientHandler {
      */
     public void closeConnection() {
         try {
-            if (socket != null) socket.close();
+            if (socket != null && !socket.isClosed()) socket.close();
             if (gameOutputStream != null) gameOutputStream.close();
             if (inputStream != null) inputStream.close();
             socket = null;

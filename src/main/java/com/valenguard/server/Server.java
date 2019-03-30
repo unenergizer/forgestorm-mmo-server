@@ -66,7 +66,12 @@ public class Server {
 
     public void exitServer() {
         Log.println(getClass(), "Stopping Server!");
+
+        getGameManager().exit();
+        commandManager.exit();
         networkManager.exit();
         databaseManager.exit();
+
+        System.exit(0);
     }
 }
