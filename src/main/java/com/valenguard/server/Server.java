@@ -67,6 +67,8 @@ public class Server {
     public void exitServer() {
         Log.println(getClass(), "Stopping Server!");
 
+        // TODO: Implement ExecutorService to manage threads and shut them down in order.
+
         getGameManager().exit();
         commandManager.exit();
         networkManager.exit();

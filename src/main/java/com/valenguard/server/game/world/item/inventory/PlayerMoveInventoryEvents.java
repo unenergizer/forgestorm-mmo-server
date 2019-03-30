@@ -18,15 +18,15 @@ public class PlayerMoveInventoryEvents {
         InventoryEvent inventoryEvent;
         while ((inventoryEvent = inventoryEvents.poll()) != null) {
 
-            if (!fromItemStackExist(inventoryEvent.getWindowMovementType().getFromWindow(), inventoryEvent)) continue;
+            if (!fromItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) continue;
 
-            if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_BAG_TO_BAG) {
+            if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_BAG_TO_BAG) {
                 bagMove(inventoryEvent);
-            } else if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_BAG_TO_EQUIPMENT) {
+            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_BAG_TO_EQUIPMENT) {
                 fromBagToEquipment(inventoryEvent);
-            } else if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_EQUIPMENT_TO_BAG) {
+            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_EQUIPMENT_TO_BAG) {
                 fromEquipmentToBag(inventoryEvent);
-            } else if (inventoryEvent.getWindowMovementType() == WindowMovementType.FROM_EQUIPMENT_TO_EQUIPMENT) {
+            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_EQUIPMENT_TO_EQUIPMENT) {
                 fromEquipmentToEquipment();
             }
         }

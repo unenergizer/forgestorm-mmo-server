@@ -10,5 +10,5 @@ public class InventoryEvent {
     private Player player;
     private byte fromPosition;
     private byte toPosition;
-    private WindowMovementType windowMovementType;
+    private InventoryMoveType inventoryMoveType;
 }

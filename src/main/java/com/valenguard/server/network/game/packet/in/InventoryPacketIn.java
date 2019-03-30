@@ -74,10 +74,10 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         if (!doesNotExceedInventoryLimit(fromWindow, toWindow, packetData)) return;
 
-        WindowMovementType windowMovementType = determineWindowMovementInfo(fromWindow, toWindow);
+        InventoryMoveType inventoryMoveType = InventoryMovementUtil.getWindowMovementInfo(fromWindow, toWindow);
 
         PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
-        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, windowMovementType));
+        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
 
     }
 
@@ -133,19 +133,6 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         }
 
         return true;
-    }
-
-    private WindowMovementType determineWindowMovementInfo(InventoryType fromWindow, InventoryType toWindow) {
-        if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.BAG_1) {
-            return WindowMovementType.FROM_EQUIPMENT_TO_BAG;
-        } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.EQUIPMENT) {
-            return WindowMovementType.FROM_BAG_TO_EQUIPMENT;
-        } else if (fromWindow == InventoryType.BAG_1 && toWindow == InventoryType.BAG_1) {
-            return WindowMovementType.FROM_BAG_TO_BAG;
-        } else if (fromWindow == InventoryType.EQUIPMENT && toWindow == InventoryType.EQUIPMENT) {
-            return WindowMovementType.FROM_EQUIPMENT_TO_EQUIPMENT;
-        }
-        throw new RuntimeException("The sanitization should have already checked for this.");
     }
 
     @AllArgsConstructor
