@@ -96,7 +96,7 @@ public class TradeManager {
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
-        ItemStack itemStack = player.getPlayerBag().getBagSlots()[itemSlot].getItemStack();
+        ItemStack itemStack = player.getPlayerBag().getInventorySlotArray()[itemSlot].getItemStack();
         if (itemStack == null) return;
 
         if (tradeData.targetPlayer == player) {
@@ -125,7 +125,7 @@ public class TradeManager {
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
-        ItemStack itemStack = player.getPlayerBag().getBagSlots()[itemSlot].getItemStack();
+        ItemStack itemStack = player.getPlayerBag().getInventorySlotArray()[itemSlot].getItemStack();
         if (itemStack == null) return;
 
         println(getClass(), "[2] Remove trade item called! Player: " + player.getName());
@@ -433,7 +433,7 @@ public class TradeManager {
      */
     private List<ItemStack> generateGiveItems(Player trader, Byte[] tradeItems) {
         List<ItemStack> giveItems = new ArrayList<>();
-        InventorySlot[] bagItems = trader.getPlayerBag().getBagSlots();
+        InventorySlot[] bagItems = trader.getPlayerBag().getInventorySlotArray();
         for (Byte itemSlot : tradeItems) {
             if (itemSlot == null) continue;
             ItemStack itemStack = bagItems[itemSlot].getItemStack();

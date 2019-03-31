@@ -80,14 +80,14 @@ public class PlayerProcessor {
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
 
         // Send player bag ItemStacks
-        for (InventorySlot inventorySlot : player.getPlayerBag().getBagSlots()) {
+        for (InventorySlot inventorySlot : player.getPlayerBag().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
                 new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_BAG, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player equipment ItemStacks
-        for (InventorySlot inventorySlot : player.getPlayerEquipment().getEquipmentSlots()) {
+        for (InventorySlot inventorySlot : player.getPlayerEquipment().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
                 new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }

@@ -90,7 +90,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 return;
             }
 
-            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getBagSlots()[packetData.slotIndex].getItemStack();
+            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getInventorySlotArray()[packetData.slotIndex].getItemStack();
             packetData.getPlayer().getPlayerBag().removeItemStack(packetData.slotIndex, true);
 
             GameMap gameMap = packetData.getPlayer().getGameMap();
@@ -99,7 +99,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             itemStackDrop.setEntityType(EntityType.ITEM_STACK);
             itemStackDrop.setName(itemStack.getName());
             itemStackDrop.setCurrentMapLocation(new Location(packetData.getPlayer().getCurrentMapLocation()));
-            itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
+            itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
             itemStackDrop.setItemStack(itemStack);
             itemStackDrop.setDropOwner(packetData.getPlayer());
             itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());

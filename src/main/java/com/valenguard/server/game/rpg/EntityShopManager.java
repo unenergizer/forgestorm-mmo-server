@@ -26,7 +26,7 @@ public class EntityShopManager {
         int itemId = shopItemStackInfo.getItemId();
 
         // The player cannot buy items if they don't have the space for the item.
-        if (player.getPlayerBag().isBagFull()) return;
+        if (player.getPlayerBag().isInventoryFull()) return;
 
         // The player does not have enough gold.
         if (buyPrice > inventorySlot.getItemStack().getAmount()) return;

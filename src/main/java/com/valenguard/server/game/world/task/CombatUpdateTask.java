@@ -34,7 +34,7 @@ public class CombatUpdateTask implements AbstractTask {
             for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                 if (aiEntity.getTargetEntity() == null) continue;
 
-                    MovingEntity targetEntity = aiEntity.getTargetEntity();
+                MovingEntity targetEntity = aiEntity.getTargetEntity();
                 // Check for distance
                 // TODO: Check distance on a per move/spell basis (shield slam allows 5 blocks, hand to hand, 1 block distance)
                 if (aiEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
@@ -176,7 +176,7 @@ public class CombatUpdateTask implements AbstractTask {
                 itemStackDrop.setEntityType(EntityType.ITEM_STACK);
                 itemStackDrop.setName(itemStack.getName());
                 itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
-                itemStackDrop.setAppearance(new Appearance((byte) 0, new short[]{(short) itemStack.getItemId()}));
+                itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
                 itemStackDrop.setItemStack(itemStack);
                 itemStackDrop.setDropOwner((Player) killerEntity);
                 itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());

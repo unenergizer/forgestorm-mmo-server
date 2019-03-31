@@ -29,7 +29,7 @@ public class PlayerDataSQL extends AbstractSingleSQL {
         initialPlayerTextureIds[Appearance.HEAD] = resultSet.getShort("head_appearance");
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance(resultSet.getByte("color_id"), initialPlayerTextureIds));
+        player.setAppearance(new Appearance(player, resultSet.getByte("color_id"), initialPlayerTextureIds));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class PlayerDataSQL extends AbstractSingleSQL {
         initialPlayerTextureIds[Appearance.HEAD] = 0;
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance((byte) 0, initialPlayerTextureIds));
+        player.setAppearance(new Appearance(player, (byte) 0, initialPlayerTextureIds));
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
         preparedStatement.setInt(2, player.getFaction());

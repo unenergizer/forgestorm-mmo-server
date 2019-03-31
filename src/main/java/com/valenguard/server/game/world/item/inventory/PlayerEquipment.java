@@ -1,41 +1,20 @@
 package com.valenguard.server.game.world.item.inventory;
 
-import com.valenguard.server.Server;
 import com.valenguard.server.game.rpg.Attributes;
-import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
-import com.valenguard.server.game.world.item.WearableItemStack;
-import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
-import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
 import static java.util.Objects.requireNonNull;
 
-public class PlayerEquipment {
+public class PlayerEquipment extends AbstractInventory {
 
     private static final boolean PRINT_DEBUG = false;
 
-    @Getter
-    private final InventorySlot[] equipmentSlots;
-    private final Player player;
-
-    public PlayerEquipment(final Player player) {
-        this.player = player;
-
-        // Setup equipment slots
-        equipmentSlots = new InventorySlot[InventoryConstants.EQUIPMENT_SIZE];
-        for (byte slotIndex = 0; slotIndex < equipmentSlots.length; slotIndex++) {
-            equipmentSlots[slotIndex] = new InventorySlot(slotIndex);
-        }
-    }
-
-    public void setEquipmentSlot(byte equipmentIndex, ItemStack itemStack) {
-        equipmentSlots[equipmentIndex].setItemStack(itemStack);
-        updatePlayerAttributes(itemStack, null, true, false);
-        updateAppearance(equipmentIndex, false);
+    public PlayerEquipment(Player inventoryOwner) {
+        super(inventoryOwner, InventoryType.EQUIPMENT, InventoryConstants.EQUIPMENT_SIZE);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -54,10 +33,13 @@ public class PlayerEquipment {
         }
 
         playerBag.setItemStack(bagIndex, equipmentItemStack, false);
-        equipmentSlots[equipmentIndex].setItemStack(bagItemStack);
+        inventorySlotArray[equipmentIndex].setItemStack(bagItemStack);
 
         updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
-        updateAppearance(equipmentIndex, true);
+
+        InventorySlot inventorySlot = inventorySlotArray[equipmentIndex];
+        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(equipmentIndex))[0];
+        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, true);
 
         return true;
     }
@@ -67,7 +49,7 @@ public class PlayerEquipment {
      */
     private void updatePlayerAttributes(ItemStack bagItemStack, ItemStack equipItemStack, boolean equipItem, boolean sendAttributePacket) {
 
-        Attributes playerClientAttributes = player.getAttributes();
+        Attributes playerClientAttributes = inventoryOwner.getAttributes();
         Attributes itemStackAttributes = equipItem ? bagItemStack.getAttributes() : equipItemStack.getAttributes();
 
         println(PRINT_DEBUG);
@@ -112,29 +94,7 @@ public class PlayerEquipment {
         println(PRINT_DEBUG);
 
         // Send attributes packet
-        if (sendAttributePacket) new EntityAttributesUpdatePacketOut(player, player).sendPacket();
-    }
-
-    private void updateAppearance(byte slotIndex, boolean sendPacket) {
-        InventorySlot inventorySlot = equipmentSlots[slotIndex];
-        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(slotIndex))[0];
-
-        if (inventorySlot.getItemStack() != null) {
-            if (inventorySlot.getItemStack() instanceof WearableItemStack) {
-                WearableItemStack newAppearanceStack = (WearableItemStack) inventorySlot.getItemStack();
-                if (newAppearanceStack.getItemStackType() == ItemStackType.CHEST) {
-                    setArmorAppearance(newAppearanceStack.getTextureId(), sendPacket);
-                } else if (newAppearanceStack.getItemStackType() == ItemStackType.HELM) {
-                    setHelmAppearance(newAppearanceStack.getTextureId(), sendPacket);
-                }
-            }
-        } else {
-            if (acceptedItemStackType == ItemStackType.CHEST) {
-                setArmorAppearance((short) -1, sendPacket);
-            } else if (acceptedItemStackType == ItemStackType.HELM) {
-                setHelmAppearance((short) -1, sendPacket);
-            }
-        }
+        if (sendAttributePacket) new EntityAttributesUpdatePacketOut(inventoryOwner, inventoryOwner).sendPacket();
     }
 
     private ItemStackType[] getAcceptedItemStackTypes(byte slotIndex) {
@@ -144,23 +104,24 @@ public class PlayerEquipment {
         return null;
     }
 
-    private void setHelmAppearance(short helmTextureId, boolean sendPacket) {
-        player.getAppearance().getTextureIds()[Appearance.HELM] = helmTextureId;
-        if (sendPacket) {
-            Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), player, EntityAppearancePacketOut.HELM_INDEX).sendPacket());
-        }
+    @Override
+    public void giveItemStack(ItemStack itemStack, boolean sendPacket) {
+        // TODO
     }
 
-    private void setArmorAppearance(short armorTextureId, boolean sendPacket) {
-        player.getAppearance().getTextureIds()[Appearance.ARMOR] = armorTextureId;
-        if (sendPacket) {
-            Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), player, EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
-        }
+    @Override
+    public void removeItemStack(byte positionIndex, boolean sendPacket) {
+        // TODO
     }
 
-    ItemStack getItemStack(byte index) {
-        return equipmentSlots[index].getItemStack();
+    @Override
+    public void setItemStack(byte slotIndex, ItemStack itemStack, boolean sendPacket) {
+        if (sendPacket) println(getClass(), "Primarily used by SQL. Do not send packets now!", true);
+        inventorySlotArray[slotIndex].setItemStack(itemStack);
+        updatePlayerAttributes(itemStack, null, true, sendPacket);
+        
+        InventorySlot inventorySlot = inventorySlotArray[slotIndex];
+        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(slotIndex))[0];
+        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, sendPacket);
     }
 }

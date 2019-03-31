@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class InventoryEvent {
     private Player player;
-    private byte fromPosition;
-    private byte toPosition;
+    private byte fromPositionIndex;
+    private byte toPositionIndex;
     private InventoryMoveType inventoryMoveType;
 }

@@ -84,10 +84,10 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         // Stack stackable items
         // TODO: Generalize for additional stackable item types
         if (itemStack.getItemStackType() == ItemStackType.GOLD) {
-            if (playerBag.getGoldInventorySlot() == null && player.getPlayerBag().isBagFull()) return;
+            if (playerBag.getGoldInventorySlot() == null && player.getPlayerBag().isInventoryFull()) return;
         } else {
             // Item is not stackable
-            if (playerBag.isBagFull()) return;
+            if (playerBag.isInventoryFull()) return;
         }
 
         // Despawn the item
@@ -122,7 +122,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         if (appearanceID >= 3) appearanceID = 0;
         else appearanceID++;
 
-        entity.setAppearance(new Appearance((byte) 0, new short[]{appearanceID}));
+        entity.setAppearance(new Appearance(entity, (byte) 0, new short[]{appearanceID}));
 
         gameMap.getPlayerController().forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
 

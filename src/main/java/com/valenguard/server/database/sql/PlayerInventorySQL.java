@@ -38,7 +38,7 @@ public class PlayerInventorySQL extends AbstractSingleSQL {
         for (byte slotIndex = 0; slotIndex < equipmentStacks.length; slotIndex++) {
             ItemStack itemStack = equipmentStacks[slotIndex].getItemStack();
             if (itemStack != null) {
-                player.getPlayerEquipment().setEquipmentSlot(slotIndex, itemStackManager.makeItemStack(itemStack));
+                player.getPlayerEquipment().setItemStack(slotIndex, itemStackManager.makeItemStack(itemStack), false);
             }
         }
     }
@@ -48,8 +48,8 @@ public class PlayerInventorySQL extends AbstractSingleSQL {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_player_inventory" +
                 " SET bag=?, equipment=?, bank=? WHERE user_id=?");
 
-        preparedStatement.setString(1, Base64Util.serializeObjectToBase64(player.getPlayerBag().getBagSlots()));
-        preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getEquipmentSlots()));
+        preparedStatement.setString(1, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
+        preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
         preparedStatement.setString(3, "todo");
         preparedStatement.setInt(4, player.getClientHandler().getDatabaseUserId());
 
@@ -63,8 +63,8 @@ public class PlayerInventorySQL extends AbstractSingleSQL {
                 "VALUES(?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
-        preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerBag().getBagSlots()));
-        preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getEquipmentSlots()));
+        preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
+        preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
         preparedStatement.setString(4, "todo");
 
         return preparedStatement;

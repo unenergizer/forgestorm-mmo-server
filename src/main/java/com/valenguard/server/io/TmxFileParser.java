@@ -234,11 +234,11 @@ public class TmxFileParser {
                         appearanceTextureIds = new short[2];
                         appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
                         appearanceTextureIds[Appearance.HEAD] = (short) (int) aiEntityData.getAtlasHeadID();
-                        aiEntity.setAppearance(new Appearance(colorID, appearanceTextureIds));
+                        aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
                     } else {
                         appearanceTextureIds = new short[1];
                         appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
-                        aiEntity.setAppearance(new Appearance(colorID, appearanceTextureIds));
+                        aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
                     }
 
                     // Setup basic attributes.
@@ -290,7 +290,7 @@ public class TmxFileParser {
                     stationaryEntity.setServerEntityId((short) entityUUID++); // todo need to determine a real id
                     stationaryEntity.setCurrentMapLocation(new Location(fileName, x, y));
                     stationaryEntity.setEntityType(EntityType.SKILL_NODE);
-                    stationaryEntity.setAppearance(new Appearance((byte) 0, new short[]{0})); // todo determine texture id
+                    stationaryEntity.setAppearance(new Appearance(stationaryEntity, (byte) 0, new short[]{0})); // todo determine texture id
                     stationaryEntity.setName(""); // todo will these even have names?
                     Server.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);
 

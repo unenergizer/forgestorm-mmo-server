@@ -18,24 +18,106 @@ public class PlayerMoveInventoryEvents {
         InventoryEvent inventoryEvent;
         while ((inventoryEvent = inventoryEvents.poll()) != null) {
 
-            if (!fromItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) continue;
+            if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) continue;
 
-            if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_BAG_TO_BAG) {
-                bagMove(inventoryEvent);
-            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_BAG_TO_EQUIPMENT) {
-                fromBagToEquipment(inventoryEvent);
-            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_EQUIPMENT_TO_BAG) {
-                fromEquipmentToBag(inventoryEvent);
-            } else if (inventoryEvent.getInventoryMoveType() == InventoryMoveType.FROM_EQUIPMENT_TO_EQUIPMENT) {
-                fromEquipmentToEquipment();
+            switch (inventoryEvent.getInventoryMoveType()) {
+                case FROM_BAG_TO_BAG:
+                    fromBagToBag(inventoryEvent);
+                    break;
+                case FROM_BAG_TO_BANK:
+                    break;
+                case FROM_BAG_TO_EQUIPMENT:
+                    fromBagToEquipment(inventoryEvent);
+                    break;
+                case FROM_BANK_TO_BAG:
+                    break;
+                case FROM_BANK_TO_BANK:
+                    break;
+                case FROM_BANK_TO_EQUIPMENT:
+                    break;
+                case FROM_EQUIPMENT_TO_BAG:
+                    fromEquipmentToBag(inventoryEvent);
+                    break;
+                case FROM_EQUIPMENT_TO_BANK:
+                    break;
+                case FROM_EQUIPMENT_TO_EQUIPMENT:
+                    fromEquipmentToEquipment();
+                    break;
             }
         }
     }
 
-    private boolean fromItemStackExist(InventoryType fromWindowType, InventoryEvent inventoryEvent) {
+    private void perfromWindowTransfer(InventoryEvent inventoryEvent) {
+        if (!checkItemStackExist(inventoryEvent)) return;
+        Player player = inventoryEvent.getPlayer();
+        InventorySlot[] playerBag = player.getPlayerBag().getInventorySlotArray();
+        InventorySlot[] playerBank = player.getPlayerBank().getInventorySlotArray();
+        InventorySlot[] playerEquipment = player.getPlayerEquipment().getInventorySlotArray();
+
+
+        // Perform server move
+        InventorySlot[] fromSlot;
+        InventorySlot[] toSlot;
+
+        switch (inventoryEvent.getInventoryMoveType()) {
+            case FROM_BAG_TO_BANK:
+                fromSlot = playerBag;
+                toSlot = playerBank;
+                break;
+            case FROM_BAG_TO_EQUIPMENT:
+                fromSlot = playerBag;
+                toSlot = playerEquipment;
+                break;
+            case FROM_BANK_TO_BAG:
+                fromSlot = playerBank;
+                toSlot = playerBag;
+                break;
+            case FROM_BANK_TO_EQUIPMENT:
+                fromSlot = playerBank;
+                toSlot = playerEquipment;
+                break;
+            case FROM_EQUIPMENT_TO_BAG:
+                fromSlot = playerEquipment;
+                toSlot = playerBag;
+                break;
+            case FROM_EQUIPMENT_TO_BANK:
+                fromSlot = playerEquipment;
+                toSlot = playerBank;
+                break;
+        }
+
+        // Perform client move
+        new InventoryPacketOut(player, new InventoryActions(
+                inventoryEvent.getInventoryMoveType().getFromWindow(),
+                inventoryEvent.getInventoryMoveType().getToWindow(),
+                inventoryEvent.getFromPositionIndex(),
+                inventoryEvent.getToPositionIndex()
+        )).sendPacket();
+    }
+
+    private boolean checkItemStackExist(InventoryEvent inventoryEvent) {
+        Player player = inventoryEvent.getPlayer();
+        byte fromPosition = inventoryEvent.getFromPositionIndex();
+
+        switch (inventoryEvent.getInventoryMoveType().getFromWindow()) {
+            case EQUIPMENT:
+                return player.getPlayerEquipment().getItemStack(fromPosition) != null;
+            case BAG_1:
+            case BAG_2:
+            case BAG_3:
+            case BAG_4:
+                return player.getPlayerBag().getItemStack(fromPosition) != null;
+            case BANK:
+                return player.getPlayerBank().getItemStack(fromPosition) != null;
+            default:
+                return false;
+        }
+    }
+
+    private boolean doesItemStackExist(InventoryType fromWindowType, InventoryEvent inventoryEvent) {
 
         Player player = inventoryEvent.getPlayer();
-        byte fromPosition = inventoryEvent.getFromPosition();
+        byte fromPosition = inventoryEvent.getFromPositionIndex();
 
         if (fromWindowType == InventoryType.BAG_1 && player.getPlayerBag().getItemStack(fromPosition) == null) {
             return false;
@@ -44,46 +126,37 @@ public class PlayerMoveInventoryEvents {
 
     }
 
-    private void bagMove(InventoryEvent inventoryEvent) {
-        inventoryEvent.getPlayer().getPlayerBag().moveItemStack(inventoryEvent.getFromPosition(), inventoryEvent.getToPosition());
+    private void fromBagToBag(InventoryEvent inventoryEvent) {
+        inventoryEvent.getPlayer().getPlayerBag().performInnerWindowMove(inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
     }
 
     private void fromBagToEquipment(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
 
-        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPosition(), inventoryEvent.getToPosition(), true)) {
+        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), true)) {
             return;
         }
 
         new InventoryPacketOut(player, new InventoryActions(
                 InventoryType.BAG_1,
                 InventoryType.EQUIPMENT,
-                inventoryEvent.getFromPosition(),
-                inventoryEvent.getToPosition()
+                inventoryEvent.getFromPositionIndex(),
+                inventoryEvent.getToPositionIndex()
         )).sendPacket();
     }
 
     private void fromEquipmentToBag(InventoryEvent inventoryEvent) {
         Player player = inventoryEvent.getPlayer();
 
-        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPosition(), inventoryEvent.getFromPosition(), false)) {
+        if (!player.getPlayerEquipment().swapBagAndEquipmentWindow(player.getPlayerBag(), inventoryEvent.getToPositionIndex(), inventoryEvent.getFromPositionIndex(), false)) {
             return;
         }
-
-        // 1, 2, 3, 4
-        // ^...
-
-        // Problems
-        // 1. At the moment we don't respond to failed movements
-        // 2. Player moves an item to a new item spot then from that new item
-        // spot they move the item again before receiving a response <- How do we know the state of the item to resolve this?
-
 
         new InventoryPacketOut(player, new InventoryActions(
                 InventoryType.EQUIPMENT,
                 InventoryType.BAG_1,
-                inventoryEvent.getFromPosition(),
-                inventoryEvent.getToPosition()
+                inventoryEvent.getFromPositionIndex(),
+                inventoryEvent.getToPositionIndex()
         )).sendPacket();
     }
 

@@ -11,8 +11,9 @@ import com.valenguard.server.game.world.item.DropTableManager;
 import com.valenguard.server.game.world.item.ItemStackManager;
 import com.valenguard.server.game.world.item.trade.TradeManager;
 import com.valenguard.server.network.NetworkManager;
-import com.valenguard.server.util.Log;
 import lombok.Getter;
+
+import static com.valenguard.server.util.Log.println;
 
 @Getter
 public class Server {
@@ -49,7 +50,7 @@ public class Server {
     }
 
     private void startServer() {
-        Log.println(getClass(), "Starting Server!");
+        println(getClass(), "Starting Server!");
 
         // Boot io loaders
         aiEntityDataManager.start();
@@ -65,7 +66,7 @@ public class Server {
     }
 
     public void exitServer() {
-        Log.println(getClass(), "Stopping Server!");
+        println(getClass(), "Stopping Server!");
 
         // TODO: Implement ExecutorService to manage threads and shut them down in order.
 
