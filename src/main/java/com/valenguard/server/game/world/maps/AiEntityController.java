@@ -15,6 +15,7 @@ public class AiEntityController extends EntityController<AiEntity> {
         for (AiEntity aiEntity : entityHashMap.values()) {
             if (aiEntity.getTargetEntity() != null && aiEntity.getTargetEntity().equals(targetToRemove)) {
                 aiEntity.setTargetEntity(null);
+                aiEntity.setInCombat(false);
             }
         }
     }

@@ -2,11 +2,15 @@ package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.world.combat.AbstractAbility;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -55,6 +59,21 @@ public class MovingEntity extends Entity {
     private Warp spawnWarp;
 
     private MoveDirection previousDirection = MoveDirection.NONE;
+
+    private final List<AbstractAbility> abstractAbilityList = new ArrayList<>();
+
+    private boolean inCombat = false;
+
+    /**
+     * The amount of time that has progressed since the player
+     * has been out of combat.
+     */
+    private int combatIdleTime;
+
+    public void setInCombat(boolean isInCombat) {
+        if (isInCombat) combatIdleTime = 0;
+        this.inCombat = isInCombat;
+    }
 
     public void gameMapRegister(Warp warp) {
         setCurrentMapLocation(new Location(warp.getLocation()));

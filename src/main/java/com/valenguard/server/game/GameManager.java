@@ -1,5 +1,6 @@
 package com.valenguard.server.game;
 
+import com.valenguard.server.game.world.combat.AbilityManager;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.Player;
@@ -17,6 +18,7 @@ import static com.valenguard.server.util.Log.println;
 @Getter
 public class GameManager {
 
+    private final AbilityManager abilityManager = new AbilityManager(this);
     private final PlayerProcessor playerProcessor = new PlayerProcessor(this);
     private final GameMapProcessor gameMapProcessor = new GameMapProcessor();
 
@@ -26,6 +28,7 @@ public class GameManager {
 
     void tickWorld(long ticksPassed) {
         // WARNING: Maintain tick order!
+        abilityManager.tick(ticksPassed);
         gameMapProcessor.spawnEntities();
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());

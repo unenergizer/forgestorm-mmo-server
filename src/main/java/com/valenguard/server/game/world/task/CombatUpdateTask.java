@@ -34,10 +34,14 @@ public class CombatUpdateTask implements AbstractTask {
             for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                 if (aiEntity.getTargetEntity() == null) continue;
 
-                MovingEntity targetEntity = aiEntity.getTargetEntity();
+                    MovingEntity targetEntity = aiEntity.getTargetEntity();
                 // Check for distance
+                // TODO: Check distance on a per move/spell basis (shield slam allows 5 blocks, hand to hand, 1 block distance)
                 if (aiEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getFutureMapLocation(), (short) 1)
                         || aiEntity.getCurrentMapLocation().isWithinDistance(targetEntity.getCurrentMapLocation(), (short) 1)) {
+
+                    if (!aiEntity.isInCombat()) aiEntity.setInCombat(true);
+                    if (!aiEntity.getTargetEntity().isInCombat()) aiEntity.getTargetEntity().setInCombat(true);
 
                     // Entity vs Target
                     Attributes movingEntityAttributes = aiEntity.getAttributes();
@@ -65,24 +69,22 @@ public class CombatUpdateTask implements AbstractTask {
                     }
                 } else {
 
-                    if (targetEntity instanceof Player) {
-                        idleTooLong((Player) targetEntity);
-                    }
+                    idleTooLong(targetEntity);
 
                 }
             }
         }
     }
 
-    private void idleTooLong(Player player) {
+    private void idleTooLong(MovingEntity movingEntity) {
 
-        if (player.getCombatIdleTime() > IDLE_COMBAT_TIMEOUT) {
-            println(getClass(), "The player is no longer in combat!");
-            player.setTargetEntity(null);
+        if (movingEntity.getCombatIdleTime() > IDLE_COMBAT_TIMEOUT) {
+            movingEntity.setInCombat(false);
+            movingEntity.setTargetEntity(null);
             return;
         }
 
-        player.setCombatIdleTime(player.getCombatIdleTime() + 1);
+        movingEntity.setCombatIdleTime(movingEntity.getCombatIdleTime() + 1);
     }
 
     private void sendCombatMessage(GameMap gameMap, AiEntity attackerEntity, MovingEntity targetEntity, boolean aiTookDamage) {
@@ -107,7 +109,10 @@ public class CombatUpdateTask implements AbstractTask {
         // Remove the deadEntity from all entities target!
         gameMap.getAiEntityController().releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
+        deadEntity.setInCombat(false);
+
         killerEntity.setTargetEntity(null);
+        killerEntity.setInCombat(false);
 
         if (deadEntity instanceof Player) {
             /*

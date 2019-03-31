@@ -23,7 +23,7 @@ public class EntityRehealTask implements AbstractTask {
             for (GameMap gameMap : Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerController().getPlayerList()) {
-                    if (player.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
+                    if (player.isInCombat()) continue; // Don't reheal entities in combat.
                     if (player.getCurrentHealth() < player.getMaxHealth()) {
                         println(getClass(), "Healing player: " + player.getName(), false, DEBUG_PRINT);
                         player.setCurrentHealth(player.getCurrentHealth() + REHEAL_AMOUNT);
@@ -34,7 +34,7 @@ public class EntityRehealTask implements AbstractTask {
 
                 // Reheal Entities
                 for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
-                    if (aiEntity.getTargetEntity() != null) continue; // Don't reheal entities with combat targets.
+                    if (aiEntity.isInCombat()) continue; // Don't reheal entities in combat.
                     if (aiEntity.getCurrentHealth() < aiEntity.getMaxHealth()) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() + REHEAL_AMOUNT);
                         gameMap.getPlayerController().forAllPlayers(anyPlayer ->

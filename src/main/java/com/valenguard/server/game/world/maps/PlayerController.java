@@ -94,7 +94,6 @@ public class PlayerController {
         Player player = queueData.getPlayer();
         player.gameMapRegister(queueData.getWarp());
         playerList.add(player);
-
         new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
     }
 
