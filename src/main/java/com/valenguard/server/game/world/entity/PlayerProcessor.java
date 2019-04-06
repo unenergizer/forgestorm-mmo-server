@@ -82,14 +82,21 @@ public class PlayerProcessor {
         // Send player bag ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBag().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_BAG, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_BAG, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+            }
+        }
+
+        // Send player bank ItemStacks
+        for (InventorySlot inventorySlot : player.getPlayerBank().getInventorySlotArray()) {
+            if (inventorySlot.getItemStack() != null) {
+                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_BANK, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player equipment ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerEquipment().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
     }

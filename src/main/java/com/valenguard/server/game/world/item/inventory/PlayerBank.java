@@ -28,7 +28,7 @@ public class PlayerBank extends AbstractInventory {
     public void setItemStack(byte slotIndex, ItemStack itemStack, boolean sendPacket) {
         inventorySlotArray[slotIndex].setItemStack(itemStack);
         if (sendPacket) {
-            new InventoryPacketOut(inventoryOwner, new InventoryActions(InventoryActions.SET_BAG, slotIndex, itemStack)).sendPacket();
+            new InventoryPacketOut(inventoryOwner, new InventoryActions(InventoryActions.ActionType.SET_BANK, slotIndex, itemStack)).sendPacket();
         }
     }
 

@@ -25,47 +25,50 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         byte dropInventory = -1;
         byte slotIndex = -1;
 
-        if (inventoryAction == InventoryActions.MOVE) {
-            fromPosition = clientHandler.readByte();
-            toPosition = clientHandler.readByte();
-            byte windowsByte = clientHandler.readByte();
-            fromWindow = (byte) (windowsByte >> 4);
-            toWindow = (byte) (windowsByte & 0x0F);
-        } else if (inventoryAction == InventoryActions.DROP) {
-            dropInventory = clientHandler.readByte();
-            slotIndex = clientHandler.readByte();
+        InventoryActions.ActionType actionType = InventoryActions.ActionType.getActionType(inventoryAction);
+
+        switch (actionType) {
+            case MOVE:
+                fromPosition = clientHandler.readByte();
+                toPosition = clientHandler.readByte();
+                byte windowsByte = clientHandler.readByte();
+                fromWindow = (byte) (windowsByte >> 4);
+                toWindow = (byte) (windowsByte & 0x0F);
+                break;
+            case DROP:
+                dropInventory = clientHandler.readByte();
+                slotIndex = clientHandler.readByte();
+                break;
         }
 
-        return new InventoryActionsPacket(inventoryAction, fromPosition, toPosition, fromWindow, toWindow, dropInventory, slotIndex);
+        return new InventoryActionsPacket(actionType, fromPosition, toPosition, fromWindow, toWindow, dropInventory, slotIndex);
     }
 
     @Override
     public boolean sanitizePacket(InventoryActionsPacket packetData) {
 
-        if (packetData.inventoryAction == InventoryActions.MOVE) {
+        if (packetData.actionType == InventoryActions.ActionType.MOVE) {
             // Making sure they are sending correct window types.
             if (packetData.toWindow >= InventoryType.values().length || packetData.fromWindow >= InventoryType.values().length) {
                 return false;
             }
-        } else if (packetData.inventoryAction == InventoryActions.DROP) {
+        } else if (packetData.actionType == InventoryActions.ActionType.DROP) {
             if (packetData.dropInventory >= InventoryType.values().length) {
                 return false;
             }
         }
 
         // TODO this should be cleaner
-        return packetData.inventoryAction <= 2;
+        return packetData.actionType.getGetActionType() <= 2;
     }
 
     @Override
     public void onEvent(InventoryActionsPacket packetData) {
-
-        if (packetData.inventoryAction == InventoryActions.MOVE) {
+        if (packetData.actionType == InventoryActions.ActionType.MOVE) {
             moveItemStack(packetData);
-        } else if (packetData.inventoryAction == InventoryActions.DROP) {
+        } else if (packetData.actionType == InventoryActions.ActionType.DROP) {
             dropItemStack(packetData);
         }
-
     }
 
     private void moveItemStack(InventoryActionsPacket packetData) {
@@ -78,7 +81,6 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
         playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
-
     }
 
     private void dropItemStack(InventoryActionsPacket packetData) {
@@ -137,7 +139,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
     @AllArgsConstructor
     class InventoryActionsPacket extends PacketData {
-        private byte inventoryAction;
+        private InventoryActions.ActionType actionType;
         private byte fromPosition;
         private byte toPosition;
         private byte fromWindow;

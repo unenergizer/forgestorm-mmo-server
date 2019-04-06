@@ -42,15 +42,15 @@ public class Attribute extends BaseAttribute {
         }
 
         int finalBonusValue = rawBonusValue;
-        int finalBonusMuliplier = rawBonusMultiplier;
+        int finalBonusMultiplier = rawBonusMultiplier;
 
         for (FinalBonus finalBonus : finalBonusList) {
             finalBonusValue += finalBonus.getBaseValue();
-            finalBonusMuliplier += finalBonus.getBaseMultiplier();
+            finalBonusMultiplier += finalBonus.getBaseMultiplier();
         }
 
         finalValue += finalBonusValue;
-        finalValue *= (1 + finalBonusMuliplier);
+        finalValue *= (1 + finalBonusMultiplier);
 
         return finalValue;
     }

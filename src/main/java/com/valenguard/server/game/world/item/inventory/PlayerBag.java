@@ -5,8 +5,6 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 
-import static com.valenguard.server.util.Log.println;
-
 public class PlayerBag extends AbstractInventory {
 
     public PlayerBag(Player inventoryOwner) {
@@ -15,10 +13,7 @@ public class PlayerBag extends AbstractInventory {
 
     @Override
     public void giveItemStack(ItemStack itemStack, boolean sendPacket) {
-        if (isInventoryFull()) {
-            println(getClass(), "Inventory full??", true);
-            return;
-        }
+        if (isInventoryFull()) return;
         findEmptySlot().setItemStack(itemStack);
         if (sendPacket) new InventoryPacketOut(inventoryOwner, new InventoryActions(itemStack)).sendPacket();
     }
@@ -33,7 +28,7 @@ public class PlayerBag extends AbstractInventory {
     public void setItemStack(byte slotIndex, ItemStack itemStack, boolean sendPacket) {
         inventorySlotArray[slotIndex].setItemStack(itemStack);
         if (sendPacket) {
-            new InventoryPacketOut(inventoryOwner, new InventoryActions(InventoryActions.SET_BAG, slotIndex, itemStack)).sendPacket();
+            new InventoryPacketOut(inventoryOwner, new InventoryActions(InventoryActions.ActionType.SET_BAG, slotIndex, itemStack)).sendPacket();
         }
     }
 

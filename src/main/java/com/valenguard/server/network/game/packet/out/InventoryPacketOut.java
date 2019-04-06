@@ -6,33 +6,44 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 public class InventoryPacketOut extends AbstractServerOutPacket {
 
-    private final InventoryActions inventoryAction;
+    private final InventoryActions inventoryActions;
 
-    public InventoryPacketOut(final Player player, final InventoryActions inventoryAction) {
+    public InventoryPacketOut(final Player player, final InventoryActions inventoryActions) {
         super(Opcodes.INVENTORY_UPDATE, player);
-        this.inventoryAction = inventoryAction;
+        this.inventoryActions = inventoryActions;
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        write.writeByte(inventoryAction.getInventoryActionType());
+        write.writeByte(inventoryActions.getInventoryActionType().getGetActionType());
 
-        if (inventoryAction.getInventoryActionType() == InventoryActions.GIVE) {
-            write.writeInt(inventoryAction.getItemStack().getItemId());
-            write.writeInt(inventoryAction.getItemStack().getAmount());
-        } else if (inventoryAction.getInventoryActionType() == InventoryActions.REMOVE) {
-            write.writeByte(inventoryAction.getSlotIndex());
-        } else if (inventoryAction.getInventoryActionType() == InventoryActions.SET_BAG || inventoryAction.getInventoryActionType() == InventoryActions.SET_EQUIPMENT) {
-            write.writeByte(inventoryAction.getSlotIndex());
-            write.writeInt(inventoryAction.getItemStack().getItemId());
-            write.writeInt(inventoryAction.getItemStack().getAmount());
-        } else if (inventoryAction.getInventoryActionType() == InventoryActions.MOVE) {
-            write.writeByte(inventoryAction.getFromPosition());
-            write.writeByte(inventoryAction.getToPosition());
+        switch (inventoryActions.getInventoryActionType()) {
 
-            // Combining the windows into a single byte.
-            byte windowsBytes = (byte) ((inventoryAction.getFromWindow() << 4) | inventoryAction.getToWindow());
-            write.writeByte(windowsBytes);
+            case MOVE:
+                write.writeByte(inventoryActions.getFromPosition());
+                write.writeByte(inventoryActions.getToPosition());
+                // Combining the windows into a single byte.
+                byte windowsBytes = (byte) ((inventoryActions.getFromWindow() << 4) | inventoryActions.getToWindow());
+                write.writeByte(windowsBytes);
+                break;
+            case DROP:
+                break;
+            case USE:
+                break;
+            case GIVE:
+                write.writeInt(inventoryActions.getItemStack().getItemId());
+                write.writeInt(inventoryActions.getItemStack().getAmount());
+                break;
+            case REMOVE:
+                write.writeByte(inventoryActions.getSlotIndex());
+                break;
+            case SET_BAG:
+            case SET_BANK:
+            case SET_EQUIPMENT:
+                write.writeByte(inventoryActions.getSlotIndex());
+                write.writeInt(inventoryActions.getItemStack().getItemId());
+                write.writeInt(inventoryActions.getItemStack().getAmount());
+                break;
         }
     }
 }

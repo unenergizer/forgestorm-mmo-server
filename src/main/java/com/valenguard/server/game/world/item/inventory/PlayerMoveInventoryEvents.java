@@ -1,6 +1,7 @@
 package com.valenguard.server.game.world.item.inventory;
 
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 
 import java.util.LinkedList;
@@ -58,31 +59,52 @@ public class PlayerMoveInventoryEvents {
         // Perform server move
         InventorySlot[] fromSlot;
         InventorySlot[] toSlot;
+        boolean windowTransfer = false;
+        boolean equipmentCheck = false;
 
         switch (inventoryEvent.getInventoryMoveType()) {
+            case FROM_BAG_TO_BAG:
+                player.getPlayerBag().performInnerWindowMove(inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
             case FROM_BAG_TO_BANK:
                 fromSlot = playerBag;
                 toSlot = playerBank;
+                windowTransfer = true;
                 break;
             case FROM_BAG_TO_EQUIPMENT:
                 fromSlot = playerBag;
                 toSlot = playerEquipment;
+                windowTransfer = true;
+                equipmentCheck = true;
                 break;
             case FROM_BANK_TO_BAG:
                 fromSlot = playerBank;
                 toSlot = playerBag;
+                windowTransfer = true;
+                break;
+            case FROM_BANK_TO_BANK:
+                player.getPlayerBank().performInnerWindowMove(inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BANK_TO_EQUIPMENT:
                 fromSlot = playerBank;
                 toSlot = playerEquipment;
+                windowTransfer = true;
+                equipmentCheck = true;
                 break;
             case FROM_EQUIPMENT_TO_BAG:
                 fromSlot = playerEquipment;
                 toSlot = playerBag;
+                windowTransfer = true;
+                equipmentCheck = true;
                 break;
             case FROM_EQUIPMENT_TO_BANK:
                 fromSlot = playerEquipment;
                 toSlot = playerBank;
+                windowTransfer = true;
+                equipmentCheck = true;
+                break;
+            case FROM_EQUIPMENT_TO_EQUIPMENT:
+                player.getPlayerEquipment().performInnerWindowMove(inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
         }
 
@@ -93,6 +115,19 @@ public class PlayerMoveInventoryEvents {
                 inventoryEvent.getFromPositionIndex(),
                 inventoryEvent.getToPositionIndex()
         )).sendPacket();
+    }
+
+    private void performWindowTransfer(InventoryEvent inventoryEvent, InventorySlot[] fromSlot, byte fromPositionIndex, InventorySlot[] toSlot,  byte toPositionIndex) {
+        ItemStack fromItemStack = fromSlot[fromPositionIndex].getItemStack();
+        ItemStack toItemStack = toSlot[toPositionIndex].getItemStack();
+//        inventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
+//        inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
+
+        new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions(
+                inventoryEvent.getInventoryMoveType().getFromWindow(),
+                inventoryEvent.getInventoryMoveType().getToWindow(),
+                fromPositionIndex,
+                toPositionIndex)).sendPacket();
     }
 
     private boolean checkItemStackExist(InventoryEvent inventoryEvent) {

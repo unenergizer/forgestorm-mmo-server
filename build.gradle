@@ -28,6 +28,8 @@ dependencies {
     compile 'mysql:mysql-connector-java:5.1.6'
     compile 'com.zaxxer:HikariCP:3.3.1'
 
+    compile 'org.fusesource.jansi:jansi:1.18'
+
     compile 'com.google.guava:guava:27.0.1-jre'
     compile 'org.yaml:snakeyaml:1.23:android'
     compileOnly 'org.projectlombok:lombok:1.18.2'

@@ -12,8 +12,10 @@ import com.valenguard.server.game.world.item.ItemStackManager;
 import com.valenguard.server.game.world.item.trade.TradeManager;
 import com.valenguard.server.network.NetworkManager;
 import lombok.Getter;
+import org.fusesource.jansi.AnsiConsole;
 
 import static com.valenguard.server.util.Log.println;
+import static org.fusesource.jansi.Ansi.ansi;
 
 @Getter
 public class Server {
@@ -50,7 +52,8 @@ public class Server {
     }
 
     private void startServer() {
-        println(getClass(), "Starting Server!");
+        AnsiConsole.systemInstall();
+        println(getClass(), ansi().fgBlue().bgBrightYellow() + "Starting Server!");
 
         // Boot io loaders
         aiEntityDataManager.start();
@@ -75,6 +78,7 @@ public class Server {
         networkManager.exit();
         databaseManager.exit();
 
+        AnsiConsole.systemUninstall();
         System.exit(0);
     }
 }
