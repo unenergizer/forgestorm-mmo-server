@@ -68,7 +68,7 @@ public class InventoryActions {
             for (ActionType entityType : ActionType.values()) {
                 if ((byte) entityType.ordinal() == inventoryActionType) return entityType;
             }
-            throw new RuntimeException("Inventory type miss match! Byte Received: " + inventoryActionType);
+            throw new RuntimeException("ActionType miss match! Byte Received: " + inventoryActionType);
         }
     }
 }

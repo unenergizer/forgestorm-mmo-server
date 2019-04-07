@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.valenguard.server.util.Log.println;
+
 @AllArgsConstructor
 public class Appearance {
 
@@ -37,15 +39,21 @@ public class Appearance {
     }
 
     public void updatePlayerAppearance(ItemStack itemStack, ItemStackType itemStackType, boolean sendPacket) {
+        println(getClass(), "SendPacket: " + sendPacket);
         if (itemStack != null) {
+            println(getClass(), "Equipping non null item and updating appearance!");
+            println(getClass(), "ItemStack: " + itemStack.toString());
             if (itemStack instanceof WearableItemStack) {
                 if (itemStackType == ItemStackType.CHEST) {
+                    println(getClass(), "Updating chest");
                     setPlayerArmor(((WearableItemStack) itemStack).getTextureId(), sendPacket);
                 } else if (itemStackType == ItemStackType.HELM) {
+                    println(getClass(), "Updating helm");
                     setPlayerHelm(((WearableItemStack) itemStack).getTextureId(), sendPacket);
                 }
             }
         } else {
+            println(getClass(), "Unequipping due to null item so the appearance becomes black!");
             if (itemStackType == ItemStackType.CHEST) {
                 setPlayerArmor(REMOVE_TEXTURE, sendPacket);
             } else if (itemStackType == ItemStackType.HELM) {

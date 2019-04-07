@@ -25,7 +25,7 @@ public class PlayerMoveInventoryEvents {
             if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) continue;
 
             println(PRINT_DEBUG);
-            println(getClass(), "MOVE INFO:", false, PRINT_DEBUG);
+            println(getClass(), "MOVE INFO IN:", false, PRINT_DEBUG);
             println(getClass(), "Type: " + inventoryEvent.getInventoryMoveType().toString(), false, PRINT_DEBUG);
             println(getClass(), "FromIndex: " + inventoryEvent.getFromPositionIndex(), false, PRINT_DEBUG);
             println(getClass(), "ToIndex: " + inventoryEvent.getToPositionIndex(), false, PRINT_DEBUG);
@@ -51,7 +51,8 @@ public class PlayerMoveInventoryEvents {
                 sendPacket = playerBag.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BAG_TO_EQUIPMENT:
-                sendPacket = playerEquipment.performEquipmentMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), true);
+                // toInventory wrong
+                sendPacket = playerEquipment.performItemStackMoveSpecial(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BANK_TO_BAG:
                 sendPacket = playerBank.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
@@ -60,16 +61,17 @@ public class PlayerMoveInventoryEvents {
                 sendPacket = playerBank.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BANK_TO_EQUIPMENT:
-                sendPacket = playerEquipment.performEquipmentMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), true);
+                // toInventory wrong
+                sendPacket = playerEquipment.performItemStackMoveSpecial(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_EQUIPMENT_TO_BAG:
-                sendPacket = playerEquipment.performEquipmentMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), false);
+                sendPacket = playerEquipment.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_EQUIPMENT_TO_BANK:
-                sendPacket = playerEquipment.performEquipmentMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), false);
+                sendPacket = playerEquipment.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_EQUIPMENT_TO_EQUIPMENT:
-                sendPacket = playerEquipment.performEquipmentMove(playerEquipment, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex(), false);
+                sendPacket = playerEquipment.performItemStackMove(playerEquipment, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
         }
 
@@ -79,6 +81,11 @@ public class PlayerMoveInventoryEvents {
         }
 
         println(getClass(), "MOVING ITEMS: true", false, PRINT_DEBUG);
+
+        println(getClass(), "MOVE INFO OUT:", false, PRINT_DEBUG);
+        println(getClass(), "Type: " + inventoryEvent.getInventoryMoveType().toString(), false, PRINT_DEBUG);
+        println(getClass(), "FromIndex: " + inventoryEvent.getFromPositionIndex(), false, PRINT_DEBUG);
+        println(getClass(), "ToIndex: " + inventoryEvent.getToPositionIndex(), false, PRINT_DEBUG);
 
         // Perform client move
         new InventoryPacketOut(player, new InventoryActions(

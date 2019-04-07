@@ -17,68 +17,75 @@ public class PlayerEquipment extends AbstractInventory {
         super(inventoryOwner, InventoryType.EQUIPMENT, InventoryConstants.EQUIPMENT_SIZE);
     }
 
+    public boolean performItemStackMoveSpecial(AbstractInventory fromInventory, byte fromPositionIndex, byte toPositionIndex) {
+        InventorySlot[] fromInventorySlotArray = fromInventory.getInventorySlotArray();
+
+        // Grab Items
+        ItemStack toItemStack = inventorySlotArray[toPositionIndex].getItemStack();
+        ItemStack fromItemStack = fromInventorySlotArray[fromPositionIndex].getItemStack();
+
+        if (!isEquippable(fromItemStack, toPositionIndex)) return false;
+
+        // Do swap
+        inventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
+        fromInventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
+
+        // TODO: Update attributes
+//        if (!insideEquipmentSwap) updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
+
+        println(getClass(), "Special check...", false, PRINT_DEBUG);
+        updateAppearance(toPositionIndex, true);
+
+        return true;
+    }
+
     @Override
     boolean performItemStackMove(AbstractInventory toInventory, byte fromPositionIndex, byte toPositionIndex) {
-        boolean equipItem = toInventory instanceof PlayerEquipment;
         InventorySlot[] toInventorySlotArray = toInventory.getInventorySlotArray();
 
         // Grab Items
         ItemStack fromItemStack = inventorySlotArray[fromPositionIndex].getItemStack();
         ItemStack toItemStack = toInventorySlotArray[toPositionIndex].getItemStack();
 
-        // TODO: Check ItemStack type (if it is equipable)
-        if (equipItem) {
-            boolean foundType = false;
-            for (ItemStackType itemStackType : requireNonNull(getAcceptedItemStackTypes(toPositionIndex))) {
-                if (itemStackType == toItemStack.getItemStackType()) foundType = true;
-            }
-            if (!foundType) return false;
+        boolean insideEquipmentSwap = toInventory instanceof PlayerEquipment;
+        boolean outsideEquipmentSwap = toItemStack != null;
+
+        // Check if ItemStack type can be equipped.
+        println(getClass(), "Attempting swap...", false, PRINT_DEBUG);
+
+        if (insideEquipmentSwap) {
+            // Inside equipment swap, lets make sure both equipment slots can perform swap.
+            println(getClass(), "Swap Type: Inside Equipment Swap", false, PRINT_DEBUG);
+            if (!isEquippable(fromItemStack, toPositionIndex)) return false;
+            if (!isEquippable(toItemStack, fromPositionIndex)) return false;
+
+        } else if (outsideEquipmentSwap) {
+            // Outside equipment swap (eg from equipment to bag, or bank to equipment).
+            // Make sure the incoming item is supported.
+            println(getClass(), "Swap Type: Outside Equipment Swap", false, PRINT_DEBUG);
+            if (!isEquippable(toItemStack, fromPositionIndex)) return false;
         }
+
+        println(getClass(), "Swap passed checks...", false, PRINT_DEBUG);
 
         // Do swap
         inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
         toInventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
 
         // TODO: Update attributes
+//        if (!insideEquipmentSwap) updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
 
-        // TODO: Update appearance
-        updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
-
-        InventorySlot inventorySlot = inventorySlotArray[equipmentIndex];
-        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(equipmentIndex))[0];
-        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, true);
-
+        println(getClass(), "Overridden check...", false, PRINT_DEBUG);
+        updateAppearance(fromPositionIndex, true);
         return true;
     }
 
-    boolean performEquipmentMove(AbstractInventory playerBag, byte bagIndex, byte equipmentIndex, boolean equipItem) {
-        ItemStack bagItemStack = playerBag.getItemStack(bagIndex);
-        ItemStack equipmentItemStack = getItemStack(equipmentIndex);
-
-        // Confirming that the equipment is allowed to be switched.
-        // If bagItemStack == null then the equipment is being removed.
-        if (bagItemStack != null) {
-            boolean foundType = false;
-            for (ItemStackType itemStackType : requireNonNull(getAcceptedItemStackTypes(equipmentIndex))) {
-                if (itemStackType == bagItemStack.getItemStackType()) foundType = true;
-            }
-            if (!foundType) return false;
+    private boolean isEquippable(ItemStack itemStackToCheck, byte destinationSlotIndex) {
+        for (ItemStackType itemStackType : requireNonNull(getAcceptedItemStackTypesArray(destinationSlotIndex))) {
+            if (itemStackType == itemStackToCheck.getItemStackType()) return true;
         }
-
-        playerBag.setItemStack(bagIndex, equipmentItemStack, false);
-        inventorySlotArray[equipmentIndex].setItemStack(bagItemStack);
-
-        if (!(playerBag instanceof PlayerEquipment)) {
-            updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
-        }
-
-        InventorySlot inventorySlot = inventorySlotArray[equipmentIndex];
-        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(equipmentIndex))[0];
-        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, true);
-
-        return true;
+        return false;
     }
-
 
     /**
      * Update the {@link Player} with the {@link Attributes} found on equipped item.
@@ -133,7 +140,14 @@ public class PlayerEquipment extends AbstractInventory {
         if (sendAttributePacket) new EntityAttributesUpdatePacketOut(inventoryOwner, inventoryOwner).sendPacket();
     }
 
-    private ItemStackType[] getAcceptedItemStackTypes(byte slotIndex) {
+    private void updateAppearance(byte slotIndex, boolean sendPacket) {
+        println(getClass(), "Appearance update for slot index: " + slotIndex);
+        InventorySlot inventorySlot = inventorySlotArray[slotIndex];
+        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypesArray(slotIndex))[0];
+        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, sendPacket);
+    }
+
+    private ItemStackType[] getAcceptedItemStackTypesArray(byte slotIndex) {
         for (EquipmentSlotTypes equipmentSlotTypes : EquipmentSlotTypes.values()) {
             if (equipmentSlotTypes.getSlotIndex() == slotIndex) return equipmentSlotTypes.getAcceptedItemStackTypes();
         }
@@ -154,10 +168,8 @@ public class PlayerEquipment extends AbstractInventory {
     public void setItemStack(byte slotIndex, ItemStack itemStack, boolean sendPacket) {
         if (sendPacket) println(getClass(), "Primarily used by SQL. Do not send packets now!", true);
         inventorySlotArray[slotIndex].setItemStack(itemStack);
+
         updatePlayerAttributes(itemStack, null, true, sendPacket);
-        
-        InventorySlot inventorySlot = inventorySlotArray[slotIndex];
-        ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypes(slotIndex))[0];
-        inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, sendPacket);
+        updateAppearance(slotIndex, sendPacket);
     }
 }
