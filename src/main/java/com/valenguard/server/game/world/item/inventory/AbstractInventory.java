@@ -4,7 +4,6 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackManager;
-import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import lombok.Getter;
 
 @Getter
@@ -46,17 +45,18 @@ public abstract class AbstractInventory {
         return inventorySlotArray[slotIndex].getItemStack();
     }
 
-    void performInnerWindowMove(byte fromPositionIndex, byte toPositionIndex) {
-        ItemStack fromItemStack = inventorySlotArray[fromPositionIndex].getItemStack();
-        ItemStack toItemStack = inventorySlotArray[toPositionIndex].getItemStack();
-        inventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
-        inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
+    boolean performItemStackMove(AbstractInventory abstractInventory, byte fromPositionIndex, byte toPositionIndex) {
+        InventorySlot[] toInventory = abstractInventory.getInventorySlotArray();
 
-        new InventoryPacketOut(inventoryOwner, new InventoryActions(
-                inventoryType,
-                inventoryType,
-                fromPositionIndex,
-                toPositionIndex)).sendPacket();
+        // Grab Items
+        ItemStack fromItemStack = inventorySlotArray[fromPositionIndex].getItemStack();
+        ItemStack toItemStack = toInventory[toPositionIndex].getItemStack();
+
+        // Do swap
+        inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
+        toInventory[toPositionIndex].setItemStack(fromItemStack);
+
+        return true;
     }
 
     InventorySlot findEmptySlot() {
@@ -76,9 +76,5 @@ public abstract class AbstractInventory {
             if (inventorySlot.getItemStack() != null) takenSlots++;
         }
         return takenSlots;
-    }
-
-    public int freeSlots() {
-        return inventorySlotArray.length - takenSlots();
     }
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class InventorySlot implements Serializable {
 
     private final transient byte slotIndex;
-    private ItemStack itemStack;
+    private ItemStack itemStack = null;
 
     InventorySlot(final byte slotIndex) {
         this.slotIndex = slotIndex;
