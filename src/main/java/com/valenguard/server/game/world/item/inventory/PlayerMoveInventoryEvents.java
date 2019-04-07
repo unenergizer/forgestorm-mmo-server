@@ -10,7 +10,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerMoveInventoryEvents {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     private final Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
 
@@ -22,7 +22,18 @@ public class PlayerMoveInventoryEvents {
         InventoryEvent inventoryEvent;
         while ((inventoryEvent = inventoryEvents.poll()) != null) {
 
-            if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) continue;
+            if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) {
+
+                // Sending back a response to the client telling them not to move anything.
+                new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions(
+                        inventoryEvent.getInventoryMoveType().getFromWindow(),
+                        inventoryEvent.getInventoryMoveType().getFromWindow(),
+                        inventoryEvent.getFromPositionIndex(),
+                        inventoryEvent.getFromPositionIndex()
+                )).sendPacket();
+
+                continue;
+            }
 
             println(PRINT_DEBUG);
             println(getClass(), "MOVE INFO IN:", false, PRINT_DEBUG);
@@ -120,10 +131,19 @@ public class PlayerMoveInventoryEvents {
         Player player = inventoryEvent.getPlayer();
         byte fromPosition = inventoryEvent.getFromPositionIndex();
 
-        if (fromWindowType == InventoryType.BAG_1 && player.getPlayerBag().getItemStack(fromPosition) == null) {
-            return false;
-        } else
-            return fromWindowType != InventoryType.EQUIPMENT || player.getPlayerEquipment().getItemStack(fromPosition) != null;
+        AbstractInventory abstractInventory = null;
+        if (fromWindowType == InventoryType.BAG_1) {
+            abstractInventory = player.getPlayerBag();
+        } else if (fromWindowType == InventoryType.EQUIPMENT) {
+            abstractInventory = player.getPlayerEquipment();
+        } else if (fromWindowType == InventoryType.BANK) {
+            abstractInventory = player.getPlayerBank();
+        }
 
+        if (abstractInventory == null) {
+            throw new RuntimeException("Did not implement stack existing checking for inventory.");
+        }
+
+        return abstractInventory.getItemStack(fromPosition) != null;
     }
 }

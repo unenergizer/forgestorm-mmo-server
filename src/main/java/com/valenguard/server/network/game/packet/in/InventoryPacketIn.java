@@ -11,11 +11,14 @@ import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
+import static com.valenguard.server.util.Log.println;
+
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
 public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
+
         byte inventoryAction = clientHandler.readByte();
         byte fromPosition = -1;
         byte toPosition = -1;
@@ -58,8 +61,10 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             }
         }
 
+        boolean validInventoryAction = packetData.actionType.getGetActionType() <= 2;
+
         // TODO this should be cleaner
-        return packetData.actionType.getGetActionType() <= 2;
+        return validInventoryAction;
     }
 
     @Override
@@ -122,16 +127,22 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
         if (fromWindow == InventoryType.BAG_1) {
-            if (packetData.fromPosition >= InventoryConstants.BAG_SIZE || packetData.fromPosition < 0) return false;
+            if (packetData.fromPosition >= InventoryConstants.BAG_SIZE || packetData.fromPosition < 0)
+                return false;
         } else if (fromWindow == InventoryType.EQUIPMENT) {
             if (packetData.fromPosition >= InventoryConstants.EQUIPMENT_SIZE || packetData.fromPosition < 0)
+                return false;
+        } else if (fromWindow == InventoryType.BANK) {
+            if (packetData.fromPosition >= InventoryConstants.BANK_SIZE|| packetData.fromPosition < 0)
                 return false;
         }
 
         if (toWindow == InventoryType.BAG_1) {
             return packetData.toPosition < InventoryConstants.BAG_SIZE && packetData.toPosition >= 0;
-        } else if (fromWindow == InventoryType.EQUIPMENT) {
+        } else if (toWindow == InventoryType.EQUIPMENT) {
             return packetData.toPosition < InventoryConstants.EQUIPMENT_SIZE && packetData.toPosition >= 0;
+        } else if (toWindow == InventoryType.BANK) {
+            return packetData.toPosition < InventoryConstants.BANK_SIZE && packetData.toPosition >= 0;
         }
 
         return true;
