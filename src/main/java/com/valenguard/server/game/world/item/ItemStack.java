@@ -14,6 +14,7 @@ public class ItemStack implements Cloneable, Serializable {
     private transient ItemStackType itemStackType;
     private transient boolean isStackable;
     private int amount;
+    private transient boolean isConsumable;
 
     private transient Attributes attributes;
 
@@ -40,6 +41,7 @@ public class ItemStack implements Cloneable, Serializable {
         itemStack.setItemStackType(itemStackType);
         itemStack.setStackable(isStackable);
         itemStack.setAttributes(attributes);
+        itemStack.setConsumable(isConsumable);
         return itemStack;
     }
 

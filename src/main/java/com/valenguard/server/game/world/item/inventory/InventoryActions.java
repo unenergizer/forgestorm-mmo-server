@@ -14,6 +14,7 @@ public class InventoryActions {
     private byte toPosition;
     private byte fromWindow;
     private byte toWindow;
+    private byte interactInventory;
 
     InventoryActions(ItemStack itemStack) {
         this.inventoryActionType = InventoryActions.ActionType.GIVE;
@@ -23,6 +24,12 @@ public class InventoryActions {
     public InventoryActions(ActionType inventoryActionType, byte slotIndex, ItemStack itemStack) {
         this.inventoryActionType = inventoryActionType;
         this.itemStack = new ItemStack(itemStack);
+        this.slotIndex = slotIndex;
+    }
+
+    public InventoryActions(ActionType inventoryActionType, byte interactInventory, byte slotIndex) {
+        this.inventoryActionType = inventoryActionType;
+        this.interactInventory = interactInventory;
         this.slotIndex = slotIndex;
     }
 
@@ -52,15 +59,16 @@ public class InventoryActions {
          */
         DROP((byte) 0x01),
         USE((byte) 0x02),
+        CONSUME((byte) 0x03),
 
         /**
          * SERVER -> CLIENT
          */
-        GIVE((byte) 0x03),
-        REMOVE((byte) 0x04),
-        SET_BAG((byte) 0x05),
-        SET_BANK((byte) 0x06),
-        SET_EQUIPMENT((byte) 0x07);
+        GIVE((byte) 0x04),
+        REMOVE((byte) 0x05),
+        SET_BAG((byte) 0x06),
+        SET_BANK((byte) 0x07),
+        SET_EQUIPMENT((byte) 0x08);
 
         private byte getActionType;
 

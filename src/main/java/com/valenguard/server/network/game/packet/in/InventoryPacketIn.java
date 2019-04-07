@@ -5,9 +5,11 @@ import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
 import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.inventory.*;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Location;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -25,7 +27,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         byte fromWindow = -1;
         byte toWindow = -1;
 
-        byte dropInventory = -1;
+        byte interactInventory = -1;
         byte slotIndex = -1;
 
         InventoryActions.ActionType actionType = InventoryActions.ActionType.getActionType(inventoryAction);
@@ -39,12 +41,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 toWindow = (byte) (windowsByte & 0x0F);
                 break;
             case DROP:
-                dropInventory = clientHandler.readByte();
+            case CONSUME:
+                interactInventory = clientHandler.readByte();
                 slotIndex = clientHandler.readByte();
                 break;
         }
 
-        return new InventoryActionsPacket(actionType, fromPosition, toPosition, fromWindow, toWindow, dropInventory, slotIndex);
+        return new InventoryActionsPacket(actionType, fromPosition, toPosition, fromWindow, toWindow, interactInventory, slotIndex);
     }
 
     @Override
@@ -56,12 +59,12 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 return false;
             }
         } else if (packetData.actionType == InventoryActions.ActionType.DROP) {
-            if (packetData.dropInventory >= InventoryType.values().length) {
+            if (packetData.interactInventory >= InventoryType.values().length) {
                 return false;
             }
         }
 
-        boolean validInventoryAction = packetData.actionType.getGetActionType() <= 2;
+        boolean validInventoryAction = packetData.actionType.getGetActionType() <= 3;
 
         // TODO this should be cleaner
         return validInventoryAction;
@@ -73,6 +76,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             moveItemStack(packetData);
         } else if (packetData.actionType == InventoryActions.ActionType.DROP) {
             dropItemStack(packetData);
+        } else if (packetData.actionType == InventoryActions.ActionType.CONSUME) {
+            consumeItem(packetData);
         }
     }
 
@@ -90,12 +95,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
     private void dropItemStack(InventoryActionsPacket packetData) {
 
-        InventoryType inventoryType = InventoryType.values()[packetData.dropInventory];
-        if (inventoryType == InventoryType.BAG_1) {
+        InventoryType inventoryType = InventoryType.values()[packetData.interactInventory];
 
-            if (packetData.slotIndex < 0 || packetData.slotIndex >= InventoryConstants.BAG_SIZE) {
-                return;
-            }
+        if (!doesNotExceedInventoryLimit(inventoryType, packetData.slotIndex)) {
+            return;
+        }
+
+        if (inventoryType == InventoryType.BAG_1) {
 
             ItemStack itemStack = packetData.getPlayer().getPlayerBag().getInventorySlotArray()[packetData.slotIndex].getItemStack();
             packetData.getPlayer().getPlayerBag().removeItemStack(packetData.slotIndex, true);
@@ -117,34 +123,61 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         } else if (inventoryType == InventoryType.EQUIPMENT) {
 
-            if (packetData.slotIndex < 0 || packetData.slotIndex >= InventoryConstants.EQUIPMENT_SIZE) {
-                // TODO: remove this later
+
+
+        }
+    }
+
+    private void consumeItem(InventoryActionsPacket packetData) {
+
+        InventoryType inventoryType = InventoryType.values()[packetData.interactInventory];
+
+        if (!doesNotExceedInventoryLimit(inventoryType, packetData.slotIndex)) {
+            return;
+        }
+
+        if (inventoryType != InventoryType.EQUIPMENT && inventoryType != InventoryType.BANK) {
+
+            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getItemStack(packetData.slotIndex);
+
+            if (!itemStack.isConsumable()) {
                 return;
             }
+
+            if (itemStack.getItemStackType() == ItemStackType.POTION) {
+                packetData.getPlayer().heal(30);
+            }
+
+            new InventoryPacketOut(packetData.getPlayer(), new InventoryActions(
+                    InventoryActions.ActionType.CONSUME,
+                    packetData.interactInventory,
+                    packetData.slotIndex
+            )).sendPacket();
+
         }
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
-        if (fromWindow == InventoryType.BAG_1) {
-            if (packetData.fromPosition >= InventoryConstants.BAG_SIZE || packetData.fromPosition < 0)
-                return false;
-        } else if (fromWindow == InventoryType.EQUIPMENT) {
-            if (packetData.fromPosition >= InventoryConstants.EQUIPMENT_SIZE || packetData.fromPosition < 0)
-                return false;
-        } else if (fromWindow == InventoryType.BANK) {
-            if (packetData.fromPosition >= InventoryConstants.BANK_SIZE|| packetData.fromPosition < 0)
-                return false;
+        if (!doesNotExceedInventoryLimit(fromWindow, packetData.fromWindow)) {
+            return false;
         }
 
-        if (toWindow == InventoryType.BAG_1) {
-            return packetData.toPosition < InventoryConstants.BAG_SIZE && packetData.toPosition >= 0;
-        } else if (toWindow == InventoryType.EQUIPMENT) {
-            return packetData.toPosition < InventoryConstants.EQUIPMENT_SIZE && packetData.toPosition >= 0;
-        } else if (toWindow == InventoryType.BANK) {
-            return packetData.toPosition < InventoryConstants.BANK_SIZE && packetData.toPosition >= 0;
+        if (!doesNotExceedInventoryLimit(toWindow, packetData.toWindow)) {
+            return false;
         }
 
+        return true;
+    }
+
+    private boolean doesNotExceedInventoryLimit(InventoryType inventoryType, byte slotIndex) {
+        if (inventoryType == InventoryType.BAG_1) {
+            return slotIndex < InventoryConstants.BAG_SIZE && slotIndex >= 0;
+        } else if (inventoryType == InventoryType.EQUIPMENT) {
+            return slotIndex < InventoryConstants.EQUIPMENT_SIZE && slotIndex >= 0;
+        } else if (inventoryType == InventoryType.BANK) {
+            return slotIndex < InventoryConstants.BANK_SIZE && slotIndex >= 0;
+        }
         return true;
     }
 
@@ -156,7 +189,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         private byte fromWindow;
         private byte toWindow;
 
-        private byte dropInventory;
+        private byte interactInventory;
         private byte slotIndex;
     }
 }

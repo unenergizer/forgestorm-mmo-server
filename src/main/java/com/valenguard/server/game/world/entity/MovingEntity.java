@@ -6,6 +6,7 @@ import com.valenguard.server.game.world.combat.AbstractAbility;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
+import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -86,6 +87,12 @@ public class MovingEntity extends Entity {
 
     void gameMapDeregister() {
         setWalkTime(0f);
+    }
+
+    public void heal(int amount) {
+        getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+                new EntityHealPacketOut(anyPlayer, this, amount).sendPacket());
+        currentHealth += amount;
     }
 
     public boolean isEntityMoving() {

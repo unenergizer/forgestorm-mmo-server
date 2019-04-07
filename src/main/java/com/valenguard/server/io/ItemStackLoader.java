@@ -49,6 +49,7 @@ public class ItemStackLoader {
             String desc = (String) itemNode.get("desc");
             ItemStackType type = ItemStackType.valueOf((String) itemNode.get("type"));
             String region = (String) itemNode.get("region");
+            boolean isConsumable = (Boolean) itemNode.get("consume");
 
             /*
              * Get wearable item io
@@ -76,6 +77,7 @@ public class ItemStackLoader {
             itemStack.setItemStackType(type);
             itemStack.setAmount(-1);
             itemStack.setAttributes(attributes);
+            itemStack.setConsumable(isConsumable);
 
             println(getClass(), "ID: " + itemId, false, PRINT_DEBUG);
             println(getClass(), "Name: " + name, false, PRINT_DEBUG);
