@@ -5,9 +5,11 @@ import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
 import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.ItemStackConsumerManager;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.inventory.*;
 import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.shared.*;
@@ -17,6 +19,8 @@ import static com.valenguard.server.util.Log.println;
 
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
 public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
+
+    private ItemStackConsumerManager itemStackConsumerManager = new ItemStackConsumerManager();
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -108,18 +112,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
             GameMap gameMap = packetData.getPlayer().getGameMap();
 
-            ItemStackDrop itemStackDrop = new ItemStackDrop();
-            itemStackDrop.setEntityType(EntityType.ITEM_STACK);
-            itemStackDrop.setName(itemStack.getName());
-            itemStackDrop.setCurrentMapLocation(new Location(packetData.getPlayer().getCurrentMapLocation()));
-            itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
-            itemStackDrop.setItemStack(itemStack);
-            itemStackDrop.setDropOwner(packetData.getPlayer());
-            itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());
-
-            gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
-
-            gameMap.getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
+            ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
+            itemStackDropEntityController.queueEntitySpawn(
+                    itemStackDropEntityController.makeItemStackDrop(
+                            itemStack,
+                            packetData.getPlayer().getCurrentMapLocation(),
+                            packetData.getPlayer()
+                    ));
 
         } else if (inventoryType == InventoryType.EQUIPMENT) {
 
@@ -144,16 +143,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 return;
             }
 
-            if (itemStack.getItemStackType() == ItemStackType.POTION) {
-                packetData.getPlayer().heal(30);
-            }
+            itemStackConsumerManager.consumeItem(packetData.getPlayer(), itemStack);
 
             new InventoryPacketOut(packetData.getPlayer(), new InventoryActions(
                     InventoryActions.ActionType.CONSUME,
                     packetData.interactInventory,
                     packetData.slotIndex
             )).sendPacket();
-
         }
     }
 

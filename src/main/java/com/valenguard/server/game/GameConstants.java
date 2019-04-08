@@ -13,4 +13,6 @@ public class GameConstants {
     public static final int GENERAL_RESPAWN_TIME = 60;
 
     public static final int PLAYERS_TO_PROCESS = 50;
+
+    public static final short MAX_GROUND_ITEMS = 3500;
 }

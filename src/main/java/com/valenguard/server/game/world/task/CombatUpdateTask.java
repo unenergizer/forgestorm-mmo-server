@@ -5,10 +5,7 @@ import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.game.world.maps.GameMap;
-import com.valenguard.server.game.world.maps.Location;
-import com.valenguard.server.game.world.maps.MoveDirection;
-import com.valenguard.server.game.world.maps.Warp;
+import com.valenguard.server.game.world.maps.*;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityDamagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
@@ -172,18 +169,14 @@ public class CombatUpdateTask implements AbstractTask {
             if (aiEntity.getDropTable() != null) {
                 ItemStack itemStack = Server.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
 
-                ItemStackDrop itemStackDrop = new ItemStackDrop();
-                itemStackDrop.setEntityType(EntityType.ITEM_STACK);
-                itemStackDrop.setName(itemStack.getName());
-                itemStackDrop.setCurrentMapLocation(new Location(deadEntity.getCurrentMapLocation()));
-                itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
-                itemStackDrop.setItemStack(itemStack);
-                itemStackDrop.setDropOwner((Player) killerEntity);
-                itemStackDrop.setServerEntityId(gameMap.getLastItemStackDrop());
-
                 gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
 
-                gameMap.getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
+                ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
+                itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
+                   itemStack,
+                   deadEntity.getCurrentMapLocation(),
+                        (Player) killerEntity
+                ));
             }
         }
     }

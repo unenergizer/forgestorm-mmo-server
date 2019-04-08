@@ -14,4 +14,9 @@ public class ShutdownCommand {
     public void onExit() {
         Server.getInstance().exitServer();
     }
+
+    @Command(base = "stop")
+    public void onStop() {
+        Server.getInstance().exitServer();
+    }
 }

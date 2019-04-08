@@ -90,9 +90,11 @@ public class MovingEntity extends Entity {
     }
 
     public void heal(int amount) {
+        // Ensuring not to exceed the maximum health.
+        final int realAmount = amount + currentHealth > maxHealth ? maxHealth - currentHealth : amount;
         getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
-                new EntityHealPacketOut(anyPlayer, this, amount).sendPacket());
-        currentHealth += amount;
+                new EntityHealPacketOut(anyPlayer, this, realAmount).sendPacket());
+        currentHealth += realAmount;
     }
 
     public boolean isEntityMoving() {

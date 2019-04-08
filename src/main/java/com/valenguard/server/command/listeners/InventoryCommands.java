@@ -3,8 +3,37 @@ package com.valenguard.server.command.listeners;
 import com.valenguard.server.Server;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.IncompleteCommand;
+import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.inventory.InventoryConstants;
 
 public class InventoryCommands {
+
+    @Command(base = "clearinv", argLenReq = 1)
+    @IncompleteCommand(missing = "clearinv <playerId>")
+    public void onClearItems(String[] args) {
+
+        short playerId;
+        try {
+
+            playerId = Short.parseShort(args[0]);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Could not parse playerId");
+            return;
+        }
+
+        Player player = Server.getInstance().getGameManager().findPlayer(playerId);
+
+        if (player == null) {
+            System.out.println("Could not find player for Id: " + playerId);
+            return;
+        }
+
+        for (byte i = 0; i < InventoryConstants.BAG_SIZE; i++) {
+            player.getPlayerBag().removeItemStack(i, true);
+        }
+    }
 
     @Command(base = "give", argLenReq = 1)
     @IncompleteCommand(missing = "give <itemId>")
