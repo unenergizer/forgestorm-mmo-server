@@ -11,6 +11,8 @@ import java.sql.SQLException;
 
 public class PlayerInventorySQL extends AbstractSingleSQL {
 
+    // TODO: Implement character column: "character_id"
+
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         InventorySlot[] inventorySlots = (InventorySlot[]) Base64Util.deserializeObjectFromBase64(resultSet.getString("bag"));

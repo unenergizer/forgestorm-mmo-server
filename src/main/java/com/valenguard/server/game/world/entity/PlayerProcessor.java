@@ -1,7 +1,7 @@
 package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.database.sql.PlayerDataSQL;
+import com.valenguard.server.database.sql.PlayerCharacterGameSQL;
 import com.valenguard.server.database.sql.PlayerExperienceSQL;
 import com.valenguard.server.database.sql.PlayerInventorySQL;
 import com.valenguard.server.database.sql.PlayerReputationSQL;
@@ -63,7 +63,7 @@ public class PlayerProcessor {
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
 
         // Setting Player Specific Data
-        new PlayerDataSQL().loadSQL(player);
+        new PlayerCharacterGameSQL().loadSQL(player);
         new PlayerInventorySQL().loadSQL(player);
         new PlayerExperienceSQL().loadSQL(player);
         new PlayerReputationSQL().loadSQL(player);
@@ -120,7 +120,7 @@ public class PlayerProcessor {
     }
 
     private void savePlayer(Player player) {
-        new PlayerDataSQL().saveSQL(player);
+        new PlayerCharacterGameSQL().saveSQL(player);
         new PlayerInventorySQL().saveSQL(player);
         new PlayerExperienceSQL().saveSQL(player);
         new PlayerReputationSQL().saveSQL(player);

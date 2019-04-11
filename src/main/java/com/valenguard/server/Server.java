@@ -4,6 +4,7 @@ import com.valenguard.server.command.CommandManager;
 import com.valenguard.server.database.DatabaseManager;
 import com.valenguard.server.game.GameLoop;
 import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.game.rpg.FactionManager;
 import com.valenguard.server.game.world.entity.AiEntityDataManager;
@@ -31,6 +32,7 @@ public class Server {
     // System
     private final TradeManager tradeManager = new TradeManager();
     private final GameManager gameManager = new GameManager();
+    private final CharacterManager characterManager = new CharacterManager();
 
     // Data Loaders
     private final FactionManager factionManager = new FactionManager();

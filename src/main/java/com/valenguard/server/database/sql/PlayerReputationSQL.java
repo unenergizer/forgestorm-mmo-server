@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 public class PlayerReputationSQL extends AbstractVariantSQL<Integer> {
 
+    // TODO: Implement character column: "character_id"
+
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         short[] reputationData = player.getReputation().getReputationData();

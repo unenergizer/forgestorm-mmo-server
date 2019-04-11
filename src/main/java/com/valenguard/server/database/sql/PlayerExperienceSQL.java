@@ -9,6 +9,8 @@ import java.sql.SQLException;
 
 public class PlayerExperienceSQL extends AbstractSingleSQL {
 
+    // TODO: Implement character column: "character_id"
+
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         player.getSkills().MELEE.addExperience(resultSet.getInt("attack_exp"));
