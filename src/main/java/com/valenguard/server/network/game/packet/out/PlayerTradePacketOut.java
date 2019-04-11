@@ -47,7 +47,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
             case TRADE_ITEM_ADD:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());
                 write.writeInt(tradePacketInfoOut.getItemStack().getItemId());
-                // TODO : send other ItemStack information
+                write.writeInt(tradePacketInfoOut.getItemStack().getAmount());
                 break;
             case TRADE_ITEM_REMOVE:
                 write.writeInt(tradePacketInfoOut.getTradeUUID());

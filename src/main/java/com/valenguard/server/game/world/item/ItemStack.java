@@ -12,7 +12,7 @@ public class ItemStack implements Cloneable, Serializable {
     private transient String name;
     private transient String description;
     private transient ItemStackType itemStackType;
-    private transient boolean isStackable;
+    private transient int stackable;
     private int amount;
     private transient boolean isConsumable;
 
@@ -27,20 +27,25 @@ public class ItemStack implements Cloneable, Serializable {
         this.name = itemStack.getName();
         this.description = itemStack.getDescription();
         this.itemStackType = itemStack.getItemStackType();
-        this.isStackable = itemStack.isStackable();
+        this.stackable = itemStack.getStackable();
         this.attributes = itemStack.getAttributes();
         this.amount = itemStack.getAmount();
+        this.isConsumable = itemStack.isConsumable();
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public Object clone() {
+        return clone(false);
+    }
+
+    public Object clone(boolean keepAmount) {
         ItemStack itemStack = generateCloneableInstance();
         itemStack.setName(name);
         itemStack.setDescription(description);
         itemStack.setItemStackType(itemStackType);
-        itemStack.setStackable(isStackable);
+        itemStack.setStackable(stackable);
         itemStack.setAttributes(attributes);
+        if (keepAmount) itemStack.setAmount(amount);
         itemStack.setConsumable(isConsumable);
         return itemStack;
     }

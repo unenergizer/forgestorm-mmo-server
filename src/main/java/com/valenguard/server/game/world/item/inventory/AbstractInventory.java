@@ -52,9 +52,21 @@ public abstract class AbstractInventory {
         ItemStack fromItemStack = inventorySlotArray[fromPositionIndex].getItemStack();
         ItemStack toItemStack = toInventory[toPositionIndex].getItemStack();
 
-        // Do swap
-        inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
-        toInventory[toPositionIndex].setItemStack(fromItemStack);
+        if (toItemStack != null && fromItemStack.getStackable() > 0 && toItemStack.getStackable() > 0
+                && fromItemStack.getItemStackType() == toItemStack.getItemStackType()) {
+
+            // TODO: Check max size
+
+            ItemStack itemStack = new ItemStack(fromItemStack);
+            itemStack.setAmount(fromItemStack.getAmount() + toItemStack.getAmount());
+
+            inventorySlotArray[fromPositionIndex].setItemStack(null);
+            toInventory[toPositionIndex].setItemStack(itemStack);
+        } else {
+            // Do swap
+            inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
+            toInventory[toPositionIndex].setItemStack(fromItemStack);
+        }
 
         return true;
     }

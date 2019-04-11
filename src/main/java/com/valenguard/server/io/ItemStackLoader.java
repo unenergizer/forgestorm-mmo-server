@@ -48,7 +48,7 @@ public class ItemStackLoader {
             String name = (String) itemNode.get("name");
             String desc = (String) itemNode.get("desc");
             ItemStackType type = ItemStackType.valueOf((String) itemNode.get("type"));
-            String region = (String) itemNode.get("region");
+            Integer stackable = (Integer) itemNode.get("stackable");
             boolean isConsumable = (Boolean) itemNode.get("consume");
 
             /*
@@ -75,6 +75,13 @@ public class ItemStackLoader {
             itemStack.setName(name);
             itemStack.setDescription(desc);
             itemStack.setItemStackType(type);
+
+            if (stackable != null) {
+                itemStack.setStackable(stackable);
+            } else {
+                itemStack.setStackable(0);
+            }
+
             itemStack.setAmount(-1);
             itemStack.setAttributes(attributes);
             itemStack.setConsumable(isConsumable);
@@ -83,7 +90,6 @@ public class ItemStackLoader {
             println(getClass(), "Name: " + name, false, PRINT_DEBUG);
             println(getClass(), "Description: " + desc, false, PRINT_DEBUG);
             println(getClass(), "ItemStackType: " + type, false, PRINT_DEBUG);
-            println(getClass(), "Region: " + region, false, PRINT_DEBUG);
 
             println(getClass(), "Damage: " + attributes.getDamage(), false, PRINT_DEBUG && attributes.getDamage() != 0);
             println(getClass(), "Armor: " + attributes.getArmor(), false, PRINT_DEBUG && attributes.getArmor() != 0);

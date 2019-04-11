@@ -17,7 +17,7 @@ public class PlayerEquipment extends AbstractInventory {
         super(inventoryOwner, InventoryType.EQUIPMENT, InventoryConstants.EQUIPMENT_SIZE);
     }
 
-    public boolean performItemStackMoveSpecial(AbstractInventory fromInventory, byte fromPositionIndex, byte toPositionIndex) {
+    boolean performItemStackMoveSpecial(AbstractInventory fromInventory, byte fromPositionIndex, byte toPositionIndex) {
         InventorySlot[] fromInventorySlotArray = fromInventory.getInventorySlotArray();
 
         // Grab Items

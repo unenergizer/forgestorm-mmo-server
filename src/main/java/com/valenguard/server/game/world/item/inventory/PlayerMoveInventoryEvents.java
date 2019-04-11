@@ -62,7 +62,6 @@ public class PlayerMoveInventoryEvents {
                 sendPacket = playerBag.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BAG_TO_EQUIPMENT:
-                // toInventory wrong
                 sendPacket = playerEquipment.performItemStackMoveSpecial(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BANK_TO_BAG:
@@ -72,7 +71,6 @@ public class PlayerMoveInventoryEvents {
                 sendPacket = playerBank.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_BANK_TO_EQUIPMENT:
-                // toInventory wrong
                 sendPacket = playerEquipment.performItemStackMoveSpecial(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
             case FROM_EQUIPMENT_TO_BAG:
