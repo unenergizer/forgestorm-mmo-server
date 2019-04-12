@@ -1,7 +1,7 @@
 package com.valenguard.server.network.login;
 
 import com.valenguard.server.database.AuthenticatedUser;
-import com.valenguard.server.database.UserAuthenticate;
+import com.valenguard.server.database.sql.XFUserAuthenticateSQL;
 import com.valenguard.server.io.NetworkSettingsLoader;
 import com.valenguard.server.network.NetworkManager;
 import lombok.Getter;
@@ -91,7 +91,7 @@ public class LoginServerConnection {
                 String username = inputStream.readUTF();
                 String password = inputStream.readUTF();
 
-                LoginState loginState = UserAuthenticate.authenticate(username, password);
+                LoginState loginState = XFUserAuthenticateSQL.authenticate(username, password);
 
                 outputStream.writeBoolean(loginState.getLoginSuccess());
 

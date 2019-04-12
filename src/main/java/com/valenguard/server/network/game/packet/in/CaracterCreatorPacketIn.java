@@ -15,11 +15,11 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
 
         String characterName = clientHandler.readString();
         byte factionId = clientHandler.readByte();
-        byte headId = clientHandler.readByte();
         byte bodyId = clientHandler.readByte();
+        byte headId = clientHandler.readByte();
         byte colorId = clientHandler.readByte();
 
-        return new NewCharacterDataPacket(characterName, factionId, headId, bodyId, colorId);
+        return new NewCharacterDataPacket(characterName, factionId, bodyId, headId, colorId);
     }
 
     @Override
@@ -33,15 +33,18 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
     public void onEvent(NewCharacterDataPacket packetData) {
         CharacterManager characterManager = Server.getInstance().getCharacterManager();
 
+        // TODO: Make sure we have not exceeded max number of characters allowed
+
         // TODO: first check username
-        if(characterManager.checkUniqueName(packetData.characterName)) {
+        // TODO: check list of unacceptable names
+        if (characterManager.isNameUnique(packetData.characterName)) {
             // Character name is unique, allow creation
             Server.getInstance().getCharacterManager().createCharacter(
                     packetData.getPlayer(),
                     packetData.characterName,
                     packetData.factionId,
-                    packetData.headId,
                     packetData.bodyId,
+                    packetData.headId,
                     packetData.colorId);
         } else {
             // TODO: Character name is not unique, send error response
@@ -53,8 +56,8 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
     class NewCharacterDataPacket extends PacketData {
         private String characterName;
         private byte factionId;
-        private byte headId;
         private byte bodyId;
+        private byte headId;
         private byte colorId;
     }
 }

@@ -1,4 +1,4 @@
-package com.valenguard.server.database;
+package com.valenguard.server.database.sql;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.valenguard.server.Server;
@@ -10,12 +10,12 @@ import java.sql.*;
 
 import static com.valenguard.server.util.Log.println;
 
-public class UserAuthenticate {
+public class XFUserAuthenticateSQL {
 
     private static final String GET_USER_ID = "SELECT user_id, username FROM xf_user WHERE username=?";
     private static final String GET_USER_HASH = "SELECT data FROM xf_user_authenticate WHERE user_id=?";
 
-    private UserAuthenticate() {
+    private XFUserAuthenticateSQL() {
     }
 
     public static LoginState authenticate(String username, String password) {
@@ -68,7 +68,7 @@ public class UserAuthenticate {
                     }
 
                 } else {
-                    println(UserAuthenticate.class, "The user Id existed in the xf_user table but not in the xf_user_authenticate table.", true);
+                    println(XFUserAuthenticateSQL.class, "The user Id existed in the xf_user table but not in the xf_user_authenticate table.", true);
                     return new LoginState().failState("Incorrect username");
                 }
 

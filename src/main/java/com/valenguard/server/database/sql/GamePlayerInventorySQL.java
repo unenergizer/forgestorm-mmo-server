@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PlayerInventorySQL extends AbstractSingleSQL {
+public class GamePlayerInventorySQL extends AbstractSingleSQL {
 
     // TODO: Implement character column: "character_id"
 

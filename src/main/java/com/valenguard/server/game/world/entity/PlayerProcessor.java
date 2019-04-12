@@ -1,10 +1,10 @@
 package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.database.sql.PlayerCharacterGameSQL;
-import com.valenguard.server.database.sql.PlayerExperienceSQL;
-import com.valenguard.server.database.sql.PlayerInventorySQL;
-import com.valenguard.server.database.sql.PlayerReputationSQL;
+import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
+import com.valenguard.server.database.sql.GamePlayerExperienceSQL;
+import com.valenguard.server.database.sql.GamePlayerInventorySQL;
+import com.valenguard.server.database.sql.GamePlayerReputationSQL;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
@@ -53,7 +53,6 @@ public class PlayerProcessor {
         // Setting Entity Specific Data
         player.setServerEntityId(playerSessionData.getServerID());
         player.setEntityType(EntityType.PLAYER);
-        player.setName(playerSessionData.getUsername());
 
         player.getAttributes().setArmor(PlayerConstants.BASE_ARMOR);
         player.getAttributes().setDamage(PlayerConstants.BASE_DAMAGE);
@@ -63,10 +62,10 @@ public class PlayerProcessor {
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
 
         // Setting Player Specific Data
-        new PlayerCharacterGameSQL().loadSQL(player);
-        new PlayerInventorySQL().loadSQL(player);
-        new PlayerExperienceSQL().loadSQL(player);
-        new PlayerReputationSQL().loadSQL(player);
+        new GamePlayerCharacterSQL().loadSQL(player);
+        new GamePlayerInventorySQL().loadSQL(player);
+        new GamePlayerExperienceSQL().loadSQL(player);
+        new GamePlayerReputationSQL().loadSQL(player);
 
         return player;
     }
@@ -102,9 +101,11 @@ public class PlayerProcessor {
     }
 
     public void queuePlayerQuitServer(ClientHandler clientHandler) {
-        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
-        clientHandler.setPlayerQuitProcessed(true);
+//        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
+//        clientHandler.setPlayerQuitProcessed(true);
         playerQuitServerQueue.add(clientHandler);
+
+        // TODO: Send player to character select screen
     }
 
     public void processPlayerQuit() {
@@ -120,10 +121,10 @@ public class PlayerProcessor {
     }
 
     private void savePlayer(Player player) {
-        new PlayerCharacterGameSQL().saveSQL(player);
-        new PlayerInventorySQL().saveSQL(player);
-        new PlayerExperienceSQL().saveSQL(player);
-        new PlayerReputationSQL().saveSQL(player);
+        new GamePlayerCharacterSQL().saveSQL(player);
+        new GamePlayerInventorySQL().saveSQL(player);
+        new GamePlayerExperienceSQL().saveSQL(player);
+        new GamePlayerReputationSQL().saveSQL(player);
     }
 
     private void playerWorldQuit(Player player) {

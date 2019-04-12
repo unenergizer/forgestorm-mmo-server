@@ -26,6 +26,8 @@ public class Player extends MovingEntity {
     private final Reputation reputation = new Reputation(this);
     private final Deque<Location> latestMoveRequests = new LinkedList<>();
 
+    private Integer characterId;
+
     private Warp warp;
 
     private long pingOutTime = 0;

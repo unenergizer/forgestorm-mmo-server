@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public class PlayerReputationSQL extends AbstractVariantSQL<Integer> {
+public class GamePlayerReputationSQL extends AbstractVariantSQL<Integer> {
 
     // TODO: Implement character column: "character_id"
 
