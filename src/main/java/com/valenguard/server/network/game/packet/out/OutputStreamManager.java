@@ -74,7 +74,7 @@ public class OutputStreamManager {
     }
 
     void addServerOutPacket(AbstractServerOutPacket abstractServerOutPacket) {
-        Queue<AbstractServerOutPacket> clientHandler = outputContexts.get(abstractServerOutPacket.packetReceiver.getClientHandler());
+        Queue<AbstractServerOutPacket> clientHandler = outputContexts.get(abstractServerOutPacket.clientHandler);
         if (clientHandler != null) clientHandler.add(abstractServerOutPacket);
     }
 }

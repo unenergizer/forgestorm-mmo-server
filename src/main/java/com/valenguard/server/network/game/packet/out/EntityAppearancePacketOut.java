@@ -17,7 +17,7 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
     private final byte appearanceBits;
 
     public EntityAppearancePacketOut(final Player receiver, final Entity entity, final byte appearanceBits) {
-        super(Opcodes.APPEARANCE, receiver);
+        super(Opcodes.APPEARANCE, receiver.getClientHandler());
         this.entity = entity;
         this.appearanceBits = appearanceBits;
     }

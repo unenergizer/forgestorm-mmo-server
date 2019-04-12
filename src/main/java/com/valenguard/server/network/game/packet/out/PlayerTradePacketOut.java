@@ -11,7 +11,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
     private final TradePacketInfoOut tradePacketInfoOut;
 
     public PlayerTradePacketOut(final Player receiver, final TradePacketInfoOut tradePacketInfoOut) {
-        super(Opcodes.PLAYER_TRADE, receiver);
+        super(Opcodes.PLAYER_TRADE, receiver.getClientHandler());
         this.tradePacketInfoOut = tradePacketInfoOut;
     }
 

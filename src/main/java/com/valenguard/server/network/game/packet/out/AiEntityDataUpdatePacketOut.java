@@ -11,7 +11,7 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
     private final byte dataBits;
 
     public AiEntityDataUpdatePacketOut(final Player packetReceiver, final AiEntity aiEntity, final byte dataBits) {
-        super(Opcodes.AI_ENTITY_UPDATE_OUT, packetReceiver);
+        super(Opcodes.AI_ENTITY_UPDATE_OUT, packetReceiver.getClientHandler());
         this.aiEntity = aiEntity;
         this.dataBits = dataBits;
     }

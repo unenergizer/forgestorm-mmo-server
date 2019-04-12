@@ -7,13 +7,14 @@ import com.valenguard.server.database.sql.GamePlayerInventorySQL;
 import com.valenguard.server.database.sql.GamePlayerReputationSQL;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.PlayerConstants;
+import com.valenguard.server.game.ScreenType;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
-import com.valenguard.server.network.game.packet.out.InitClientSessionPacketOut;
+import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.packet.out.PingPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
@@ -40,7 +41,6 @@ public class PlayerProcessor {
     public void processPlayerJoin() {
         PlayerSessionData playerSessionData;
         while ((playerSessionData = playerJoinServerQueue.poll()) != null) {
-            Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
             Player player = playerLoad(playerSessionData);
             playerWorldJoin(player);
         }
@@ -71,7 +71,7 @@ public class PlayerProcessor {
     }
 
     private void playerWorldJoin(Player player) {
-        new InitClientSessionPacketOut(player, true, player.getServerEntityId()).sendPacket();
+        new InitScreenPacketOut(player.getClientHandler(), ScreenType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
 

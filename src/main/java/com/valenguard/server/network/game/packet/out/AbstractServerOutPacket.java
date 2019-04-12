@@ -4,6 +4,7 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 
 public abstract class AbstractServerOutPacket {
@@ -14,14 +15,14 @@ public abstract class AbstractServerOutPacket {
     @Getter
     private final byte opcode;
 
-    /**
-     * The packetReceiver who will receive the packet.
-     */
     final Player packetReceiver;
 
-    AbstractServerOutPacket(byte opcode, Player packetReceiver) {
+    final ClientHandler clientHandler;
+
+    AbstractServerOutPacket(byte opcode, ClientHandler clientHandler) {
         this.opcode = opcode;
-        this.packetReceiver = packetReceiver;
+        this.clientHandler = clientHandler;
+        this.packetReceiver = clientHandler.getPlayer();
     }
 
     /**
@@ -40,7 +41,7 @@ public abstract class AbstractServerOutPacket {
      *
      */
     EntityType getEntityType(Entity entity) {
-        if (packetReceiver.equals(entity)) return EntityType.CLIENT_PLAYER;
+        if (clientHandler.getPlayer().equals(entity)) return EntityType.CLIENT_PLAYER;
         return entity.getEntityType();
     }
 }

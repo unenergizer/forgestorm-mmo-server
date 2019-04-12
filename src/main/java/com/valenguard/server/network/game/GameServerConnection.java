@@ -149,6 +149,7 @@ public class GameServerConnection {
                 authenticationManager.removeEntry(uuid);
 
                 // Adding the client handle to a list of current client handles
+                // TODO: this needs to be ran on the gamethread. Not the client's thread
                 Server.getInstance().getCharacterManager().playerLogin(new PlayerSessionData(tempID, username, clientHandler));
                 tempID++;
 

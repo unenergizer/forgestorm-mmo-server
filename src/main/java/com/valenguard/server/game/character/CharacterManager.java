@@ -3,10 +3,12 @@ package com.valenguard.server.game.character;
 import com.valenguard.server.Server;
 import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
 import com.valenguard.server.game.PlayerConstants;
+import com.valenguard.server.game.ScreenType;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.PlayerSessionData;
+import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 
 import static com.valenguard.server.util.Log.println;
@@ -33,15 +35,12 @@ public class CharacterManager {
         initialPlayerTextureIds[Appearance.HEAD] = headId;
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance(player, (byte) 0, initialPlayerTextureIds));
+        player.setAppearance(new Appearance(player, colorId, initialPlayerTextureIds));
 
         // TODO: Insert into SQL and then load player defaults!
         new GamePlayerCharacterSQL().firstTimeSaveSQL(player);
 
-        // TODO: Get new character ID and load player game
-
-        PlayerSessionData playerSessionData = null;//new PlayerSessionData(tempID, username, clientHandler)
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(playerSessionData); // TODO: Redo!
+        // TODO: Send player back to character select screen and show them all characters (including the one just made)
     }
 
     public void deleteCharacter(Player player, int characterId) {
@@ -49,7 +48,10 @@ public class CharacterManager {
     }
 
     public void characterLogin(Player player, int characterId) {
-        // TODO: Trigger SQL data load
+        // TODO: Get new character ID and load player game
+
+        PlayerSessionData playerSessionData = null;//new PlayerSessionData(tempID, username, clientHandler)
+        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(playerSessionData); // TODO: Redo!
     }
 
     public void characterLogout(Player player) {
@@ -60,9 +62,13 @@ public class CharacterManager {
     public void playerLogin(PlayerSessionData playerSessionData) {
         println(getClass(), "Player has logged in!");
 
+        Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
+
         // TODO: Send player to the character select screen
+        new InitScreenPacketOut(playerSessionData.getClientHandler(), ScreenType.CHARACTER_SELECT).sendPacket();
 
         // TODO: Send player all their characters
+
     }
 
     public void playerLogout(Player player) {

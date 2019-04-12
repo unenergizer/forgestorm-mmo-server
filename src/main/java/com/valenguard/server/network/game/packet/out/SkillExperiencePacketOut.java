@@ -9,7 +9,7 @@ public class SkillExperiencePacketOut extends AbstractServerOutPacket {
     private final ExperiencePacketInfo experiencePacketInfo;
 
     public SkillExperiencePacketOut(final Player player, final ExperiencePacketInfo experiencePacketInfo) {
-        super(Opcodes.EXPERIENCE, player);
+        super(Opcodes.EXPERIENCE, player.getClientHandler());
         this.experiencePacketInfo = experiencePacketInfo;
     }
 

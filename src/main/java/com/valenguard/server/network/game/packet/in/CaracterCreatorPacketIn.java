@@ -3,10 +3,12 @@ package com.valenguard.server.network.game.packet.in;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.character.CharacterCreatorErrors;
 import com.valenguard.server.game.character.CharacterManager;
+import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.packet.out.CharacterCreatorPacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
+@AllowNullPlayer
 @Opcode(getOpcode = Opcodes.APPEARANCE)
 public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPacketIn.NewCharacterDataPacket> {
 

@@ -15,7 +15,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
     private final MoveDirection facingDirection;
 
     public MovingEntityTeleportPacketOut(final Player receiver, final MovingEntity teleportedEntity, final Location teleportLocation, final MoveDirection facingDirection) {
-        super(Opcodes.PLAYER_TELEPORT, receiver);
+        super(Opcodes.PLAYER_TELEPORT, receiver.getClientHandler());
         this.teleportedEntity = teleportedEntity;
         this.teleportLocation = teleportLocation;
         this.facingDirection = facingDirection;

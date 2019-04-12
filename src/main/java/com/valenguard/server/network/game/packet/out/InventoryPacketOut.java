@@ -9,7 +9,7 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
     private final InventoryActions inventoryActions;
 
     public InventoryPacketOut(final Player player, final InventoryActions inventoryActions) {
-        super(Opcodes.INVENTORY_UPDATE, player);
+        super(Opcodes.INVENTORY_UPDATE, player.getClientHandler());
         this.inventoryActions = inventoryActions;
     }
 

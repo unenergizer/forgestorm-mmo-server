@@ -17,7 +17,7 @@ public class CharacterSelectorPacketOut extends AbstractServerOutPacket {
     private final byte appearanceBits;
 
     public CharacterSelectorPacketOut(final Player receiver, final Entity entity, final byte appearanceBits) {
-        super(Opcodes.APPEARANCE, receiver);
+        super(Opcodes.APPEARANCE, receiver.getClientHandler());
         this.entity = entity;
         this.appearanceBits = appearanceBits;
     }
