@@ -1,10 +1,8 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.character.CharacterCreatorErrors;
 import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
-import com.valenguard.server.network.game.packet.out.CharacterCreatorPacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -42,7 +40,7 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
         if (characterManager.isNameUnique(packetData.characterName)) {
             // Character name is unique, allow creation
             Server.getInstance().getCharacterManager().createCharacter(
-                    packetData.getPlayer(),
+                    packetData.getClientHandler().getPlayer(),
                     packetData.characterName,
                     packetData.factionId,
                     packetData.bodyId,
@@ -50,7 +48,7 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
                     packetData.colorId);
         } else {
             // TODO: Character name is not unique, send error response
-            new CharacterCreatorPacketOut(packetData.getPlayer(), CharacterCreatorErrors.NAME_TAKEN).sendPacket();
+//            new CharacterCreatorPacketOut(packetData.getPlayer(), CharacterCreatorErrors.NAME_TAKEN).sendPacket();
         }
     }
 

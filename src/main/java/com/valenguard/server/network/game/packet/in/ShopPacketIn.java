@@ -30,24 +30,26 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
 
     @Override
     public boolean sanitizePacket(ShopPacket packetData) {
+        Player player = packetData.getClientHandler().getPlayer();
+
         // The packetReceiver cannot move and shop at the same time.
-        if (packetData.getPlayer().isEntityMoving()) {
-            packetData.getPlayer().setCurrentShoppingEntity(null);
+        if (player.isEntityMoving()) {
+            player.setCurrentShoppingEntity(null);
             return false;
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            if (packetData.getPlayer().getGameMap().getAiEntityController().doesNotContainKey(packetData.entityId))
+            if (player.getGameMap().getAiEntityController().doesNotContainKey(packetData.entityId))
                 return false;
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            AiEntity aiEntity = (AiEntity) packetData.getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityId);
+            AiEntity aiEntity = (AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId);
             if (aiEntity.getShopId() == -1) return false;
         }
 
         if (packetData.shopOpcode == ShopOpcodes.BUY || packetData.shopOpcode == ShopOpcodes.SELL) {
-            return packetData.getPlayer().getCurrentShoppingEntity() != null;
+            return player.getCurrentShoppingEntity() != null;
         }
 
         return true;
@@ -56,7 +58,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
     @Override
     public void onEvent(ShopPacket packetData) {
 
-        Player player = packetData.getPlayer();
+        Player player = packetData.getClientHandler().getPlayer();
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
             player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));

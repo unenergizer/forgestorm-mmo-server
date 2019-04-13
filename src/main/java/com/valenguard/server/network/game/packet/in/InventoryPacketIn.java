@@ -1,21 +1,15 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.world.entity.Appearance;
-import com.valenguard.server.game.world.entity.EntityType;
-import com.valenguard.server.game.world.entity.ItemStackDrop;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackConsumerManager;
-import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.inventory.*;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
-import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
-
-import static com.valenguard.server.util.Log.println;
 
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
 public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
@@ -94,10 +88,11 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         InventoryMoveType inventoryMoveType = InventoryMovementUtil.getWindowMovementInfo(fromWindow, toWindow);
 
         PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
-        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
+        playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getClientHandler().getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
     }
 
     private void dropItemStack(InventoryActionsPacket packetData) {
+        Player player = packetData.getClientHandler().getPlayer();
 
         InventoryType inventoryType = InventoryType.values()[packetData.interactInventory];
 
@@ -107,17 +102,17 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         if (inventoryType == InventoryType.BAG_1) {
 
-            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getInventorySlotArray()[packetData.slotIndex].getItemStack();
-            packetData.getPlayer().getPlayerBag().removeItemStack(packetData.slotIndex, true);
+            ItemStack itemStack = player.getPlayerBag().getInventorySlotArray()[packetData.slotIndex].getItemStack();
+            player.getPlayerBag().removeItemStack(packetData.slotIndex, true);
 
-            GameMap gameMap = packetData.getPlayer().getGameMap();
+            GameMap gameMap = player.getGameMap();
 
             ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
             itemStackDropEntityController.queueEntitySpawn(
                     itemStackDropEntityController.makeItemStackDrop(
                             itemStack,
-                            packetData.getPlayer().getCurrentMapLocation(),
-                            packetData.getPlayer()
+                            player.getCurrentMapLocation(),
+                            player
                     ));
 
         } else if (inventoryType == InventoryType.EQUIPMENT) {
@@ -128,6 +123,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     }
 
     private void consumeItem(InventoryActionsPacket packetData) {
+        Player player = packetData.getClientHandler().getPlayer();
 
         InventoryType inventoryType = InventoryType.values()[packetData.interactInventory];
 
@@ -137,15 +133,15 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         if (inventoryType != InventoryType.EQUIPMENT && inventoryType != InventoryType.BANK) {
 
-            ItemStack itemStack = packetData.getPlayer().getPlayerBag().getItemStack(packetData.slotIndex);
+            ItemStack itemStack = player.getPlayerBag().getItemStack(packetData.slotIndex);
 
             if (!itemStack.isConsumable()) {
                 return;
             }
 
-            itemStackConsumerManager.consumeItem(packetData.getPlayer(), itemStack);
+            itemStackConsumerManager.consumeItem(player, itemStack);
 
-            new InventoryPacketOut(packetData.getPlayer(), new InventoryActions(
+            new InventoryPacketOut(player, new InventoryActions(
                     InventoryActions.ActionType.CONSUME,
                     packetData.interactInventory,
                     packetData.slotIndex

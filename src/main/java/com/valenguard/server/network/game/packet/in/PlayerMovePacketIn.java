@@ -1,6 +1,7 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.task.MovementUpdateTask;
 import com.valenguard.server.network.game.shared.*;
@@ -23,12 +24,14 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
     @Override
     public void onEvent(MovePacket packetData) {
+        Player player = packetData.getClientHandler().getPlayer();
+
         MovementUpdateTask movementUpdateTask = Server.getInstance().getGameLoop().getMovementUpdateTask();
-        Location location = new Location(packetData.getPlayer().getMapName(), packetData.x, packetData.y);
+        Location location = new Location(player.getMapName(), packetData.x, packetData.y);
 
-        if (!movementUpdateTask.preMovementChecks(packetData.getPlayer(), location)) return;
+        if (!movementUpdateTask.preMovementChecks(player, location)) return;
 
-        movementUpdateTask.performPlayerMove(packetData.getPlayer(), location);
+        movementUpdateTask.performPlayerMove(player, location);
     }
 
     @AllArgsConstructor

@@ -35,6 +35,8 @@ public class NetworkManager {
             eventBus.registerListener(new ClickActionPacketIn());
             eventBus.registerListener(new PlayerTradePacketIn());
             eventBus.registerListener(new ShopPacketIn());
+            eventBus.registerListener(new CaracterCreatorPacketIn());
+            eventBus.registerListener(new CharacterSelectPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();

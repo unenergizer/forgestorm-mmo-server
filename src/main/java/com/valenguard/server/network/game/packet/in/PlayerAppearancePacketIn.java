@@ -3,6 +3,7 @@ package com.valenguard.server.network.game.packet.in;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.Appearance;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -23,15 +24,16 @@ public class PlayerAppearancePacketIn implements PacketListener<PlayerAppearance
 
     @Override
     public void onEvent(AppearancePacket packetData) {
+        Player player = packetData.getClientHandler().getPlayer();
 
-        short[] textureIds = packetData.getPlayer().getAppearance().getTextureIds();
+        short[] textureIds = player.getAppearance().getTextureIds();
         textureIds[Appearance.BODY] = packetData.textureIds[Appearance.BODY];
         textureIds[Appearance.HEAD] = packetData.textureIds[Appearance.HEAD];
 
         final byte appearanceByte = EntityAppearancePacketOut.BODY_INDEX | EntityAppearancePacketOut.HEAD_INDEX;
 
-        Server.getInstance().getGameManager().sendToAllButPlayer(packetData.getPlayer(), clientHandler ->
-                new EntityAppearancePacketOut(clientHandler.getPlayer(), packetData.getPlayer(), appearanceByte).sendPacket());
+        Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+                new EntityAppearancePacketOut(clientHandler.getPlayer(), player, appearanceByte).sendPacket());
     }
 
     @AllArgsConstructor

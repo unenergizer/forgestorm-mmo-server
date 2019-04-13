@@ -70,7 +70,7 @@ public class EventBus {
         if (packetListenerData == null) return;
         PacketData packetData = packetListenerData.packetListener.decodePacket(clientHandler);
         packetData.setOpcode(opcode);
-        packetData.setPlayer(clientHandler.getPlayer());
+        packetData.setClientHandler(clientHandler);
         decodedPackets.add(packetData);
     }
 
@@ -92,7 +92,7 @@ public class EventBus {
     private void publishOnGameThread(PacketData packetData) {
         PacketListenerData packetListenerData = getPacketListenerData(packetData.getOpcode());
         if (packetListenerData == null) return;
-        if (packetListenerData.ensureNonNullPlayer && packetData.getPlayer() == null) return;
+        if (packetListenerData.ensureNonNullPlayer && packetData.getClientHandler().getPlayer() == null) return;
         if (!packetListenerData.packetListener.sanitizePacket(packetData)) return;
         List<PacketListener> cancelableListeners = cancellingCallbacks.get(packetListenerData.packetListener.getClass());
 
@@ -100,7 +100,7 @@ public class EventBus {
         // packet type.
         if (cancelableListeners != null) {
             if (cancelableListeners.contains(packetListenerData))
-                ((PacketInCancelable) packetListenerData).onCancel(packetData.getPlayer());
+                ((PacketInCancelable) packetListenerData).onCancel(packetData.getClientHandler().getPlayer());
         }
         packetListenerData.packetListener.onEvent(packetData);
     }

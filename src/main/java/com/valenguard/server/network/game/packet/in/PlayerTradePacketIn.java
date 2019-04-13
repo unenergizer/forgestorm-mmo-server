@@ -1,6 +1,7 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.trade.TradeManager;
 import com.valenguard.server.game.world.item.trade.TradeStatusOpcode;
 import com.valenguard.server.network.game.shared.*;
@@ -59,37 +60,38 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
     @Override
     public void onEvent(TradePacketIn packetData) {
         TradeManager tradeManager = Server.getInstance().getTradeManager();
+        Player player = packetData.getClientHandler().getPlayer();
 
         switch (packetData.tradeStatusOpcode) {
 
             // Stage 1: Init trade
             case TRADE_REQUEST_INIT_TARGET:
-                tradeManager.requestTradeInitialized(packetData.getPlayer(), packetData.getPlayer().getGameMap().getPlayerController().findPlayer(packetData.entityUUID));
+                tradeManager.requestTradeInitialized(player, player.getGameMap().getPlayerController().findPlayer(packetData.entityUUID));
                 break;
 
             // Stage 2: Wait for TargetPlayer response or time out
             case TRADE_REQUEST_TARGET_ACCEPT:
-                tradeManager.targetPlayerAcceptedTradeRequest(packetData.getPlayer(), packetData.tradeUUID);
+                tradeManager.targetPlayerAcceptedTradeRequest(player, packetData.tradeUUID);
                 break;
             case TRADE_REQUEST_TARGET_DECLINE:
-                tradeManager.tradeCanceled(packetData.getPlayer(), packetData.tradeUUID, packetData.tradeStatusOpcode);
+                tradeManager.tradeCanceled(player, packetData.tradeUUID, packetData.tradeStatusOpcode);
                 break;
 
             // Stage 3: Trade started -> adding/removing items from trade window
             case TRADE_ITEM_ADD:
-                tradeManager.sendItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemSlot());
+                tradeManager.sendItem(player, packetData.tradeUUID, packetData.getItemSlot());
                 break;
 
             case TRADE_ITEM_REMOVE:
-                tradeManager.removeItem(packetData.getPlayer(), packetData.tradeUUID, packetData.getItemSlot());
+                tradeManager.removeItem(player, packetData.tradeUUID, packetData.getItemSlot());
                 break;
 
             // Stage 4: First Trade Confirm (items are in window, do trade or cancel)
             case TRADE_OFFER_CONFIRM:
-                tradeManager.playerConfirmedTrade(packetData.getPlayer(), packetData.tradeUUID);
+                tradeManager.playerConfirmedTrade(player, packetData.tradeUUID);
                 break;
             case TRADE_OFFER_UNCONFIRM:
-                tradeManager.playerUnconfirmedTrade(packetData.getPlayer(), packetData.tradeUUID);
+                tradeManager.playerUnconfirmedTrade(player, packetData.tradeUUID);
                 break;
 
 
@@ -98,7 +100,7 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
 
             // Generic trade cancel
             case TRADE_CANCELED:
-                tradeManager.tradeCanceled(packetData.getPlayer(), packetData.tradeUUID, packetData.tradeStatusOpcode);
+                tradeManager.tradeCanceled(player, packetData.tradeUUID, packetData.tradeStatusOpcode);
                 break;
             default:
                 println(getClass(), "onEvent unused trade status: " + packetData.tradeStatusOpcode, true, true);

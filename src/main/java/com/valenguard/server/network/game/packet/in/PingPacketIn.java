@@ -1,5 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -18,8 +19,10 @@ public class PingPacketIn implements PacketListener<PingPacketIn.PingPacket> {
 
     @Override
     public void onEvent(PingPacket packetData) {
-        long timeTaken = packetData.packetReceivedTime - packetData.getPlayer().getPingOutTime();
-        packetData.getPlayer().setLastPingTime(timeTaken);
+        Player player = packetData.getClientHandler().getPlayer();
+
+        long timeTaken = packetData.packetReceivedTime - player.getPingOutTime();
+        player.setLastPingTime(timeTaken);
     }
 
     @AllArgsConstructor

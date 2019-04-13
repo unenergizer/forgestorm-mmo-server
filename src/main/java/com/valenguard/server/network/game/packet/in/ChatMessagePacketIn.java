@@ -28,7 +28,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     public void onEvent(TextMessage packetData) {
         // TODO : Use StringBuilder
         Server.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
-                new ChatMessagePacketOut(onlinePlayer, packetData.getPlayer().getName() + ": " + packetData.text).sendPacket());
+                new ChatMessagePacketOut(onlinePlayer, packetData.getClientHandler().getPlayer().getName() + ": " + packetData.text).sendPacket());
     }
 
     @AllArgsConstructor

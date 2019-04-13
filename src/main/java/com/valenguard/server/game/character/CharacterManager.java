@@ -8,6 +8,7 @@ import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.PlayerSessionData;
+import com.valenguard.server.network.game.packet.out.CharacterMenuLoadPacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 
@@ -47,11 +48,13 @@ public class CharacterManager {
         // TODO: Soft delete the players character / place deleted flag on character, but do NOT remove entry (for recovery purposes)
     }
 
-    public void characterLogin(Player player, int characterId) {
+    public void characterLogin(ClientHandler clientHandler, int characterId) {
         // TODO: Get new character ID and load player game
 
-        PlayerSessionData playerSessionData = null;//new PlayerSessionData(tempID, username, clientHandler)
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(playerSessionData); // TODO: Redo!
+        println(getClass(), "Character Selected: " + characterId);
+
+//        PlayerSessionData playerSessionData = null;//new PlayerSessionData(tempID, username, clientHandler)
+//        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(playerSessionData); // TODO: Redo!
     }
 
     public void characterLogout(Player player) {
@@ -68,6 +71,14 @@ public class CharacterManager {
         new InitScreenPacketOut(playerSessionData.getClientHandler(), ScreenType.CHARACTER_SELECT).sendPacket();
 
         // TODO: Send player all their characters
+
+        CharacterDataOut characterDataOut1 = new CharacterDataOut("Hello bob", (byte) 0);
+        CharacterDataOut characterDataOut2 = new CharacterDataOut("Jim Boo", (byte) 1);
+        CharacterDataOut[] characterDataOuts = new CharacterDataOut[2];
+        characterDataOuts[0] = characterDataOut1;
+        characterDataOuts[1] = characterDataOut2;
+
+        new CharacterMenuLoadPacketOut(playerSessionData.getClientHandler(), characterDataOuts).sendPacket();
 
     }
 
