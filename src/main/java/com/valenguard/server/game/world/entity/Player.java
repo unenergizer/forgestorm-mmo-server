@@ -1,5 +1,8 @@
 package com.valenguard.server.game.world.entity;
 
+import com.valenguard.server.game.character.CharacterClasses;
+import com.valenguard.server.game.character.CharacterGenders;
+import com.valenguard.server.game.character.CharacterRaces;
 import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.rpg.skills.Skills;
 import com.valenguard.server.game.world.item.inventory.PlayerBag;
@@ -27,6 +30,10 @@ public class Player extends MovingEntity {
     private final Deque<Location> latestMoveRequests = new LinkedList<>();
 
     private Integer characterId;
+
+    private CharacterClasses characterClass;
+    private CharacterGenders characterGender;
+    private CharacterRaces characterRace;
 
     private Warp warp;
 

@@ -1,25 +1,29 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.character.CharacterManager;
+import com.valenguard.server.game.character.*;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
 @AllowNullPlayer
-@Opcode(getOpcode = Opcodes.APPEARANCE)
-public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPacketIn.NewCharacterDataPacket> {
+@Opcode(getOpcode = Opcodes.CHARACTER_CREATOR)
+public class CharacterCreatorPacketIn implements PacketListener<CharacterCreatorPacketIn.NewCharacterDataPacket> {
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
 
+        byte characterClass = clientHandler.readByte();
+        byte characterGender = clientHandler.readByte();
+        byte characterRace = clientHandler.readByte();
+        byte characterColor = clientHandler.readByte();
         String characterName = clientHandler.readString();
-        byte factionId = clientHandler.readByte();
-        byte bodyId = clientHandler.readByte();
-        byte headId = clientHandler.readByte();
-        byte colorId = clientHandler.readByte();
 
-        return new NewCharacterDataPacket(characterName, factionId, bodyId, headId, colorId);
+        return new NewCharacterDataPacket(CharacterClasses.getType(characterClass),
+                CharacterGenders.getType(characterGender),
+                CharacterRaces.getType(characterRace),
+                ColorList.getType(characterColor),
+                characterName);
     }
 
     @Override
@@ -40,12 +44,12 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
         if (characterManager.isNameUnique(packetData.characterName)) {
             // Character name is unique, allow creation
             Server.getInstance().getCharacterManager().createCharacter(
-                    packetData.getClientHandler().getPlayer(),
-                    packetData.characterName,
-                    packetData.factionId,
-                    packetData.bodyId,
-                    packetData.headId,
-                    packetData.colorId);
+                    packetData.getClientHandler(),
+                    packetData.characterClass,
+                    packetData.characterGender,
+                    packetData.characterRace,
+                    packetData.characterColor,
+                    packetData.characterName);
         } else {
             // TODO: Character name is not unique, send error response
 //            new CharacterCreatorPacketOut(packetData.getPlayer(), CharacterCreatorErrors.NAME_TAKEN).sendPacket();
@@ -54,10 +58,10 @@ public class CaracterCreatorPacketIn implements PacketListener<CaracterCreatorPa
 
     @AllArgsConstructor
     class NewCharacterDataPacket extends PacketData {
+        private CharacterClasses characterClass;
+        private CharacterGenders characterGender;
+        private CharacterRaces characterRace;
+        private ColorList characterColor;
         private String characterName;
-        private byte factionId;
-        private byte bodyId;
-        private byte headId;
-        private byte colorId;
     }
 }

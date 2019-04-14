@@ -12,36 +12,52 @@ import com.valenguard.server.network.game.packet.out.CharacterMenuLoadPacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 
+import java.util.List;
+
 import static com.valenguard.server.util.Log.println;
 
 public class CharacterManager {
+
+    private static final boolean PRINT_DEBUG = true;
 
     public boolean isNameUnique(String name) {
         // TODO: check to make sure the players chosen name is unique
         return true;
     }
 
-    public void createCharacter(Player player, String characterName, byte factionId, byte bodyId, byte headId, byte colorId) {
+    public void createCharacter(ClientHandler clientHandler, CharacterClasses characterClass, CharacterGenders characterGender, CharacterRaces characterRace, ColorList characterColor, String characterName) {
+        Player player = clientHandler.getPlayer();
+
+        println(getClass(), "Class: " + characterClass.name(), false, PRINT_DEBUG);
+        println(getClass(), "Gender: " + characterGender.name(), false, PRINT_DEBUG);
+        println(getClass(), "Race: " + characterRace.name(), false, PRINT_DEBUG);
+        println(getClass(), "Color: " + characterColor.name(), false, PRINT_DEBUG);
+        println(getClass(), "Name: " + characterName, false, PRINT_DEBUG);
 
         // Set
         player.setName(characterName);
-        player.setFaction(factionId);
+        player.setFaction((byte) 0); // TODO: Fill in from client
         player.setCurrentHealth(PlayerConstants.BASE_HP);
         player.setFacingDirection(PlayerConstants.SPAWN_FACING_DIRECTION);
         player.setCurrentMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
         player.setFutureMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
 
+        player.setCharacterClass(characterClass);
+        player.setCharacterGender(characterGender);
+        player.setCharacterRace(characterRace);
+
         short[] initialPlayerTextureIds = new short[4];
-        initialPlayerTextureIds[Appearance.BODY] = bodyId;
-        initialPlayerTextureIds[Appearance.HEAD] = headId;
+        initialPlayerTextureIds[Appearance.BODY] = 0; // TODO: Fill in from client
+        initialPlayerTextureIds[Appearance.HEAD] = 0; // TODO: Fill in from client
         initialPlayerTextureIds[Appearance.ARMOR] = -1;
         initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance(player, colorId, initialPlayerTextureIds));
+        player.setAppearance(new Appearance(player, characterColor.getTypeByte(), initialPlayerTextureIds));
 
-        // TODO: Insert into SQL and then load player defaults!
+        // Insert into SQL and then load player defaults!
         new GamePlayerCharacterSQL().firstTimeSaveSQL(player);
 
-        // TODO: Send player back to character select screen and show them all characters (including the one just made)
+        // Send player back to character select screen and show them all characters (including the one just made)
+        sendCharacters(clientHandler);
     }
 
     public void deleteCharacter(Player player, int characterId) {
@@ -49,12 +65,10 @@ public class CharacterManager {
     }
 
     public void characterLogin(ClientHandler clientHandler, int characterId) {
-        // TODO: Get new character ID and load player game
-
         println(getClass(), "Character Selected: " + characterId);
+        clientHandler.getPlayer().setCharacterId(characterId);
 
-//        PlayerSessionData playerSessionData = null;//new PlayerSessionData(tempID, username, clientHandler)
-//        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(playerSessionData); // TODO: Redo!
+        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(clientHandler);
     }
 
     public void characterLogout(Player player) {
@@ -63,28 +77,29 @@ public class CharacterManager {
     }
 
     public void playerLogin(PlayerSessionData playerSessionData) {
-        println(getClass(), "Player has logged in!");
+        Player player = new Player(playerSessionData.getClientHandler());
+        playerSessionData.getClientHandler().setPlayer(player);
+        player.setServerEntityId(playerSessionData.getServerID());
 
         Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
-        // TODO: Send player to the character select screen
+        // Send player to the character select screen
         new InitScreenPacketOut(playerSessionData.getClientHandler(), ScreenType.CHARACTER_SELECT).sendPacket();
 
-        // TODO: Send player all their characters
-
-        CharacterDataOut characterDataOut1 = new CharacterDataOut("Hello bob", (byte) 0);
-        CharacterDataOut characterDataOut2 = new CharacterDataOut("Jim Boo", (byte) 1);
-        CharacterDataOut[] characterDataOuts = new CharacterDataOut[2];
-        characterDataOuts[0] = characterDataOut1;
-        characterDataOuts[1] = characterDataOut2;
-
-        new CharacterMenuLoadPacketOut(playerSessionData.getClientHandler(), characterDataOuts).sendPacket();
-
+        // Send player all their characters
+        sendCharacters(playerSessionData.getClientHandler());
     }
 
     public void playerLogout(Player player) {
         ClientHandler clientHandler = player.getClientHandler();
         if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
         clientHandler.setPlayerQuitProcessed(true);
+    }
+
+    private void sendCharacters(ClientHandler clientHandler) {
+
+        List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getDatabaseUserId());
+
+        new CharacterMenuLoadPacketOut(clientHandler, characterDataOutList).sendPacket();
     }
 }

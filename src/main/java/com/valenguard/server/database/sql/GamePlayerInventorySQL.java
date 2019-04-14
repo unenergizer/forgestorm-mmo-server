@@ -11,8 +11,6 @@ import java.sql.SQLException;
 
 public class GamePlayerInventorySQL extends AbstractSingleSQL {
 
-    // TODO: Implement character column: "character_id"
-
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         InventorySlot[] inventorySlots = (InventorySlot[]) Base64Util.deserializeObjectFromBase64(resultSet.getString("bag"));
@@ -28,12 +26,12 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
     @Override
     PreparedStatement databaseSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_player_inventory" +
-                " SET bag=?, equipment=?, bank=? WHERE user_id=?");
+                " SET bag=?, equipment=?, bank=? WHERE character_id=?");
 
         preparedStatement.setString(1, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
         preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
         preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerBank().getInventorySlotArray()));
-        preparedStatement.setInt(4, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(4, player.getCharacterId());
 
         return preparedStatement;
     }
@@ -41,19 +39,20 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
     @Override
     PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_inventory " +
-                "(user_id, bag, equipment, bank) " +
-                "VALUES(?, ?, ?, ?)");
+                "(user_id, character_id, bag, equipment, bank) " +
+                "VALUES(?, ?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
-        preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
-        preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
-        preparedStatement.setString(4, Base64Util.serializeObjectToBase64(player.getPlayerBank().getInventorySlotArray()));
+        preparedStatement.setInt(2, player.getCharacterId());
+        preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
+        preparedStatement.setString(4, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
+        preparedStatement.setString(5, Base64Util.serializeObjectToBase64(player.getPlayerBank().getInventorySlotArray()));
 
         return preparedStatement;
     }
 
     @Override
     SqlSearchData searchForData(Player player) {
-        return new SqlSearchData("game_player_inventory", "user_id", player.getClientHandler().getDatabaseUserId());
+        return new SqlSearchData("game_player_inventory", "character_id", player.getCharacterId());
     }
 }

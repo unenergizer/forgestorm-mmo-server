@@ -12,7 +12,6 @@ import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
-import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
@@ -27,31 +26,28 @@ import static com.valenguard.server.util.Log.println;
 public class PlayerProcessor {
 
     private final GameManager gameManager;
-    private final Queue<PlayerSessionData> playerJoinServerQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<ClientHandler> playerJoinServerQueue = new ConcurrentLinkedQueue<>();
     private final Queue<ClientHandler> playerQuitServerQueue = new ConcurrentLinkedQueue<>();
 
     public PlayerProcessor(final GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
-    public void queuePlayerJoinServer(PlayerSessionData playerSessionData) {
-        playerJoinServerQueue.add(playerSessionData);
+    public void queuePlayerJoinServer(ClientHandler clientHandler) {
+        playerJoinServerQueue.add(clientHandler);
     }
 
     public void processPlayerJoin() {
-        PlayerSessionData playerSessionData;
-        while ((playerSessionData = playerJoinServerQueue.poll()) != null) {
-            Player player = playerLoad(playerSessionData);
+        ClientHandler clientHandler;
+        while ((clientHandler = playerJoinServerQueue.poll()) != null) {
+            Player player = playerLoad(clientHandler.getPlayer());
             playerWorldJoin(player);
         }
     }
 
-    private Player playerLoad(final PlayerSessionData playerSessionData) {
-        Player player = new Player(playerSessionData.getClientHandler());
-        playerSessionData.getClientHandler().setPlayer(player);
+    private Player playerLoad(Player player) {
 
         // Setting Entity Specific Data
-        player.setServerEntityId(playerSessionData.getServerID());
         player.setEntityType(EntityType.PLAYER);
 
         player.getAttributes().setArmor(PlayerConstants.BASE_ARMOR);

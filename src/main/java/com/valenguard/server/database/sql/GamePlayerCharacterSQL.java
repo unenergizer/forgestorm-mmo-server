@@ -1,6 +1,7 @@
 package com.valenguard.server.database.sql;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.game.character.CharacterDataOut;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
@@ -10,10 +11,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GamePlayerCharacterSQL implements AbstractSQL {
+import static com.valenguard.server.util.Log.println;
 
-    private void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
+public class GamePlayerCharacterSQL extends AbstractSingleSQL implements AbstractSQL {
+
+    @Override
+    public void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         player.setName(resultSet.getString("name"));
         player.setFaction(resultSet.getByte("faction"));
         player.setCurrentHealth(resultSet.getInt("health"));
@@ -30,7 +36,8 @@ public class GamePlayerCharacterSQL implements AbstractSQL {
         player.setAppearance(new Appearance(player, resultSet.getByte("color_id"), initialPlayerTextureIds));
     }
 
-    private PreparedStatement databaseSave(Player player, Connection connection) throws SQLException {
+    @Override
+    public PreparedStatement databaseSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_player_characters" +
                 " SET name=?, faction=?, health=?, facing_direction=?, world_name=?, world_x=?, world_y=?," +
                 " body_appearance=?, head_appearance=?, color_id=? WHERE character_id=?");
@@ -50,81 +57,62 @@ public class GamePlayerCharacterSQL implements AbstractSQL {
         return preparedStatement;
     }
 
-    private PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
+    @Override
+    public PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_characters " +
-                "(user_id, name, faction, health, facing_direction, world_name, world_x, world_y, body_appearance, head_appearance, color_id) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, body_appearance, head_appearance, color_id) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
-        preparedStatement.setInt(3, player.getFaction());
-        preparedStatement.setInt(4, player.getCurrentHealth());
-        preparedStatement.setString(5, player.getFacingDirection().toString());
-        preparedStatement.setString(6, player.getCurrentMapLocation().getMapName());
-        preparedStatement.setInt(7, player.getCurrentMapLocation().getX());
-        preparedStatement.setInt(8, player.getCurrentMapLocation().getY());
-        preparedStatement.setInt(9, player.getAppearance().getTextureId(Appearance.BODY));
-        preparedStatement.setInt(10, player.getAppearance().getTextureId(Appearance.HEAD));
-        preparedStatement.setInt(11, player.getAppearance().getColorId());
+        preparedStatement.setInt(3, player.getCharacterClass().getTypeByte());
+        preparedStatement.setInt(4, player.getCharacterGender().getTypeByte());
+        preparedStatement.setInt(5, player.getCharacterRace().getTypeByte());
+        preparedStatement.setInt(6, player.getFaction());
+        preparedStatement.setInt(7, player.getCurrentHealth());
+        preparedStatement.setString(8, player.getFacingDirection().toString());
+        preparedStatement.setString(9, player.getCurrentMapLocation().getMapName());
+        preparedStatement.setInt(10, player.getCurrentMapLocation().getX());
+        preparedStatement.setInt(11, player.getCurrentMapLocation().getY());
+        preparedStatement.setInt(12, player.getAppearance().getTextureId(Appearance.BODY));
+        preparedStatement.setInt(13, player.getAppearance().getTextureId(Appearance.HEAD));
+        preparedStatement.setInt(14, player.getAppearance().getColorId());
 
         return preparedStatement;
     }
 
-    private SqlSearchData searchForData(Player player) {
+    @Override
+    public SqlSearchData searchForData(Player player) {
         return new SqlSearchData("game_player_characters", "character_id", player.getCharacterId());
     }
 
-    @Override
-    public void loadSQL(Player player) {
+    public List<CharacterDataOut> searchCharacters(int databaseUserId) {
 
-        ResultSet resultSet = null;
-        PreparedStatement searchStatement = null;
-        PreparedStatement firstTimeSaveStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        List<CharacterDataOut> characterDataOuts = new ArrayList<>();
+        String query = "SELECT character_id, name FROM game_player_characters WHERE user_id = ?";
 
-            SqlSearchData sqlSearchData = searchForData(player);
+        try {
+            Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, databaseUserId);
 
-            searchStatement = connection.prepareStatement("SELECT * FROM " + sqlSearchData.getTableName() + " WHERE " + sqlSearchData.getColumnName() + "=?");
-            searchStatement.setObject(1, sqlSearchData.getSetData());
-            resultSet = searchStatement.executeQuery();
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (!resultSet.next()) {
-                firstTimeSaveStatement = firstTimeSave(player, connection);
-                firstTimeSaveStatement.execute();
-            } else {
-                databaseLoad(player, resultSet);
+            while (resultSet.next()) {
+                int characterId = resultSet.getInt("character_id");
+                String name = resultSet.getString("name");
+                characterDataOuts.add(new CharacterDataOut(
+                        (byte) characterId,
+                        name
+                ));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (searchStatement != null) searchStatement.close();
-                if (firstTimeSaveStatement != null) firstTimeSaveStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-    }
 
-    @Override
-    public void saveSQL(Player player) {
-        PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
-            preparedStatement = databaseSave(player, connection);
-            preparedStatement.execute();
-        } catch (SQLException exe) {
-            exe.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        println(getClass(), "Total Characters Loaded: " + characterDataOuts.size());
+        return characterDataOuts;
     }
 
     public void firstTimeSaveSQL(Player player) {
