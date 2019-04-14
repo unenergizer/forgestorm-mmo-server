@@ -2,6 +2,7 @@ package com.valenguard.server.io;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.rpg.Attributes;
+import com.valenguard.server.game.rpg.StationaryTypes;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.maps.*;
 import com.valenguard.server.util.Log;
@@ -271,7 +272,7 @@ public class TmxFileParser {
                     short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
                     short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1);
 
-                    int typeID = 0;
+                    String typeID = null;
 
                     NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
 
@@ -280,8 +281,8 @@ public class TmxFileParser {
                         if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
                         Element propertyElement = (Element) properties.item(k);
 
-                        if (propertyElement.getAttribute("name").equals("type")) {
-                            typeID = Integer.parseInt(propertyElement.getAttribute("value"));
+                        if (propertyElement.getAttribute("name").equals("TYPE")) {
+                            typeID = propertyElement.getAttribute("value");
                         }
                     }
 
@@ -290,6 +291,7 @@ public class TmxFileParser {
                     stationaryEntity.setServerEntityId((short) entityUUID++); // todo need to determine a real id
                     stationaryEntity.setCurrentMapLocation(new Location(fileName, x, y));
                     stationaryEntity.setEntityType(EntityType.SKILL_NODE);
+                    stationaryEntity.setStationaryType(StationaryTypes.valueOf(typeID));
                     stationaryEntity.setAppearance(new Appearance(stationaryEntity, (byte) 0, new short[]{0})); // todo determine texture id
                     stationaryEntity.setName(""); // todo will these even have names?
                     Server.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);

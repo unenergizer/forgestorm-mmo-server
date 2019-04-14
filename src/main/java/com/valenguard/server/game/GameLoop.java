@@ -3,6 +3,7 @@ package com.valenguard.server.game;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.item.inventory.PlayerMoveInventoryEvents;
 import com.valenguard.server.game.world.task.*;
+import com.valenguard.server.game.world.task.skills.ProcessMining;
 import lombok.Getter;
 
 /**
@@ -22,6 +23,7 @@ public class GameLoop extends Thread {
     private final CombatUpdateTask combatUpdateTask = new CombatUpdateTask();
     private final EntityRehealTask entityRehealTask = new EntityRehealTask();
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
+    private final ProcessMining processMining = new ProcessMining();
 
     /* UPDATES PER SECOND */
     private int currentTPS;
@@ -67,6 +69,7 @@ public class GameLoop extends Thread {
             groundItemTimerTask.tick(numberOfTicksPassed);
             combatUpdateTask.tick(numberOfTicksPassed);
             entityRehealTask.tick(numberOfTicksPassed);
+            processMining.tick(numberOfTicksPassed);
             aiEntityRespawnTimerTask.tick(numberOfTicksPassed);
             server.getGameManager().tickWorld(numberOfTicksPassed);
             server.getNetworkManager().getOutStreamManager().sendPackets();

@@ -167,7 +167,7 @@ public class CombatUpdateTask implements AbstractTask {
 
             // Give packetReceiver drop table item
             if (aiEntity.getDropTable() != null) {
-                ItemStack itemStack = Server.getInstance().getDropTableManager().dropItemOnMap(aiEntity.getDropTable(), 1);
+                ItemStack itemStack = Server.getInstance().getDropTableManager().getItemStack(aiEntity.getDropTable(), 1);
 
                 gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
 

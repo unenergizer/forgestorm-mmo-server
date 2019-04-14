@@ -1,0 +1,5 @@
+0:
+  name: "Stone Ore"
+  numberOfUsages: 3
+  dropTableId: 2
+  experience: 25

@@ -1,5 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
+import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
@@ -67,7 +68,16 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
     private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {
         if (gameMap.getStationaryEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
         StationaryEntity clickedOnEntity = (StationaryEntity) gameMap.getStationaryEntityController().getEntity(packetData.getEntityUUID());
-        changeEntityAppearance(clickedOnEntity, gameMap);
+
+        // TODO: check if the place they're trying to gather from is empty
+
+        switch (clickedOnEntity.getStationaryType()) {
+            case ORE:
+                Server.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
+                break;
+        }
+
+        //changeEntityAppearance(clickedOnEntity, gameMap);
     }
 
     private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {

@@ -18,7 +18,7 @@ public class DropTableManager {
         loadedDropTables.toArray(dropTables);
     }
 
-    public ItemStack dropItemOnMap(Integer dropTableID, int amount) {
+    public ItemStack getItemStack(Integer dropTableID, int amount) {
         Integer itemStackID = dropTables[dropTableID].getItemStackID();
 
         checkNotNull(itemStackID, "ItemStack IDs cannot be null!");

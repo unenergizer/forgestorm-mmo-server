@@ -12,6 +12,7 @@ public enum FilePaths {
     // Entity
     AI_ENTITY("entity/AiEntities.yaml"),
     FACTIONS("entity/Factions.yaml"),
+    SKILL_NODES("entity/SkillNodes.yaml"),
 
     // Item
     DROP_TABLE("item/DropTables.yaml"),

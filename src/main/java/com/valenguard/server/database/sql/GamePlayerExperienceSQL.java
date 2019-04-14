@@ -22,7 +22,7 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
 
         preparedStatement.setInt(1, player.getSkills().MELEE.getExperience());
         preparedStatement.setInt(2, player.getSkills().MINING.getExperience());
-        preparedStatement.setInt(3, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(3, player.getCharacterId());
 
         return preparedStatement;
     }
