@@ -23,6 +23,9 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
         for (CharacterDataOut dataOut : characterDataOuts) {
             write.writeString(dataOut.getName());
             write.writeByte(dataOut.getCharacterId());
+            write.writeShort(dataOut.getBodyId());
+            write.writeShort(dataOut.getHeadId());
+            write.writeByte(dataOut.getColorId());
         }
     }
 }

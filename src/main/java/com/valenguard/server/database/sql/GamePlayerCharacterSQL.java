@@ -89,7 +89,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public List<CharacterDataOut> searchCharacters(int databaseUserId) {
 
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
-        String query = "SELECT character_id, name FROM game_player_characters WHERE user_id = ?";
+        String query = "SELECT character_id, name, body_appearance, head_appearance, color_id FROM game_player_characters WHERE user_id = ?";
 
         try {
             Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
@@ -101,9 +101,15 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
             while (resultSet.next()) {
                 int characterId = resultSet.getInt("character_id");
                 String name = resultSet.getString("name");
+                short bodyId = resultSet.getByte("body_appearance");
+                short headId = resultSet.getByte("head_appearance");
+                byte colorId = resultSet.getByte("color_id");
                 characterDataOuts.add(new CharacterDataOut(
                         (byte) characterId,
-                        name
+                        name,
+                        bodyId,
+                        headId,
+                        colorId
                 ));
             }
 

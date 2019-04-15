@@ -8,4 +8,7 @@ import lombok.Getter;
 public class CharacterDataOut {
     private final byte characterId;
     private final String name;
+    private final short bodyId;
+    private final short headId;
+    private final byte colorId;
 }
