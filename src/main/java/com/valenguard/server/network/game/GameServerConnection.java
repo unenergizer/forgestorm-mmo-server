@@ -150,7 +150,7 @@ public class GameServerConnection {
 
                 // Adding the client handle to a list of current client handles
                 // TODO: this needs to be ran on the gamethread. Not the client's thread
-                Server.getInstance().getCharacterManager().playerLogin(new PlayerSessionData(tempID, username, clientHandler));
+                Server.getInstance().getCharacterManager().clientConnect(new PlayerSessionData(tempID, username, clientHandler));
                 tempID++;
 
                 // Reading in a byte which represents an opcode that the client sent to the

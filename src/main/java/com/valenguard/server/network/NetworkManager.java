@@ -37,6 +37,7 @@ public class NetworkManager {
             eventBus.registerListener(new ShopPacketIn());
             eventBus.registerListener(new CharacterCreatorPacketIn());
             eventBus.registerListener(new CharacterSelectPacketIn());
+            eventBus.registerListener(new CharacterLogoutPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();

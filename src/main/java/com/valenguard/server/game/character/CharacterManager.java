@@ -57,7 +57,7 @@ public class CharacterManager {
         new GamePlayerCharacterSQL().firstTimeSaveSQL(player);
 
         // Send player back to character select screen and show them all characters (including the one just made)
-        sendCharacters(clientHandler);
+        sendToCharacterScreen(clientHandler);
     }
 
     public void deleteCharacter(Player player, int characterId) {
@@ -65,41 +65,43 @@ public class CharacterManager {
     }
 
     public void characterLogin(ClientHandler clientHandler, int characterId) {
-        println(getClass(), "Character Selected: " + characterId);
         clientHandler.getPlayer().setCharacterId(characterId);
 
         Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(clientHandler);
     }
 
-    public void characterLogout(Player player) {
+    public void characterLogout(ClientHandler clientHandler) {
+        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
 
-        // TODO: Save player login information and send the character back to menu
+        // Send player all their characters
+        sendToCharacterScreen(clientHandler);
     }
 
-    public void playerLogin(PlayerSessionData playerSessionData) {
+    public void clientConnect(PlayerSessionData playerSessionData) {
         Player player = new Player(playerSessionData.getClientHandler());
         playerSessionData.getClientHandler().setPlayer(player);
         player.setServerEntityId(playerSessionData.getServerID());
 
         Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
 
-        // Send player to the character select screen
-        new InitScreenPacketOut(playerSessionData.getClientHandler(), ScreenType.CHARACTER_SELECT).sendPacket();
-
         // Send player all their characters
-        sendCharacters(playerSessionData.getClientHandler());
+        sendToCharacterScreen(playerSessionData.getClientHandler());
     }
 
-    public void playerLogout(Player player) {
-        ClientHandler clientHandler = player.getClientHandler();
+    public void clientDisconnect(ClientHandler clientHandler) {
         if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
         clientHandler.setPlayerQuitProcessed(true);
+
+        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(clientHandler);
+        clientHandler.closeConnection();
     }
 
-    private void sendCharacters(ClientHandler clientHandler) {
+    private void sendToCharacterScreen(ClientHandler clientHandler) {
+        // Send player to the character select screen
+        new InitScreenPacketOut(clientHandler, ScreenType.CHARACTER_SELECT).sendPacket();
 
+        // Send player all their characters
         List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getDatabaseUserId());
-
         new CharacterMenuLoadPacketOut(clientHandler, characterDataOutList).sendPacket();
     }
 }

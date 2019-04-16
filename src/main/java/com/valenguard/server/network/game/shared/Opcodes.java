@@ -35,4 +35,5 @@ public class Opcodes {
     public static final byte ENTITY_SHOPS = 0x03;
     public static final byte CHARACTER_SELECT = 0x04;
     public static final byte CHARACTER_CREATOR = 0x05;
+    public static final byte CHARACTER_LOGOUT = 0x06;
 }

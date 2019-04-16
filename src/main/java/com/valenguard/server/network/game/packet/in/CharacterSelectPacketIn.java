@@ -5,8 +5,6 @@ import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
-import static com.valenguard.server.util.Log.println;
-
 @AllowNullPlayer
 @Opcode(getOpcode = Opcodes.CHARACTER_SELECT)
 public class CharacterSelectPacketIn implements PacketListener<CharacterSelectPacketIn.CharacterSelectDataPacket> {
@@ -14,9 +12,6 @@ public class CharacterSelectPacketIn implements PacketListener<CharacterSelectPa
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         final byte characterId = clientHandler.readByte();
-
-        println(getClass(), "Selecting character ID: " + characterId);
-
         return new CharacterSelectDataPacket(characterId);
     }
 
@@ -27,7 +22,6 @@ public class CharacterSelectPacketIn implements PacketListener<CharacterSelectPa
 
     @Override
     public void onEvent(CharacterSelectDataPacket packetData) {
-        println(getClass(), "Processing packetdata");
         Server.getInstance().getCharacterManager().characterLogin(packetData.getClientHandler(), packetData.characterId);
     }
 

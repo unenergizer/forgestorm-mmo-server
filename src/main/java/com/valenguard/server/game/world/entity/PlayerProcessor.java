@@ -98,7 +98,7 @@ public class PlayerProcessor {
 
     public void queuePlayerQuitServer(ClientHandler clientHandler) {
 //        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
-//        clientHandler.setPlayerQuitProcessed(true);
+        clientHandler.setPlayerQuitProcessed(true);
         playerQuitServerQueue.add(clientHandler);
 
         // TODO: Send player to character select screen
@@ -107,6 +107,8 @@ public class PlayerProcessor {
     public void processPlayerQuit() {
         for (ClientHandler clientHandler : playerQuitServerQueue) {
             Player player = clientHandler.getPlayer();
+
+            if (player == null) return;
 
             println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (gameManager.getTotalPlayersOnline() - 1));
 
@@ -134,7 +136,5 @@ public class PlayerProcessor {
         GameMap gameMap = player.getGameMap();
         gameMap.getPlayerController().removePlayer(player);
         Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
-        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
-        player.getClientHandler().closeConnection();
     }
 }

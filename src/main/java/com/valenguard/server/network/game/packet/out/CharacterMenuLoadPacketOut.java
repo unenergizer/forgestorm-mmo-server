@@ -18,7 +18,7 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
     @Override
     protected void createPacket(GameOutputStream write) {
 
-        write.writeByte((byte) characterDataOuts.size());
+        write.writeByte((byte) characterDataOuts.size()); // Tell client how many times to loop
 
         for (CharacterDataOut dataOut : characterDataOuts) {
             write.writeString(dataOut.getName());
