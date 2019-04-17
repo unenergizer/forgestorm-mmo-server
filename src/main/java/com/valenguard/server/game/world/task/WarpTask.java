@@ -2,6 +2,8 @@ package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.inventory.BankActions;
+import com.valenguard.server.network.game.packet.out.BankManagePacketOut;
 import com.valenguard.server.util.Log;
 
 public class WarpTask implements AbstractTask {
@@ -23,6 +25,11 @@ public class WarpTask implements AbstractTask {
         Log.println(getClass(), "FLy: " + player.getFutureMapLocation().getY(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRx: " + player.getRealX(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
+
+        if (player.isBankOpen()) {
+            new BankManagePacketOut(player, BankActions.SERVER_CLOSE).sendPacket();
+            player.setBankOpen(false);
+        }
 
         Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player warping.");
         Server.getInstance().getGameManager().getGameMapProcessor().playerSwitchGameMap(player);

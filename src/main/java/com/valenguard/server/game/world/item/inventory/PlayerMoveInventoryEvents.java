@@ -21,8 +21,13 @@ public class PlayerMoveInventoryEvents {
     public void processInventoryEvents() {
         InventoryEvent inventoryEvent;
         while ((inventoryEvent = inventoryEvents.poll()) != null) {
+            InventoryMoveType inventoryMoveType = inventoryEvent.getInventoryMoveType();
+            boolean isBankMove = inventoryMoveType.getToWindow() == InventoryType.BANK
+                    || inventoryMoveType.getFromWindow()  == InventoryType.BANK;
 
-            if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent)) {
+            if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent) ||
+                    /* The player is trying to move item in their bank but their bank is not open */
+                    (isBankMove && !inventoryEvent.getPlayer().isBankOpen())) {
 
                 // Sending back a response to the client telling them not to move anything.
                 new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions(

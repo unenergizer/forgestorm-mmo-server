@@ -45,6 +45,11 @@ public class GameMap {
         return location.getGameMap().getMap()[location.getX()][location.getY()].getWarp();
     }
 
+    public boolean locationHasBankAccess(Location location) {
+        Tile tile = getTileByLocation(location);
+        return tile != null && tile.isBankAccess();
+    }
+
     public boolean locationHasWarp(Location location) {
         return getTileByLocation(location).getWarp() != null;
     }

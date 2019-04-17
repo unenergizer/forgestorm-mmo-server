@@ -52,6 +52,8 @@ public class Player extends MovingEntity {
      */
     private int combatIdleTime;
 
+    private boolean isBankOpen;
+
     public Player(final ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
     }

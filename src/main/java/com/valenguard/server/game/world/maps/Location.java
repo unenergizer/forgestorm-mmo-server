@@ -43,9 +43,10 @@ public class Location {
         this.y = location.y;
     }
 
-    public void add(short x, short y) {
+    public Location add(short x, short y) {
         this.x = (short) (this.x + x);
         this.y = (short) (this.y + y);
+        return this;
     }
 
     public boolean isWithinDistance(Location otherLocation, short distance) {

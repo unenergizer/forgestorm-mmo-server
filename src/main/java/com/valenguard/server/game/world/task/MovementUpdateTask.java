@@ -5,9 +5,11 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.item.inventory.BankActions;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
+import com.valenguard.server.network.game.packet.out.BankManagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
 
 import static com.valenguard.server.util.Log.println;
@@ -349,6 +351,13 @@ public class MovementUpdateTask implements AbstractTask {
                 Server.getInstance().getGameLoop().getProcessMining().removePlayer(player);
             }
         }
+
+        // Cannot move and have the bank open
+        if (player.isBankOpen()) {
+            new BankManagePacketOut(player, BankActions.SERVER_CLOSE).sendPacket();
+            player.setBankOpen(false);
+        }
+
 
         player.setFutureMapLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
