@@ -343,6 +343,13 @@ public class MovementUpdateTask implements AbstractTask {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
         }
 
+        StationaryEntity stationaryEntity = Server.getInstance().getGameLoop().getProcessMining().getMiningNode(player);
+        if (stationaryEntity != null) {
+            if (!stationaryEntity.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
+                Server.getInstance().getGameLoop().getProcessMining().removePlayer(player);
+            }
+        }
+
         player.setFutureMapLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));

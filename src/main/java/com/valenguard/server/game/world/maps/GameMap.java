@@ -1,7 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -15,9 +14,6 @@ public class GameMap {
     private final AiEntityController aiEntityController = new AiEntityController(this);
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
-
-    @Setter
-    private short lastItemStackDrop = 0; // TODO: generate the id from a pool of free ids
 
     public GameMap(String mapName, int mapWidth, int mapHeight, Tile[][] map) {
         this.mapName = mapName;

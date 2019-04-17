@@ -169,8 +169,6 @@ public class CombatUpdateTask implements AbstractTask {
             if (aiEntity.getDropTable() != null) {
                 ItemStack itemStack = Server.getInstance().getDropTableManager().getItemStack(aiEntity.getDropTable(), 1);
 
-                gameMap.setLastItemStackDrop((short) (gameMap.getLastItemStackDrop() + 1));
-
                 ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
                 itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
                    itemStack,

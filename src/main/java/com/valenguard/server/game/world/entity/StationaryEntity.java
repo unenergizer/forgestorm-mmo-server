@@ -11,6 +11,7 @@ import lombok.Setter;
 public class StationaryEntity extends Entity {
     private StationaryTypes stationaryType;
     private int skillNodeId;
+    private boolean usedThisTick;
 
     public SkillNodeData getSkillNodeData() {
         return Server.getInstance().getSkillNodeManager().getSkillNodeData(skillNodeId);
