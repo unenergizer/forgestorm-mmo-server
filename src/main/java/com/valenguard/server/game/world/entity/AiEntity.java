@@ -11,6 +11,7 @@ public class AiEntity extends MovingEntity {
     private int expDrop = 0;
     private Integer dropTable = 0;
     private short shopId = -1;
+    private boolean isBankKeeper;
 
     private RandomRegionMoveGenerator randomRegionMoveGenerator;
 

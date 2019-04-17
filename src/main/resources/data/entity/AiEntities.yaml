@@ -10,6 +10,7 @@
   walkSpeed: 0.7
   probabilityStill: 0.1
   probabilityWalkStart: 0.5
+  bankKeeper: false
 1:
   name: "Angry Crab"
   type: MONSTER
@@ -22,6 +23,7 @@
   walkSpeed: 0.6
   probabilityStill: 0.1
   probabilityWalkStart: 0.5
+  bankKeeper: false
 2:
   name: "Fishing Master"
   type: NPC
@@ -36,6 +38,7 @@
   walkSpeed: 0.5
   probabilityStill: 1.0
   probabilityWalkStart: 0.0
+  bankKeeper: false
 3:
   name: "Old Man"
   type: NPC
@@ -50,6 +53,7 @@
   walkSpeed: 0.5
   probabilityStill: 1.0
   probabilityWalkStart: 0.0
+  bankKeeper: false
 4:
   name: "Unseen Eye"
   type: MONSTER
@@ -62,6 +66,7 @@
   walkSpeed: 0.3
   probabilityStill: 1.0
   probabilityWalkStart: 0.0
+  bankKeeper: false
 5:
   name: "Big Joseph"
   type: NPC
@@ -76,6 +81,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 6:
   name: "Angry Mother"
   type: NPC
@@ -90,6 +96,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 7:
   name: "Passive Father"
   type: NPC
@@ -104,6 +111,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 8:
   name: "Kenny"
   type: NPC
@@ -118,6 +126,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 9:
   name: "Niels"
   type: NPC
@@ -132,6 +141,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 10:
   name: "Busy Waiter"
   type: NPC
@@ -146,6 +156,7 @@
   walkSpeed: 0.2
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
+  bankKeeper: false
 11:
   name: "Tohmer"
   type: NPC
@@ -160,6 +171,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 12:
   name: "Elevator Man"
   type: NPC
@@ -174,6 +186,7 @@
   walkSpeed: 0.4
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
 13:
   name: "Inn Keeper"
   type: NPC
@@ -189,6 +202,7 @@
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
   shopID: 2
+  bankKeeper: false
 14:
   name: "Frantic Cook"
   type: NPC
@@ -203,6 +217,7 @@
   walkSpeed: 0.2
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
+  bankKeeper: false
 15:
   name: "Sea Watcher"
   type: NPC
@@ -217,3 +232,19 @@
   walkSpeed: 0.5
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
+  bankKeeper: false
+16:
+  name: "Bank Teller"
+  type: NPC
+  faction: THE_EMPIRE
+  colorID: 1
+  atlasBodyID: 47
+  atlasHeadID: 35
+  health: 5000
+  damage: 10000
+  expDrop: 1
+  dropTable: 0
+  walkSpeed: 0.5
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
+  bankKeeper: true

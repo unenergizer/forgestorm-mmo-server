@@ -1,8 +1,10 @@
 package com.valenguard.server.game.world.maps;
 
+import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.network.game.packet.out.AiEntityDataUpdatePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityDespawnPacketOut;
 import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
@@ -63,6 +65,18 @@ public abstract class EntityController<T extends Entity> {
             // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
                 new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+
+                // Sending additional information for the AI entity.
+                if (entityToSpawn instanceof AiEntity) {
+                    if (((AiEntity) entityToSpawn).isBankKeeper()) {
+                        // TODO: we could toggle bank access to certain bank tellers depending
+                        // TODO: on if the player has the bank teller unlocked.
+                        new AiEntityDataUpdatePacketOut(
+                                packetReceiver,
+                                (AiEntity) entityToSpawn,
+                                AiEntityDataUpdatePacketOut.BANK_KEEPER_INDEX).sendPacket();
+                    }
+                }
             }
 
             // Send joined packetReceiver to all online players

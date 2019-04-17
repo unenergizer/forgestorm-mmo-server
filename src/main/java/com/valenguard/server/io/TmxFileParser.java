@@ -219,6 +219,7 @@ public class TmxFileParser {
                     aiEntity.setExpDrop(aiEntityData.getExpDrop());
                     aiEntity.setDropTable(aiEntityData.getDropTable());
                     aiEntity.setMoveSpeed(aiEntityData.getWalkSpeed());
+                    aiEntity.setBankKeeper(aiEntityData.isBankKeeper());
 
                     aiEntity.setMovementInfo(aiEntityData.getProbabilityStill(), aiEntityData.getProbabilityWalkStart(), bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
                     aiEntity.setSpawnWarp(new Warp(new Location(fileName, x, y), direction));

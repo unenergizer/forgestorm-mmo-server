@@ -1,14 +1,8 @@
 package com.valenguard.server.game.world.maps;
 
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.world.entity.Entity;
-import com.valenguard.server.game.world.entity.EntityType;
-import com.valenguard.server.game.world.entity.ItemStackDrop;
-import com.valenguard.server.game.world.entity.Player;
-import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
-import com.valenguard.server.network.game.packet.out.EntityDespawnPacketOut;
-import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
-import com.valenguard.server.network.game.packet.out.InitializeMapPacketOut;
+import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.network.game.packet.out.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -66,7 +60,17 @@ public class PlayerController {
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
             postPlayerSpawn(playerWhoJoined);
             // Tell the packetReceiver about all the mobs currently on the map.
-            gameMap.getAiEntityController().getEntities().forEach(mob -> postPlayerSpawn(playerWhoJoined, mob));
+            gameMap.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
+            gameMap.getAiEntityController().getEntities().forEach(aiEntity -> {
+                // Sending additional information for the AI entity.
+                    if (aiEntity.isBankKeeper()) {
+                        // TODO: we could toggle bank access to certain bank tellers depending
+                        // TODO: on if the player has the bank teller unlocked.
+                        new AiEntityDataUpdatePacketOut(
+                                playerWhoJoined, aiEntity,
+                                AiEntityDataUpdatePacketOut.BANK_KEEPER_INDEX).sendPacket();
+                    }
+            });
             gameMap.getStationaryEntityController().getEntities().forEach(stationaryEntity -> postPlayerSpawn(playerWhoJoined, stationaryEntity));
 
             // Spawn itemStack drops!
@@ -104,18 +108,18 @@ public class PlayerController {
         player.gameMapDeregister();
     }
 
-    private void postPlayerSpawn(Entity entityToSpawn) {
+    private void postPlayerSpawn(Player playerWhoJoined) {
         for (Player packetReceiver : playerList) {
 
-            // Send all online players, the entity that just spawned.
-            if (!packetReceiver.equals(entityToSpawn)) {
-                new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+            // Send all online players, the player that just spawned.
+            if (!packetReceiver.equals(playerWhoJoined)) {
+                new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
             }
 
             // Send joined packetReceiver to all online players
-            if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
-                new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
-                new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
+            if (playerWhoJoined.getEntityType() == EntityType.PLAYER) {
+                new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
+                new EntityAttributesUpdatePacketOut(playerWhoJoined, packetReceiver).sendPacket();
             }
         }
     }

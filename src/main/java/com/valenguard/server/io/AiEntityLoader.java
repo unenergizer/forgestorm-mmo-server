@@ -57,6 +57,7 @@ public class AiEntityLoader {
             double probabilityStill = (Double) entityDataNode.get("probabilityStill");
             double probabilityWalkStart = (Double) entityDataNode.get("probabilityWalkStart");
             Integer shopID = (Integer) entityDataNode.get("shopID");
+            boolean isBankKeeper = (Boolean) entityDataNode.get("bankKeeper");
 
             // Create EntityData
             AiEntityData aiEntityData = new AiEntityData(entityDataID);
@@ -75,6 +76,7 @@ public class AiEntityLoader {
             aiEntityData.setProbabilityStill((float) probabilityStill);
             aiEntityData.setProbabilityWalkStart((float) probabilityWalkStart);
             aiEntityData.setShopID(shopID == null ? -1 : shopID);
+            aiEntityData.setBankKeeper(isBankKeeper);
 
             // Loading Finished & Creation Finished! Save me!
             aiEntityDataList.add(aiEntityData);
@@ -125,6 +127,7 @@ public class AiEntityLoader {
         private float probabilityStill;
         private float probabilityWalkStart;
         private Integer shopID;
+        private boolean isBankKeeper;
 
         AiEntityData(final int entityDataID) {
             this.entityDataID = entityDataID;
