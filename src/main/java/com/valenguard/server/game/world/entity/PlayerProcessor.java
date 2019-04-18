@@ -33,11 +33,11 @@ public class PlayerProcessor {
         this.gameManager = gameManager;
     }
 
-    public void queuePlayerJoinServer(ClientHandler clientHandler) {
+    public void queuePlayerEnterGameWorld(ClientHandler clientHandler) {
         playerJoinServerQueue.add(clientHandler);
     }
 
-    public void processPlayerJoin() {
+    public void processPlayerJoinGameWorld() {
         ClientHandler clientHandler;
         while ((clientHandler = playerJoinServerQueue.poll()) != null) {
             Player player = playerLoad(clientHandler.getPlayer());
@@ -96,12 +96,8 @@ public class PlayerProcessor {
         }
     }
 
-    public void queuePlayerQuitServer(ClientHandler clientHandler) {
-//        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
-        clientHandler.setPlayerQuitProcessed(true);
+    public void queuePlayerQuitGameWorld(ClientHandler clientHandler) {
         playerQuitServerQueue.add(clientHandler);
-
-        // TODO: Send player to character select screen
     }
 
     public void processPlayerQuit() {

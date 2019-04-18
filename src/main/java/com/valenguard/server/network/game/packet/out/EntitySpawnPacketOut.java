@@ -29,6 +29,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     }
 
     private void spawnMovingEntity(GameOutputStream write) {
+        Player packetReceiver = clientHandler.getPlayer();
+
         write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeString(entityToSpawn.getName());

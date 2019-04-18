@@ -179,9 +179,7 @@ public class GameServerConnection {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        if (!clientHandler.isPlayerQuitProcessed()) {
-                            Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
-                        }
+                        Server.getInstance().getCharacterManager().clientDisconnect(clientHandler);
                     }
                 } else {
                     e.printStackTrace();

@@ -37,7 +37,7 @@ public class GameManager {
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().sendPlayersPacket());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
         playerProcessor.processPlayerQuit();
-        playerProcessor.processPlayerJoin();
+        playerProcessor.processPlayerJoinGameWorld();
     }
 
     public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
@@ -94,7 +94,7 @@ public class GameManager {
 
     private void kickPlayer(Player player) {
         println(getClass(), "CALLED 1");
-        playerProcessor.queuePlayerQuitServer(player.getClientHandler());
+        playerProcessor.queuePlayerQuitGameWorld(player.getClientHandler());
     }
 
     public void exit() {

@@ -17,6 +17,7 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        Player packetReceiver = clientHandler.getPlayer();
 
         // Write inner opcode (TradeStatusOpcode
         write.writeByte(tradePacketInfoOut.getTradeOpcode().getTradeOpcodeByte());

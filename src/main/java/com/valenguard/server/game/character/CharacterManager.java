@@ -46,12 +46,9 @@ public class CharacterManager {
         player.setCharacterGender(characterGender);
         player.setCharacterRace(characterRace);
 
-        short[] initialPlayerTextureIds = new short[4];
-        initialPlayerTextureIds[Appearance.BODY] = 0; // TODO: Fill in from client
-        initialPlayerTextureIds[Appearance.HEAD] = 0; // TODO: Fill in from client
-        initialPlayerTextureIds[Appearance.ARMOR] = -1;
-        initialPlayerTextureIds[Appearance.HELM] = -1;
-        player.setAppearance(new Appearance(player, characterColor.getTypeByte(), initialPlayerTextureIds));
+        // TODO: Get bodyID and headID from client!
+        Appearance appearance = CharacterUtil.generateAppearance(player, (short) 0, (short) 0, characterColor.getTypeByte());
+        player.setAppearance(appearance);
 
         // Insert into SQL and then load player defaults!
         new GamePlayerCharacterSQL().firstTimeSaveSQL(player);
@@ -64,34 +61,27 @@ public class CharacterManager {
         // TODO: Soft delete the players character / place deleted flag on character, but do NOT remove entry (for recovery purposes)
     }
 
-    public void characterLogin(ClientHandler clientHandler, int characterId) {
-        clientHandler.getPlayer().setCharacterId(characterId);
-
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerJoinServer(clientHandler);
+    public void characterLogin(ClientHandler clientHandler, byte characterId) {
+        clientHandler.setCurrentPlayerId(characterId);
+        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerEnterGameWorld(clientHandler);
     }
 
     public void characterLogout(ClientHandler clientHandler) {
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitServer(clientHandler);
+        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
 
-        // Send player all their characters
         sendToCharacterScreen(clientHandler);
     }
 
     public void clientConnect(PlayerSessionData playerSessionData) {
-        Player player = new Player(playerSessionData.getClientHandler());
-        playerSessionData.getClientHandler().setPlayer(player);
-        player.setServerEntityId(playerSessionData.getServerID());
+        ClientHandler clientHandler = playerSessionData.getClientHandler();
 
-        Server.getInstance().getNetworkManager().getOutStreamManager().addClient(playerSessionData.getClientHandler());
+        Server.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
 
         // Send player all their characters
         sendToCharacterScreen(playerSessionData.getClientHandler());
     }
 
     public void clientDisconnect(ClientHandler clientHandler) {
-        if (clientHandler.isPlayerQuitProcessed()) return; // Check to make sure we only remove the player once
-        clientHandler.setPlayerQuitProcessed(true);
-
         Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(clientHandler);
         clientHandler.closeConnection();
     }
@@ -100,8 +90,13 @@ public class CharacterManager {
         // Send player to the character select screen
         new InitScreenPacketOut(clientHandler, ScreenType.CHARACTER_SELECT).sendPacket();
 
-        // Send player all their characters
+        // Load all basic character information
         List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getDatabaseUserId());
-        new CharacterMenuLoadPacketOut(clientHandler, characterDataOutList).sendPacket();
+
+        // Generate a player object for all characters in the database
+        clientHandler.loadAllPlayers(characterDataOutList);
+
+        // Send the player all their characters
+        new CharacterMenuLoadPacketOut(clientHandler).sendPacket();
     }
 }

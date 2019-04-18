@@ -11,7 +11,8 @@ public class PingPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        packetReceiver.setPingOutTime(System.currentTimeMillis());
-        write.writeLong(packetReceiver.getLastPingTime());
+        Player player = clientHandler.getPlayer();
+        player.setPingOutTime(System.currentTimeMillis());
+        write.writeLong(player.getLastPingTime());
     }
 }

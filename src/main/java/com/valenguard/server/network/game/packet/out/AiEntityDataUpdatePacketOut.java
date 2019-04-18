@@ -22,6 +22,8 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        Player packetReceiver = clientHandler.getPlayer();
+
         write.writeShort(aiEntity.getServerEntityId());
         write.writeByte(dataBits);
         if ((dataBits & ALIGNMENT_INDEX) != 0) {

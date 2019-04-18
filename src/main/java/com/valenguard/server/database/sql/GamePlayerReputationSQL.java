@@ -22,7 +22,7 @@ public class GamePlayerReputationSQL extends AbstractVariantSQL<Integer> {
                 "(user_id, character_id, faction_id, reputation) VALUES (?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
-        preparedStatement.setInt(2, player.getCharacterId());
+        preparedStatement.setInt(2, player.getCharacterDatabaseId());
         preparedStatement.setByte(3, index.byteValue());
         preparedStatement.setShort(4, player.getReputation().getReputationData()[index]);
 
@@ -40,7 +40,7 @@ public class GamePlayerReputationSQL extends AbstractVariantSQL<Integer> {
                     "UPDATE game_player_reputation SET reputation=? WHERE character_id=? AND faction_id=?");
 
             preparedStatement.setShort(1, reputationData[factionIndex]);
-            preparedStatement.setInt(2, player.getCharacterId());
+            preparedStatement.setInt(2, player.getCharacterDatabaseId());
             preparedStatement.setByte(3, factionIndex);
             preparedStatements[factionIndex] = preparedStatement;
         }
@@ -50,7 +50,7 @@ public class GamePlayerReputationSQL extends AbstractVariantSQL<Integer> {
 
     @Override
     SqlSearchData searchForData(Player player) {
-        return new SqlSearchData("game_player_reputation", "character_id", player.getCharacterId());
+        return new SqlSearchData("game_player_reputation", "character_id", player.getCharacterDatabaseId());
     }
 
     @Override

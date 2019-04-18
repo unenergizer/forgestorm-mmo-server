@@ -3,7 +3,6 @@ package com.valenguard.server.network.game.packet.out;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.EntityType;
-import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 
@@ -15,14 +14,11 @@ public abstract class AbstractServerOutPacket {
     @Getter
     private final byte opcode;
 
-    final Player packetReceiver;
-
     final ClientHandler clientHandler;
 
     AbstractServerOutPacket(byte opcode, ClientHandler clientHandler) {
         this.opcode = opcode;
         this.clientHandler = clientHandler;
-        this.packetReceiver = clientHandler.getPlayer();
     }
 
     /**

@@ -22,14 +22,14 @@ import java.util.LinkedList;
 public class Player extends MovingEntity {
 
     private final ClientHandler clientHandler;
+    private final Integer characterDatabaseId;
+
     private final Skills skills = new Skills(this);
     private final PlayerBag playerBag = new PlayerBag(this);
     private final PlayerBank playerBank = new PlayerBank(this);
     private final PlayerEquipment playerEquipment = new PlayerEquipment(this);
     private final Reputation reputation = new Reputation(this);
     private final Deque<Location> latestMoveRequests = new LinkedList<>();
-
-    private Integer characterId;
 
     private CharacterClasses characterClass;
     private CharacterGenders characterGender;
@@ -54,8 +54,9 @@ public class Player extends MovingEntity {
 
     private boolean isBankOpen;
 
-    public Player(final ClientHandler clientHandler) {
+    public Player(final ClientHandler clientHandler, int characterDatabaseId) {
         this.clientHandler = clientHandler;
+        this.characterDatabaseId = characterDatabaseId;
     }
 
     /**

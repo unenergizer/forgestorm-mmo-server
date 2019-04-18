@@ -26,7 +26,7 @@ public class InitScreenPacketOut extends AbstractServerOutPacket {
             case CHARACTER_SELECT:
                 break;
             case GAME:
-                write.writeShort(packetReceiver.getServerEntityId());
+                write.writeShort(clientHandler.getPlayer().getServerEntityId());
                 break;
         }
     }

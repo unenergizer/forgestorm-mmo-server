@@ -1,17 +1,21 @@
 package com.valenguard.server.network.game.shared;
 
+import com.valenguard.server.game.character.CharacterDataOut;
+import com.valenguard.server.game.character.CharacterUtil;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 public class ClientHandler {
@@ -21,11 +25,43 @@ public class ClientHandler {
     private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
 
-    @Setter
-    private boolean playerQuitProcessed = false;
+    @Getter
+    private final Map<Byte, Player> loadedPlayers = new HashMap<>();
 
-    @Setter
-    private Player player;
+    @Getter
+    private byte currentPlayerId = 0;
+
+    public void loadAllPlayers(List<CharacterDataOut> characterDataOutList) {
+        for (byte i = 0; i < characterDataOutList.size(); i++) {
+            CharacterDataOut characterDataOut = characterDataOutList.get(i);
+
+            // Skip already loaded player clients / Prevent overwriting or unnecessary adding...
+            if (!loadedPlayers.isEmpty()) {
+                if (loadedPlayers.containsKey(i)) {
+                    if (characterDataOut.getCharacterId() == loadedPlayers.get(i).getCharacterDatabaseId()) continue;
+                }
+            }
+
+            final Player player = new Player(this, characterDataOut.getCharacterId());
+
+            player.setName(characterDataOut.getName());
+            player.setAppearance(CharacterUtil.generateAppearance(
+                    player,
+                    characterDataOut.getBodyId(),
+                    characterDataOut.getHeadId(),
+                    characterDataOut.getColorId()));
+
+            loadedPlayers.put(i, player);
+        }
+    }
+
+    public Player getPlayer() {
+        return loadedPlayers.get(currentPlayerId);
+    }
+
+    public void setCurrentPlayerId(byte characterId) {
+        currentPlayerId = characterId;
+    }
 
     public ClientHandler(final int databaseUserId, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
         this.databaseUserId = databaseUserId;

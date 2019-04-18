@@ -31,7 +31,7 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
         preparedStatement.setString(1, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
         preparedStatement.setString(2, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
         preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerBank().getInventorySlotArray()));
-        preparedStatement.setInt(4, player.getCharacterId());
+        preparedStatement.setInt(4, player.getCharacterDatabaseId());
 
         return preparedStatement;
     }
@@ -43,7 +43,7 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
                 "VALUES(?, ?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
-        preparedStatement.setInt(2, player.getCharacterId());
+        preparedStatement.setInt(2, player.getCharacterDatabaseId());
         preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
         preparedStatement.setString(4, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));
         preparedStatement.setString(5, Base64Util.serializeObjectToBase64(player.getPlayerBank().getInventorySlotArray()));
@@ -53,6 +53,6 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
 
     @Override
     SqlSearchData searchForData(Player player) {
-        return new SqlSearchData("game_player_inventory", "character_id", player.getCharacterId());
+        return new SqlSearchData("game_player_inventory", "character_id", player.getCharacterDatabaseId());
     }
 }
