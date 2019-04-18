@@ -3,6 +3,9 @@ package com.valenguard.server.command.listeners;
 import com.valenguard.server.Server;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
+import com.valenguard.server.command.EndlessArguments;
+import com.valenguard.server.command.IncompleteCommand;
+import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,12 +53,11 @@ public class ServerCommands {
         commandSource.sendMessage("Server UpTime: " + time);
     }
 
-//    @Command(base = "say")
-//    @EndlessArguments
-//    public void serverSay(CommandSource commandSource, String[] args) {
-//        Server.getInstance().getGameManager().forAllPlayers(anyPlayer ->
-//                new ChatMessagePacketOut(anyPlayer, "[Server] " + args).sendPacket());
-//    }
-
-
+    @Command(base = "say")
+    @IncompleteCommand(missing = "say <Message...>")
+    @EndlessArguments
+    public void serverSay(CommandSource commandSource, String[] args) {
+        Server.getInstance().getGameManager().forAllPlayers(anyPlayer ->
+                new ChatMessagePacketOut(anyPlayer, "[Server] " + String.join(" ", args)).sendPacket());
+    }
 }

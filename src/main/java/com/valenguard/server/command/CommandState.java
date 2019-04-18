@@ -18,6 +18,7 @@ public class CommandState {
     }
 
     CommandState(CommandType commandType, String[] multipleIncompleteMessages) {
+        this.commandType = commandType;
         this.multipleIncompleteMessages = multipleIncompleteMessages;
     }
 
