@@ -14,8 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.valenguard.server.util.Log.println;
-
 public class GamePlayerCharacterSQL extends AbstractSingleSQL implements AbstractSQL {
 
     @Override
@@ -117,7 +115,6 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
             e.printStackTrace();
         }
 
-        println(getClass(), "Total Characters Loaded: " + characterDataOuts.size());
         return characterDataOuts;
     }
 

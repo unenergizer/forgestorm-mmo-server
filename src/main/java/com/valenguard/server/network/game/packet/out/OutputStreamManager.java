@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import static com.valenguard.server.util.Log.println;
+
 public class OutputStreamManager {
 
     private static final int MAX_BUFFER_SIZE = 500;
@@ -67,10 +69,12 @@ public class OutputStreamManager {
 
     public void addClient(ClientHandler clientHandler) {
         outputContexts.put(clientHandler, new LinkedList<>());
+        println(getClass(), " + Connected clients: " + outputContexts.size());
     }
 
     public void removeClient(ClientHandler clientHandler) {
         outputContexts.remove(clientHandler);
+        println(getClass(), " - Connected clients: " + outputContexts.size());
     }
 
     void addServerOutPacket(AbstractServerOutPacket abstractServerOutPacket) {

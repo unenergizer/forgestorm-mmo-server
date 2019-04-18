@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.valenguard.server.util.Log.println;
-
 public class AuthenticationManager {
 
     // TODO: Create an automatic timeout remove method. If it takes X amount of time to make the switch, kick them
@@ -15,7 +13,6 @@ public class AuthenticationManager {
     private final Map<UUID, AuthenticatedUser> authenticatedUserMap = new ConcurrentHashMap<>();
 
     public void addLoginUser(UUID uuid, AuthenticatedUser authenticatedUser) {
-        println(getClass(), "User authenticated! Adding them to the map!");
         authenticatedUserMap.put(uuid, authenticatedUser);
     }
 

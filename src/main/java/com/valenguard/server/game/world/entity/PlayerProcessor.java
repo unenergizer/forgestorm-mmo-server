@@ -21,8 +21,6 @@ import com.valenguard.server.network.game.shared.ClientHandler;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.valenguard.server.util.Log.println;
-
 public class PlayerProcessor {
 
     private final GameManager gameManager;
@@ -105,8 +103,6 @@ public class PlayerProcessor {
             Player player = clientHandler.getPlayer();
 
             if (player == null) return;
-
-            println(getClass(), "PlayerQuit: " + player.getClientHandler().getSocket().getInetAddress().getHostAddress() + ", Online Players: " + (gameManager.getTotalPlayersOnline() - 1));
 
             savePlayer(player);
             playerWorldQuit(player);

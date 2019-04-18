@@ -4,8 +4,6 @@ import com.valenguard.server.game.ScreenType;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.network.game.shared.Opcodes;
 
-import static com.valenguard.server.util.Log.println;
-
 public class InitScreenPacketOut extends AbstractServerOutPacket {
 
     private final ScreenType screenType;
@@ -17,7 +15,6 @@ public class InitScreenPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        println(getClass(), "Sending screen packet!");
         write.writeByte(screenType.getScreenTypeByte());
 
         switch (screenType) {

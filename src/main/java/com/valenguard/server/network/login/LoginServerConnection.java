@@ -102,10 +102,6 @@ public class LoginServerConnection {
                     networkManager.getAuthenticationManager().addLoginUser(uuid,
                             new AuthenticatedUser(clientSocket.getInetAddress().getHostAddress(), loginState.getUserId(), loginState.getUsername()));
 
-                    println(getClass(), "User username: " + username);
-                    println(getClass(), "User UUID: " + uuid.toString());
-                    println(getClass(), "User IP: " + clientSocket.getInetAddress().getHostAddress());
-
                     // Write Success io
                     outputStream.writeUTF(uuid.toString());
                 } else {
