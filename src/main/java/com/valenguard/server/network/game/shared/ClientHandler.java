@@ -25,6 +25,7 @@ public class ClientHandler {
     private Socket socket;
     private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
+    private boolean isAdmin;
 
     @Getter
     private final Map<Byte, Player> loadedPlayers = new HashMap<>();
@@ -71,11 +72,12 @@ public class ClientHandler {
         currentPlayerId = characterId;
     }
 
-    public ClientHandler(final int databaseUserId, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
+    public ClientHandler(final int databaseUserId, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream, final boolean isAdmin) {
         this.databaseUserId = databaseUserId;
         this.socket = socket;
         this.gameOutputStream = gameOutputStream;
         this.inputStream = inputStream;
+        this.isAdmin = isAdmin;
     }
 
     @FunctionalInterface

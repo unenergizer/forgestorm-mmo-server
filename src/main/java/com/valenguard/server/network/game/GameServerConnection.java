@@ -141,7 +141,7 @@ public class GameServerConnection {
 
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving io
-                clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new GameOutputStream(outStream), inStream);
+                clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new GameOutputStream(outStream), inStream, authenticationManager.getIsUserAdmin(uuid));
 
                 String username = authenticationManager.getUsername(uuid);
 

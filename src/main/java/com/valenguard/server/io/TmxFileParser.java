@@ -130,7 +130,7 @@ public class TmxFileParser {
 
                     // Check for end of map width
                     if (currentX == mapWidth) {
-                        //Log.println(TmxFileParser.class,("");
+                        //Log.sendMessage(TmxFileParser.class,("");
                         currentX = 0; // reset x counter
                         currentY--; // decrement y value
                     }
@@ -287,7 +287,7 @@ public class TmxFileParser {
                 NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
                 for (int j = 0; j < objectTag.getLength(); j++) {
 
-                    //System.out.println("NodeType: " + objectTag.item(j).getNodeType());
+                    //System.out.sendMessage("NodeType: " + objectTag.item(j).getNodeType());
                     if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element objectTagElement = (Element) objectTag.item(j);
@@ -362,7 +362,7 @@ public class TmxFileParser {
 //                        // Get map name:
 //                        if (propertyElement.getAttribute("name").equals("mapname")) {
 //                            warpMapName = propertyElement.getAttribute("value");
-//                            Log.println(TmxFileParser.class, "WarpMap: " + warpMapName, false, PRINT_DEBUG);
+//                            Log.sendMessage(TmxFileParser.class, "WarpMap: " + warpMapName, false, PRINT_DEBUG);
 //                        }
 
                         // Get map X:

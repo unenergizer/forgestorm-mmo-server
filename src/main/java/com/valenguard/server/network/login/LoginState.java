@@ -9,6 +9,7 @@ public class LoginState {
     private Boolean loginSuccess;
     private String failReason;
     private String username;
+    private boolean isAdmin;
 
     public LoginState failState(String failReason) {
         this.failReason = failReason;
@@ -16,10 +17,11 @@ public class LoginState {
         return this;
     }
 
-    public LoginState successState(int userId, String username) {
+    public LoginState successState(int userId, String username, boolean isAdmin) {
         this.userId = userId;
         loginSuccess = true;
         this.username = username;
+        this.isAdmin = isAdmin;
         return this;
     }
 

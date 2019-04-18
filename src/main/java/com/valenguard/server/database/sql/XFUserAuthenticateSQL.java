@@ -12,7 +12,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class XFUserAuthenticateSQL {
 
-    private static final String GET_USER_ID = "SELECT user_id, username FROM xf_user WHERE username=?";
+    private static final String GET_USER_ID = "SELECT user_id, username, is_admin FROM xf_user WHERE username=?";
     private static final String GET_USER_HASH = "SELECT data FROM xf_user_authenticate WHERE user_id=?";
 
     private XFUserAuthenticateSQL() {
@@ -25,6 +25,7 @@ public class XFUserAuthenticateSQL {
         PreparedStatement getHashStatement = null;
         int databaseUserId;
         String databaseUsername;
+        boolean isAdmin;
         if (Server.getInstance().getGameManager().findPlayer(username) != null) {
             return new LoginState().failState("User already logged in.");
         }
@@ -41,6 +42,7 @@ public class XFUserAuthenticateSQL {
 
                 databaseUserId = userIdResult.getInt("user_id");
                 databaseUsername = userIdResult.getString("username");
+                isAdmin = userIdResult.getBoolean("is_admin");
 
                 getHashStatement = connection.prepareStatement(GET_USER_HASH);
                 getHashStatement.setInt(1, databaseUserId);
@@ -90,6 +92,6 @@ public class XFUserAuthenticateSQL {
                 e.printStackTrace();
             }
         }
-        return new LoginState().successState(databaseUserId, databaseUsername);
+        return new LoginState().successState(databaseUserId, databaseUsername, isAdmin);
     }
 }

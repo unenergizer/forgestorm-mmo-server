@@ -29,6 +29,10 @@ public class AuthenticationManager {
         return authenticatedUserMap.get(uuid).getDatabaseUserId();
     }
 
+    public boolean getIsUserAdmin(UUID uuid) {
+        return authenticatedUserMap.get(uuid).isAdmin();
+    }
+
     public String getUsername(UUID uuid) {
         return authenticatedUserMap.get(uuid).getUsername();
     }
