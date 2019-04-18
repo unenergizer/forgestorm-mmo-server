@@ -69,16 +69,20 @@ public class OutputStreamManager {
 
     public void addClient(ClientHandler clientHandler) {
         outputContexts.put(clientHandler, new LinkedList<>());
-        println(getClass(), " + Connected clients: " + outputContexts.size());
+        println(getClass(), " + Connected clients: " + clientsOnline());
     }
 
     public void removeClient(ClientHandler clientHandler) {
         outputContexts.remove(clientHandler);
-        println(getClass(), " - Connected clients: " + outputContexts.size());
+        println(getClass(), " - Connected clients: " + clientsOnline());
     }
 
     void addServerOutPacket(AbstractServerOutPacket abstractServerOutPacket) {
         Queue<AbstractServerOutPacket> clientHandler = outputContexts.get(abstractServerOutPacket.clientHandler);
         if (clientHandler != null) clientHandler.add(abstractServerOutPacket);
+    }
+
+    public int clientsOnline() {
+        return outputContexts.size();
     }
 }

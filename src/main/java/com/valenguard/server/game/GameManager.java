@@ -13,8 +13,6 @@ import lombok.Getter;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static com.valenguard.server.util.Log.println;
-
 @Getter
 public class GameManager {
 
@@ -81,19 +79,11 @@ public class GameManager {
         return null;
     }
 
-    public int getTotalPlayersOnline() {
-        int onlinePlayers = 0;
-        for (GameMap gameMap : gameMapProcessor.getGameMaps().values())
-            onlinePlayers = onlinePlayers + gameMap.getPlayerController().getPlayerCount();
-        return onlinePlayers;
-    }
-
     public void kickPlayer(String username) {
         kickPlayer(findPlayer(username));
     }
 
-    private void kickPlayer(Player player) {
-        println(getClass(), "CALLED 1");
+    public void kickPlayer(Player player) {
         playerProcessor.queuePlayerQuitGameWorld(player.getClientHandler());
     }
 

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameMapProcessor {
@@ -51,8 +50,6 @@ public class GameMapProcessor {
     public void playerSwitchGameMap(Player player) {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
-        checkArgument(!warp.getLocation().getMapName().equalsIgnoreCase(currentMapName),
-                "The packetReceiver is trying to switch to a game map they are already on. Map: " + warp.getLocation().getMapName());
 
         gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
         gameMaps.get(warp.getLocation().getMapName()).getPlayerController().addPlayer(player, warp);
@@ -88,5 +85,14 @@ public class GameMapProcessor {
     public GameMap getGameMap(String mapName) throws RuntimeException {
         checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
         return gameMaps.get(mapName);
+    }
+
+    public boolean doesGameMapExist(String mapName) {
+        return gameMaps.containsKey(mapName);
+    }
+
+    public boolean doesLocationExist(Location location) {
+        if (!doesGameMapExist(location.getMapName())) return false;
+        return !gameMaps.get(location.getMapName()).isOutOfBounds(location.getX(), location.getY());
     }
 }
