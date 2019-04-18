@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 @Getter
 public class ClientHandler {
 
@@ -35,14 +36,21 @@ public class ClientHandler {
         for (byte i = 0; i < characterDataOutList.size(); i++) {
             CharacterDataOut characterDataOut = characterDataOutList.get(i);
 
+            Player player;
+
             // Skip already loaded player clients / Prevent overwriting or unnecessary adding...
             if (!loadedPlayers.isEmpty()) {
-                if (loadedPlayers.containsKey(i)) {
-                    if (characterDataOut.getCharacterId() == loadedPlayers.get(i).getCharacterDatabaseId()) continue;
+                if (loadedPlayers.containsKey(i) && characterDataOut.getCharacterId() == loadedPlayers.get(i).getCharacterDatabaseId()) {
+                    // Use existing player
+                    player = loadedPlayers.get(i);
+                } else {
+                    // Player doesn't exist, create a new one
+                    player = new Player(this, characterDataOut.getCharacterId());
                 }
+            } else {
+                // Player doesn't exist, create a new one
+                player = new Player(this, characterDataOut.getCharacterId());
             }
-
-            final Player player = new Player(this, characterDataOut.getCharacterId());
 
             player.setName(characterDataOut.getName());
             player.setAppearance(CharacterUtil.generateAppearance(
@@ -95,6 +103,7 @@ public class ClientHandler {
                 return "";
             }
             byte[] charArray = new byte[stringLength];
+            //noinspection ResultOfMethodCallIgnored
             inputStream.read(charArray);
             StringBuilder stringBuilder = new StringBuilder();
             for (byte ch : charArray) {

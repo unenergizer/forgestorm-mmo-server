@@ -82,6 +82,14 @@ public class CharacterManager {
     }
 
     public void clientDisconnect(ClientHandler clientHandler) {
+
+        // Make sure we save player data!
+        for (Player player : clientHandler.getLoadedPlayers().values()) {
+            if (player.isLoggedInGameWorld()) {
+                Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
+            }
+        }
+
         Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(clientHandler);
         clientHandler.closeConnection();
     }

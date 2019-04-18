@@ -65,6 +65,8 @@ public class PlayerProcessor {
     }
 
     private void playerWorldJoin(Player player) {
+        player.setLoggedInGameWorld(true);
+
         new InitScreenPacketOut(player.getClientHandler(), ScreenType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
@@ -118,6 +120,8 @@ public class PlayerProcessor {
     }
 
     private void playerWorldQuit(Player player) {
+        player.setLoggedInGameWorld(false);
+
         for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;

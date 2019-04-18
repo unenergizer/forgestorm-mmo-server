@@ -24,6 +24,8 @@ public class Player extends MovingEntity {
     private final ClientHandler clientHandler;
     private final Integer characterDatabaseId;
 
+    private boolean loggedInGameWorld = false;
+
     private final Skills skills = new Skills(this);
     private final PlayerBag playerBag = new PlayerBag(this);
     private final PlayerBank playerBank = new PlayerBank(this);
