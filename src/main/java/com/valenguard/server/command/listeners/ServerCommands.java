@@ -47,7 +47,7 @@ public class ServerCommands {
 
         String time = String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
 
-        commandSource.sendMessage("Server Time: " + time);
+        commandSource.sendMessage("Server UpTime: " + time);
     }
 
 //    @Command(base = "say")

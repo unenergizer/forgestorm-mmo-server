@@ -138,7 +138,8 @@ public class PlayerCommands {
         commandSource.sendMessage(" ");
         commandSource.sendMessage("---- Player Information ----");
         commandSource.sendMessage("Account Name: " + authenticatedUser.getUsername());
-        commandSource.sendMessage("Database Id: " + authenticatedUser.getDatabaseUserId());
+        commandSource.sendMessage("Character Id: " + player.getCharacterDatabaseId());
+        commandSource.sendMessage("Account Id: " + authenticatedUser.getDatabaseUserId());
         commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
         commandSource.sendMessage("IP: " + authenticatedUser.getIp());
     }
