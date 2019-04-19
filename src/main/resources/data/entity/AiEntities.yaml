@@ -6,7 +6,7 @@
   health: 14
   damage: 1
   expDrop: 7
-  dropTable: 0
+  dropTable: 3
   walkSpeed: 0.7
   probabilityStill: 0.1
   probabilityWalkStart: 0.5

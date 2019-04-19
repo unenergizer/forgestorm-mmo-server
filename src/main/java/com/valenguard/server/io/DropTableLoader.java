@@ -29,25 +29,29 @@ public class DropTableLoader {
             e.printStackTrace();
         }
 
-        Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
+        Map<Integer, Map<Integer, Map<String, Object>>> root = yaml.load(inputStream);
 
         List<DropTable> dropTables = new ArrayList<>();
 
-        for (Map.Entry<Integer, Map<String, Object>> entry : root.entrySet()) {
+        for (Map.Entry<Integer, Map<Integer, Map<String, Object>>> entry : root.entrySet()) {
             int dropTableID = entry.getKey();
-            Map<String, Object> itemNode = entry.getValue();
+            Map<Integer, Map<String, Object>> dropNode = entry.getValue();
 
             DropTable dropTable = new DropTable(dropTableID);
 
-            /*
-             * Get universal item information
-             */
-            Integer itemID = (Integer) itemNode.get("item");
+            int[] itemStackIDs = new int[dropNode.size()];
+            float[] probabilities = new float[dropNode.size()];
+            for (Map.Entry<Integer, Map<String, Object>> itemDrop : dropNode.entrySet()) {
+                Map<String, Object> itemInfo = itemDrop.getValue();
+                probabilities[itemDrop.getKey()] = (float) (double) (Double) itemInfo.get("prob");
+                itemStackIDs[itemDrop.getKey()] = (int) itemInfo.get("item");
+            }
 
-            dropTable.setItemStackID(itemID);
+            dropTable.setItemStackIDs(itemStackIDs);
+            dropTable.setProbabilities(probabilities);
 
             println(getClass(), "DropTableID: " + dropTableID, false, PRINT_DEBUG);
-            println(getClass(), "ItemStackID: " + itemID, false, PRINT_DEBUG);
+            //println(getClass(), "ItemStackID: " + itemID, false, PRINT_DEBUG);
             println(PRINT_DEBUG);
 
             dropTables.add(dropTable);
@@ -60,8 +64,10 @@ public class DropTableLoader {
     @Setter
     @Getter
     public class DropTable {
+        private int[] itemStackIDs;
+        private float[] probabilities;
+
         private final int dropTableID;
-        private Integer itemStackID;
 
         DropTable(int dropTableID) {
             this.dropTableID = dropTableID;

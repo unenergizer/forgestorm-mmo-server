@@ -1,6 +1,19 @@
 0:
-  item: 0
+  0:
+    item: 0
+    prob: 100.0
 1:
-  item: 5
+  0:
+    item: 0
+    prob: 100.0
 2:
-  item: 21
+  0:
+    item: 21
+    prob: 100.0
+3:
+  0:
+    item: 5
+    prob: 50.0
+  1:
+    item: 4
+    prob: 50.0
