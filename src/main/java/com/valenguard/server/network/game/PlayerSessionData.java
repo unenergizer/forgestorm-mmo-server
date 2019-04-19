@@ -8,6 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PlayerSessionData {
     private short serverID;
-    private String username;
     private ClientHandler clientHandler;
 }

@@ -1,5 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
+import com.valenguard.server.game.PlayerConstants;
 import lombok.Getter;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -66,5 +67,9 @@ public class GameMap {
         if (direction == MoveDirection.EAST) return new Location(mapName, (short) 1, (short) 0);
         if (direction == MoveDirection.NONE) return new Location(mapName, (short) 0, (short) 0);
         throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + mapName + ", MoveDirection: " + direction);
+    }
+
+    public boolean isGraveYardMap() {
+        return mapName.equals(PlayerConstants.RESPAWN_LOCATION.getMapName());
     }
 }

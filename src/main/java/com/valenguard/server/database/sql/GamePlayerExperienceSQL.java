@@ -33,7 +33,7 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
                 "(user_id, character_id, attack_exp, mining_exp) " +
                 "VALUES(?, ?, ?, ?)");
 
-        preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setInt(2, player.getCharacterDatabaseId());
         preparedStatement.setInt(3, 0);
         preparedStatement.setInt(4, 0);

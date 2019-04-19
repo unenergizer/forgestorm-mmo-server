@@ -1,17 +1,13 @@
 package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.game.world.maps.*;
+import com.valenguard.server.game.world.maps.GameMap;
+import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityDamagePacketOut;
-import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
-import com.valenguard.server.network.game.packet.out.MovingEntityTeleportPacketOut;
-
-import static com.valenguard.server.util.Log.println;
 
 public class CombatUpdateTask implements AbstractTask {
 
@@ -116,33 +112,7 @@ public class CombatUpdateTask implements AbstractTask {
              * A PLAYER DEATH -------------------------------------------------
              */
             Player deadPlayer = (Player) deadEntity;
-            Location teleportLocation = new Location(PlayerConstants.RESPAWN_LOCATION);
-            MoveDirection facingDirection = PlayerConstants.SPAWN_FACING_DIRECTION;
-
-            // Check to see if the packetReceiver needs to change maps!
-            if (!isGraveYardMap(deadPlayer.getCurrentMapLocation())) {
-                println(getClass(), "Warping packetReceiver to graveyard map!");
-
-                // Warp packetReceiver to graveyard
-                deadPlayer.setWarp(new Warp(teleportLocation, facingDirection));
-            } else {
-                println(getClass(), "Teleporting packetReceiver to graveyard!");
-
-                // Teleport packetReceiver
-                deadPlayer.getLatestMoveRequests().clear();
-                deadPlayer.gameMapRegister(new Warp(teleportLocation, facingDirection));
-
-                // Send all players in map the teleport packet
-                gameMap.getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, deadEntity, teleportLocation, facingDirection).sendPacket());
-
-                // Send other players info about the reheal (if they are still on the same map)
-                gameMap.getPlayerController().forAllPlayers(player -> new EntityHealPacketOut(player, deadEntity, player.getMaxHealth() - player.getCurrentHealth()).sendPacket());
-            }
-
-            // Reheal Player
-            deadPlayer.setCurrentHealth(deadPlayer.getMaxHealth());
-
-            new ChatMessagePacketOut(deadPlayer, "You died! Respawning you in graveyard!").sendPacket();
+            deadPlayer.killPlayer();
 
         } else {
             /*
@@ -171,15 +141,11 @@ public class CombatUpdateTask implements AbstractTask {
 
                 ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
                 itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
-                   itemStack,
-                   deadEntity.getCurrentMapLocation(),
+                        itemStack,
+                        deadEntity.getCurrentMapLocation(),
                         (Player) killerEntity
                 ));
             }
         }
-    }
-
-    private boolean isGraveYardMap(Location location) {
-        return location.getMapName().equals(PlayerConstants.RESPAWN_LOCATION.getMapName());
     }
 }

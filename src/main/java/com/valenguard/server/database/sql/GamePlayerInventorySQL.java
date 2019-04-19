@@ -42,7 +42,7 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
                 "(user_id, character_id, bag, equipment, bank) " +
                 "VALUES(?, ?, ?, ?, ?)");
 
-        preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setInt(2, player.getCharacterDatabaseId());
         preparedStatement.setString(3, Base64Util.serializeObjectToBase64(player.getPlayerBag().getInventorySlotArray()));
         preparedStatement.setString(4, Base64Util.serializeObjectToBase64(player.getPlayerEquipment().getInventorySlotArray()));

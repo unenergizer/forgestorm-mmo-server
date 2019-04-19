@@ -14,14 +14,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class CommandProcessor {
 
-    @AllArgsConstructor
-    private class CommandInfo {
-        private Object listener;
-        private Method method;
-        private int reqArgs;
-        private String incompleteMsg;
-    }
-
     void addListener(Object listener) {
         for (Method method : listener.getClass().getMethods()) {
             Command[] cmdAnnotations = method.getAnnotationsByType(Command.class);
@@ -39,10 +31,11 @@ public class CommandProcessor {
             checkArgument(params[0].equals(CommandSource.class), simpleName + " The first argument for a command method must be the CommandSource.");
             checkArgument(!(cmdAnnotations[0].argLenReq() < 0), simpleName + " The Required argument length for a command cannot be below 0.");
 
+            boolean endlessArguments = method.getAnnotationsByType(EndlessArguments.class).length == 1;
             if (argumentLengthRequirement != 0) {
                 checkArgument(params.length == 2, simpleName + " Missing 2nd parameter for command arguments. Should be type String[].");
                 checkArgument(params[1].equals(String[].class), simpleName + " The second command method parameter should be of type String[].");
-            } else {
+            } else if (!endlessArguments) {
                 checkArgument(params.length == 1, simpleName + " Expected only one parameter for command method with no required arguments.");
             }
 
@@ -55,21 +48,19 @@ public class CommandProcessor {
             if (commandInfoMap == null) {
                 commandInfoMap = new HashMap<>();
             }
+
             commandInfoMap.put(argumentLengthRequirement, new CommandInfo(
-                    listener, method, cmdAnnotations[0].argLenReq(), incompleteMsg
+                    listener, method, cmdAnnotations[0].argLenReq(), incompleteMsg, endlessArguments
             ));
 
             commandListeners.put(commandBaseLowerCase, commandInfoMap);
         }
     }
 
-    private final Queue<PublishInfo> publishedCommands = new ConcurrentLinkedQueue<>();
-
-    private final Map<String, Map<Integer, CommandInfo>> commandListeners = new HashMap<>();
-
     public synchronized CommandState publish(CommandSource commandSource, String command, String[] args) {
         Map<Integer, CommandInfo> commandInfoMap = commandListeners.get(command.toLowerCase());
         if (commandInfoMap == null) return new CommandState(CommandState.CommandType.NOT_FOUND);
+
         CommandInfo commandInfo = commandInfoMap.get(args.length);
         if (commandInfo == null) {
 
@@ -91,6 +82,28 @@ public class CommandProcessor {
         }
         publishedCommands.add(new PublishInfo(commandSource, args, commandInfo));
         return new CommandState(CommandState.CommandType.FOUND);
+    }
+
+    private final Queue<PublishInfo> publishedCommands = new ConcurrentLinkedQueue<>();
+
+    private final Map<String, Map<Integer, CommandInfo>> commandListeners = new HashMap<>();
+
+    // say <playerName> <...args>
+    // say <...args>
+
+    // party sendMessage
+
+    // guild/clan sendMessage
+
+    // help my dick burns
+
+    @AllArgsConstructor
+    private class CommandInfo {
+        private Object listener;
+        private Method method;
+        private int reqArgs;
+        private String incompleteMsg;
+        private boolean endlessArguments;
     }
 
     public void executeCommands() {

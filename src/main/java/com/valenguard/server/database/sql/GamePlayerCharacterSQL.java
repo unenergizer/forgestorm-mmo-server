@@ -61,7 +61,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, body_appearance, head_appearance, color_id) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
         preparedStatement.setInt(3, player.getCharacterClass().getTypeByte());
         preparedStatement.setInt(4, player.getCharacterGender().getTypeByte());

@@ -1,5 +1,6 @@
 package com.valenguard.server.network.game.shared;
 
+import com.valenguard.server.database.AuthenticatedUser;
 import com.valenguard.server.game.character.CharacterDataOut;
 import com.valenguard.server.game.character.CharacterUtil;
 import com.valenguard.server.game.world.entity.Player;
@@ -21,11 +22,10 @@ import java.util.Map;
 @Getter
 public class ClientHandler {
 
-    private final int databaseUserId;
+    private final AuthenticatedUser authenticatedUser;
     private Socket socket;
     private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
-    private boolean isAdmin;
 
     @Getter
     private final Map<Byte, Player> loadedPlayers = new HashMap<>();
@@ -72,12 +72,11 @@ public class ClientHandler {
         currentPlayerId = characterId;
     }
 
-    public ClientHandler(final int databaseUserId, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream, final boolean isAdmin) {
-        this.databaseUserId = databaseUserId;
+    public ClientHandler(final AuthenticatedUser authenticatedUser, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
+        this.authenticatedUser = authenticatedUser;
         this.socket = socket;
         this.gameOutputStream = gameOutputStream;
         this.inputStream = inputStream;
-        this.isAdmin = isAdmin;
     }
 
     @FunctionalInterface

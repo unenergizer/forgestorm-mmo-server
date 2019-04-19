@@ -24,6 +24,8 @@ public class Server {
 
     private static Server instance = null;
 
+    public static final long SERVER_START_TIME = System.currentTimeMillis();
+
     // Framework
     private final GameLoop gameLoop = new GameLoop();
     private final CommandManager commandManager = new CommandManager();

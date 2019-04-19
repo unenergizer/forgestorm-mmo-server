@@ -1,7 +1,10 @@
 package com.valenguard.server.game.world.maps;
 
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.entity.Entity;
+import com.valenguard.server.game.world.entity.EntityType;
+import com.valenguard.server.game.world.entity.ItemStackDrop;
+import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -75,7 +78,7 @@ public class PlayerController {
 
             // Spawn itemStack drops!
             for (ItemStackDrop itemStackDrop : gameMap.getItemStackDropEntityController().getEntities()) {
-                if (playerWhoJoined.getClientHandler().getDatabaseUserId() == itemStackDrop.getDropOwner().getClientHandler().getDatabaseUserId()) {
+                if (playerWhoJoined.getClientHandler().getAuthenticatedUser() == itemStackDrop.getDropOwner().getClientHandler().getAuthenticatedUser()) {
                     // ItemStackDrop Owner killed something, disconnected and reconnected. Send them the entity again.
                     postPlayerSpawn(playerWhoJoined, itemStackDrop);
                 } else if (itemStackDrop.isSpawnedForAll()) {

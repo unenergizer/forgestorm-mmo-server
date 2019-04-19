@@ -1,6 +1,8 @@
 package com.valenguard.server.command;
 
-import com.valenguard.server.command.listeners.*;
+import com.valenguard.server.command.listeners.InventoryCommands;
+import com.valenguard.server.command.listeners.PlayerCommands;
+import com.valenguard.server.command.listeners.ServerCommands;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
@@ -13,11 +15,9 @@ public class CommandManager {
 
     public void start() {
         println(getClass(), "Registering commands...");
-        commandProcessor.addListener(new TicksPerSecondCommand());
         commandProcessor.addListener(new InventoryCommands());
         commandProcessor.addListener(new PlayerCommands());
-        commandProcessor.addListener(new ShutdownCommand());
-        commandProcessor.addListener(new PlayersOnlineCommand());
+        commandProcessor.addListener(new ServerCommands());
 
         consoleCommandManager.start();
     }

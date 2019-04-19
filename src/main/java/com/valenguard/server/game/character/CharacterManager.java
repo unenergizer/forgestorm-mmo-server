@@ -99,7 +99,7 @@ public class CharacterManager {
         new InitScreenPacketOut(clientHandler, ScreenType.CHARACTER_SELECT).sendPacket();
 
         // Load all basic character information
-        List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getDatabaseUserId());
+        List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getAuthenticatedUser().getDatabaseUserId());
 
         // Generate a player object for all characters in the database
         clientHandler.loadAllPlayers(characterDataOutList);

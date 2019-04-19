@@ -4,6 +4,7 @@ import com.valenguard.server.Server;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.IncompleteCommand;
+import com.valenguard.server.database.AuthenticatedUser;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.GameMapProcessor;
 import com.valenguard.server.game.world.maps.Location;
@@ -91,7 +92,6 @@ public class PlayerCommands {
         commandSource.sendMessage("Sending <" + playerName + "> to " + location.toString());
     }
 
-
     @Command(base = "kick", argLenReq = 1)
     @IncompleteCommand(missing = "kick <playerName>")
     public void kickPlayer(CommandSource commandSource, String[] args) {
@@ -106,5 +106,40 @@ public class PlayerCommands {
         Server.getInstance().getGameManager().kickPlayer(player);
         Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
         player.getClientHandler().closeConnection();
+    }
+
+    @Command(base = "kill", argLenReq = 1)
+    @IncompleteCommand(missing = "kick <playerName>")
+    public void killPlayer(CommandSource commandSource, String[] args) {
+        String playerName = args[0];
+        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
+
+        if (player == null) {
+            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
+            return;
+        }
+
+        player.killPlayer();
+    }
+
+    @Command(base = "info", argLenReq = 1)
+    @IncompleteCommand(missing = "info <playerName>")
+    public void getServerTime(CommandSource commandSource, String[] args) {
+        String playerName = args[0];
+        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
+
+        if (player == null) {
+            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
+            return;
+        }
+
+        AuthenticatedUser authenticatedUser = player.getClientHandler().getAuthenticatedUser();
+
+        commandSource.sendMessage(" ");
+        commandSource.sendMessage("---- Player Information ----");
+        commandSource.sendMessage("Account Name: " + authenticatedUser.getUsername());
+        commandSource.sendMessage("Database Id: " + authenticatedUser.getDatabaseUserId());
+        commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
+        commandSource.sendMessage("IP: " + authenticatedUser.getIp());
     }
 }

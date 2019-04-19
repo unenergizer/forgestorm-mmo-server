@@ -40,7 +40,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     }
 
     private boolean attemptCommand(TextMessage packetData) {
-        if (!packetData.getClientHandler().isAdmin()) return false;
+        if (!packetData.getClientHandler().getAuthenticatedUser().isAdmin()) return false;
         if (!packetData.text.startsWith("/")) return false;
 
         String[] content = packetData.text.split("\\s+");

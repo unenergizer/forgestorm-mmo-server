@@ -21,7 +21,7 @@ public class GamePlayerReputationSQL extends AbstractVariantSQL<Integer> {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_reputation " +
                 "(user_id, character_id, faction_id, reputation) VALUES (?, ?, ?, ?)");
 
-        preparedStatement.setInt(1, player.getClientHandler().getDatabaseUserId());
+        preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setInt(2, player.getCharacterDatabaseId());
         preparedStatement.setByte(3, index.byteValue());
         preparedStatement.setShort(4, player.getReputation().getReputationData()[index]);

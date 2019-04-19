@@ -25,16 +25,8 @@ public class AuthenticationManager {
         authenticatedUserMap.remove(uuid);
     }
 
-    public int getDatabaseUserId(UUID uuid) {
-        return authenticatedUserMap.get(uuid).getDatabaseUserId();
-    }
-
-    public boolean getIsUserAdmin(UUID uuid) {
-        return authenticatedUserMap.get(uuid).isAdmin();
-    }
-
-    public String getUsername(UUID uuid) {
-        return authenticatedUserMap.get(uuid).getUsername();
+    public AuthenticatedUser getAuthData(UUID uuid) {
+        return authenticatedUserMap.get(uuid);
     }
 
 }

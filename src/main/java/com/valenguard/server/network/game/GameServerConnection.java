@@ -141,16 +141,14 @@ public class GameServerConnection {
 
                 // Creating a new client handle that contains the necessary components for
                 // sending and receiving io
-                clientHandler = new ClientHandler(authenticationManager.getDatabaseUserId(uuid), clientSocket, new GameOutputStream(outStream), inStream, authenticationManager.getIsUserAdmin(uuid));
-
-                String username = authenticationManager.getUsername(uuid);
+                clientHandler = new ClientHandler(authenticationManager.getAuthData(uuid), clientSocket, new GameOutputStream(outStream), inStream);
 
                 // Client handlers setup, remove entry from AuthenticationManager!
                 authenticationManager.removeEntry(uuid);
 
                 // Adding the client handle to a list of current client handles
                 // TODO: this needs to be ran on the gamethread. Not the client's thread
-                Server.getInstance().getCharacterManager().clientConnect(new PlayerSessionData(tempID, username, clientHandler));
+                Server.getInstance().getCharacterManager().clientConnect(new PlayerSessionData(tempID, clientHandler));
                 tempID++;
 
                 // Reading in a byte which represents an opcode that the client sent to the
