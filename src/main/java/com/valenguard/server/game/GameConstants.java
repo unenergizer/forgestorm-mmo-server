@@ -15,4 +15,6 @@ public class GameConstants {
     public static final int PLAYERS_TO_PROCESS = 50;
 
     public static final short MAX_GROUND_ITEMS = 3500;
+    public static final short MAX_AI_ENTITIES = 500;
+    public static final short MAX_STATIONARY_ENTITIES = 75;
 }

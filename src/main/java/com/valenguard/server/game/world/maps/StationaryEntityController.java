@@ -1,11 +1,12 @@
 package com.valenguard.server.game.world.maps;
 
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.StationaryEntity;
 
 public class StationaryEntityController extends EntityController<StationaryEntity> {
 
     StationaryEntityController(GameMap gameMap) {
-        super(gameMap);
+        super(gameMap, GameConstants.MAX_STATIONARY_ENTITIES);
     }
 
     @Override

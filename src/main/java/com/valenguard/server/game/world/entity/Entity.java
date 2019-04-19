@@ -23,4 +23,8 @@ public class Entity {
         return currentMapLocation.getGameMap();
     }
 
+    @Override
+    public String toString() {
+        return "[" + name + "] -> { EntityType=" + entityType.toString() + ", Location=" + currentMapLocation.toString() + " }";
+    }
 }

@@ -23,7 +23,6 @@ public class TmxFileParser {
 
     private static final short TILE_SIZE = 16;
     private static final boolean PRINT_DEBUG = false;
-    private static final boolean SHOW_ID_IN_NAME = true;
 
     /**
      * This takes in a TMX map and gets the collision elements from it and builds a collision
@@ -141,8 +140,6 @@ public class TmxFileParser {
         /* *********************************************************************************************
          * GET SPECIFIC TILE ATTRIBUTES - WARNING: Element names are CASE sensitive!
          ***********************************************************************************************/
-        int entityUUID = 0;
-
 
         // Examine XML file and find tags called "layer" then loop through them.
         NodeList objectGroupTag = tmx.getElementsByTagName("objectgroup");
@@ -208,12 +205,7 @@ public class TmxFileParser {
                         ((NPC) aiEntity).setFaction(Server.getInstance().getFactionManager().getFactionByName(aiEntityData.getFaction()));
                     }
 
-                    aiEntity.setServerEntityId((short) entityUUID);
-                    if (SHOW_ID_IN_NAME) {
-                        aiEntity.setName(aiEntityData.getName() + " " + entityUUID);
-                    } else {
-                        aiEntity.setName(aiEntityData.getName());
-                    }
+                    aiEntity.setName(aiEntityData.getName());
                     aiEntity.setEntityType(aiEntityData.getEntityType());
                     aiEntity.setCurrentHealth(aiEntityData.getHealth());
                     aiEntity.setMaxHealth(aiEntityData.getHealth());
@@ -229,7 +221,7 @@ public class TmxFileParser {
                     // Setup appearance
                     byte colorID = 0;
                     if (aiEntityData.getColorID() != null) {
-                        colorID = (byte) aiEntityDataID;
+                        colorID = (byte) (int) aiEntityData.getColorID();
                     }
 
                     short[] appearanceTextureIds;
@@ -254,8 +246,7 @@ public class TmxFileParser {
                     // Queue Mob Spawn
                     Server.getInstance().getGameManager().getGameMapProcessor().queueAiEntitySpawn(aiEntity);
 
-                    Log.println(TmxFileParser.class, "[Entity] UUID: " + entityUUID + ", AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
-                    entityUUID++;
+                    Log.println(TmxFileParser.class, "[Entity] AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
                 }
             }
 
@@ -311,7 +302,6 @@ public class TmxFileParser {
 
                     // TODO: SEND SKILL NODE OFF TO BE MANAGED. DECIPHER TYPE IN SPECIFIC MANAGER (reduce code here)
                     StationaryEntity stationaryEntity = new StationaryEntity();
-                    stationaryEntity.setServerEntityId((short) entityUUID++); // todo need to determine a real id
                     stationaryEntity.setCurrentMapLocation(new Location(fileName, x, y));
                     stationaryEntity.setEntityType(EntityType.SKILL_NODE);
                     stationaryEntity.setStationaryType(StationaryTypes.valueOf(typeID));
@@ -322,7 +312,7 @@ public class TmxFileParser {
                     // Making it's associated tile non-traversable
                     map[x][y].setTraversable(false);
 
-                    Log.println(TmxFileParser.class, "[SILL] ID: " + entityUUID + ", TYPE: " + typeID, false, PRINT_DEBUG);
+                    Log.println(TmxFileParser.class, "[SILL] TYPE: " + typeID, false, PRINT_DEBUG);
                 }
             }
 

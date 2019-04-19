@@ -12,25 +12,36 @@ import lombok.Getter;
 
 import java.util.*;
 
+import static com.valenguard.server.util.Log.println;
+
 @SuppressWarnings("SuspiciousMethodCalls")
 public abstract class EntityController<T extends Entity> {
 
     private final GameMap gameMap;
 
     @Getter
+    private QueuedIdGenerator queuedIdGenerator;
+
+    @Getter
     protected final Map<Short, T> entityHashMap = new HashMap<>();
     final Queue<T> entitySpawnQueue = new LinkedList<>();
     final Queue<T> entityDespawnQueue = new LinkedList<>();
 
-    EntityController(GameMap gameMap) {
+    EntityController(GameMap gameMap, short maximumSpawnsAllowed) {
         this.gameMap = gameMap;
+        queuedIdGenerator = new QueuedIdGenerator(maximumSpawnsAllowed);
     }
 
     public void queueEntitySpawn(T entity) {
+        if (!queuedIdGenerator.generateId(entity)) {
+            println(getClass(), "Not enough space reserved to spawn entity: " + entity);
+            return;
+        }
         entitySpawnQueue.add(entity);
     }
 
     public void queueEntityDespawn(T entity) {
+        queuedIdGenerator.deregisterId(entity);
         entityDespawnQueue.add(entity);
     }
 

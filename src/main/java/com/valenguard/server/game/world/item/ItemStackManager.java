@@ -15,6 +15,15 @@ public class ItemStackManager {
         loadedItemStacks.toArray(itemStacks);
     }
 
+    public ItemStack makeItemStack(String name, int amount) {
+        for (ItemStack itemStack : itemStacks) {
+            if (itemStack.getName().toLowerCase().equals(name.toLowerCase())) {
+                return (ItemStack) itemStack.clone();
+            }
+        }
+        return null;
+    }
+
     public ItemStack makeItemStack(int id, int amount) {
         ItemStack itemStack = (ItemStack) itemStacks[id].clone();
         itemStack.setAmount(amount);

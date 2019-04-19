@@ -8,20 +8,16 @@ import com.valenguard.server.game.world.entity.ItemStackDrop;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
-import lombok.Getter;
 
 public class ItemStackDropEntityController extends EntityController<ItemStackDrop> {
 
-    @Getter
-    private QueuedIdGenerator queuedIdGenerator = new QueuedIdGenerator(GameConstants.MAX_GROUND_ITEMS);
-
     ItemStackDropEntityController(GameMap gameMap) {
-        super(gameMap);
+        super(gameMap, GameConstants.MAX_GROUND_ITEMS);
     }
 
     @Override
     public void postEntityDespawn(ItemStackDrop entity) {
-        queuedIdGenerator.deregisterId(entity);
+
     }
 
     public ItemStackDrop makeItemStackDrop(ItemStack itemStack, Location spawnLocation, Player dropOwner) {
@@ -33,9 +29,6 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
         itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
         itemStackDrop.setItemStack(itemStack);
         itemStackDrop.setDropOwner(dropOwner);
-
-        // Grabbing a free id for the ItemStack drop
-        queuedIdGenerator.generateId(itemStackDrop);
 
         return itemStackDrop;
     }
