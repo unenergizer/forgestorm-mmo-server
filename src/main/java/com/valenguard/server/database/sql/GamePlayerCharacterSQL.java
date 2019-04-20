@@ -89,8 +89,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
         String query = "SELECT character_id, name, body_appearance, head_appearance, color_id FROM game_player_characters WHERE user_id = ?";
 
-        try {
-            Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, databaseUserId);
 

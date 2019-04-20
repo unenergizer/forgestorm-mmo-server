@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import static com.valenguard.server.util.Log.println;
@@ -40,9 +41,8 @@ public class DatabaseManager {
     }
 
     private void testConnection() {
-        try {
-            hikariDataSource.getConnection();
-            println(getClass(), "Database Connection Successful");
+        try (Connection ignored = hikariDataSource.getConnection()) {
+            println(getClass(), "Database Connection Successful: ");
         } catch (SQLException | RuntimeException e) {
             println(getClass(), "Could not connect to MySQL Database!", true);
             println(getClass(), "ServerName: " + databaseSettings.getIp(), true);

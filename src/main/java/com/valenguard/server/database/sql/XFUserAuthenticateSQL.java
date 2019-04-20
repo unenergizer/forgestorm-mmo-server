@@ -30,8 +30,7 @@ public class XFUserAuthenticateSQL {
             return new LoginState().failState("User already logged in.");
         }
 
-        try {
-            Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection();
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             getUserIdStatement = connection.prepareStatement(GET_USER_ID);
             getUserIdStatement.setString(1, username);
@@ -83,6 +82,7 @@ public class XFUserAuthenticateSQL {
             e.printStackTrace();
             return new LoginState().failState("Server failed to connect");
         } finally {
+
             try {
                 if (userIdResult != null) userIdResult.close();
                 if (hashResult != null) hashResult.close();
