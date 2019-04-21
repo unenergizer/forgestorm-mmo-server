@@ -20,7 +20,7 @@ public class GameLoop extends Thread {
     private final MovementUpdateTask movementUpdateTask = new MovementUpdateTask();
     private final WarpTask warpTask = new WarpTask();
     private final GroundItemTimerTask groundItemTimerTask = new GroundItemTimerTask();
-    private final CombatUpdateTask combatUpdateTask = new CombatUpdateTask();
+    private final AbilityUpdateTask abilityUpdateTask = new AbilityUpdateTask();
     private final EntityRehealTask entityRehealTask = new EntityRehealTask();
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
     private final ProcessMining processMining = new ProcessMining();
@@ -67,7 +67,7 @@ public class GameLoop extends Thread {
             movementUpdateTask.tick(numberOfTicksPassed);
             warpTask.tick(numberOfTicksPassed);
             groundItemTimerTask.tick(numberOfTicksPassed);
-            combatUpdateTask.tick(numberOfTicksPassed);
+            abilityUpdateTask.tick(numberOfTicksPassed);
             entityRehealTask.tick(numberOfTicksPassed);
             processMining.tick(numberOfTicksPassed);
             aiEntityRespawnTimerTask.tick(numberOfTicksPassed);

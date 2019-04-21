@@ -1,6 +1,7 @@
 package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.game.PlayerConstants;
+import com.valenguard.server.game.abilities.WaitingAbility;
 import com.valenguard.server.game.character.CharacterClasses;
 import com.valenguard.server.game.character.CharacterGenders;
 import com.valenguard.server.game.character.CharacterRaces;
@@ -20,7 +21,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -57,11 +60,13 @@ public class Player extends MovingEntity {
 
     /**
      * The amount of time that has progressed since the player
-     * has been out of combat.
+     * has been out of active.
      */
     private int combatIdleTime;
 
     private boolean isBankOpen;
+
+    private Map<Short, WaitingAbility> queuedAbilities = new HashMap<>();
 
     public Player(final ClientHandler clientHandler, int characterDatabaseId) {
         this.clientHandler = clientHandler;

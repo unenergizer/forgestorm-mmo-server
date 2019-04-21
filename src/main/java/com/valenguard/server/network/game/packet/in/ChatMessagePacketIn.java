@@ -3,6 +3,7 @@ package com.valenguard.server.network.game.packet.in;
 import com.valenguard.server.Server;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.CommandState;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.shared.*;
@@ -62,22 +63,21 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         CommandState.CommandType commandType = commandState.getCommandType();
 
         if (commandType == CommandState.CommandType.NOT_FOUND) {
-            new ChatMessagePacketOut(player, "Unknown Command").sendPacket();
+            new ChatMessagePacketOut(player, MessageText.ERROR + "Unknown Command").sendPacket();
             println(getClass(), playerName + "Unknown Command");
 
         } else if (commandType == CommandState.CommandType.SINGE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, "[Command] -> " + commandState.getIncompleteMessage()).sendPacket();
+            new ChatMessagePacketOut(player, MessageText.ERROR + "[Command] -> " + commandState.getIncompleteMessage()).sendPacket();
             println(getClass(), playerName + " [Command] -> " + commandState.getIncompleteMessage());
 
         } else if (commandType == CommandState.CommandType.MULTIPLE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, "Suggested Alternatives:").sendPacket();
+            new ChatMessagePacketOut(player, "[YELLOW]Suggested Alternatives:").sendPacket();
             println(getClass(), playerName + " Suggested Alternatives:");
             for (String incompleteMsg : commandState.getMultipleIncompleteMessages()) {
-                new ChatMessagePacketOut(player, " - [Command] -> " + incompleteMsg).sendPacket();
+                new ChatMessagePacketOut(player, "[YELLOW] - [Command] -> " + incompleteMsg).sendPacket();
                 println(getClass(), playerName + " - [Command] -> " + incompleteMsg);
             }
         }
-
         return true;
     }
 

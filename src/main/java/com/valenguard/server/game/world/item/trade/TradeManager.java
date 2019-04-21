@@ -1,6 +1,7 @@
 package com.valenguard.server.game.world.item.trade;
 
 import com.valenguard.server.game.GameLoop;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.inventory.InventoryConstants;
@@ -40,11 +41,11 @@ public class TradeManager {
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
         if (isTradeInProgress(tradeStarter, targetPlayer)) {
-            new ChatMessagePacketOut(tradeStarter, "[Server] " + targetPlayer.getName() + " is already trading.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + targetPlayer.getName() + " is already trading.").sendPacket();
             return;
         }
         if (!checkMapSanity(tradeStarter, targetPlayer)) {
-            new ChatMessagePacketOut(tradeStarter, "[Server] You must be closer to begin a trade.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + "You must be closer to begin a trade.").sendPacket();
             return;
         }
 
@@ -53,8 +54,8 @@ public class TradeManager {
         tradeStarter.setTradeUUID(tradeUUID);
         tradeDataMap.put(tradeUUID, new TradeData(tradeStarter, targetPlayer));
 
-        new ChatMessagePacketOut(tradeStarter, "[Server] Trade request received. Waiting on " + targetPlayer.getName() + "...").sendPacket();
-        new ChatMessagePacketOut(targetPlayer, "[Server] Trade request received from " + tradeStarter.getName() + ".").sendPacket();
+        new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + "Trade request received. Waiting on " + targetPlayer.getName() + "...").sendPacket();
+        new ChatMessagePacketOut(targetPlayer, MessageText.SERVER + "Trade request received from " + tradeStarter.getName() + ".").sendPacket();
         new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_SENDER, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
         new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_TARGET, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
     }
@@ -76,8 +77,8 @@ public class TradeManager {
         tradeData.tradeActive = true;
 
         targetPlayer.setTradeUUID(tradeUUID);
-        new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade opened with " + tradeData.targetPlayer.getName() + ".").sendPacket();
-        new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade opened with " + tradeData.tradeStarter.getName() + ".").sendPacket();
+        new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Trade opened with " + tradeData.targetPlayer.getName() + ".").sendPacket();
+        new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade opened with " + tradeData.tradeStarter.getName() + ".").sendPacket();
         new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
     }
@@ -170,8 +171,8 @@ public class TradeManager {
              * TRADE COMPLETED / FINALIZED
              * TRADE ITEMS CONFIRMED FOR BOTH PLAYERS
              */
-            new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade offer confirmation accepted!").sendPacket();
-            new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade offer confirmation accepted!").sendPacket();
+            new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Trade offer confirmation accepted!").sendPacket();
+            new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade offer confirmation accepted!").sendPacket();
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_COMPLETE)).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_COMPLETE)).sendPacket();
 
@@ -184,13 +185,13 @@ public class TradeManager {
 
             // Check to make sure the packetReceiver has room for the traded items
             if (!checkInventoryForTradeSpace(tradeData.tradeStarter, starterGiveItems, targetGiveItems)) {
-                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] You don't have enough item space.").sendPacket();
-                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Other packetReceiver didn't have enough item space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "You don't have enough item space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Other packetReceiver didn't have enough item space.").sendPacket();
                 return;
             }
             if (!checkInventoryForTradeSpace(tradeData.targetPlayer, targetGiveItems, starterGiveItems)) {
-                new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Other packetReceiver didn't have enough item space.").sendPacket();
-                new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] You don't have enough item space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Other packetReceiver didn't have enough item space.").sendPacket();
+                new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "You don't have enough item space.").sendPacket();
                 return;
             }
 
@@ -202,8 +203,8 @@ public class TradeManager {
             /*
              * TRADE ITEMS CONFIRMED FOR ONE PLAYER
              */
-            new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] " + confirmedPlayer.getName() + " has confirmed the trade!").sendPacket();
-            new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] " + confirmedPlayer.getName() + " has confirmed the trade!").sendPacket();
+            new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "" + confirmedPlayer.getName() + " has confirmed the trade!").sendPacket();
+            new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "" + confirmedPlayer.getName() + " has confirmed the trade!").sendPacket();
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
         }
@@ -224,8 +225,8 @@ public class TradeManager {
             tradeData.tradeStarterConfirmedTrade = false;
         }
 
-        new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] " + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
-        new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] " + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
+        new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "" + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
+        new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "" + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
         new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
     }
@@ -242,13 +243,13 @@ public class TradeManager {
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
         if (tradeStatusOpcode == TradeStatusOpcode.TRADE_REQUEST_TARGET_DECLINE) {
-            new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade request declined.").sendPacket();
-            new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade request declined.").sendPacket();
+            new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade request declined.").sendPacket();
+            new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Trade request declined.").sendPacket();
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_DECLINE)).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_DECLINE)).sendPacket();
         } else if (tradeStatusOpcode == TradeStatusOpcode.TRADE_CANCELED) {
-            new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade offer canceled.").sendPacket();
-            new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade offer canceled.").sendPacket();
+            new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade offer canceled.").sendPacket();
+            new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Trade offer canceled.").sendPacket();
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
         }
@@ -326,8 +327,8 @@ public class TradeManager {
                     removeTradeData(tradeData.tradeStarter.getTradeUUID(), false);
 
                     // Notify the trade starter that the target tradeStarter didn't respond in time.
-                    new ChatMessagePacketOut(tradeData.tradeStarter, "[Server] Trade canceled. Trade timed out.").sendPacket();
-                    new ChatMessagePacketOut(tradeData.targetPlayer, "[Server] Trade canceled. Trade timed out.").sendPacket();
+                    new ChatMessagePacketOut(tradeData.tradeStarter, MessageText.SERVER + "Trade canceled. Trade timed out.").sendPacket();
+                    new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade canceled. Trade timed out.").sendPacket();
                     new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_SERVER_TIMED_OUT)).sendPacket();
                     new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_SERVER_TIMED_OUT)).sendPacket();
 
@@ -402,8 +403,8 @@ public class TradeManager {
     private boolean checkMapSanity(Player tradeStarter, Player targetPlayer) {
         // Make sure the packetReceiver is on the same map as the other one
         if (!tradeStarter.getMapName().equals(targetPlayer.getMapName())) {
-            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because packetReceiver left the map.").sendPacket();
-            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because packetReceiver left the map.").sendPacket();
+            new ChatMessagePacketOut(targetPlayer, MessageText.SERVER + "Trade canceled because packetReceiver left the map.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + "Trade canceled because packetReceiver left the map.").sendPacket();
             new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
             new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
 
@@ -413,8 +414,8 @@ public class TradeManager {
 
         // Make sure the packetReceiver is within the correct distance
         if (!tradeStarter.getCurrentMapLocation().isWithinDistance(targetPlayer.getCurrentMapLocation(), MAX_TRADE_DISTANCE)) {
-            new ChatMessagePacketOut(targetPlayer, "[Server] Trade canceled because both players are too far apart.").sendPacket();
-            new ChatMessagePacketOut(tradeStarter, "[Server] Trade canceled because both players are too far apart.").sendPacket();
+            new ChatMessagePacketOut(targetPlayer, MessageText.SERVER + "Trade canceled because both players are too far apart.").sendPacket();
+            new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + "Trade canceled because both players are too far apart.").sendPacket();
             new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
             new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
 

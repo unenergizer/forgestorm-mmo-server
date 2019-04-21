@@ -3,7 +3,7 @@
   type: MONSTER
   alignment: FRIENDLY
   atlasBodyID: 16
-  health: 14
+  health: 140
   damage: 1
   expDrop: 7
   dropTable: 3
@@ -16,7 +16,7 @@
   type: MONSTER
   alignment: HOSTILE
   atlasBodyID: 26
-  health: 5
+  health: 50
   damage: 15
   expDrop: 15
   dropTable: 0

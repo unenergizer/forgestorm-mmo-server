@@ -6,6 +6,7 @@ import com.valenguard.server.database.sql.GamePlayerExperienceSQL;
 import com.valenguard.server.database.sql.GamePlayerInventorySQL;
 import com.valenguard.server.database.sql.GamePlayerReputationSQL;
 import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.ScreenType;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
@@ -69,7 +70,7 @@ public class PlayerProcessor {
 
         new InitScreenPacketOut(player.getClientHandler(), ScreenType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
-        new ChatMessagePacketOut(player, "[Server] Welcome to Valenguard: Retro MMO!").sendPacket();
+        new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to Valenguard: Retro MMO!").sendPacket();
 
         // Add player to World
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
@@ -131,6 +132,6 @@ public class PlayerProcessor {
 
         GameMap gameMap = player.getGameMap();
         gameMap.getPlayerController().removePlayer(player);
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Player quit server.");
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player quit server.");
     }
 }

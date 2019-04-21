@@ -3,6 +3,7 @@ package com.valenguard.server.game.world.task;
 import com.google.common.base.Preconditions;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.inventory.BankActions;
@@ -339,7 +340,7 @@ public class MovementUpdateTask implements AbstractTask {
     public void performPlayerMove(Player player, Location attemptLocation) {
 
         // Canceling trade for the packetReceiver.
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, "[Server] Trade canceled. Players can not move when trading.");
+        Server.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
         if (player.getGameMap().locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));

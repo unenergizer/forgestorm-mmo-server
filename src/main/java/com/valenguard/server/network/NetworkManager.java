@@ -39,6 +39,7 @@ public class NetworkManager {
             eventBus.registerListener(new CharacterSelectPacketIn());
             eventBus.registerListener(new CharacterLogoutPacketIn());
             eventBus.registerListener(new BankManagePacketIn());
+            eventBus.registerListener(new AbilityRequestPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();

@@ -53,7 +53,7 @@ public class Location {
         return getDistanceAway(otherLocation) <= distance;
     }
 
-    private short getDistanceAway(Location otherLocation) {
+    public short getDistanceAway(Location otherLocation) {
         int diffX = otherLocation.getX() - x;
         int diffY = otherLocation.getY() - y;
 

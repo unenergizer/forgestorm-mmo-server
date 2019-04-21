@@ -19,6 +19,9 @@ public enum FilePaths {
     ENTITY_SHOP("item/ShopItems.yaml"),
     ITEM_STACK("item/ItemStacks.yaml"),
 
+    // Abilities
+    COMBAT_ABILITIES("abilities/CombatAbilities.yaml"),
+
     // Maps
     MAPS("maps/");
 

@@ -1,17 +1,24 @@
 package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.game.GameConstants;
+import com.valenguard.server.game.abilities.Ability;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.world.combat.AbstractAbility;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
+import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.network.game.packet.out.EntityDamagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.valenguard.server.util.Log.println;
 
 @Getter
 @Setter
@@ -65,15 +72,26 @@ public class MovingEntity extends Entity {
 
     private boolean inCombat = false;
 
+    private Map<Short, Integer> abilitiesToCooldown = new HashMap<>();
+
     /**
      * The amount of time that has progressed since the player
-     * has been out of combat.
+     * has been out of active.
      */
     private int combatIdleTime;
 
     public void setInCombat(boolean isInCombat) {
         if (isInCombat) combatIdleTime = 0;
         this.inCombat = isInCombat;
+    }
+
+    public void addAbilityCooldown(Ability ability) {
+        println(getClass(), "Adding a cooldown with time: " + (ability.getCooldown() * 20));
+        abilitiesToCooldown.put(ability.getAbilityId(), ability.getCooldown() * 20); // Times * 20 ticks (1 second)
+    }
+
+    public boolean isAbilityOnCooldown(Ability ability) {
+        return abilitiesToCooldown.containsKey(ability.getAbilityId());
     }
 
     public void gameMapRegister(Warp warp) {
@@ -95,6 +113,24 @@ public class MovingEntity extends Entity {
         getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
                 new EntityHealPacketOut(anyPlayer, this, realAmount).sendPacket());
         currentHealth += realAmount;
+    }
+
+    public void dealDamage(int amount, MovingEntity attackerEntity) {
+        if (currentHealth - amount <= 0) {
+            //
+            currentHealth = 0;
+        } else {
+            currentHealth -= amount;
+        }
+
+        getGameMap().getPlayerController().forAllPlayers(player ->
+                new EntityDamagePacketOut(player, this, currentHealth, amount).sendPacket());
+        if (this instanceof Player) {
+            new ChatMessagePacketOut((Player) this, "[RED]" + attackerEntity.getName() + " hit you for " + amount + ".").sendPacket();
+        }
+        if (attackerEntity instanceof Player) {
+            new ChatMessagePacketOut((Player) attackerEntity, "You hit " + getName() + " for " + amount + ".").sendPacket();
+        }
     }
 
     public boolean isEntityMoving() {

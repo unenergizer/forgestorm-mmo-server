@@ -33,7 +33,11 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
         write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
-        write.writeString(entityToSpawn.getName());
+        if (!(entityToSpawn instanceof Player)) {
+            write.writeString(entityToSpawn.getName() + " " + entityToSpawn.getServerEntityId());
+        } else {
+            write.writeString(entityToSpawn.getName());
+        }
 
         MovingEntity movingEntity = (MovingEntity) entityToSpawn;
 

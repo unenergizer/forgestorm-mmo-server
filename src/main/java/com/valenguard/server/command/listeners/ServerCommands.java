@@ -5,6 +5,7 @@ import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.EndlessArguments;
 import com.valenguard.server.command.IncompleteCommand;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,6 @@ public class ServerCommands {
     @EndlessArguments
     public void serverSay(CommandSource commandSource, String[] args) {
         Server.getInstance().getGameManager().forAllPlayers(anyPlayer ->
-                new ChatMessagePacketOut(anyPlayer, "[Server] " + String.join(" ", args)).sendPacket());
+                new ChatMessagePacketOut(anyPlayer, MessageText.SERVER + String.join(" ", args)).sendPacket());
     }
 }

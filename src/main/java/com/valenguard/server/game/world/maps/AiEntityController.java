@@ -35,7 +35,7 @@ public class AiEntityController extends EntityController<AiEntity> {
         while ((entity = entitySpawnQueue.poll()) != null) {
             entitySpawn(entity);
 
-            // Find AiEntity a combat target
+            // Find AiEntity a active target
             MovementUpdateTask movementUpdateTask = Server.getInstance().getGameLoop().getMovementUpdateTask();
             movementUpdateTask.initEntityTargeting(entity);
         }

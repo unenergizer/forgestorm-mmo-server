@@ -15,7 +15,7 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
     private static final boolean PRINT_DEBUG = false;
     private final List<RespawnTimer> respawnTimers = new ArrayList<>();
 
-    private int timerTick = 0; // combat speed
+    private int timerTick = 0; // active speed
 
     public void addAiEntity(AiEntity aiEntity) {
         respawnTimers.add(new RespawnTimer(aiEntity, GameConstants.GENERAL_RESPAWN_TIME));

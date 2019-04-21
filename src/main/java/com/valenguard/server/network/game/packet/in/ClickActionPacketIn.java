@@ -76,8 +76,6 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 Server.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
                 break;
         }
-
-        //changeEntityAppearance(clickedOnEntity, gameMap);
     }
 
     private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {

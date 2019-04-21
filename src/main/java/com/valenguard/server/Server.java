@@ -4,6 +4,7 @@ import com.valenguard.server.command.CommandManager;
 import com.valenguard.server.database.DatabaseManager;
 import com.valenguard.server.game.GameLoop;
 import com.valenguard.server.game.GameManager;
+import com.valenguard.server.game.abilities.AbilityManager;
 import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.game.rpg.FactionManager;
@@ -44,6 +45,7 @@ public class Server {
     private final DropTableManager dropTableManager = new DropTableManager();
     private final SkillNodeManager skillNodeManager = new SkillNodeManager();
     private final EntityShopManager entityShopManager = new EntityShopManager();
+    private final AbilityManager abilityManager = new AbilityManager();
 
     private Server() {
     }
@@ -66,6 +68,7 @@ public class Server {
         itemStackManager.start();
         dropTableManager.start();
         skillNodeManager.start();
+        abilityManager.start();
 
         // Start systems
         gameManager.start();
