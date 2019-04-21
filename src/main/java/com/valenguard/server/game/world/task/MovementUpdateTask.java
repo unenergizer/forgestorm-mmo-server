@@ -232,19 +232,19 @@ public class MovementUpdateTask implements AbstractTask {
         Location eastLocation = currentLocation.add(gameMap.getLocation(MoveDirection.EAST));
         Location westLocation = currentLocation.add(gameMap.getLocation(MoveDirection.WEST));
 
-        if (targetLocation.getX() > currentLocation.getX()) {
+        if (targetLocation.getX() > currentLocation.getX() && gameMap.isMovable(eastLocation)) {
             if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(eastLocation)) performAiEntityMove(aiEntity, MoveDirection.EAST);
             }
-        } else if (targetLocation.getX() < currentLocation.getX()) {
+        } else if (targetLocation.getX() < currentLocation.getX() && gameMap.isMovable(westLocation)) {
             if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(westLocation)) performAiEntityMove(aiEntity, MoveDirection.WEST);
             }
-        } else if (targetLocation.getY() > currentLocation.getY()) {
+        } else if (targetLocation.getY() > currentLocation.getY() && gameMap.isMovable(northLocation)) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(northLocation)) performAiEntityMove(aiEntity, MoveDirection.NORTH);
             }
-        } else if (targetLocation.getY() < currentLocation.getY()) {
+        } else if (targetLocation.getY() < currentLocation.getY() && gameMap.isMovable(southLocation)) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(southLocation)) performAiEntityMove(aiEntity, MoveDirection.SOUTH);
             }

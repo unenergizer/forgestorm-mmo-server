@@ -10,7 +10,7 @@ public class GameConstants {
     public static final short START_ATTACK_RADIUS = 6;
     public static final short QUIT_ATTACK_RADIUS = 8;
 
-    public static final int GENERAL_RESPAWN_TIME = 2;
+    public static final int GENERAL_RESPAWN_TIME = 60;
 
     public static final int PLAYERS_TO_PROCESS = 50;
 
