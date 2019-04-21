@@ -82,6 +82,13 @@ public class OutputStreamManager {
         if (clientHandler != null) clientHandler.add(abstractServerOutPacket);
     }
 
+    public boolean isAccountOnline(String xfAccountName) {
+        for (ClientHandler clientHandler : outputContexts.keySet()) {
+            if (clientHandler.getAuthenticatedUser().getXfAccountName().equalsIgnoreCase(xfAccountName)) return true;
+        }
+        return false;
+    }
+
     public int clientsOnline() {
         return outputContexts.size();
     }

@@ -18,7 +18,7 @@ public class XFUserAuthenticateSQL {
     private XFUserAuthenticateSQL() {
     }
 
-    public static LoginState authenticate(String username, String password) {
+    public static LoginState authenticate(String xfAccountName, String xfPassword) {
         ResultSet userIdResult = null;
         ResultSet hashResult = null;
         PreparedStatement getUserIdStatement = null;
@@ -26,14 +26,15 @@ public class XFUserAuthenticateSQL {
         int databaseUserId;
         String databaseUsername;
         boolean isAdmin;
-        if (Server.getInstance().getGameManager().findPlayer(username) != null) {
+
+        if (Server.getInstance().getNetworkManager().getOutStreamManager().isAccountOnline(xfAccountName)) {
             return new LoginState().failState("User already logged in.");
         }
 
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             getUserIdStatement = connection.prepareStatement(GET_USER_ID);
-            getUserIdStatement.setString(1, username);
+            getUserIdStatement.setString(1, xfAccountName);
 
             userIdResult = getUserIdStatement.executeQuery();
 
@@ -63,7 +64,7 @@ public class XFUserAuthenticateSQL {
                     String storedStr = stored.toString();
                     String hash = storedStr.substring(22, storedStr.length() - 3);
 
-                    BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hash);
+                    BCrypt.Result result = BCrypt.verifyer().verify(xfPassword.toCharArray(), hash);
                     if (!result.verified) {
                         return new LoginState().failState("Incorrect password");
                     }

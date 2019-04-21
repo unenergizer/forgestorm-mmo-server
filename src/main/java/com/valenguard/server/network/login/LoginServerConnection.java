@@ -88,10 +88,10 @@ public class LoginServerConnection {
                     DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream())
             ) {
 
-                String username = inputStream.readUTF();
-                String password = inputStream.readUTF();
+                String xfAccountName = inputStream.readUTF();
+                String xfPassword = inputStream.readUTF();
 
-                LoginState loginState = XFUserAuthenticateSQL.authenticate(username, password);
+                LoginState loginState = XFUserAuthenticateSQL.authenticate(xfAccountName, xfPassword);
 
                 outputStream.writeBoolean(loginState.getLoginSuccess());
 

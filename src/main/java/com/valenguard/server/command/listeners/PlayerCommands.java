@@ -137,7 +137,7 @@ public class PlayerCommands {
 
         commandSource.sendMessage(" ");
         commandSource.sendMessage("---- Player Information ----");
-        commandSource.sendMessage("Account Name: " + authenticatedUser.getUsername());
+        commandSource.sendMessage("Account Name: " + authenticatedUser.getXfAccountName());
         commandSource.sendMessage("Character Id: " + player.getCharacterDatabaseId());
         commandSource.sendMessage("Account Id: " + authenticatedUser.getDatabaseUserId());
         commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
