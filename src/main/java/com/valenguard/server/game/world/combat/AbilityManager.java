@@ -1,5 +1,6 @@
 package com.valenguard.server.game.world.combat;
 
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
@@ -15,7 +16,7 @@ public class AbilityManager {
     }
 
     public void tick(long ticksPassed) {
-        if (ticksPassed % 20 == 0) {
+        if (ticksPassed % GameConstants.TICKS_PER_SECOND == 0) {
             for (GameMap gameMap : gameManager.getGameMapProcessor().getGameMaps().values()) {
                 for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
                     processEntity(aiEntity);

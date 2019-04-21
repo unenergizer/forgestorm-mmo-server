@@ -48,6 +48,8 @@ public class AbilityUpdateTask implements AbstractTask {
                 processEntityDeath(gameMap, aiEntity, targetEntity);
             }
         }
+
+
     }
 
     private void updateCooldowns(MovingEntity movingEntity) {
@@ -58,6 +60,8 @@ public class AbilityUpdateTask implements AbstractTask {
             if (cooldownRemaining <= 0) {
                 if (movingEntity instanceof Player) {
 
+                    // The player cast an ability before it was finished cooling down.
+                    // We saved the ability cast and will perform it now for the player.
                     WaitingAbility queuedAbility = ((Player) movingEntity).getQueuedAbilities().get(cooldown.getKey());
                     if (queuedAbility != null) {
                         Server.getInstance().getAbilityManager().performAbility(cooldown.getKey(), movingEntity, queuedAbility.getTargetEntity());

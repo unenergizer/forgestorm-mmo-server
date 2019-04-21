@@ -5,12 +5,14 @@ import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.IncompleteCommand;
 import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.GameMapProcessor;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
+import com.valenguard.server.network.game.packet.out.EntityUpdatePacketOut;
 
 public class PlayerCommands {
 
@@ -35,11 +37,8 @@ public class PlayerCommands {
                 return;
             }
         } else {
-            player = Server.getInstance().getGameManager().findPlayer(args[0]);
-            if (player == null) {
-                commandSource.sendMessage("Could not find a packetReceiver for name: " + args[0]);
-                return;
-            }
+            player = getPlayer(commandSource, args[0]);
+            if (player == null) return;
         }
 
         commandSource.sendMessage("Healed packetReceiver " + player.getName());
@@ -81,12 +80,8 @@ public class PlayerCommands {
             return;
         }
 
-        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
-
-        if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
-            return;
-        }
+        Player player = getPlayer(commandSource, playerName);
+        if (player == null) return;
 
         player.setWarp(new Warp(new Location(mapName, x, y), MoveDirection.SOUTH));
         commandSource.sendMessage("Sending <" + playerName + "> to " + location.toString());
@@ -96,12 +91,8 @@ public class PlayerCommands {
     @IncompleteCommand(missing = "kick <playerName>")
     public void kickPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
-
-        if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
-            return;
-        }
+        Player player = getPlayer(commandSource, playerName);
+        if (player == null) return;
 
         Server.getInstance().getGameManager().kickPlayer(player);
         Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
@@ -112,26 +103,18 @@ public class PlayerCommands {
     @IncompleteCommand(missing = "kick <playerName>")
     public void killPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
-
-        if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
-            return;
-        }
+        Player player = getPlayer(commandSource, playerName);
+        if (player == null) return;
 
         player.killPlayer();
     }
 
     @Command(base = "info", argLenReq = 1)
     @IncompleteCommand(missing = "info <playerName>")
-    public void getServerTime(CommandSource commandSource, String[] args) {
+    public void getPlayerInfo(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
-
-        if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
-            return;
-        }
+        Player player = getPlayer(commandSource, playerName);
+        if (player == null) return;
 
         AuthenticatedUser authenticatedUser = player.getClientHandler().getAuthenticatedUser();
 
@@ -142,5 +125,32 @@ public class PlayerCommands {
         commandSource.sendMessage("Account Id: " + authenticatedUser.getDatabaseUserId());
         commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
         commandSource.sendMessage("IP: " + authenticatedUser.getIp());
+    }
+
+    @Command(base = "speed", argLenReq = 2)
+    @IncompleteCommand(missing = "info <playerName> <speed>")
+    public void setPlayerSpeed(CommandSource commandSource, String[] args) {
+        String playerName = args[0];
+        Player player = getPlayer(commandSource, playerName);
+        if (player == null) return;
+
+        float oldMoveSpeed = player.getMoveSpeed();
+        float moveSpeed = Float.parseFloat(args[1]);
+        player.setMoveSpeed(moveSpeed);
+        commandSource.sendMessage(MessageText.SERVER + playerName + " move speed set to " + player.getMoveSpeed() + " from " + oldMoveSpeed + ".");
+
+        player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+                new EntityUpdatePacketOut(anyPlayer, player, moveSpeed).sendPacket());
+    }
+
+    private Player getPlayer(CommandSource commandSource, String playerName) {
+        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
+
+        if (player == null) {
+            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
+            return null;
+        }
+
+        return player;
     }
 }
