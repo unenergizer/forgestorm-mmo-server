@@ -53,7 +53,7 @@ public class GameManager {
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
-    public void forAllAiEntitiesFiltered(Consumer<Entity> callback, Predicate<AiEntity> predicate) {
+    public void forAllAiEntitiesFiltered(Consumer<AiEntity> callback, Predicate<AiEntity> predicate) {
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
     }
 

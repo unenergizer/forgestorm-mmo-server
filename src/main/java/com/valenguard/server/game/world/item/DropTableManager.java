@@ -24,33 +24,15 @@ public class DropTableManager {
 
     public ItemStack getItemStack(Integer dropTableID, int amount) {
 
-        println(getClass(), "Getting item from drop table: " + dropTableID);
-
         DropTableLoader.DropTable dropTable = dropTables[dropTableID];
         int[] itemStackIDs = dropTable.getItemStackIDs();
         float[] probabilities = dropTable.getProbabilities();
 
-        for (float f : probabilities) {
-            println(getClass(), "Probability: " + f);
-        }
-
-        for (int id : itemStackIDs) {
-            println(getClass(), "item ID: " + id);
-        }
-
         for (int i = 0; i < itemStackIDs.length - 1; i++) {
-
-            println(getClass(), "Must be greater than: " + random.nextFloat() * 100);
-            println(getClass(), "The probability: " + probabilities[i]);
-
             if (random.nextFloat() * 100 < probabilities[i]) {
                 return makeItemStack(itemStackIDs[i], amount);
             }
         }
-
-        //Integer itemStackID = dropTables[dropTableID].getItemStackID();
-
-        //checkNotNull(itemStackID, "ItemStack IDs cannot be null!");
 
         return makeItemStack(itemStackIDs[itemStackIDs.length - 1], amount);
     }

@@ -12,6 +12,11 @@ import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.network.game.packet.out.BankManagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityMovePacketOut;
+import com.valenguard.server.util.RandomUtil;
+import lombok.AllArgsConstructor;
+
+import java.lang.reflect.MalformedParameterizedTypeException;
+import java.util.*;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -19,17 +24,42 @@ public class MovementUpdateTask implements AbstractTask {
 
     private final static boolean PRINT_DEBUG = false;
 
+    @AllArgsConstructor
+    private class MovementTargetInfo {
+        private AiEntity tracker;
+        private Integer locationData;
+    }
+
+    private Map<MovingEntity, List<MovementTargetInfo>> targetsLocations = new HashMap<>();
+
     @Override
     public void tick(long ticksPassed) {
+
+        mapTargets();
+
         Server.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> generateNewAIMovements((AiEntity) aiEntity),
-                entity -> !entity.isEntityMoving());
+        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::generateNewAIMovements, entity -> !entity.isEntityMoving());
 
         // Continue entity movement
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> updateEntitiesPosition((AiEntity) aiEntity),
-                MovingEntity::isEntityMoving);
+        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
+    }
+
+    private void mapTargets() {
+        targetsLocations.clear();
+        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
+                        Location location =  aiEntity.getFutureMapLocation();
+                        MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, conjoinShorts(location));
+                        if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
+                            targetsLocations.get(aiEntity.getTargetEntity()).add(movementTargetInfo);
+                        } else {
+                            List<MovementTargetInfo> locations = new ArrayList<>();
+                            locations.add(movementTargetInfo);
+                            targetsLocations.put(aiEntity.getTargetEntity(), locations);
+                        }
+                    },
+                aiEntity -> aiEntity.getTargetEntity() != null);
     }
 
     private void generateNewAIMovements(AiEntity aiEntity) {
@@ -225,6 +255,9 @@ public class MovementUpdateTask implements AbstractTask {
         Location currentLocation = aiEntity.getCurrentMapLocation();
         Location targetLocation = targetEntity.getCurrentMapLocation();
 
+        List<MovementTargetInfo> otherTargetLocations = targetsLocations.get(targetEntity);
+        if (otherTargetLocations == null) otherTargetLocations = new ArrayList<>();
+
         aiEntity.setTargetEntity(targetEntity);
 
         Location northLocation = currentLocation.add(gameMap.getLocation(MoveDirection.NORTH));
@@ -232,21 +265,33 @@ public class MovementUpdateTask implements AbstractTask {
         Location eastLocation = currentLocation.add(gameMap.getLocation(MoveDirection.EAST));
         Location westLocation = currentLocation.add(gameMap.getLocation(MoveDirection.WEST));
 
-        if (targetLocation.getX() > currentLocation.getX() && gameMap.isMovable(eastLocation)) {
+        if (targetLocation.getX() > currentLocation.getX() && gameMap.isMovable(eastLocation) &&
+                !containsMovement(otherTargetLocations, eastLocation, aiEntity)) {
             if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(eastLocation)) performAiEntityMove(aiEntity, MoveDirection.EAST);
+            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.EAST);
             }
-        } else if (targetLocation.getX() < currentLocation.getX() && gameMap.isMovable(westLocation)) {
+        } else if (targetLocation.getX() < currentLocation.getX() && gameMap.isMovable(westLocation) &&
+                !containsMovement(otherTargetLocations, westLocation, aiEntity)) {
             if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
                 if (gameMap.isMovable(westLocation)) performAiEntityMove(aiEntity, MoveDirection.WEST);
+            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.WEST);
             }
-        } else if (targetLocation.getY() > currentLocation.getY() && gameMap.isMovable(northLocation)) {
+        } else if (targetLocation.getY() > currentLocation.getY() && gameMap.isMovable(northLocation) &&
+                !containsMovement(otherTargetLocations, northLocation, aiEntity)) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(northLocation)) performAiEntityMove(aiEntity, MoveDirection.NORTH);
+            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NORTH);
             }
-        } else if (targetLocation.getY() < currentLocation.getY() && gameMap.isMovable(southLocation)) {
+        } else if (targetLocation.getY() < currentLocation.getY() && gameMap.isMovable(southLocation) &&
+                !containsMovement(otherTargetLocations, southLocation, aiEntity)) {
             if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
                 if (gameMap.isMovable(southLocation)) performAiEntityMove(aiEntity, MoveDirection.SOUTH);
+            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.SOUTH);
             }
         } else if (targetLocation.getX() == currentLocation.getX() && targetLocation.getY() == currentLocation.getY()) {
             // on top of each other
@@ -262,7 +307,27 @@ public class MovementUpdateTask implements AbstractTask {
                 println(getClass(), "Setting target null??");
                 aiEntity.setTargetEntity(null);
             }
+        } else {
+            if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NONE);
+            }
         }
+    }
+
+    private void generateNewMoveAndExclude(List<MovementTargetInfo> otherTargetLocations, AiEntity aiEntity, MoveDirection excludeDirection) {
+        otherTargetLocations.removeIf(info -> info.tracker.equals(aiEntity));
+        List<MoveDirection> directions = new LinkedList<>(Arrays.asList(MoveDirection.EAST, MoveDirection.NORTH, MoveDirection.SOUTH, MoveDirection.WEST));
+        directions.removeIf(direction -> direction == excludeDirection);
+        MoveDirection attemptDirection = directions.get(RandomUtil.getNewRandom(0, 2));
+        GameMap gameMap = aiEntity.getGameMap();
+        if (gameMap.isMovable(aiEntity.getCurrentMapLocation().add(gameMap.getLocation(attemptDirection)))) {
+            performAiEntityMove(aiEntity, attemptDirection);
+        }
+    }
+
+    private boolean containsMovement(List<MovementTargetInfo> otherTargetLocations, Location testLocation, AiEntity tracker) {
+        return otherTargetLocations.stream().anyMatch(info -> !info.tracker.equals(tracker) &&
+                                                               info.locationData.equals(conjoinShorts(testLocation)));
     }
 
     public boolean preMovementChecks(Player player, Location attemptLocation) {
@@ -382,5 +447,9 @@ public class MovementUpdateTask implements AbstractTask {
 
         aiEntity.getGameMap().getPlayerController().getPlayerList().forEach(player ->
                 new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureMapLocation()).sendPacket());
+    }
+
+    private int conjoinShorts(Location location) {
+        return (location.getX() << 16) | (location.getY() & 0xFFFF);
     }
 }
