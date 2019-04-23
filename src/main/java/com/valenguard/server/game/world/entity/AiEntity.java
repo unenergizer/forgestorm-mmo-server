@@ -4,8 +4,12 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
+import com.valenguard.server.util.MoveNode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 @Getter
 @Setter
@@ -16,6 +20,8 @@ public class AiEntity extends MovingEntity {
     private Integer dropTable = 0;
     private short shopId = -1;
     private boolean isBankKeeper;
+
+    private Queue<MoveNode> moveNodes = new LinkedList<>();
 
     private RandomRegionMoveGenerator randomRegionMoveGenerator;
 

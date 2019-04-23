@@ -126,7 +126,7 @@ public class PlayerProcessor {
         for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
-                new ChatMessagePacketOut(playerSearch, player.getServerEntityId() + " has quit the server.").sendPacket();
+                new ChatMessagePacketOut(playerSearch, player.getName() + " has quit the server.").sendPacket();
             }
         }
 

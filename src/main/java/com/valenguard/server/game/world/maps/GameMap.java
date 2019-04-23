@@ -27,7 +27,7 @@ public class GameMap {
         return !isOutOfBounds(location) && isTraversable(location);
     }
 
-    private boolean isTraversable(Location location) {
+    public boolean isTraversable(Location location) {
         if (isOutOfBounds(location)) return false;
         return location.getGameMap().getMap()[location.getX()][location.getY()].isTraversable();
     }
@@ -55,7 +55,7 @@ public class GameMap {
         return getTileByLocation(location).getWarp() != null;
     }
 
-    private Tile getTileByLocation(Location location) {
+    public Tile getTileByLocation(Location location) {
         checkArgument(!isOutOfBounds(location));
         return location.getGameMap().getMap()[location.getX()][location.getY()];
     }
