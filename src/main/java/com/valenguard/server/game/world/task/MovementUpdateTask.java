@@ -86,15 +86,6 @@ public class MovementUpdateTask implements AbstractTask {
         targetsLocations.forEach((target, trackers) ->
             trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureMapLocation()) >= 2));
 
-//        targetsLocations.forEach((target, trackers) -> {
-//            trackers.sort(new Comparator<MovementTargetInfo>() {
-//                @Override
-//                public int compare(MovementTargetInfo lhs, MovementTargetInfo rhs) {
-//                    return lhs.location.getDistanceAway(target.getFutureMapLocation())
-//                            - rhs.location.getDistanceAway(target.getFutureMapLocation());
-//                }
-//            });
-//        });
     }
 
     private void generateNewAIMovements(AiEntity aiEntity) {
@@ -305,7 +296,7 @@ public class MovementUpdateTask implements AbstractTask {
             // They will go ahead and perform A* if they are this close
             if ((distanceAway == 1 && currentLocationIsTaken) ||
                 distanceAway == 2) {
-                startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, false);
+                startAttemptAStar(otherTargetLocations, currentLocation, targetLocation, gameMap, aiEntity, false);
             } else if (distanceAway == 1) {
 
                 int xDiff = Math.abs(targetLocation.getX() - currentLocation.getX());
@@ -314,14 +305,12 @@ public class MovementUpdateTask implements AbstractTask {
                 // At a diagonal to the entity
 
                 if (xDiff + yDiff > 1) {
-                    startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, true);
+                    startAttemptAStar(otherTargetLocations, currentLocation, targetLocation, gameMap, aiEntity, true);
                 }
 
             }
             return;
         }
-
-        println(getClass(), "Non A*!");
 
         MoveDirection attemptDirection1 = directionOptions.get(RandomUtil.getNewRandom(0, 3));
         if (attemptAiTargetMove(currentLocation, targetLocation, gameMap, attemptDirection1, otherTargetLocations, aiEntity)) {
@@ -354,33 +343,39 @@ public class MovementUpdateTask implements AbstractTask {
         if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
             generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NONE);
         } else {
-            startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, false);
+            startAttemptAStar(otherTargetLocations, currentLocation, targetLocation, gameMap, aiEntity, false);
         }
     }
 
-    private void startAttemptAStar(List<MovementTargetInfo> otherTargetLocations,
+    private void startAttemptAStar(List<MovementTargetInfo> otherTargetLocations, Location currentLocation,
                                    Location targetLocation, GameMap gameMap, AiEntity aiEntity,
                                    boolean attemptSidesOnly) {
 
-        Location north = targetLocation.add(gameMap.getLocation(MoveDirection.NORTH));
-        Location south = targetLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
-        Location east = targetLocation.add(gameMap.getLocation(MoveDirection.EAST));
-        Location west = targetLocation.add(gameMap.getLocation(MoveDirection.WEST));
-        Location northEast = north.add(gameMap.getLocation(MoveDirection.EAST));
-        Location northWest = north.add(gameMap.getLocation(MoveDirection.WEST));
-        Location southEast = south.add(gameMap.getLocation(MoveDirection.EAST));
-        Location southWest = south.add(gameMap.getLocation(MoveDirection.WEST));
+        List<Location> besideLocations = new ArrayList<>();
 
-        if (attemptAStar(otherTargetLocations, north, aiEntity)) return;
-        if (attemptAStar(otherTargetLocations, south, aiEntity)) return;
-        if (attemptAStar(otherTargetLocations, east, aiEntity)) return;
-        if (attemptAStar(otherTargetLocations, west, aiEntity)) return;
+        besideLocations.add(targetLocation.add(gameMap.getLocation(MoveDirection.NORTH)));
+        besideLocations.add(targetLocation.add(gameMap.getLocation(MoveDirection.SOUTH)));
+        besideLocations.add(targetLocation.add(gameMap.getLocation(MoveDirection.EAST)));
+        besideLocations.add(targetLocation.add(gameMap.getLocation(MoveDirection.WEST)));
+
+        List<Location> diagonalLocations = new ArrayList<>();
+        diagonalLocations.add(besideLocations.get(0).add(gameMap.getLocation(MoveDirection.EAST)));
+        diagonalLocations.add(besideLocations.get(0).add(gameMap.getLocation(MoveDirection.WEST)));
+        diagonalLocations.add(besideLocations.get(1).add(gameMap.getLocation(MoveDirection.EAST)));
+        diagonalLocations.add(besideLocations.get(1).add(gameMap.getLocation(MoveDirection.WEST)));
+
+        besideLocations.sort(Comparator.comparingInt(lhs -> lhs.getDistanceAway(currentLocation)));
+
+        for (Location location : besideLocations) {
+            if (attemptAStar(otherTargetLocations, location, aiEntity)) return;
+        }
+
+        diagonalLocations.sort(Comparator.comparingInt(lhs -> lhs.getDistanceAway(currentLocation)));
 
         if (!attemptSidesOnly) {
-            if (attemptAStar(otherTargetLocations, northEast, aiEntity)) return;
-            if (attemptAStar(otherTargetLocations, northWest, aiEntity)) return;
-            if (attemptAStar(otherTargetLocations, southEast, aiEntity)) return;
-            attemptAStar(otherTargetLocations, southWest, aiEntity);
+            for (Location location : diagonalLocations) {
+                if (attemptAStar(otherTargetLocations, location, aiEntity)) return;
+            }
         }
     }
 
@@ -449,7 +444,6 @@ public class MovementUpdateTask implements AbstractTask {
         if (nodes == null) return false;
         tracker.setMoveNodes(nodes);
         MoveNode moveNode = nodes.peek();
-        println(getClass(), "Provinding the entity with some new nodes!");
         updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY()));
         return true;
     }
