@@ -46,14 +46,15 @@ public class ClientHandler {
                     player = loadedPlayers.get(i);
                 } else {
                     // Player doesn't exist, create a new one
-                    player = new Player(this, characterDataOut.getCharacterId());
+                    player = new Player(this);
                 }
             } else {
                 // Player doesn't exist, create a new one
-                player = new Player(this, characterDataOut.getCharacterId());
+                player = new Player(this);
             }
 
             player.setName(characterDataOut.getName());
+            player.setCharacterDatabaseId((int) characterDataOut.getCharacterId());
             player.setAppearance(CharacterUtil.generateAppearance(
                     player,
                     characterDataOut.getBodyId(),
@@ -65,7 +66,13 @@ public class ClientHandler {
     }
 
     public Player getPlayer() {
-        return loadedPlayers.get(currentPlayerId);
+        Player player = loadedPlayers.get(currentPlayerId);
+
+        if (player == null) {
+            player = new Player(this);
+        }
+
+        return player;
     }
 
     public void setCurrentPlayerId(byte characterId) {

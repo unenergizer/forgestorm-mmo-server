@@ -32,7 +32,7 @@ import static com.valenguard.server.util.Log.println;
 public class Player extends MovingEntity {
 
     private final ClientHandler clientHandler;
-    private final Integer characterDatabaseId;
+    private Integer characterDatabaseId;
 
     private boolean loggedInGameWorld = false;
 
@@ -68,9 +68,8 @@ public class Player extends MovingEntity {
 
     private Map<Short, WaitingAbility> queuedAbilities = new HashMap<>();
 
-    public Player(final ClientHandler clientHandler, int characterDatabaseId) {
+    public Player(final ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
-        this.characterDatabaseId = characterDatabaseId;
     }
 
     /**
