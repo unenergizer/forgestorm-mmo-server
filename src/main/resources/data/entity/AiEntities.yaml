@@ -35,24 +35,24 @@
   damage: 10
   expDrop: 28
   dropTable: 0
-  walkSpeed: 0.5
-  probabilityStill: 1.0
-  probabilityWalkStart: 0.0
+  walkSpeed: 0.4
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
   bankKeeper: false
 3:
   name: "Old Man"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 1
-  atlasBodyID: 18
-  atlasHeadID: 40
+  colorID: 0
+  atlasBodyID: 57
+  atlasHeadID: 64
   health: 80
   damage: 15
   expDrop: 28
   dropTable: 0
-  walkSpeed: 0.5
-  probabilityStill: 1.0
-  probabilityWalkStart: 0.0
+  walkSpeed: 1.0
+  probabilityStill: 0.5
+  probabilityWalkStart: 0.5
   bankKeeper: false
 4:
   name: "Unseen Eye"
