@@ -62,6 +62,7 @@ public class CharacterManager {
     }
 
     public void characterLogin(ClientHandler clientHandler, byte characterId) {
+        if (clientHandler.getPlayer().isLoggedInGameWorld()) return;
         clientHandler.setCurrentPlayerId(characterId);
         Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerEnterGameWorld(clientHandler);
     }
