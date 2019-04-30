@@ -15,6 +15,7 @@ import com.valenguard.server.util.MoveNode;
 import com.valenguard.server.util.PathFinding;
 import com.valenguard.server.util.RandomUtil;
 import lombok.AllArgsConstructor;
+import org.checkerframework.framework.qual.TargetLocations;
 
 import java.util.*;
 
@@ -27,7 +28,13 @@ public class MovementUpdateTask implements AbstractTask {
     @AllArgsConstructor
     private class MovementTargetInfo {
         private AiEntity tracker;
-        private Integer locationData;
+        private Location location;
+    }
+
+    @AllArgsConstructor
+    private class RandomDirectionResult {
+        private MoveDirection moveDirection;
+        private Location attemptLocation;
     }
 
     private final PathFinding pathFinding = new PathFinding();
@@ -65,7 +72,7 @@ public class MovementUpdateTask implements AbstractTask {
         targetsLocations.clear();
         Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
                     Location location = aiEntity.getFutureMapLocation();
-                    MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, conjoinShorts(location));
+                    MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, location);
                     if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
                         targetsLocations.get(aiEntity.getTargetEntity()).add(movementTargetInfo);
                     } else {
@@ -75,6 +82,19 @@ public class MovementUpdateTask implements AbstractTask {
                     }
                 },
                 aiEntity -> aiEntity.getTargetEntity() != null);
+
+        targetsLocations.forEach((target, trackers) ->
+            trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureMapLocation()) >= 2));
+
+//        targetsLocations.forEach((target, trackers) -> {
+//            trackers.sort(new Comparator<MovementTargetInfo>() {
+//                @Override
+//                public int compare(MovementTargetInfo lhs, MovementTargetInfo rhs) {
+//                    return lhs.location.getDistanceAway(target.getFutureMapLocation())
+//                            - rhs.location.getDistanceAway(target.getFutureMapLocation());
+//                }
+//            });
+//        });
     }
 
     private void generateNewAIMovements(AiEntity aiEntity) {
@@ -122,6 +142,7 @@ public class MovementUpdateTask implements AbstractTask {
             aiEntity.getRandomRegionMoveGenerator().setAlreadyDeterminedMove(false);
 
             if (aiEntity.getTargetEntity() != null) return;
+            if (!aiEntity.getMoveNodes().isEmpty()) return;
 
             MoveDirection predictedMoveDirection = aiEntity.getRandomRegionMoveGenerator().generateMoveDirection(true);
 
@@ -276,93 +297,145 @@ public class MovementUpdateTask implements AbstractTask {
 
         aiEntity.setTargetEntity(targetEntity);
 
-        Location northLocation = currentLocation.add(gameMap.getLocation(MoveDirection.NORTH));
-        Location southLocation = currentLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
-        Location eastLocation = currentLocation.add(gameMap.getLocation(MoveDirection.EAST));
-        Location westLocation = currentLocation.add(gameMap.getLocation(MoveDirection.WEST));
+        List<MoveDirection> directionOptions = new LinkedList<>(Arrays.asList(MoveDirection.EAST, MoveDirection.NORTH, MoveDirection.SOUTH, MoveDirection.WEST));
 
-        // To the right of the entity && right location is not
-        if (targetLocation.getX() > currentLocation.getX() && gameMap.isMovable(eastLocation) &&
-                !containsMovement(otherTargetLocations, eastLocation, aiEntity)) {
-            if (!(currentLocation.getX() + 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
-                if (gameMap.isMovable(eastLocation)) performAiEntityMove(aiEntity, MoveDirection.EAST);
-            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
-                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.EAST);
-            }
-        } else if (targetLocation.getX() < currentLocation.getX() && gameMap.isMovable(westLocation) &&
-                !containsMovement(otherTargetLocations, westLocation, aiEntity)) {
-            if (!(currentLocation.getX() - 1 == targetLocation.getX() && currentLocation.getY() == targetLocation.getY())) {
-                if (gameMap.isMovable(westLocation)) performAiEntityMove(aiEntity, MoveDirection.WEST);
-            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
-                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.WEST);
-            }
-        } else if (targetLocation.getY() > currentLocation.getY() && gameMap.isMovable(northLocation) &&
-                !containsMovement(otherTargetLocations, northLocation, aiEntity)) {
-            if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() + 1 == targetLocation.getY())) {
-                if (gameMap.isMovable(northLocation)) performAiEntityMove(aiEntity, MoveDirection.NORTH);
-            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
-                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NORTH);
-            }
-        } else if (targetLocation.getY() < currentLocation.getY() && gameMap.isMovable(southLocation) &&
-                !containsMovement(otherTargetLocations, southLocation, aiEntity)) {
-            if (!(currentLocation.getX() == targetLocation.getX() && currentLocation.getY() - 1 == targetLocation.getY())) {
-                if (gameMap.isMovable(southLocation)) performAiEntityMove(aiEntity, MoveDirection.SOUTH);
-            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
-                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.SOUTH);
-            }
+        int distanceAway = targetLocation.getDistanceAway(currentLocation);
+        boolean currentLocationIsTaken = containsMovement(otherTargetLocations, currentLocation, aiEntity);
+        if (distanceAway <= 2 && distanceAway != 0) {
+            // They will go ahead and perform A* if they are this close
+            if ((distanceAway == 1 && currentLocationIsTaken) ||
+                distanceAway == 2) {
+                startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, false);
+            } else if (distanceAway == 1) {
 
-            // The entities are on top of each other
-        } else if (targetLocation.getX() == currentLocation.getX() && targetLocation.getY() == currentLocation.getY()) {
-            if (gameMap.isMovable(northLocation)) {
-                performAiEntityMove(aiEntity, MoveDirection.NORTH);
-            } else if (gameMap.isMovable(southLocation)) {
-                performAiEntityMove(aiEntity, MoveDirection.SOUTH);
-            } else if (gameMap.isMovable(westLocation)) {
-                performAiEntityMove(aiEntity, MoveDirection.WEST);
-            } else if (gameMap.isMovable(eastLocation)) {
-                performAiEntityMove(aiEntity, MoveDirection.EAST);
-            } else {
-                println(getClass(), "Setting target null??");
-                aiEntity.setTargetEntity(null);
-            }
-        } else {
-            if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
-                generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NONE);
-            } else {
+                int xDiff = Math.abs(targetLocation.getX() - currentLocation.getX());
+                int yDiff = Math.abs(targetLocation.getY() - currentLocation.getY());
 
-                Location north = targetLocation.add(gameMap.getLocation(MoveDirection.NORTH));
-                Location south = targetLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
-                Location east = targetLocation.add(gameMap.getLocation(MoveDirection.EAST));
-                Location west = targetLocation.add(gameMap.getLocation(MoveDirection.WEST));
-                Location northEast = north.add(gameMap.getLocation(MoveDirection.EAST));
-                Location northWest = north.add(gameMap.getLocation(MoveDirection.WEST));
-                Location southEast = south.add(gameMap.getLocation(MoveDirection.EAST));
-                Location southWest = south.add(gameMap.getLocation(MoveDirection.WEST));
+                // At a diagonal to the entity
 
-                if (attemptAStar(otherTargetLocations, north, aiEntity)) return;
-                if (attemptAStar(otherTargetLocations, south, aiEntity)) return;
-                if (attemptAStar(otherTargetLocations, east, aiEntity)) return;
-                if (attemptAStar(otherTargetLocations, west, aiEntity)) return;
-
-                // The entity is already in one of the four corners
-                if (currentLocation.equals(northEast) || currentLocation.equals(northWest) ||
-                        currentLocation.equals(southEast) || currentLocation.equals(southWest)) {
-                    return;
+                if (xDiff + yDiff > 1) {
+                    startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, true);
                 }
 
-                if (attemptAStar(otherTargetLocations, northEast, aiEntity)) return;
-                if (attemptAStar(otherTargetLocations, northWest, aiEntity)) return;
-                if (attemptAStar(otherTargetLocations, southEast, aiEntity)) return;
-                attemptAStar(otherTargetLocations, southWest, aiEntity);
-
             }
+            return;
+        }
+
+        println(getClass(), "Non A*!");
+
+        MoveDirection attemptDirection1 = directionOptions.get(RandomUtil.getNewRandom(0, 3));
+        if (attemptAiTargetMove(currentLocation, targetLocation, gameMap, attemptDirection1, otherTargetLocations, aiEntity)) {
+            return;
+        }
+
+        directionOptions.removeIf(direction -> direction == attemptDirection1);
+        MoveDirection attemptDirection2 = directionOptions.get(RandomUtil.getNewRandom(0, 2));
+        if (attemptAiTargetMove(currentLocation, targetLocation, gameMap, attemptDirection2, otherTargetLocations, aiEntity)) {
+            return;
+        }
+
+        directionOptions.removeIf(direction -> direction == attemptDirection2);
+        MoveDirection attemptDirection3 = directionOptions.get(RandomUtil.getNewRandom(0, 1));
+        if (attemptAiTargetMove(currentLocation, targetLocation, gameMap, attemptDirection3, otherTargetLocations, aiEntity)) {
+            return;
+        }
+
+        directionOptions.removeIf(direction -> direction == attemptDirection3);
+        MoveDirection attemptDirection4 = directionOptions.get(0);
+        if (attemptAiTargetMove(currentLocation, targetLocation, gameMap, attemptDirection4, otherTargetLocations, aiEntity)) {
+            return;
+        }
+
+        if (targetLocation.getX() == currentLocation.getX() && targetLocation.getY() == currentLocation.getY()) {
+            moveAiOffTarget(gameMap, currentLocation, aiEntity);
+            return;
+        }
+
+        if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+            generateNewMoveAndExclude(otherTargetLocations, aiEntity, MoveDirection.NONE);
+        } else {
+            startAttemptAStar(otherTargetLocations, targetLocation, gameMap, aiEntity, false);
         }
     }
 
-    private boolean targetLocationMovable(List<MovementTargetInfo> otherTargetLocations, Location attemptLocation, AiEntity tracker) {
-        if (!attemptLocation.getGameMap().isMovable(attemptLocation)) return false;
-        if (!containsMovement(otherTargetLocations, attemptLocation, tracker)) return false;
-        return true;
+    private void startAttemptAStar(List<MovementTargetInfo> otherTargetLocations,
+                                   Location targetLocation, GameMap gameMap, AiEntity aiEntity,
+                                   boolean attemptSidesOnly) {
+
+        Location north = targetLocation.add(gameMap.getLocation(MoveDirection.NORTH));
+        Location south = targetLocation.add(gameMap.getLocation(MoveDirection.SOUTH));
+        Location east = targetLocation.add(gameMap.getLocation(MoveDirection.EAST));
+        Location west = targetLocation.add(gameMap.getLocation(MoveDirection.WEST));
+        Location northEast = north.add(gameMap.getLocation(MoveDirection.EAST));
+        Location northWest = north.add(gameMap.getLocation(MoveDirection.WEST));
+        Location southEast = south.add(gameMap.getLocation(MoveDirection.EAST));
+        Location southWest = south.add(gameMap.getLocation(MoveDirection.WEST));
+
+        if (attemptAStar(otherTargetLocations, north, aiEntity)) return;
+        if (attemptAStar(otherTargetLocations, south, aiEntity)) return;
+        if (attemptAStar(otherTargetLocations, east, aiEntity)) return;
+        if (attemptAStar(otherTargetLocations, west, aiEntity)) return;
+
+        if (!attemptSidesOnly) {
+            if (attemptAStar(otherTargetLocations, northEast, aiEntity)) return;
+            if (attemptAStar(otherTargetLocations, northWest, aiEntity)) return;
+            if (attemptAStar(otherTargetLocations, southEast, aiEntity)) return;
+            attemptAStar(otherTargetLocations, southWest, aiEntity);
+        }
+    }
+
+    private void moveAiOffTarget(GameMap gameMap, Location currentLocation, AiEntity aiEntity) {
+        List<MoveDirection> directionOptions = new LinkedList<>(Arrays.asList(MoveDirection.EAST, MoveDirection.NORTH, MoveDirection.SOUTH, MoveDirection.WEST));
+
+        RandomDirectionResult result = genNewRandomAttemptLocation(directionOptions, MoveDirection.NONE, gameMap, currentLocation);
+        for (int i = 0; i < 4; i++) {
+            if (gameMap.isMovable(result.attemptLocation)) {
+                performAiEntityMove(aiEntity, result.moveDirection);
+                return;
+            }
+            if (i + 1 != 4) {
+                result = genNewRandomAttemptLocation(directionOptions, result.moveDirection, gameMap, currentLocation);
+            }
+        }
+
+        println(getClass(), "Setting target null??");
+        aiEntity.setTargetEntity(null);
+    }
+
+    private RandomDirectionResult genNewRandomAttemptLocation(List<MoveDirection> directionOptions, MoveDirection previousMove,
+                                                              GameMap gameMap, Location currentLocation) {
+        if (previousMove != MoveDirection.NONE) directionOptions.removeIf(direction -> direction == previousMove);
+        MoveDirection attemptDirection = directionOptions.get(RandomUtil.getNewRandom(0, directionOptions.size() - 1));
+        return new RandomDirectionResult(attemptDirection, currentLocation.add(gameMap.getLocation(attemptDirection)));
+    }
+
+    private boolean attemptAiTargetMove(Location currentLocation, Location targetLocation, GameMap gameMap,
+                                        MoveDirection attemptDirection, List<MovementTargetInfo> otherTargetLocations,
+                                        AiEntity aiEntity) {
+
+        Location attemptLocation = currentLocation.add(gameMap.getLocation(attemptDirection));
+
+        boolean directionComparison = false;
+        if (attemptDirection == MoveDirection.NORTH) {
+            directionComparison = targetLocation.getY() > currentLocation.getY();
+        } else if (attemptDirection == MoveDirection.EAST) {
+            directionComparison = targetLocation.getX() > currentLocation.getX();
+        } else if (attemptDirection == MoveDirection.SOUTH) {
+            directionComparison = targetLocation.getY() < currentLocation.getY();
+        } else if (attemptDirection == MoveDirection.WEST) {
+            directionComparison = targetLocation.getX() < currentLocation.getX();
+        }
+
+        if (directionComparison && gameMap.isMovable(attemptLocation)) {
+
+            if (!(attemptLocation.equals(targetLocation))) {
+                if (gameMap.isMovable(attemptLocation)) performAiEntityMove(aiEntity, attemptDirection);
+            } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
+                generateNewMoveAndExclude(otherTargetLocations, aiEntity, attemptDirection);
+            }
+            return true;
+        }
+        return false;
     }
 
     private boolean attemptAStar(List<MovementTargetInfo> otherTargetLocations, Location location, AiEntity tracker) {
@@ -375,7 +448,23 @@ public class MovementUpdateTask implements AbstractTask {
                 location.getY());
         if (nodes == null) return false;
         tracker.setMoveNodes(nodes);
+        MoveNode moveNode = nodes.peek();
+        println(getClass(), "Provinding the entity with some new nodes!");
+        updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY()));
         return true;
+    }
+
+    private void updateFutureLocation(AiEntity aiEntity, Location futureLocation) {
+        if (aiEntity.getTargetEntity() != null) {
+            List<MovementTargetInfo> targetInfoList = targetsLocations.get(aiEntity.getTargetEntity());
+            if (targetInfoList != null) {
+                targetInfoList.forEach(targetInfo -> {
+                    if (targetInfo.tracker.equals(aiEntity)) {
+                        targetInfo.location = futureLocation;
+                    }
+                });
+            }
+        }
     }
 
     private void generateNewMoveAndExclude(List<MovementTargetInfo> otherTargetLocations, AiEntity aiEntity, MoveDirection excludeDirection) {
@@ -391,7 +480,7 @@ public class MovementUpdateTask implements AbstractTask {
 
     private boolean containsMovement(List<MovementTargetInfo> otherTargetLocations, Location testLocation, AiEntity tracker) {
         return otherTargetLocations.stream().anyMatch(info -> !info.tracker.equals(tracker) &&
-                info.locationData.equals(conjoinShorts(testLocation)));
+                info.location.equals(testLocation));
     }
 
     public boolean preMovementChecks(Player player, Location attemptLocation) {
@@ -500,20 +589,21 @@ public class MovementUpdateTask implements AbstractTask {
     private void performAiEntityMove(AiEntity aiEntity, MoveDirection moveDirection) {
 //        Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
         if (moveDirection == MoveDirection.NONE) return;
+        if (aiEntity.isEntityMoving()) {
+            println(getClass(), "The Entity is already moving!");
+        }
 
         Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
         aiEntity.setFutureMapLocation(futureLocation);
         aiEntity.setWalkTime(0f);
         aiEntity.setFacingDirection(moveDirection);
 
+        updateFutureLocation(aiEntity, futureLocation);
+
         println(getClass(), "CurrentLocation: " + aiEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
         println(getClass(), "FutureLocation: " + aiEntity.getFutureMapLocation(), false, PRINT_DEBUG);
 
         aiEntity.getGameMap().getPlayerController().getPlayerList().forEach(player ->
                 new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureMapLocation()).sendPacket());
-    }
-
-    private int conjoinShorts(Location location) {
-        return (location.getX() << 16) | (location.getY() & 0xFFFF);
     }
 }
