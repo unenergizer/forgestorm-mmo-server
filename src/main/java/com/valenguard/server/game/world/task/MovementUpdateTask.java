@@ -1,6 +1,5 @@
 package com.valenguard.server.game.world.task;
 
-import com.google.common.base.Preconditions;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.MessageText;
@@ -17,7 +16,6 @@ import com.valenguard.server.util.PathFinding;
 import com.valenguard.server.util.RandomUtil;
 import lombok.AllArgsConstructor;
 
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.*;
 
 import static com.valenguard.server.util.Log.println;
@@ -66,16 +64,16 @@ public class MovementUpdateTask implements AbstractTask {
     private void mapTargets() {
         targetsLocations.clear();
         Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
-                        Location location =  aiEntity.getFutureMapLocation();
-                        MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, conjoinShorts(location));
-                        if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
-                            targetsLocations.get(aiEntity.getTargetEntity()).add(movementTargetInfo);
-                        } else {
-                            List<MovementTargetInfo> locations = new ArrayList<>();
-                            locations.add(movementTargetInfo);
-                            targetsLocations.put(aiEntity.getTargetEntity(), locations);
-                        }
-                    },
+                    Location location = aiEntity.getFutureMapLocation();
+                    MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, conjoinShorts(location));
+                    if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
+                        targetsLocations.get(aiEntity.getTargetEntity()).add(movementTargetInfo);
+                    } else {
+                        List<MovementTargetInfo> locations = new ArrayList<>();
+                        locations.add(movementTargetInfo);
+                        targetsLocations.put(aiEntity.getTargetEntity(), locations);
+                    }
+                },
                 aiEntity -> aiEntity.getTargetEntity() != null);
     }
 
@@ -348,7 +346,7 @@ public class MovementUpdateTask implements AbstractTask {
 
                 // The entity is already in one of the four corners
                 if (currentLocation.equals(northEast) || currentLocation.equals(northWest) ||
-                    currentLocation.equals(southEast) || currentLocation.equals(southWest)) {
+                        currentLocation.equals(southEast) || currentLocation.equals(southWest)) {
                     return;
                 }
 
@@ -371,10 +369,10 @@ public class MovementUpdateTask implements AbstractTask {
         if (!location.getGameMap().isMovable(location)) return false;
         if (containsMovement(otherTargetLocations, location, tracker)) return false;
         Queue<MoveNode> nodes = pathFinding.findPath(tracker.getGameMap(),
-                  tracker.getCurrentMapLocation().getX(),
-                  tracker.getCurrentMapLocation().getY(),
-                  location.getX(),
-                  location.getY());
+                tracker.getCurrentMapLocation().getX(),
+                tracker.getCurrentMapLocation().getY(),
+                location.getX(),
+                location.getY());
         if (nodes == null) return false;
         tracker.setMoveNodes(nodes);
         return true;
@@ -393,7 +391,7 @@ public class MovementUpdateTask implements AbstractTask {
 
     private boolean containsMovement(List<MovementTargetInfo> otherTargetLocations, Location testLocation, AiEntity tracker) {
         return otherTargetLocations.stream().anyMatch(info -> !info.tracker.equals(tracker) &&
-                                                               info.locationData.equals(conjoinShorts(testLocation)));
+                info.locationData.equals(conjoinShorts(testLocation)));
     }
 
     public boolean preMovementChecks(Player player, Location attemptLocation) {
@@ -500,8 +498,8 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private void performAiEntityMove(AiEntity aiEntity, MoveDirection moveDirection) {
-        Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
-
+//        Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
+        if (moveDirection == MoveDirection.NONE) return;
 
         Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
         aiEntity.setFutureMapLocation(futureLocation);
