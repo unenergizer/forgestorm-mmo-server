@@ -1,10 +1,17 @@
 package com.valenguard.server.game.world.item;
 
+import com.valenguard.server.game.world.entity.Appearance;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum ItemStackType {
     // Main Body
-    HELM,
-    CHEST,
-    BOOTS,
+    HELM(Appearance.HELM),
+    CHEST(Appearance.CHEST),
+    PANTS(Appearance.PANTS),
+    SHOES(Appearance.SHOES),
     CAPE,
     GLOVES,
     BELT,
@@ -22,8 +29,13 @@ public enum ItemStackType {
     // Generic
     GOLD,
     POTION,
-    MATERIAL
+    MATERIAL;
 
     // Trade Items
     // Skill Items
+
+    private int appearanceId;
+
+    ItemStackType() {
+    }
 }

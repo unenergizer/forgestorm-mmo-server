@@ -47,7 +47,7 @@ public class CharacterManager {
         player.setCharacterRace(characterRace);
 
         // TODO: Get bodyID and headID from client!
-        Appearance appearance = CharacterUtil.generateAppearance(player, (short) 0, (short) 0, characterColor.getTypeByte());
+        Appearance appearance = CharacterUtil.generateAppearance(player, (short) 0, characterColor.getTypeByte());
         player.setAppearance(appearance);
 
         // Insert into SQL and then load player defaults!

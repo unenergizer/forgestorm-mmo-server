@@ -89,6 +89,7 @@ public class PlayerMoveInventoryEvents {
                 break;
         }
 
+        // TODO: Shouldn't we be sending back a fail response?
         if (!sendPacket) {
             println(getClass(), "MOVING ITEMS: false", false, PRINT_DEBUG);
             return;

@@ -7,11 +7,15 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 public class EntityAppearancePacketOut extends AbstractServerOutPacket {
 
+    // Cannot exceed -0x80 (Sign bit). Extend to short if
+    // the number of indexes goes beyond 8.
     private static final byte COLOR_INDEX = 0x01;
     public static final byte BODY_INDEX = 0x02;
     public static final byte HEAD_INDEX = 0x04;
-    public static final byte ARMOR_INDEX = 0x08;
-    public static final byte HELM_INDEX = 0x10;
+    public static final byte HELM_INDEX = 0x08;
+    public static final byte CHEST_INDEX = 0x10;
+    public static final byte PANTS_INDEX = 0x20;
+    public static final byte SHOES_INDEX = 0x40;
 
     private final Entity entity;
     private final byte appearanceBits;
@@ -37,11 +41,17 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
         if ((appearanceBits & HEAD_INDEX) != 0) {
             write.writeShort(appearance.getTextureIds()[Appearance.HEAD]);
         }
-        if ((appearanceBits & ARMOR_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.ARMOR]);
-        }
         if ((appearanceBits & HELM_INDEX) != 0) {
             write.writeShort(appearance.getTextureIds()[Appearance.HELM]);
+        }
+        if ((appearanceBits & CHEST_INDEX) != 0) {
+            write.writeShort(appearance.getTextureIds()[Appearance.CHEST]);
+        }
+        if ((appearanceBits & PANTS_INDEX) != 0) {
+            write.writeShort(appearance.getTextureIds()[Appearance.PANTS]);
+        }
+        if ((appearanceBits & SHOES_INDEX) != 0) {
+            write.writeShort(appearance.getTextureIds()[Appearance.SHOES]);
         }
     }
 }

@@ -57,7 +57,6 @@ public class ClientHandler {
             player.setCharacterDatabaseId((int) characterDataOut.getCharacterId());
             player.setAppearance(CharacterUtil.generateAppearance(
                     player,
-                    characterDataOut.getBodyId(),
                     characterDataOut.getHeadId(),
                     characterDataOut.getColorId()));
 

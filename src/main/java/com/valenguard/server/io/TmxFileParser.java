@@ -231,9 +231,14 @@ public class TmxFileParser {
 
             short[] appearanceTextureIds;
             if (aiEntityData.getAtlasHeadID() != null) {
-                appearanceTextureIds = new short[2];
+                // TODO: NPC needs clothes!
+                appearanceTextureIds = new short[6];
                 appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
                 appearanceTextureIds[Appearance.HEAD] = (short) (int) aiEntityData.getAtlasHeadID();
+                appearanceTextureIds[Appearance.HELM] = (short) -1;
+                appearanceTextureIds[Appearance.CHEST] = (short) -1;
+                appearanceTextureIds[Appearance.PANTS] = (short) -1;
+                appearanceTextureIds[Appearance.SHOES] = (short) -1;
                 aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
             } else {
                 appearanceTextureIds = new short[1];

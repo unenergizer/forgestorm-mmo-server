@@ -57,6 +57,10 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getColorId());
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
+                write.writeShort(appearance.getTextureId(Appearance.HELM));
+                write.writeShort(appearance.getTextureId(Appearance.CHEST));
+                write.writeShort(appearance.getTextureId(Appearance.PANTS));
+                write.writeShort(appearance.getTextureId(Appearance.SHOES));
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
                 write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
                 write.writeByte(((NPC) entityToSpawn).getFaction());
@@ -66,8 +70,10 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getColorId());
                 write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(appearance.getTextureId(Appearance.HEAD));
-                write.writeShort(appearance.getTextureId(Appearance.ARMOR));
                 write.writeShort(appearance.getTextureId(Appearance.HELM));
+                write.writeShort(appearance.getTextureId(Appearance.CHEST));
+                write.writeShort(appearance.getTextureId(Appearance.PANTS));
+                write.writeShort(appearance.getTextureId(Appearance.SHOES));
                 break;
         }
 

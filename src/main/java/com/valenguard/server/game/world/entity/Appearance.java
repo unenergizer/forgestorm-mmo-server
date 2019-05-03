@@ -16,8 +16,10 @@ public class Appearance {
 
     public static final int BODY = 0; // Base ID
     public static final int HEAD = 1; // Base ID
-    public static final int ARMOR = 2; // Cover Base ID
-    public static final int HELM = 3; // Cover Base ID
+    public static final int HELM = 2;
+    public static final int CHEST = 3;
+    public static final int PANTS = 4;
+    public static final int SHOES = 5;
 
     private static final short REMOVE_TEXTURE = -1;
 
@@ -43,38 +45,42 @@ public class Appearance {
         if (itemStack != null) {
             println(getClass(), "Equipping non null item and updating appearance!");
             println(getClass(), "ItemStack: " + itemStack.toString());
+
             if (itemStack instanceof WearableItemStack) {
-                if (itemStackType == ItemStackType.CHEST) {
-                    println(getClass(), "Updating chest");
-                    setPlayerArmor(((WearableItemStack) itemStack).getTextureId(), sendPacket);
-                } else if (itemStackType == ItemStackType.HELM) {
-                    println(getClass(), "Updating helm");
-                    setPlayerHelm(((WearableItemStack) itemStack).getTextureId(), sendPacket);
-                }
+                setPlayerBody(itemStackType.getAppearanceId(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
             }
         } else {
             println(getClass(), "Unequipping due to null item so the appearance becomes black!");
-            if (itemStackType == ItemStackType.CHEST) {
-                setPlayerArmor(REMOVE_TEXTURE, sendPacket);
-            } else if (itemStackType == ItemStackType.HELM) {
-                setPlayerHelm(REMOVE_TEXTURE, sendPacket);
-            }
+
+            if (itemStackType.getAppearanceId() == 0) return;
+            setPlayerBody(itemStackType.getAppearanceId(), REMOVE_TEXTURE, sendPacket);
+
         }
     }
 
-    private void setPlayerHelm(short helmTextureId, boolean sendPacket) {
-        textureIds[Appearance.HELM] = helmTextureId;
-        if (sendPacket) {
-            Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner, EntityAppearancePacketOut.HELM_INDEX).sendPacket());
+    private void setPlayerBody(int appearanceId, short textureId, boolean sendPacket) {
+        textureIds[appearanceId] = textureId;
+        byte changeBit = 0x00;
+        switch (appearanceId) {
+            case HELM:
+                changeBit = EntityAppearancePacketOut.HELM_INDEX;
+                break;
+            case CHEST:
+                changeBit = EntityAppearancePacketOut.CHEST_INDEX;
+                break;
+            case PANTS:
+                changeBit = EntityAppearancePacketOut.PANTS_INDEX;
+                break;
+            case SHOES:
+                changeBit = EntityAppearancePacketOut.SHOES_INDEX;
+                break;
         }
-    }
 
-    private void setPlayerArmor(short armorTextureId, boolean sendPacket) {
-        textureIds[Appearance.ARMOR] = armorTextureId;
+        final byte appearanceByte = changeBit;
+
         if (sendPacket) {
             Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner, EntityAppearancePacketOut.ARMOR_INDEX).sendPacket());
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner, appearanceByte));
         }
     }
 }
