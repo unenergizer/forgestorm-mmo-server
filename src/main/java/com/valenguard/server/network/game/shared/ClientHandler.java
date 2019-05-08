@@ -2,7 +2,7 @@ package com.valenguard.server.network.game.shared;
 
 import com.valenguard.server.database.AuthenticatedUser;
 import com.valenguard.server.game.character.CharacterDataOut;
-import com.valenguard.server.game.character.CharacterUtil;
+import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.GameOutputStream;
@@ -54,11 +54,12 @@ public class ClientHandler {
             }
 
             player.setName(characterDataOut.getName());
-            player.setCharacterDatabaseId((int) characterDataOut.getCharacterId());
-            player.setAppearance(CharacterUtil.generateAppearance(
-                    player,
-                    characterDataOut.getHeadId(),
-                    characterDataOut.getColorId()));
+            player.setCharacterDatabaseId(characterDataOut.getCharacterId());
+
+            Appearance appearance = new Appearance(player);
+            player.setAppearance(appearance);
+            appearance.setHairTexture(characterDataOut.getHeadTexture());
+            appearance.setSkinColor(characterDataOut.getSkinColor());
 
             loadedPlayers.put(i, player);
         }

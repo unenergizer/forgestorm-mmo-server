@@ -17,7 +17,7 @@ public class StationaryEntity extends Entity {
         return Server.getInstance().getSkillNodeManager().getSkillNodeData(skillNodeId);
     }
 
-    public int getBodyId() {
-        return getAppearance().getTextureId(Appearance.BODY);
+    public byte getBodyId() {
+        return getAppearance().getMonsterBodyTexture();
     }
 }

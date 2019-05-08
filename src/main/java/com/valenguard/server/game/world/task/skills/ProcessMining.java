@@ -61,7 +61,7 @@ public class ProcessMining implements AbstractTask {
                             // 15% chance
                             if (random.nextFloat() >= .85f) {
                                 if (stationaryEntity.getBodyId() > 0) {
-                                    changeEntityAppearance(stationaryEntity, (short) (stationaryEntity.getBodyId() - 1));
+                                    changeEntityAppearance(stationaryEntity, (byte) (stationaryEntity.getBodyId() - 1));
                                 }
                             }
                             stationaryEntity.setUsedThisTick(false);
@@ -102,7 +102,7 @@ public class ProcessMining implements AbstractTask {
             clickedEntity.setUsedThisTick(true);
             player.getSkills().MINING.addExperience(skillNodeData.getExperience());
 
-            changeEntityAppearance(clickedEntity, (short) (clickedEntity.getBodyId() + 1));
+            changeEntityAppearance(clickedEntity, (byte) (clickedEntity.getBodyId() + 1));
 
             return true;
         }
@@ -110,11 +110,12 @@ public class ProcessMining implements AbstractTask {
         return false;
     }
 
-    private void changeEntityAppearance(StationaryEntity entity, short appearanceID) {
-        entity.setAppearance(new Appearance(entity, (byte) 0, new short[]{appearanceID}));
+    private void changeEntityAppearance(StationaryEntity entity, byte appearanceID) {
+        Appearance appearance = entity.getAppearance();
+        appearance.setMonsterBodyTexture(appearanceID);
 
         entity.getGameMap().getPlayerController()
-                .forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
+                .forAllPlayers(player -> new EntityAppearancePacketOut(player, entity).sendPacket());
 
     }
 }

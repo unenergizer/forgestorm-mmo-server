@@ -26,7 +26,9 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
         itemStackDrop.setEntityType(EntityType.ITEM_STACK);
         itemStackDrop.setName(itemStack.getName());
         itemStackDrop.setCurrentMapLocation(new Location(spawnLocation));
-        itemStackDrop.setAppearance(new Appearance(itemStackDrop, (byte) 0, new short[]{(short) itemStack.getItemId()}));
+        Appearance appearance = new Appearance(itemStackDrop);
+        itemStackDrop.setAppearance(appearance);
+        appearance.setMonsterBodyTexture((byte) itemStack.getItemId());
         itemStackDrop.setItemStack(itemStack);
         itemStackDrop.setDropOwner(dropOwner);
 

@@ -57,7 +57,7 @@ public class ItemStackLoader {
             Integer wearable = (Integer) itemNode.get("wearable");
             if (wearable != null) {
                 itemStack = new WearableItemStack(itemId);
-                ((WearableItemStack) itemStack).setTextureId(wearable.shortValue());
+                ((WearableItemStack) itemStack).setTextureId(wearable.byteValue());
             }
 
             /*

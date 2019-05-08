@@ -9,7 +9,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
     private final Entity entityToSpawn;
 
     public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
@@ -31,8 +31,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     private void spawnMovingEntity(GameOutputStream write) {
         Player packetReceiver = clientHandler.getPlayer();
 
-        write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
+        write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
         if (!(entityToSpawn instanceof Player)) {
             write.writeString(entityToSpawn.getName() + " " + entityToSpawn.getServerEntityId());
         } else {
@@ -49,40 +49,56 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
             case MONSTER:
-                write.writeShort(appearance.getTextureId(Appearance.BODY));
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
+
                 write.writeByte(((Monster) entityToSpawn).getAlignment().getEntityAlignmentByte());
+
+                write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
+                write.writeFloat(movingEntity.getMoveSpeed());
+                write.writeInt(movingEntity.getMaxHealth());
+                write.writeInt(movingEntity.getCurrentHealth());
+
+                write.writeByte(appearance.getMonsterBodyTexture());
                 break;
             case NPC:
-                write.writeByte(appearance.getColorId());
-                write.writeShort(appearance.getTextureId(Appearance.BODY));
-                write.writeShort(appearance.getTextureId(Appearance.HEAD));
-                write.writeShort(appearance.getTextureId(Appearance.HELM));
-                write.writeShort(appearance.getTextureId(Appearance.CHEST));
-                write.writeShort(appearance.getTextureId(Appearance.PANTS));
-                write.writeShort(appearance.getTextureId(Appearance.SHOES));
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
+
                 write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
                 write.writeByte(((NPC) entityToSpawn).getFaction());
+
+                write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
+                write.writeFloat(movingEntity.getMoveSpeed());
+                write.writeInt(movingEntity.getMaxHealth());
+                write.writeInt(movingEntity.getCurrentHealth());
+
+                write.writeByte(appearance.getHairTexture());
+                write.writeByte(appearance.getHelmTexture());
+                write.writeByte(appearance.getChestTexture());
+                write.writeByte(appearance.getPantsTexture());
+                write.writeByte(appearance.getShoesTexture());
+                write.writeByte(appearance.getHairColor());
+                write.writeByte(appearance.getEyeColor());
+                write.writeByte(appearance.getSkinColor());
+                write.writeByte(appearance.getGlovesColor());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:
-                write.writeByte(appearance.getColorId());
-                write.writeShort(appearance.getTextureId(Appearance.BODY));
-                write.writeShort(appearance.getTextureId(Appearance.HEAD));
-                write.writeShort(appearance.getTextureId(Appearance.HELM));
-                write.writeShort(appearance.getTextureId(Appearance.CHEST));
-                write.writeShort(appearance.getTextureId(Appearance.PANTS));
-                write.writeShort(appearance.getTextureId(Appearance.SHOES));
+                write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
+                write.writeFloat(movingEntity.getMoveSpeed());
+                write.writeInt(movingEntity.getMaxHealth());
+                write.writeInt(movingEntity.getCurrentHealth());
+
+                write.writeByte(appearance.getHairTexture());
+                write.writeByte(appearance.getHelmTexture());
+                write.writeByte(appearance.getChestTexture());
+                write.writeByte(appearance.getPantsTexture());
+                write.writeByte(appearance.getShoesTexture());
+                write.writeByte(appearance.getHairColor());
+                write.writeByte(appearance.getEyeColor());
+                write.writeByte(appearance.getSkinColor());
+                write.writeByte(appearance.getGlovesColor());
                 break;
         }
-
-        write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
-        write.writeFloat(movingEntity.getMoveSpeed());
-
-        // send hp
-        write.writeInt(movingEntity.getMaxHealth());
-        write.writeInt(movingEntity.getCurrentHealth());
 
         println(getClass(), "===================================", false, PRINT_DEBUG);
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
@@ -93,26 +109,33 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
         println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
 
-        for (int i = 0; i < entityToSpawn.getAppearance().getTextureIds().length; i++) {
-            println(getClass(), "textureIds #" + i + ": " + entityToSpawn.getAppearance().getTextureIds()[i], false, PRINT_DEBUG);
-        }
+        println(getClass(), "MonsterBody: " + appearance.getMonsterBodyTexture(), false, PRINT_DEBUG);
+        println(getClass(), "Hair: " + appearance.getHairTexture(), false, PRINT_DEBUG);
+        println(getClass(), "Helm: " + appearance.getHelmTexture(), false, PRINT_DEBUG);
+        println(getClass(), "Chest: " + appearance.getChestTexture(), false, PRINT_DEBUG);
+        println(getClass(), "Pants: " + appearance.getPantsTexture(), false, PRINT_DEBUG);
+        println(getClass(), "Shoes: " + appearance.getShoesTexture(), false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + appearance.getHairColor(), false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
+        println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
     }
 
     private void spawnStationaryEntity(GameOutputStream write) {
-        write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
+        write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeString(entityToSpawn.getName());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
-        write.writeShort(entityToSpawn.getAppearance().getTextureId(Appearance.BODY));
+        write.writeByte(entityToSpawn.getAppearance().getMonsterBodyTexture());
     }
 
     private void spawnItemStackDrop(GameOutputStream write) {
-        write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeShort(entityToSpawn.getServerEntityId());
+        write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeString(entityToSpawn.getName());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
         write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
-        write.writeShort(entityToSpawn.getAppearance().getTextureId(Appearance.BODY));
+        write.writeByte(entityToSpawn.getAppearance().getMonsterBodyTexture());
     }
 }

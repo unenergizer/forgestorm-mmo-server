@@ -1,13 +1,29 @@
 package com.valenguard.server.game.character;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import static com.valenguard.server.util.Log.println;
+
+
 @Getter
-@AllArgsConstructor
 public class CharacterDataOut {
-    private final byte characterId;
+
+    private static final boolean PRINT_DEBUG = false;
+
+    private final int characterId;
     private final String name;
-    private final short headId;
-    private final byte colorId;
+    private final byte headTexture;
+    private final byte skinColor;
+
+    public CharacterDataOut(int characterId, String name, byte headTexture, byte skinColor) {
+        this.characterId = characterId;
+        this.name = name;
+        this.headTexture = headTexture;
+        this.skinColor = skinColor;
+
+        println(getClass(), "ID: " + characterId, false, PRINT_DEBUG);
+        println(getClass(), "Name: " + name, false, PRINT_DEBUG);
+        println(getClass(), "HeadTexture: " + headTexture, false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
+    }
 }

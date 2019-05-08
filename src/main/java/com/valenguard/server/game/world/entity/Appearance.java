@@ -5,40 +5,34 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import static com.valenguard.server.util.Log.println;
 
-@AllArgsConstructor
+@Getter
+@Setter
 public class Appearance {
 
-    public static final int BODY = 0; // Base ID
-    public static final int HEAD = 1; // Base ID
-    public static final int HELM = 2;
-    public static final int CHEST = 3;
-    public static final int PANTS = 4;
-    public static final int SHOES = 5;
+    private byte monsterBodyTexture = -1;
+    private byte hairTexture = 0;
+    private byte helmTexture = -1;
+    private byte chestTexture = -1;
+    private byte pantsTexture = -1;
+    private byte shoesTexture = -1;
+    private byte hairColor = 1;
+    private byte eyeColor = 7;
+    private byte skinColor = 0;
+    private byte glovesColor = 0;
 
-    private static final short REMOVE_TEXTURE = -1;
+    private static final byte REMOVE_TEXTURE = -1;
 
     private final Entity appearanceOwner;
 
-    @Setter
-    @Getter
-    private byte colorId;
-
-    /**
-     * IDs are arranged from head to toe or from top to bottom.
-     */
-    @Setter
-    @Getter
-    private short[] textureIds;
-
-    public short getTextureId(int index) {
-        return textureIds[index];
+    public Appearance(Entity appearanceOwner) {
+        this.appearanceOwner = appearanceOwner;
     }
+
 
     public void updatePlayerAppearance(ItemStack itemStack, ItemStackType itemStackType, boolean sendPacket) {
         println(getClass(), "SendPacket: " + sendPacket);
@@ -47,40 +41,52 @@ public class Appearance {
             println(getClass(), "ItemStack: " + itemStack.toString());
 
             if (itemStack instanceof WearableItemStack) {
-                setPlayerBody(itemStackType.getAppearanceId(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
+                setPlayerBody(itemStackType.getAppearanceType(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
             }
         } else {
             println(getClass(), "Unequipping due to null item so the appearance becomes black!");
 
-            if (itemStackType.getAppearanceId() == 0) return;
-            setPlayerBody(itemStackType.getAppearanceId(), REMOVE_TEXTURE, sendPacket);
-
+            if (itemStackType.getAppearanceType() == null) return;
+            setPlayerBody(itemStackType.getAppearanceType(), REMOVE_TEXTURE, sendPacket);
         }
     }
 
-    private void setPlayerBody(int appearanceId, short textureId, boolean sendPacket) {
-        textureIds[appearanceId] = textureId;
-        byte changeBit = 0x00;
-        switch (appearanceId) {
-            case HELM:
-                changeBit = EntityAppearancePacketOut.HELM_INDEX;
+    private void setPlayerBody(AppearanceType appearanceType, byte updateId, boolean sendPacket) {
+        switch (appearanceType) {
+            case MONSTER_BODY_TEXTURE:
+                monsterBodyTexture = updateId;
                 break;
-            case CHEST:
-                changeBit = EntityAppearancePacketOut.CHEST_INDEX;
+            case HAIR_TEXTURE:
+                hairTexture = updateId;
                 break;
-            case PANTS:
-                changeBit = EntityAppearancePacketOut.PANTS_INDEX;
+            case HELM_TEXTURE:
+                helmTexture = updateId;
                 break;
-            case SHOES:
-                changeBit = EntityAppearancePacketOut.SHOES_INDEX;
+            case CHEST_TEXTURE:
+                chestTexture = updateId;
+                break;
+            case PANTS_TEXTURE:
+                pantsTexture = updateId;
+                break;
+            case SHOES_TEXTURE:
+                shoesTexture = updateId;
+                break;
+            case HAIR_COLOR:
+                hairColor = updateId;
+                break;
+            case EYE_COLOR:
+                eyeColor = updateId;
+                break;
+            case SKIN_COLOR:
+                skinColor = updateId;
+                break;
+            case GLOVES_COLOR:
+                glovesColor = updateId;
                 break;
         }
-
-        final byte appearanceByte = changeBit;
-
         if (sendPacket) {
             Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner, appearanceByte));
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner));
         }
     }
 }

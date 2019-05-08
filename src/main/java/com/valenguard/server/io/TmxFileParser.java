@@ -224,26 +224,14 @@ public class TmxFileParser {
             aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
             // Setup appearance
-            byte colorID = 0;
-            if (aiEntityData.getColorID() != null) {
-                colorID = (byte) (int) aiEntityData.getColorID();
-            }
+            Appearance appearance = new Appearance(aiEntity);
+            aiEntity.setAppearance(appearance);
 
-            short[] appearanceTextureIds;
-            if (aiEntityData.getAtlasHeadID() != null) {
-                // TODO: NPC needs clothes!
-                appearanceTextureIds = new short[6];
-                appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
-                appearanceTextureIds[Appearance.HEAD] = (short) (int) aiEntityData.getAtlasHeadID();
-                appearanceTextureIds[Appearance.HELM] = (short) -1;
-                appearanceTextureIds[Appearance.CHEST] = (short) -1;
-                appearanceTextureIds[Appearance.PANTS] = (short) -1;
-                appearanceTextureIds[Appearance.SHOES] = (short) -1;
-                aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
+            if (aiEntityData.getAtlasHairTextureID() != null) {
+                appearance.setHairTexture((byte) (int) aiEntityData.getAtlasHairTextureID());
+                appearance.setSkinColor((byte) (int) aiEntityData.getSkinColor());
             } else {
-                appearanceTextureIds = new short[1];
-                appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
-                aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
+                appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getAtlasMonsterBodyID());
             }
 
             // Setup basic attributes.
@@ -304,7 +292,9 @@ public class TmxFileParser {
             stationaryEntity.setCurrentMapLocation(new Location(fileName, x, y));
             stationaryEntity.setEntityType(EntityType.SKILL_NODE);
             stationaryEntity.setStationaryType(StationaryTypes.valueOf(typeID));
-            stationaryEntity.setAppearance(new Appearance(stationaryEntity, (byte) 0, new short[]{0})); // TODO: Determine texture id
+            Appearance appearance = new Appearance(stationaryEntity);
+            stationaryEntity.setAppearance(appearance);
+            appearance.setMonsterBodyTexture((byte) 0);// TODO: Determine texture id
             stationaryEntity.setName(""); // Empty name
             Server.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);
 

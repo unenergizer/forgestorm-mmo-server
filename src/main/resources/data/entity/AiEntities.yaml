@@ -2,7 +2,7 @@
   name: "Happy Crab"
   type: MONSTER
   alignment: FRIENDLY
-  atlasBodyID: 16
+  atlasMonsterBodyID: 16
   health: 140
   damage: 1
   expDrop: 7
@@ -15,7 +15,7 @@
   name: "Angry Crab"
   type: MONSTER
   alignment: HOSTILE
-  atlasBodyID: 26
+  atlasMonsterBodyID: 26
   health: 50
   damage: 15
   expDrop: 15
@@ -28,9 +28,8 @@
   name: "Fishing Master"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 0
-  atlasBodyID: 52
-  atlasHeadID: 30
+  skinColor: 0
+  atlasHairTextureID: 1
   health: 80
   damage: 10
   expDrop: 28
@@ -43,9 +42,8 @@
   name: "Old Man"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 0
-  atlasBodyID: 57
-  atlasHeadID: 64
+  skinColor: 0
+  atlasHairTextureID: 2
   health: 80
   damage: 15
   expDrop: 28
@@ -58,7 +56,7 @@
   name: "Unseen Eye"
   type: MONSTER
   alignment: NEUTRAL
-  atlasBodyID: 30
+  atlasMonsterBodyID: 30
   health: 50
   damage: 11
   expDrop: 38
@@ -71,9 +69,8 @@
   name: "Big Joseph"
   type: NPC
   faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
-  colorID: 2
-  atlasBodyID: 55
-  atlasHeadID: 3
+  skinColor: 2
+  atlasHairTextureID: 3
   health: 9
   damage: 1
   expDrop: 1
@@ -86,9 +83,8 @@
   name: "Angry Mother"
   type: NPC
   faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
-  colorID: 3
-  atlasBodyID: 48
-  atlasHeadID: 36
+  skinColor: 3
+  atlasHairTextureID: 4
   health: 45
   damage: 7
   expDrop: 11
@@ -101,9 +97,8 @@
   name: "Passive Father"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 4
-  atlasBodyID: 48
-  atlasHeadID: 36
+  skinColor: 4
+  atlasHairTextureID: 5
   health: 45
   damage: 7
   expDrop: 11
@@ -116,9 +111,8 @@
   name: "Kenny"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 5
-  atlasBodyID: 4
-  atlasHeadID: 40
+  skinColor: 5
+  atlasHairTextureID: 6
   health: 45
   damage: 7
   expDrop: 11
@@ -131,9 +125,8 @@
   name: "Niels"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 6
-  atlasBodyID: 1
-  atlasHeadID: 63
+  skinColor: 6
+  atlasHairTextureID: 7
   health: 45
   damage: 7
   expDrop: 11
@@ -146,9 +139,8 @@
   name: "Busy Waiter"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 7
-  atlasBodyID: 1
-  atlasHeadID: 1
+  skinColor: 7
+  atlasHairTextureID: 1
   health: 65
   damage: 20
   expDrop: 11
@@ -161,9 +153,8 @@
   name: "Tohmer"
   type: NPC
   faction: FROZEN_THRONE
-  colorID: 8
-  atlasBodyID: 52
-  atlasHeadID: 30
+  skinColor: 8
+  atlasHairTextureID: 8
   health: 45
   damage: 7
   expDrop: 11
@@ -176,9 +167,8 @@
   name: "Elevator Man"
   type: NPC
   faction: FROZEN_THRONE
-  colorID: 9
-  atlasBodyID: 41
-  atlasHeadID: 38
+  skinColor: 9
+  atlasHairTextureID: 9
   health: 45
   damage: 7
   expDrop: 11
@@ -191,9 +181,8 @@
   name: "Inn Keeper"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 10
-  atlasBodyID: 1
-  atlasHeadID: 1
+  skinColor: 10
+  atlasHairTextureID: 1
   health: 65
   damage: 20
   expDrop: 11
@@ -207,9 +196,8 @@
   name: "Frantic Cook"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 11
-  atlasBodyID: 48
-  atlasHeadID: 35
+  skinColor: 11
+  atlasHairTextureID: 10
   health: 65
   damage: 20
   expDrop: 11
@@ -222,9 +210,8 @@
   name: "Sea Watcher"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 1
-  atlasBodyID: 47
-  atlasHeadID: 35
+  skinColor: 1
+  atlasHairTextureID: 11
   health: 80
   damage: 10
   expDrop: 28
@@ -237,9 +224,8 @@
   name: "Bank Teller"
   type: NPC
   faction: THE_EMPIRE
-  colorID: 1
-  atlasBodyID: 47
-  atlasHeadID: 35
+  skinColor: 1
+  atlasHairTextureID: 1
   health: 5000
   damage: 10000
   expDrop: 1

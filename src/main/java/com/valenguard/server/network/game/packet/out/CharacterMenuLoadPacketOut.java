@@ -28,9 +28,8 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
             write.writeByte(index); // index of array (player will send back index to load and play character)
 
             Appearance appearance = player.getAppearance();
-            write.writeShort(appearance.getTextureId(Appearance.BODY));
-            write.writeShort(appearance.getTextureId(Appearance.HEAD));
-            write.writeByte(appearance.getColorId());
+            write.writeByte(appearance.getHairTexture());
+            write.writeByte(appearance.getSkinColor());
         }
     }
 }

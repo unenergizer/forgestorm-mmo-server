@@ -7,7 +7,6 @@ import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.game.world.item.inventory.PlayerBag;
 import com.valenguard.server.game.world.maps.GameMap;
-import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -124,17 +123,17 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
     }
 
-    private void changeEntityAppearance(Entity entity, GameMap gameMap) {
-        short appearanceID = entity.getAppearance().getTextureId(0);
-
-        if (appearanceID >= 3) appearanceID = 0;
-        else appearanceID++;
-
-        entity.setAppearance(new Appearance(entity, (byte) 0, new short[]{appearanceID}));
-
-        gameMap.getPlayerController().forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
-
-    }
+//    private void changeEntityAppearance(Entity entity, GameMap gameMap) {
+//        short appearanceID = entity.getAppearance().getTextureId(0);
+//
+//        if (appearanceID >= 3) appearanceID = 0;
+//        else appearanceID++;
+//
+//        entity.setAppearance(new Appearance(entity, (byte) 0, new short[]{appearanceID}));
+//
+//        gameMap.getPlayerController().forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
+//
+//    }
 
     @Getter
     @AllArgsConstructor

@@ -7,51 +7,39 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 public class EntityAppearancePacketOut extends AbstractServerOutPacket {
 
-    // Cannot exceed -0x80 (Sign bit). Extend to short if
-    // the number of indexes goes beyond 8.
-    private static final byte COLOR_INDEX = 0x01;
-    public static final byte BODY_INDEX = 0x02;
-    public static final byte HEAD_INDEX = 0x04;
-    public static final byte HELM_INDEX = 0x08;
-    public static final byte CHEST_INDEX = 0x10;
-    public static final byte PANTS_INDEX = 0x20;
-    public static final byte SHOES_INDEX = 0x40;
-
     private final Entity entity;
-    private final byte appearanceBits;
 
-    public EntityAppearancePacketOut(final Player receiver, final Entity entity, final byte appearanceBits) {
+    public EntityAppearancePacketOut(final Player receiver, final Entity entity) {
         super(Opcodes.APPEARANCE, receiver.getClientHandler());
         this.entity = entity;
-        this.appearanceBits = appearanceBits;
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        Appearance appearance = entity.getAppearance();
+
         write.writeShort(entity.getServerEntityId());
         write.writeByte(getEntityType(entity).getEntityTypeByte());
-        write.writeByte(appearanceBits);
-        Appearance appearance = entity.getAppearance();
-        if ((appearanceBits & COLOR_INDEX) != 0) {
-            write.writeByte(appearance.getColorId());
-        }
-        if ((appearanceBits & BODY_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.BODY]);
-        }
-        if ((appearanceBits & HEAD_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.HEAD]);
-        }
-        if ((appearanceBits & HELM_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.HELM]);
-        }
-        if ((appearanceBits & CHEST_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.CHEST]);
-        }
-        if ((appearanceBits & PANTS_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.PANTS]);
-        }
-        if ((appearanceBits & SHOES_INDEX) != 0) {
-            write.writeShort(appearance.getTextureIds()[Appearance.SHOES]);
+
+        switch (entity.getEntityType()) {
+            case CLIENT_PLAYER:
+            case PLAYER:
+            case NPC:
+                write.writeByte(appearance.getHairTexture());
+                write.writeByte(appearance.getHelmTexture());
+                write.writeByte(appearance.getChestTexture());
+                write.writeByte(appearance.getPantsTexture());
+                write.writeByte(appearance.getShoesTexture());
+                write.writeByte(appearance.getHairColor());
+                write.writeByte(appearance.getEyeColor());
+                write.writeByte(appearance.getSkinColor());
+                write.writeByte(appearance.getGlovesColor());
+                break;
+            case MONSTER:
+            case ITEM_STACK:
+            case SKILL_NODE:
+                write.writeByte(appearance.getMonsterBodyTexture());
+                break;
         }
     }
 }

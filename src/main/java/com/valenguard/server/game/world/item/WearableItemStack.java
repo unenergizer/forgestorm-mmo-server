@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class WearableItemStack extends ItemStack {
 
-    private short textureId;
+    private byte textureId;
 
     public WearableItemStack(int itemId) {
         super(itemId);

@@ -52,20 +52,17 @@ public class AiEntityDataManager {
 
         // Setup appearance
         byte colorID = 0;
-        if (aiEntityData.getColorID() != null) {
-            colorID = (byte) (int) aiEntityData.getColorID();
+        if (aiEntityData.getSkinColor() != null) {
+            colorID = (byte) (int) aiEntityData.getSkinColor();
         }
 
-        short[] appearanceTextureIds;
-        if (aiEntityData.getAtlasHeadID() != null) {
-            appearanceTextureIds = new short[2];
-            appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
-            appearanceTextureIds[Appearance.HEAD] = (short) (int) aiEntityData.getAtlasHeadID();
-            aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
+        Appearance appearance = new Appearance(aiEntity);
+        aiEntity.setAppearance(appearance);
+        if (aiEntityData.getAtlasHairTextureID() != null) {
+            appearance.setHairTexture((byte) (int) aiEntityData.getAtlasHairTextureID());
+            appearance.setSkinColor(colorID);
         } else {
-            appearanceTextureIds = new short[1];
-            appearanceTextureIds[Appearance.BODY] = aiEntityData.getAtlasBodyID();
-            aiEntity.setAppearance(new Appearance(aiEntity, colorID, appearanceTextureIds));
+            appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getAtlasMonsterBodyID());
         }
 
         // Setup basic attributes.
