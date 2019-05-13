@@ -46,9 +46,6 @@ public class AiEntityLoader {
             String type = (String) entityDataNode.get("type");
             String alignment = (String) entityDataNode.get("alignment");
             String faction = (String) entityDataNode.get("faction");
-            Integer skinColor = (Integer) entityDataNode.get("skinColor");
-            Integer atlasBodyID = (Integer) entityDataNode.get("atlasMonsterBodyID");
-            Integer atlasHeadID = (Integer) entityDataNode.get("atlasHairTextureID");
             int health = (Integer) entityDataNode.get("health");
             int damage = (Integer) entityDataNode.get("damage");
             int expDrop = (Integer) entityDataNode.get("expDrop");
@@ -65,9 +62,6 @@ public class AiEntityLoader {
             aiEntityData.setEntityType(EntityType.valueOf(type));
             if (alignment != null) aiEntityData.setEntityAlignment(EntityAlignment.valueOf(alignment));
             aiEntityData.setFaction(faction);
-            aiEntityData.setSkinColor(skinColor);
-            aiEntityData.setAtlasMonsterBodyID(atlasBodyID);
-            aiEntityData.setAtlasHairTextureID(atlasHeadID);
             aiEntityData.setHealth(health);
             aiEntityData.setDamage(damage);
             aiEntityData.setExpDrop(expDrop);
@@ -78,6 +72,29 @@ public class AiEntityLoader {
             aiEntityData.setShopID(shopID == null ? -1 : shopID);
             aiEntityData.setBankKeeper(isBankKeeper);
 
+            // Appearance Data
+            Integer monsterBodyTexture = (Integer) entityDataNode.get("monsterBodyTexture");
+            Integer hairTexture = (Integer) entityDataNode.get("hairTexture");
+            Integer helmTexture = (Integer) entityDataNode.get("helmTexture");
+            Integer chestTexture = (Integer) entityDataNode.get("chestTexture");
+            Integer pantsTexture = (Integer) entityDataNode.get("pantsTexture");
+            Integer shoesTexture = (Integer) entityDataNode.get("shoesTexture");
+            Integer hairColor = (Integer) entityDataNode.get("hairColor");
+            Integer eyesColor = (Integer) entityDataNode.get("eyesColor");
+            Integer skinColor = (Integer) entityDataNode.get("skinColor");
+            Integer glovesColor = (Integer) entityDataNode.get("glovesColor");
+
+            aiEntityData.setMonsterBodyTexture(monsterBodyTexture);
+            aiEntityData.setHairTexture(hairTexture);
+            aiEntityData.setHelmTexture(helmTexture);
+            aiEntityData.setChestTexture(chestTexture);
+            aiEntityData.setPantsTexture(pantsTexture);
+            aiEntityData.setShoesTexture(shoesTexture);
+            aiEntityData.setHairColor(hairColor);
+            aiEntityData.setEyeColor(eyesColor);
+            aiEntityData.setSkinColor(skinColor);
+            aiEntityData.setGlovesColor(glovesColor);
+
             // Loading Finished & Creation Finished! Save me!
             aiEntityDataList.add(aiEntityData);
 
@@ -87,9 +104,6 @@ public class AiEntityLoader {
             println(getClass(), "Type: " + aiEntityData.getEntityType(), false, PRINT_DEBUG);
             println(getClass(), "Alignment: " + aiEntityData.getEntityAlignment(), false, PRINT_DEBUG);
             println(getClass(), "Faction: " + aiEntityData, false, PRINT_DEBUG);
-            println(getClass(), "ColorID: " + aiEntityData.getSkinColor(), false, PRINT_DEBUG);
-            println(getClass(), "AtlasBodyID: " + aiEntityData.getAtlasMonsterBodyID(), false, PRINT_DEBUG);
-            println(getClass(), "AtlasHeadID: " + aiEntityData.getAtlasHairTextureID(), false, PRINT_DEBUG);
             println(getClass(), "Health: " + aiEntityData.getHealth(), false, PRINT_DEBUG);
             println(getClass(), "Damage: " + aiEntityData.getDamage(), false, PRINT_DEBUG);
             println(getClass(), "ExpDrop: " + aiEntityData.getExpDrop(), false, PRINT_DEBUG);
@@ -98,6 +112,18 @@ public class AiEntityLoader {
             println(getClass(), "ProbabilityStill: " + aiEntityData.getProbabilityStill(), false, PRINT_DEBUG);
             println(getClass(), "ProbabilityWalkStart: " + aiEntityData.getProbabilityWalkStart(), false, PRINT_DEBUG);
             println(getClass(), "ShopID: " + aiEntityData.getShopID(), false, PRINT_DEBUG);
+            println(PRINT_DEBUG);
+            println(getClass(), "-- AppearanceData --", false, PRINT_DEBUG);
+            println(getClass(), "MonsterBody: " + aiEntityData.getMonsterBodyTexture(), false, PRINT_DEBUG);
+            println(getClass(), "Hair: " + aiEntityData.getHairTexture(), false, PRINT_DEBUG);
+            println(getClass(), "Chest: " + aiEntityData.getChestTexture(), false, PRINT_DEBUG);
+            println(getClass(), "Pants: " + aiEntityData.getPantsTexture(), false, PRINT_DEBUG);
+            println(getClass(), "Shoes: " + aiEntityData.getShoesTexture(), false, PRINT_DEBUG);
+            println(getClass(), "HairColor: " + aiEntityData.getHairColor(), false, PRINT_DEBUG);
+            println(getClass(), "EyesColor: " + aiEntityData.getEyeColor(), false, PRINT_DEBUG);
+            println(getClass(), "SkinColor: " + aiEntityData.getSkinColor(), false, PRINT_DEBUG);
+            println(getClass(), "GlovesColor: " + aiEntityData.getGlovesColor(), false, PRINT_DEBUG);
+            println(PRINT_DEBUG);
             println(PRINT_DEBUG);
         }
 
@@ -116,9 +142,6 @@ public class AiEntityLoader {
         private EntityType entityType;
         private EntityAlignment entityAlignment;
         private String faction;
-        private Integer skinColor;
-        private Integer atlasMonsterBodyID;
-        private Integer atlasHairTextureID;
         private int health;
         private int damage;
         private int expDrop;
@@ -128,6 +151,18 @@ public class AiEntityLoader {
         private float probabilityWalkStart;
         private Integer shopID;
         private boolean isBankKeeper;
+
+        // Appearance Data
+        private Integer monsterBodyTexture;
+        private Integer hairTexture;
+        private Integer helmTexture;
+        private Integer chestTexture;
+        private Integer pantsTexture;
+        private Integer shoesTexture;
+        private Integer hairColor;
+        private Integer eyeColor;
+        private Integer skinColor;
+        private Integer glovesColor;
 
         AiEntityData(final int entityDataID) {
             this.entityDataID = entityDataID;

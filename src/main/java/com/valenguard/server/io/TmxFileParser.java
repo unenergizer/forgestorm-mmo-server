@@ -89,7 +89,7 @@ public class TmxFileParser {
     }
 
     private static Tile[][] parseMapTiles(int mapWidth, int mapHeight, Element tmx) {
-        Tile map[][] = new Tile[mapWidth][mapHeight];
+        Tile[][] map = new Tile[mapWidth][mapHeight];
 
         // Examine XML file and find tags called "layer" then loop through them.
         NodeList layerTag = tmx.getElementsByTagName("layer");
@@ -227,11 +227,21 @@ public class TmxFileParser {
             Appearance appearance = new Appearance(aiEntity);
             aiEntity.setAppearance(appearance);
 
-            if (aiEntityData.getAtlasHairTextureID() != null) {
-                appearance.setHairTexture((byte) (int) aiEntityData.getAtlasHairTextureID());
-                appearance.setSkinColor((byte) (int) aiEntityData.getSkinColor());
+            if (aiEntityData.getMonsterBodyTexture() != null) {
+                appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getMonsterBodyTexture());
             } else {
-                appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getAtlasMonsterBodyID());
+                if (aiEntityData.getHairTexture() != null) {
+                    appearance.setHairTexture((byte) (int) aiEntityData.getHairTexture());
+                } else {
+                    appearance.setHelmTexture((byte) (int) aiEntityData.getHelmTexture());
+                }
+                appearance.setChestTexture((byte) (int) aiEntityData.getChestTexture());
+                appearance.setPantsTexture((byte) (int) aiEntityData.getPantsTexture());
+                appearance.setShoesTexture((byte) (int) aiEntityData.getShoesTexture());
+                appearance.setHairColor((byte) (int) aiEntityData.getHairColor());
+                appearance.setEyeColor((byte) (int) aiEntityData.getEyeColor());
+                appearance.setSkinColor((byte) (int) aiEntityData.getSkinColor());
+                appearance.setGlovesColor((byte) (int) aiEntityData.getGlovesColor());
             }
 
             // Setup basic attributes.

@@ -58,11 +58,11 @@ public class AiEntityDataManager {
 
         Appearance appearance = new Appearance(aiEntity);
         aiEntity.setAppearance(appearance);
-        if (aiEntityData.getAtlasHairTextureID() != null) {
-            appearance.setHairTexture((byte) (int) aiEntityData.getAtlasHairTextureID());
+        if (aiEntityData.getHairTexture() != null) {
+            appearance.setHairTexture((byte) (int) aiEntityData.getHairTexture());
             appearance.setSkinColor(colorID);
         } else {
-            appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getAtlasMonsterBodyID());
+            appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getMonsterBodyTexture());
         }
 
         // Setup basic attributes.

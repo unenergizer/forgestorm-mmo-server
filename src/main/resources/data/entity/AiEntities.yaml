@@ -2,7 +2,7 @@
   name: "Happy Crab"
   type: MONSTER
   alignment: FRIENDLY
-  atlasMonsterBodyID: 16
+  monsterBodyTexture: 16
   health: 140
   damage: 1
   expDrop: 7
@@ -15,7 +15,7 @@
   name: "Angry Crab"
   type: MONSTER
   alignment: HOSTILE
-  atlasMonsterBodyID: 26
+  monsterBodyTexture: 26
   health: 50
   damage: 15
   expDrop: 15
@@ -28,8 +28,6 @@
   name: "Fishing Master"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 0
-  atlasHairTextureID: 1
   health: 80
   damage: 10
   expDrop: 28
@@ -38,12 +36,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 3:
   name: "Old Man"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 0
-  atlasHairTextureID: 2
   health: 80
   damage: 15
   expDrop: 28
@@ -52,11 +56,19 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 4:
   name: "Unseen Eye"
   type: MONSTER
   alignment: NEUTRAL
-  atlasMonsterBodyID: 30
+  monsterBodyTexture: 30
   health: 50
   damage: 11
   expDrop: 38
@@ -70,7 +82,7 @@
   type: NPC
   faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
   skinColor: 2
-  atlasHairTextureID: 3
+  hairTexture: 3
   health: 9
   damage: 1
   expDrop: 1
@@ -83,8 +95,6 @@
   name: "Angry Mother"
   type: NPC
   faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
-  skinColor: 3
-  atlasHairTextureID: 4
   health: 45
   damage: 7
   expDrop: 11
@@ -93,12 +103,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 7:
   name: "Passive Father"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 4
-  atlasHairTextureID: 5
   health: 45
   damage: 7
   expDrop: 11
@@ -107,12 +123,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 8:
   name: "Kenny"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 5
-  atlasHairTextureID: 6
   health: 45
   damage: 7
   expDrop: 11
@@ -121,12 +143,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 9:
   name: "Niels"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 6
-  atlasHairTextureID: 7
   health: 45
   damage: 7
   expDrop: 11
@@ -135,12 +163,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 10:
   name: "Busy Waiter"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 7
-  atlasHairTextureID: 1
   health: 65
   damage: 20
   expDrop: 11
@@ -149,12 +183,18 @@
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 11:
   name: "Tohmer"
   type: NPC
   faction: FROZEN_THRONE
-  skinColor: 8
-  atlasHairTextureID: 8
   health: 45
   damage: 7
   expDrop: 11
@@ -163,12 +203,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 12:
   name: "Elevator Man"
   type: NPC
   faction: FROZEN_THRONE
-  skinColor: 9
-  atlasHairTextureID: 9
   health: 45
   damage: 7
   expDrop: 11
@@ -177,12 +223,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 13:
   name: "Inn Keeper"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 10
-  atlasHairTextureID: 1
   health: 65
   damage: 20
   expDrop: 11
@@ -192,12 +244,18 @@
   probabilityWalkStart: 1.0
   shopID: 2
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 14:
   name: "Frantic Cook"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 11
-  atlasHairTextureID: 10
   health: 65
   damage: 20
   expDrop: 11
@@ -206,12 +264,18 @@
   probabilityStill: 0.0
   probabilityWalkStart: 1.0
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 15:
   name: "Sea Watcher"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 1
-  atlasHairTextureID: 11
   health: 80
   damage: 10
   expDrop: 28
@@ -220,12 +284,18 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
 16:
   name: "Bank Teller"
   type: NPC
   faction: THE_EMPIRE
-  skinColor: 1
-  atlasHairTextureID: 1
   health: 5000
   damage: 10000
   expDrop: 1
@@ -234,3 +304,11 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: true
+  hairTexture: 2
+  chestTexture: 5
+  pantsTexture: 8
+  shoesTexture: 9
+  hairColor: 9
+  eyesColor: 8
+  skinColor: 0
+  glovesColor: 0
