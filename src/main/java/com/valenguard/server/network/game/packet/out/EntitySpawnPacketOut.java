@@ -88,6 +88,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeInt(movingEntity.getMaxHealth());
                 write.writeInt(movingEntity.getCurrentHealth());
 
+                write.writeBoolean(((Player) movingEntity).getClientHandler().getAuthenticatedUser().isAdmin());
+
                 write.writeByte(appearance.getHairTexture());
                 write.writeByte(appearance.getHelmTexture());
                 write.writeByte(appearance.getChestTexture());

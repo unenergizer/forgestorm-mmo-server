@@ -36,14 +36,14 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
-  hairTexture: 2
-  chestTexture: 5
-  pantsTexture: 8
-  shoesTexture: 9
-  hairColor: 9
-  eyesColor: 8
-  skinColor: 0
-  glovesColor: 0
+  hairTexture: 1
+  chestTexture: 10
+  pantsTexture: 12
+  shoesTexture: 3
+  hairColor: 11
+  eyesColor: 9
+  skinColor: 16
+  glovesColor: 16
 3:
   name: "Old Man"
   type: NPC
@@ -56,11 +56,11 @@
   probabilityStill: 0.5
   probabilityWalkStart: 0.5
   bankKeeper: false
-  hairTexture: 2
-  chestTexture: 5
-  pantsTexture: 8
-  shoesTexture: 9
-  hairColor: 9
+  hairTexture: 9
+  chestTexture: 4
+  pantsTexture: 7
+  shoesTexture: 8
+  hairColor: 15
   eyesColor: 8
   skinColor: 0
   glovesColor: 0
