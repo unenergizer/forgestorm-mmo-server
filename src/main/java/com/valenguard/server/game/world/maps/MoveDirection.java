@@ -1,11 +1,18 @@
 package com.valenguard.server.game.world.maps;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum MoveDirection {
-    NORTH,
-    SOUTH,
-    WEST,
-    EAST,
-    NONE;
+    SOUTH("down"),
+    EAST("right"),
+    NORTH("up"),
+    WEST("left"),
+    NONE("down"); // Just defualt to down...
+
+    private String directionName;
 
     public static MoveDirection getDirection(byte directionByte) {
         for (MoveDirection direction : MoveDirection.values()) {
