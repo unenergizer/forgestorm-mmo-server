@@ -40,9 +40,9 @@
   chestTexture: 10
   pantsTexture: 12
   shoesTexture: 3
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 3:
   name: "Old Man"
@@ -60,9 +60,9 @@
   chestTexture: 4
   pantsTexture: 7
   shoesTexture: 8
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 4:
   name: "Unseen Eye"
@@ -81,7 +81,7 @@
   name: "Big Joseph"
   type: NPC
   faction: MOUNTAIN_DWELLERS_OF_THE_NORTH
-  skinColor: -3872513
+  skinColor: -1522433
   hairTexture: 3
   health: 9
   damage: 1
@@ -107,9 +107,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 7:
   name: "Passive Father"
@@ -127,9 +127,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 8:
   name: "Kenny"
@@ -147,9 +147,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 9:
   name: "Niels"
@@ -167,9 +167,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 10:
   name: "Busy Waiter"
@@ -187,9 +187,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 11:
   name: "Tohmer"
@@ -207,9 +207,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 12:
   name: "Elevator Man"
@@ -227,9 +227,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 13:
   name: "Inn Keeper"
@@ -248,9 +248,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 14:
   name: "Frantic Cook"
@@ -268,9 +268,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 15:
   name: "Sea Watcher"
@@ -288,9 +288,9 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
 16:
   name: "Bank Teller"
@@ -308,7 +308,7 @@
   chestTexture: 5
   pantsTexture: 8
   shoesTexture: 9
-  hairColor: -11501569
-  eyesColor: -2004671
-  skinColor: -3872513
+  hairColor: -8433409
+  eyesColor: 1097458175
+  skinColor: -1522433
   glovesColor: 0
