@@ -9,7 +9,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
     private final Entity entityToSpawn;
 
     public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
@@ -76,10 +76,10 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getChestTexture());
                 write.writeByte(appearance.getPantsTexture());
                 write.writeByte(appearance.getShoesTexture());
-                write.writeByte(appearance.getHairColor());
-                write.writeByte(appearance.getEyeColor());
-                write.writeByte(appearance.getSkinColor());
-                write.writeByte(appearance.getGlovesColor());
+                write.writeInt(appearance.getHairColor());
+                write.writeInt(appearance.getEyeColor());
+                write.writeInt(appearance.getSkinColor());
+                write.writeInt(appearance.getGlovesColor());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:
@@ -95,13 +95,14 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getChestTexture());
                 write.writeByte(appearance.getPantsTexture());
                 write.writeByte(appearance.getShoesTexture());
-                write.writeByte(appearance.getHairColor());
-                write.writeByte(appearance.getEyeColor());
-                write.writeByte(appearance.getSkinColor());
-                write.writeByte(appearance.getGlovesColor());
+                write.writeInt(appearance.getHairColor());
+                write.writeInt(appearance.getEyeColor());
+                write.writeInt(appearance.getSkinColor());
+                write.writeInt(appearance.getGlovesColor());
                 break;
         }
 
+        if (entityToSpawn.getEntityType() != EntityType.PLAYER) return;
         println(getClass(), "===================================", false, PRINT_DEBUG);
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);

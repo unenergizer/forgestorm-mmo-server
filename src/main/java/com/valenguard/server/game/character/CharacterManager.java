@@ -11,6 +11,7 @@ import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.CharacterMenuLoadPacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
+import com.valenguard.server.util.ColorList;
 
 import java.util.List;
 
@@ -49,7 +50,9 @@ public class CharacterManager {
         // TODO: Get bodyID and headID from client!
         Appearance appearance = new Appearance(player);
         appearance.setHairTexture((byte) 0);
-        appearance.setSkinColor((byte) 0);
+        appearance.setHairColor(-11501569);
+        appearance.setEyeColor(-2004671);
+        appearance.setSkinColor(-3872513);
         player.setAppearance(appearance);
 
         // Insert into SQL and then load player defaults!

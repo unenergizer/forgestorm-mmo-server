@@ -29,7 +29,9 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
 
             Appearance appearance = player.getAppearance();
             write.writeByte(appearance.getHairTexture());
-            write.writeByte(appearance.getSkinColor());
+            write.writeInt(appearance.getHairColor());
+            write.writeInt(appearance.getEyeColor());
+            write.writeInt(appearance.getSkinColor());
         }
     }
 }

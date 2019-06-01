@@ -51,9 +51,9 @@ public class AiEntityDataManager {
         aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 
         // Setup appearance
-        byte colorID = 0;
+        int colorID = 0;
         if (aiEntityData.getSkinColor() != null) {
-            colorID = (byte) (int) aiEntityData.getSkinColor();
+            colorID = aiEntityData.getSkinColor();
         }
 
         Appearance appearance = new Appearance(aiEntity);

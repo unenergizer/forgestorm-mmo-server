@@ -1,9 +1,8 @@
-package com.valenguard.server.game.character;
+package com.valenguard.server.util;
 
+import com.valenguard.server.util.libgdx.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.awt.*;
 
 @Getter
 @AllArgsConstructor

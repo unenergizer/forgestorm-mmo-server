@@ -13,17 +13,23 @@ public class CharacterDataOut {
     private final int characterId;
     private final String name;
     private final byte headTexture;
-    private final byte skinColor;
+    private final int hairColor;
+    private final int eyeColor;
+    private final int skinColor;
 
-    public CharacterDataOut(int characterId, String name, byte headTexture, byte skinColor) {
+    public CharacterDataOut(int characterId, String name, byte headTexture, int hairColor, int eyeColor, int skinColor) {
         this.characterId = characterId;
         this.name = name;
         this.headTexture = headTexture;
+        this.hairColor = hairColor;
+        this.eyeColor = eyeColor;
         this.skinColor = skinColor;
 
         println(getClass(), "ID: " + characterId, false, PRINT_DEBUG);
         println(getClass(), "Name: " + name, false, PRINT_DEBUG);
         println(getClass(), "HeadTexture: " + headTexture, false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + eyeColor, false, PRINT_DEBUG);
         println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
     }
 }

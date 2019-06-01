@@ -1,9 +1,13 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.character.*;
+import com.valenguard.server.game.character.CharacterClasses;
+import com.valenguard.server.game.character.CharacterGenders;
+import com.valenguard.server.game.character.CharacterManager;
+import com.valenguard.server.game.character.CharacterRaces;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
+import com.valenguard.server.util.ColorList;
 import lombok.AllArgsConstructor;
 
 @AllowNullPlayer

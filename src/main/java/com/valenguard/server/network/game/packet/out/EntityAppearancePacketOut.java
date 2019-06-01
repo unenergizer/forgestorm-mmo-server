@@ -30,10 +30,10 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getChestTexture());
                 write.writeByte(appearance.getPantsTexture());
                 write.writeByte(appearance.getShoesTexture());
-                write.writeByte(appearance.getHairColor());
-                write.writeByte(appearance.getEyeColor());
-                write.writeByte(appearance.getSkinColor());
-                write.writeByte(appearance.getGlovesColor());
+                write.writeInt(appearance.getHairColor());
+                write.writeInt(appearance.getEyeColor());
+                write.writeInt(appearance.getSkinColor());
+                write.writeInt(appearance.getGlovesColor());
                 break;
             case MONSTER:
             case ITEM_STACK:

@@ -28,7 +28,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
         Appearance appearance = new Appearance(player);
         appearance.setHairTexture(resultSet.getByte("head_appearance"));
-        appearance.setSkinColor(resultSet.getByte("color_id"));
+        appearance.setHairColor(resultSet.getInt("hair_color"));
+        appearance.setEyeColor(resultSet.getInt("eye_color"));
+        appearance.setSkinColor(resultSet.getInt("skin_color"));
         player.setAppearance(appearance);
     }
 
@@ -36,7 +38,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public PreparedStatement databaseSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_player_characters" +
                 " SET name=?, faction=?, health=?, facing_direction=?, world_name=?, world_x=?, world_y=?," +
-                " head_appearance=?, color_id=? WHERE character_id=?");
+                " head_appearance=?, hair_color=?, eye_color=?, skin_color=? WHERE character_id=?");
 
         preparedStatement.setString(1, player.getName());
         preparedStatement.setInt(2, player.getFaction());
@@ -46,8 +48,10 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(6, player.getFutureMapLocation().getX());
         preparedStatement.setInt(7, player.getFutureMapLocation().getY());
         preparedStatement.setInt(8, player.getAppearance().getHairTexture());
-        preparedStatement.setInt(9, player.getAppearance().getSkinColor());
-        preparedStatement.setInt(10, player.getCharacterDatabaseId());
+        preparedStatement.setInt(9, player.getAppearance().getHairColor());
+        preparedStatement.setInt(10, player.getAppearance().getEyeColor());
+        preparedStatement.setInt(11, player.getAppearance().getSkinColor());
+        preparedStatement.setInt(12, player.getCharacterDatabaseId());
 
         return preparedStatement;
     }
@@ -55,8 +59,8 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     @Override
     public PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_characters " +
-                "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, head_appearance, color_id) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, head_appearance, hair_color, eye_color, skin_color) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
@@ -70,7 +74,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(10, player.getCurrentMapLocation().getX());
         preparedStatement.setInt(11, player.getCurrentMapLocation().getY());
         preparedStatement.setInt(12, player.getAppearance().getHairTexture());
-        preparedStatement.setInt(13, player.getAppearance().getSkinColor());
+        preparedStatement.setInt(13, player.getAppearance().getHairColor());
+        preparedStatement.setInt(14, player.getAppearance().getEyeColor());
+        preparedStatement.setInt(15, player.getAppearance().getSkinColor());
 
         return preparedStatement;
     }
@@ -83,7 +89,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public List<CharacterDataOut> searchCharacters(int databaseUserId) {
 
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
-        String query = "SELECT character_id, name, head_appearance, color_id FROM game_player_characters WHERE user_id = ?";
+        String query = "SELECT character_id, name, head_appearance, hair_color, eye_color, skin_color FROM game_player_characters WHERE user_id = ?";
 
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -95,12 +101,16 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 int characterId = resultSet.getInt("character_id");
                 String name = resultSet.getString("name");
                 byte headId = resultSet.getByte("head_appearance");
-                byte colorId = resultSet.getByte("color_id");
+                int hairColor = resultSet.getInt("hair_color");
+                int eyeColor = resultSet.getInt("eye_color");
+                int skinColor = resultSet.getInt("skin_color");
                 characterDataOuts.add(new CharacterDataOut(
                         characterId,
                         name,
                         headId,
-                        colorId
+                        hairColor,
+                        eyeColor,
+                        skinColor
                 ));
             }
 

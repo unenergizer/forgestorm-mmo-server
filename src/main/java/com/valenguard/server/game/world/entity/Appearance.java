@@ -5,6 +5,7 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
+import com.valenguard.server.util.ColorList;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,10 +21,10 @@ public class Appearance {
     private byte chestTexture = -1;
     private byte pantsTexture = -1;
     private byte shoesTexture = -1;
-    private byte hairColor = 1;
-    private byte eyeColor = 7;
-    private byte skinColor = 0;
-    private byte glovesColor = 0;
+    private int hairColor = ColorList.CORAL.getColor().toIntBits();
+    private int eyeColor = ColorList.BLUE.getColor().toIntBits();
+    private int skinColor = ColorList.PLAYER_DEFAULT.getColor().toIntBits();
+    private int glovesColor = ColorList.CLEAR.getColor().toIntBits();
 
     private static final byte REMOVE_TEXTURE = -1;
 
@@ -72,16 +73,16 @@ public class Appearance {
                 shoesTexture = updateId;
                 break;
             case HAIR_COLOR:
-                hairColor = updateId;
+//                hairColor = updateId;
                 break;
             case EYE_COLOR:
-                eyeColor = updateId;
+//                eyeColor = updateId;
                 break;
             case SKIN_COLOR:
-                skinColor = updateId;
+//                skinColor = updateId;
                 break;
             case GLOVES_COLOR:
-                glovesColor = updateId;
+//                glovesColor = updateId;
                 break;
         }
         if (sendPacket) {

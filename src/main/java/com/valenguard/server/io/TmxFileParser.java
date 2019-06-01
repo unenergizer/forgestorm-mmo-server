@@ -238,10 +238,10 @@ public class TmxFileParser {
                 appearance.setChestTexture((byte) (int) aiEntityData.getChestTexture());
                 appearance.setPantsTexture((byte) (int) aiEntityData.getPantsTexture());
                 appearance.setShoesTexture((byte) (int) aiEntityData.getShoesTexture());
-                appearance.setHairColor((byte) (int) aiEntityData.getHairColor());
-                appearance.setEyeColor((byte) (int) aiEntityData.getEyeColor());
-                appearance.setSkinColor((byte) (int) aiEntityData.getSkinColor());
-                appearance.setGlovesColor((byte) (int) aiEntityData.getGlovesColor());
+                appearance.setHairColor(aiEntityData.getHairColor());
+                appearance.setEyeColor(aiEntityData.getEyeColor());
+                appearance.setSkinColor(aiEntityData.getSkinColor());
+                appearance.setGlovesColor(aiEntityData.getGlovesColor());
             }
 
             // Setup basic attributes.
