@@ -9,6 +9,7 @@ public class FactionManager {
     private final Map<Byte, FactionLoader.FactionData> factionDataMap = new FactionLoader().loadFactionInfo();
 
     public Byte getFactionByName(String factionName) {
+        factionName = factionName.replace(" ", "_");
         for (Map.Entry<Byte, FactionLoader.FactionData> entry : factionDataMap.entrySet()) {
             if (factionName.equals(entry.getValue().getFactionName())) return entry.getKey();
         }
