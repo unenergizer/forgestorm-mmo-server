@@ -6,6 +6,7 @@ import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.valenguard.server.util.ColorList;
+import com.valenguard.server.util.libgdx.Color;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,10 +22,10 @@ public class Appearance {
     private byte chestTexture = -1;
     private byte pantsTexture = -1;
     private byte shoesTexture = -1;
-    private int hairColor = ColorList.CORAL.getColor().toIntBits();
-    private int eyeColor = ColorList.BLUE.getColor().toIntBits();
-    private int skinColor = ColorList.PLAYER_DEFAULT.getColor().toIntBits();
-    private int glovesColor = ColorList.CLEAR.getColor().toIntBits();
+    private int hairColor = Color.rgba8888(ColorList.CORAL.getColor());
+    private int eyeColor = Color.rgba8888(ColorList.ROYAL.getColor());
+    private int skinColor = Color.rgba8888(ColorList.PLAYER_DEFAULT.getColor());
+    private int glovesColor = Color.rgba8888(ColorList.CLEAR.getColor());
 
     private static final byte REMOVE_TEXTURE = -1;
 
