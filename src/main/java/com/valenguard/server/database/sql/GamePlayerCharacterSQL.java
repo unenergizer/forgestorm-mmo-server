@@ -26,7 +26,6 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         player.setCurrentMapLocation(new Location(loginLocation));
         player.setFutureMapLocation(new Location(loginLocation));
 
-//        player.setAppearance(appearance);
         Appearance appearance = player.getAppearance();
         appearance.setHairTexture(resultSet.getByte("hair_texture"));
         appearance.setHairColor(resultSet.getInt("hair_color"));
@@ -51,7 +50,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(9, player.getAppearance().getHairColor());
         preparedStatement.setInt(10, player.getAppearance().getEyeColor());
         preparedStatement.setInt(11, player.getAppearance().getSkinColor());
-        preparedStatement.setInt(12, player.getCharacterDatabaseId());
+        preparedStatement.setInt(12, player.getDatabaseId());
 
         return preparedStatement;
     }
@@ -83,7 +82,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
     @Override
     public SqlSearchData searchForData(Player player) {
-        return new SqlSearchData("game_player_characters", "character_id", player.getCharacterDatabaseId());
+        return new SqlSearchData("game_player_characters", "character_id", player.getDatabaseId());
     }
 
     public List<CharacterDataOut> searchCharacters(int databaseUserId) {

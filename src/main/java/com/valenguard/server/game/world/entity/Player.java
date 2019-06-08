@@ -32,7 +32,6 @@ import static com.valenguard.server.util.Log.println;
 public class Player extends MovingEntity {
 
     private final ClientHandler clientHandler;
-    private Integer characterDatabaseId;
 
     private boolean loggedInGameWorld = false;
 

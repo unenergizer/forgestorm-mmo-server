@@ -3,10 +3,12 @@ package com.valenguard.server.game.world.entity;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Random;
 
+@Getter
 public class RandomRegionMoveGenerator {
 
     private final AiEntity aiEntity;

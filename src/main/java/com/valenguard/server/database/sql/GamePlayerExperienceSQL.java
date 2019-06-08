@@ -22,7 +22,7 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
 
         preparedStatement.setInt(1, player.getSkills().MELEE.getExperience());
         preparedStatement.setInt(2, player.getSkills().MINING.getExperience());
-        preparedStatement.setInt(3, player.getCharacterDatabaseId());
+        preparedStatement.setInt(3, player.getDatabaseId());
 
         return preparedStatement;
     }
@@ -34,7 +34,7 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
                 "VALUES(?, ?, ?, ?)");
 
         preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
-        preparedStatement.setInt(2, player.getCharacterDatabaseId());
+        preparedStatement.setInt(2, player.getDatabaseId());
         preparedStatement.setInt(3, 0);
         preparedStatement.setInt(4, 0);
 
@@ -43,6 +43,6 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
 
     @Override
     SqlSearchData searchForData(Player player) {
-        return new SqlSearchData("game_player_experience", "character_id", player.getCharacterDatabaseId());
+        return new SqlSearchData("game_player_experience", "character_id", player.getDatabaseId());
     }
 }

@@ -41,7 +41,7 @@ public class ClientHandler {
 
             // Skip already loaded player clients / Prevent overwriting or unnecessary adding...
             if (!loadedPlayers.isEmpty()) {
-                if (loadedPlayers.containsKey(i) && characterDataOut.getCharacterId() == loadedPlayers.get(i).getCharacterDatabaseId()) {
+                if (loadedPlayers.containsKey(i) && characterDataOut.getCharacterId() == loadedPlayers.get(i).getDatabaseId()) {
                     // Use existing player
                     player = loadedPlayers.get(i);
                 } else {
@@ -54,7 +54,7 @@ public class ClientHandler {
             }
 
             player.setName(characterDataOut.getName());
-            player.setCharacterDatabaseId(characterDataOut.getCharacterId());
+            player.setDatabaseId(characterDataOut.getCharacterId());
 
             Appearance appearance = new Appearance(player);
             player.setAppearance(appearance);

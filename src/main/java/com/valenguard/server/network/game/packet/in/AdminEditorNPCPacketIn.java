@@ -18,6 +18,8 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.ADMIN_EDITOR_NPC)
 public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPacketIn.NpcDataIn> {
 
+    private static final boolean PRINT_DEBUG = false;
+
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         // Editor data
@@ -53,33 +55,33 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         int skinColor = clientHandler.readInt();
         int glovesColor = clientHandler.readInt();
 
-        println(true);
-        println(getClass(), "=============== NPC EDITOR PACKET IN =============");
-        println(getClass(), "Spawn: " + spawn);
-        println(getClass(), "Save: " + save);
-        println(getClass(), "Name: " + name);
-        println(getClass(), "Faction: " + faction);
-        println(getClass(), "Health: " + health);
-        println(getClass(), "Damage: " + damage);
-        println(getClass(), "ExpDrop: " + expDrop);
-        println(getClass(), "DropTable: " + dropTable);
-        println(getClass(), "WalkSpeed: " + walkSpeed);
-        println(getClass(), "ProbStop: " + probStop);
-        println(getClass(), "ProbWalk: " + probWalk);
-        println(getClass(), "ShopID: " + shopId);
-        println(getClass(), "BankKeeper: " + bankKeeper);
-        println(getClass(), "WorldName: " + worldName);
-        println(getClass(), "World X: " + worldX);
-        println(getClass(), "World Y: " + worldY);
-        println(getClass(), "HairTexture: " + hairTexture);
-        println(getClass(), "HelmTexture: " + helmTexture);
-        println(getClass(), "ChestTexture: " + chestTexture);
-        println(getClass(), "PantsTexture: " + pantsTexture);
-        println(getClass(), "ShoesTexture: " + shoesTexture);
-        println(getClass(), "HairColor: " + hairColor);
-        println(getClass(), "EyesColor: " + eyesColor);
-        println(getClass(), "SkinColor: " + skinColor);
-        println(getClass(), "GlovesColor: " + glovesColor);
+        println(PRINT_DEBUG);
+        println(getClass(), "=============== NPC EDITOR PACKET IN =============", false, PRINT_DEBUG);
+        println(getClass(), "Spawn: " + spawn, false, PRINT_DEBUG);
+        println(getClass(), "Save: " + save, false, PRINT_DEBUG);
+        println(getClass(), "Name: " + name, false, PRINT_DEBUG);
+        println(getClass(), "Faction: " + faction, false, PRINT_DEBUG);
+        println(getClass(), "Health: " + health, false, PRINT_DEBUG);
+        println(getClass(), "Damage: " + damage, false, PRINT_DEBUG);
+        println(getClass(), "ExpDrop: " + expDrop, false, PRINT_DEBUG);
+        println(getClass(), "DropTable: " + dropTable, false, PRINT_DEBUG);
+        println(getClass(), "WalkSpeed: " + walkSpeed, false, PRINT_DEBUG);
+        println(getClass(), "ProbStop: " + probStop, false, PRINT_DEBUG);
+        println(getClass(), "ProbWalk: " + probWalk, false, PRINT_DEBUG);
+        println(getClass(), "ShopID: " + shopId, false, PRINT_DEBUG);
+        println(getClass(), "BankKeeper: " + bankKeeper, false, PRINT_DEBUG);
+        println(getClass(), "WorldName: " + worldName, false, PRINT_DEBUG);
+        println(getClass(), "World X: " + worldX, false, PRINT_DEBUG);
+        println(getClass(), "World Y: " + worldY, false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
+        println(getClass(), "HelmTexture: " + helmTexture, false, PRINT_DEBUG);
+        println(getClass(), "ChestTexture: " + chestTexture, false, PRINT_DEBUG);
+        println(getClass(), "PantsTexture: " + pantsTexture, false, PRINT_DEBUG);
+        println(getClass(), "ShoesTexture: " + shoesTexture, false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
+        println(getClass(), "EyesColor: " + eyesColor, false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
+        println(getClass(), "GlovesColor: " + glovesColor, false, PRINT_DEBUG);
 
         return new NpcDataIn(
                 spawn,
@@ -116,7 +118,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         boolean isAdmin = authenticatedUser.isAdmin();
 
         if (!isAdmin) {
-            println(getClass(), "Non admin player attempted to create a NPC! XF Account name: " + authenticatedUser.getXfAccountName());
+            println(getClass(), "Non admin player attempted to create a NPC! XF Account name: " + authenticatedUser.getXfAccountName(), true);
         } else {
             println(getClass(), "Spawning NPC made by NPC Editor");
         }
@@ -164,6 +166,11 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         if (packetData.shopId != -1) npc.setShopId(packetData.shopId);
 
         player.getGameMap().getAiEntityController().queueEntitySpawn(npc);
+
+        if (packetData.save) {
+            // Do a MySQL save
+
+        }
     }
 
     @AllArgsConstructor
