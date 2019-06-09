@@ -1,18 +1,14 @@
 package com.valenguard.server.game.world.maps;
 
-import com.valenguard.server.game.world.entity.AiEntity;
-import com.valenguard.server.game.world.entity.Player;
-import com.valenguard.server.game.world.entity.StationaryEntity;
+import com.valenguard.server.database.sql.GameWorldNpcSQL;
+import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -67,6 +63,26 @@ public class GameMapProcessor {
 
         Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
+    }
+
+    public void getNpcFromDatabase() {
+        for (String mapName : gameMaps.keySet()) {
+
+            GameWorldNpcSQL gameWorldNpcSQL = new GameWorldNpcSQL();
+            List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(mapName);
+
+            for (Integer i : npcIdList) {
+                NPC npc = new NPC();
+                npc.setFacingDirection(MoveDirection.SOUTH);
+                npc.setEntityType(EntityType.NPC);
+                npc.setAppearance(new Appearance(npc));
+                npc.setDatabaseId(i);
+
+                gameWorldNpcSQL.loadSQL(npc);
+
+                queueAiEntitySpawn(npc);
+            }
+        }
     }
 
     private void fixWarpHeights() {

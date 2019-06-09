@@ -59,10 +59,10 @@ public class TmxFileParser {
         for (int i = 0; i < objectGroupTag.getLength(); i++) {
 
             // Get Entities
-            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
-                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
-                processAiEntities(mapHeight, objectTag, fileName);
-            }
+//            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
+//                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
+//                processAiEntities(mapHeight, objectTag, fileName);
+//            }
 
             // Get Bank Access
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("bank_access")) {

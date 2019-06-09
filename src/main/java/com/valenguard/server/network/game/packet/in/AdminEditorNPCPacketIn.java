@@ -2,6 +2,7 @@ package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.database.sql.GameWorldNpcSQL;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
@@ -18,7 +19,7 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.ADMIN_EDITOR_NPC)
 public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPacketIn.NpcDataIn> {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -169,7 +170,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
 
         if (packetData.save) {
             // Do a MySQL save
-
+            new GameWorldNpcSQL().firstTimeSaveSQL(npc);
         }
     }
 

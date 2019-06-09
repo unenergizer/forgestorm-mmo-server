@@ -2,7 +2,6 @@ package com.valenguard.server.game;
 
 import com.valenguard.server.game.world.combat.AbilityManager;
 import com.valenguard.server.game.world.entity.AiEntity;
-import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.entity.PlayerProcessor;
 import com.valenguard.server.game.world.maps.GameMap;
@@ -22,6 +21,7 @@ public class GameManager {
 
     public void start() {
         gameMapProcessor.loadAllMaps();
+        gameMapProcessor.getNpcFromDatabase();
     }
 
     void tickWorld(long ticksPassed) {

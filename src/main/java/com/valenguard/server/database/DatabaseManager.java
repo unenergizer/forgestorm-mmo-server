@@ -42,7 +42,7 @@ public class DatabaseManager {
 
     private void testConnection() {
         try (Connection ignored = hikariDataSource.getConnection()) {
-            println(getClass(), "Database Connection Successful: ");
+            println(getClass(), "Database Connection Successful");
         } catch (SQLException | RuntimeException e) {
             println(getClass(), "Could not connect to MySQL Database!", true);
             println(getClass(), "ServerName: " + databaseSettings.getIp(), true);

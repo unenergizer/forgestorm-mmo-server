@@ -24,7 +24,7 @@ public class GameWorldNpcSQL {
         int dropTable = resultSet.getInt("drop_table");
         float walkSpeed = resultSet.getFloat("walk_speed");
         float probStill = resultSet.getFloat("prob_still");
-        float probWalk = resultSet.getFloat("prob_walk	");
+        float probWalk = resultSet.getFloat("prob_walk");
         short shopId = resultSet.getShort("shop_id");
         byte hairTexture = resultSet.getByte("hair_texture");
         byte helmTexture = resultSet.getByte("helm_texture");
@@ -95,7 +95,7 @@ public class GameWorldNpcSQL {
 
     private PreparedStatement firstTimeSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_npc " +
-                "(world_name, world_x, world_y, name, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color,) " +
+                "(world_name, world_x, world_y, name, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, npc.getCurrentMapLocation().getMapName());
@@ -130,7 +130,7 @@ public class GameWorldNpcSQL {
     public List<Integer> searchNPC(String worldName) {
 
         List<Integer> gameWorldNpcIds = new ArrayList<>();
-        String query = "SELECT npc_id FROM hair_texture WHERE world_name = ?";
+        String query = "SELECT npc_id FROM game_world_npc WHERE world_name=?";
 
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);

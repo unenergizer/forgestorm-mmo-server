@@ -71,9 +71,9 @@ public class Server {
         abilityManager.start();
 
         // Start systems
+        databaseManager.start();
         gameManager.start();
         commandManager.start();
-        databaseManager.start();
         networkManager.start();
         gameLoop.start();
     }
