@@ -18,7 +18,12 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
     private int timerTick = 0; // active speed
 
     public void addAiEntity(AiEntity aiEntity) {
-        respawnTimers.add(new RespawnTimer(aiEntity, GameConstants.GENERAL_RESPAWN_TIME));
+        if (aiEntity.isInstantRespawn()) {
+            respawnTimers.add(new RespawnTimer(aiEntity, 1));
+            aiEntity.setInstantRespawn(false); // Reset to false
+        } else {
+            respawnTimers.add(new RespawnTimer(aiEntity, GameConstants.GENERAL_RESPAWN_TIME));
+        }
     }
 
     @Override

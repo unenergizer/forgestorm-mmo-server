@@ -20,6 +20,7 @@ public class AiEntity extends MovingEntity {
     private Integer dropTable = 0;
     private short shopId = -1;
     private boolean isBankKeeper;
+    private boolean instantRespawn = false;
 
     private Queue<MoveNode> moveNodes = new LinkedList<>();
 
@@ -33,6 +34,7 @@ public class AiEntity extends MovingEntity {
         getGameMap().getAiEntityController().queueEntityDespawn(this);
 
         // If a AI entity kills and AI entity, do not drop ItemStack
+        if (killerEntity == null) return;
         if (killerEntity.getEntityType() != EntityType.PLAYER) return;
 
         Player killerPlayer = (Player) killerEntity;

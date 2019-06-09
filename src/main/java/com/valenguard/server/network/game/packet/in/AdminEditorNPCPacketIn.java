@@ -28,6 +28,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         boolean save = clientHandler.readBoolean();
 
         // Basic data
+        short entityID = clientHandler.readShort();
         String name = clientHandler.readString();
         String faction = clientHandler.readString();
         int health = clientHandler.readInt();
@@ -60,6 +61,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         println(getClass(), "=============== NPC EDITOR PACKET IN =============", false, PRINT_DEBUG);
         println(getClass(), "Spawn: " + spawn, false, PRINT_DEBUG);
         println(getClass(), "Save: " + save, false, PRINT_DEBUG);
+        println(getClass(), "EntityID: " + entityID, false, PRINT_DEBUG);
         println(getClass(), "Name: " + name, false, PRINT_DEBUG);
         println(getClass(), "Faction: " + faction, false, PRINT_DEBUG);
         println(getClass(), "Health: " + health, false, PRINT_DEBUG);
@@ -87,6 +89,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         return new NpcDataIn(
                 spawn,
                 save,
+                entityID,
                 name,
                 faction,
                 health,
@@ -130,7 +133,13 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
     @Override
     public void onEvent(NpcDataIn packetData) {
         Player player = packetData.getClientHandler().getPlayer();
-        NPC npc = new NPC();
+        NPC npc;
+
+        if (packetData.entityID != -1) {
+            npc = (NPC) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+        } else {
+            npc = new NPC();
+        }
 
         npc.setName(packetData.name);
         npc.setFaction(Server.getInstance().getFactionManager().getFactionByName(packetData.faction));
@@ -166,11 +175,14 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
 
         if (packetData.shopId != -1) npc.setShopId(packetData.shopId);
 
-        player.getGameMap().getAiEntityController().queueEntitySpawn(npc);
-
-        if (packetData.save) {
-            // Do a MySQL save
+        if (packetData.save && packetData.entityID != -1) {
+            new GameWorldNpcSQL().saveSQL(npc);
+            npc.setInstantRespawn(true);
+            npc.killAiEntity(null);
+        } else if (packetData.save) {
             new GameWorldNpcSQL().firstTimeSaveSQL(npc);
+        } else {
+            if (packetData.spawn) player.getGameMap().getAiEntityController().queueEntitySpawn(npc);
         }
     }
 
@@ -181,6 +193,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         private boolean save;
 
         // Basic data
+        private short entityID;
         private String name;
         private String faction;
         private int health;
