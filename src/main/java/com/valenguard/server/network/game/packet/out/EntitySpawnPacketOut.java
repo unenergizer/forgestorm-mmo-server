@@ -57,6 +57,14 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeByte(appearance.getMonsterBodyTexture());
                 break;
             case NPC:
+                if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+                    write.writeInt(movingEntity.getAttributes().getDamage());
+                    write.writeInt(((NPC) entityToSpawn).getExpDrop());
+                    write.writeInt(((NPC) entityToSpawn).getDropTable());
+                    write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityStill());
+                    write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityWalkStart());
+                }
+
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
 
                 write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
@@ -83,8 +91,6 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeFloat(movingEntity.getMoveSpeed());
                 write.writeInt(movingEntity.getMaxHealth());
                 write.writeInt(movingEntity.getCurrentHealth());
-
-                write.writeBoolean(((Player) movingEntity).getClientHandler().getAuthenticatedUser().isAdmin());
 
                 write.writeByte(appearance.getHairTexture());
                 write.writeByte(appearance.getHelmTexture());

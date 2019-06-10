@@ -9,6 +9,7 @@ import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.PlayerSessionData;
 import com.valenguard.server.network.game.packet.out.CharacterMenuLoadPacketOut;
+import com.valenguard.server.network.game.packet.out.InitClientPrivilegePacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import com.valenguard.server.util.ColorList;
@@ -83,12 +84,14 @@ public class CharacterManager {
 
         Server.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
 
+        // Tell the client its privileges
+        new InitClientPrivilegePacketOut(clientHandler, clientHandler.getAuthenticatedUser().isAdmin()).sendPacket();
+
         // Send player all their characters
         sendToCharacterScreen(playerSessionData.getClientHandler());
     }
 
     public void clientDisconnect(ClientHandler clientHandler) {
-
         // Make sure we save player data!
         for (Player player : clientHandler.getLoadedPlayers().values()) {
             if (player.isLoggedInGameWorld()) {
