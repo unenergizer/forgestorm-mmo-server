@@ -9,12 +9,14 @@ public class AuthenticatedUser {
     private final int databaseUserId;
     private final String xfAccountName;
     private final boolean isAdmin;
+    private final boolean isModerator;
 
-    public AuthenticatedUser(final String ip, final int databaseUserId, final String xfAccountName, final boolean isAdmin) {
+    public AuthenticatedUser(final String ip, final int databaseUserId, final String xfAccountName, final boolean isAdmin, final boolean isModerator) {
         this.ip = ip;
         this.databaseUserId = databaseUserId;
         this.xfAccountName = xfAccountName;
         this.isAdmin = isAdmin;
+        this.isModerator = isModerator;
     }
 
 }

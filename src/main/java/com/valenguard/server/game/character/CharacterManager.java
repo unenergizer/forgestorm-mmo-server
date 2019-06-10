@@ -85,7 +85,7 @@ public class CharacterManager {
         Server.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
 
         // Tell the client its privileges
-        new InitClientPrivilegePacketOut(clientHandler, clientHandler.getAuthenticatedUser().isAdmin()).sendPacket();
+        new InitClientPrivilegePacketOut(clientHandler).sendPacket();
 
         // Send player all their characters
         sendToCharacterScreen(playerSessionData.getClientHandler());
