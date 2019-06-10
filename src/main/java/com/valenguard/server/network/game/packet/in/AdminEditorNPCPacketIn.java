@@ -181,6 +181,7 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
             npc.killAiEntity(null);
         } else if (packetData.save) {
             new GameWorldNpcSQL().firstTimeSaveSQL(npc);
+            player.getGameMap().getAiEntityController().queueEntitySpawn(npc);
         } else {
             if (packetData.spawn) player.getGameMap().getAiEntityController().queueEntitySpawn(npc);
         }
