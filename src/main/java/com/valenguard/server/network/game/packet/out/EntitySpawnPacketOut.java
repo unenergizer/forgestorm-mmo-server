@@ -63,6 +63,9 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeInt(((NPC) entityToSpawn).getDropTable());
                     write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityStill());
                     write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityWalkStart());
+                    write.writeString(((NPC) entityToSpawn).getDefaultSpawnLocation().getMapName());
+                    write.writeShort(((NPC) entityToSpawn).getDefaultSpawnLocation().getX());
+                    write.writeShort(((NPC) entityToSpawn).getDefaultSpawnLocation().getY());
                 }
 
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());

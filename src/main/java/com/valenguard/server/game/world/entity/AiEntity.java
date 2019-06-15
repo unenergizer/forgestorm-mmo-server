@@ -3,6 +3,7 @@ package com.valenguard.server.game.world.entity;
 import com.valenguard.server.Server;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
+import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.util.MoveNode;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class AiEntity extends MovingEntity {
 
     private Queue<MoveNode> moveNodes = new LinkedList<>();
 
+    private Location defaultSpawnLocation;
     private RandomRegionMoveGenerator randomRegionMoveGenerator;
 
     public void setMovementInfo(float probabilityStill, float probabilityWalkStart, int bounds1x, int bounds1y, int bounds2x, int bounds2y) {

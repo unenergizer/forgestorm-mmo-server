@@ -38,6 +38,7 @@ public class GameWorldNpcSQL {
 
         Location location = new Location(worldName, worldX, worldY);
 
+        npc.setDefaultSpawnLocation(location);
         npc.setCurrentMapLocation(location);
         npc.setFutureMapLocation(location);
         npc.setName(name);
