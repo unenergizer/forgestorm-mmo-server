@@ -73,9 +73,8 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         println(getClass(), "ProbWalk: " + probWalk, false, PRINT_DEBUG);
         println(getClass(), "ShopID: " + shopId, false, PRINT_DEBUG);
         println(getClass(), "BankKeeper: " + bankKeeper, false, PRINT_DEBUG);
-        println(getClass(), "WorldName: " + worldName, false, PRINT_DEBUG);
-        println(getClass(), "World X: " + worldX, false, PRINT_DEBUG);
-        println(getClass(), "World Y: " + worldY, false, PRINT_DEBUG);
+        println(getClass(), "Spawn: " + worldName + " X: " + worldX + ", Y: " + worldY, false, PRINT_DEBUG);
+        println(getClass(), " *** Appearance Data ***", false, PRINT_DEBUG);
         println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
         println(getClass(), "HelmTexture: " + helmTexture, false, PRINT_DEBUG);
         println(getClass(), "ChestTexture: " + chestTexture, false, PRINT_DEBUG);
@@ -152,7 +151,9 @@ public class AdminEditorNPCPacketIn implements PacketListener<AdminEditorNPCPack
         npc.setBankKeeper(packetData.bankKeeper);
 
         npc.setMovementInfo(packetData.probStop, packetData.probWalk, 0, 0, 96, 54);
-        npc.setSpawnWarp(new Warp(new Location(packetData.worldName, packetData.worldX, packetData.worldY), MoveDirection.SOUTH));
+        Location location = new Location(packetData.worldName, packetData.worldX, packetData.worldY);
+        npc.setDefaultSpawnLocation(location);
+        npc.setSpawnWarp(new Warp(location, MoveDirection.SOUTH));
         npc.gameMapRegister(npc.getSpawnWarp());
 
         // Setup appearance
