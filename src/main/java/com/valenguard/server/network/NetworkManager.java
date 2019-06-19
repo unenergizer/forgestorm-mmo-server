@@ -40,7 +40,7 @@ public class NetworkManager {
             eventBus.registerListener(new CharacterLogoutPacketIn());
             eventBus.registerListener(new BankManagePacketIn());
             eventBus.registerListener(new AbilityRequestPacketIn());
-            eventBus.registerListener(new AdminEditorNPCPacketIn());
+            eventBus.registerListener(new AdminEditorEntityPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();

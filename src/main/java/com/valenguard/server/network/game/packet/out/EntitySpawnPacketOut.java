@@ -45,6 +45,16 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
             case MONSTER:
+                if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+                    write.writeInt(movingEntity.getAttributes().getDamage());
+                    write.writeInt(((Monster) entityToSpawn).getExpDrop());
+                    write.writeInt(((Monster) entityToSpawn).getDropTable());
+                    write.writeFloat(((Monster) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityStill());
+                    write.writeFloat(((Monster) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityWalkStart());
+                    write.writeString(((Monster) entityToSpawn).getDefaultSpawnLocation().getMapName());
+                    write.writeShort(((Monster) entityToSpawn).getDefaultSpawnLocation().getX());
+                    write.writeShort(((Monster) entityToSpawn).getDefaultSpawnLocation().getY());
+                }
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
 
                 write.writeByte(((Monster) entityToSpawn).getAlignment().getEntityAlignmentByte());

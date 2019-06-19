@@ -1,6 +1,8 @@
 package com.valenguard.server.game.world.maps;
 
+import com.valenguard.server.database.sql.GameWorldMonsterSQL;
 import com.valenguard.server.database.sql.GameWorldNpcSQL;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
@@ -81,6 +83,27 @@ public class GameMapProcessor {
                 gameWorldNpcSQL.loadSQL(npc);
 
                 queueAiEntitySpawn(npc);
+            }
+        }
+    }
+
+    public void getMonsterFromDatabase() {
+        for (String mapName : gameMaps.keySet()) {
+
+            GameWorldMonsterSQL gameWorldMonsterSQL = new GameWorldMonsterSQL();
+            List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(mapName);
+
+            for (Integer i : monsterIdList) {
+                Monster monster = new Monster();
+                monster.setAlignment(EntityAlignment.FRIENDLY); // TODO: LOAD FROM DB
+                monster.setFacingDirection(MoveDirection.SOUTH);
+                monster.setEntityType(EntityType.MONSTER);
+                monster.setAppearance(new Appearance(monster));
+                monster.setDatabaseId(i);
+
+                gameWorldMonsterSQL.loadSQL(monster);
+
+                queueAiEntitySpawn(monster);
             }
         }
     }

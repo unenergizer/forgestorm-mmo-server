@@ -22,6 +22,7 @@ public class GameManager {
     public void start() {
         gameMapProcessor.loadAllMaps();
         gameMapProcessor.getNpcFromDatabase();
+        gameMapProcessor.getMonsterFromDatabase();
     }
 
     void tickWorld(long ticksPassed) {
