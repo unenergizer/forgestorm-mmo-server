@@ -38,11 +38,13 @@ public class Appearance {
 
     public void updatePlayerAppearance(ItemStack itemStack, ItemStackType itemStackType, boolean sendPacket) {
         println(getClass(), "SendPacket: " + sendPacket);
+
         if (itemStack != null) {
             println(getClass(), "Equipping non null item and updating appearance!");
             println(getClass(), "ItemStack: " + itemStack.toString());
 
             if (itemStack instanceof WearableItemStack) {
+                println(getClass(), "Equipping wearable ItemStack!");
                 setPlayerBody(itemStackType.getAppearanceType(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
             }
         } else {
@@ -51,9 +53,17 @@ public class Appearance {
             if (itemStackType.getAppearanceType() == null) return;
             setPlayerBody(itemStackType.getAppearanceType(), REMOVE_TEXTURE, sendPacket);
         }
+
+
+        if (sendPacket) {
+            println(getClass(), "Sending appearance update!");
+            Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
+        }
     }
 
     private void setPlayerBody(AppearanceType appearanceType, byte updateId, boolean sendPacket) {
+        println(getClass(), "AppearanceType: " + appearanceType + ", UpdateID: " + updateId + ", SendPacket: " + sendPacket);
         switch (appearanceType) {
             case MONSTER_BODY_TEXTURE:
                 monsterBodyTexture = updateId;
@@ -85,10 +95,6 @@ public class Appearance {
             case GLOVES_COLOR:
 //                glovesColor = updateId;
                 break;
-        }
-        if (sendPacket) {
-            Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner));
         }
     }
 }
