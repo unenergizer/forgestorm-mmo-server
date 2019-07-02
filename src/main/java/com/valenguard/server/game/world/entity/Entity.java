@@ -10,7 +10,7 @@ import lombok.Setter;
 public class Entity {
 
     private Integer databaseId;
-    private short serverEntityId;
+    private Short serverEntityId;
     private EntityType entityType;
     private String name = "";
     private Location currentMapLocation;
