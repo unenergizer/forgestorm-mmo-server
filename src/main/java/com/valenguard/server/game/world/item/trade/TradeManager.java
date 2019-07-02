@@ -17,6 +17,8 @@ import static com.valenguard.server.util.Log.println;
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class TradeManager {
 
+    private static final boolean PRINT_DEBUG = true;
+
     /**
      * The max time to wait before the trade request times out.
      */
@@ -40,6 +42,7 @@ public class TradeManager {
      * @param targetPlayer The target {@link Player}
      */
     public void requestTradeInitialized(Player tradeStarter, Player targetPlayer) {
+        println(getClass(), "method: requestTradeInitialized(" + tradeStarter + "," + targetPlayer + ")", false, PRINT_DEBUG);
         if (isTradeInProgress(tradeStarter, targetPlayer)) {
             new ChatMessagePacketOut(tradeStarter, MessageText.SERVER + targetPlayer.getName() + " is already trading.").sendPacket();
             return;
@@ -58,6 +61,8 @@ public class TradeManager {
         new ChatMessagePacketOut(targetPlayer, MessageText.SERVER + "Trade request received from " + tradeStarter.getName() + ".").sendPacket();
         new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_SENDER, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
         new PlayerTradePacketOut(targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_INIT_TARGET, tradeUUID, tradeStarter.getServerEntityId(), targetPlayer.getServerEntityId())).sendPacket();
+
+        println(getClass(), "method: requestTradeInitialized() -> Trade Request Sent", false, PRINT_DEBUG);
     }
 
     /**
@@ -68,6 +73,7 @@ public class TradeManager {
      * @param tradeUUID    The trade window unique reference id.
      */
     public void targetPlayerAcceptedTradeRequest(Player targetPlayer, int tradeUUID) {
+        println(getClass(), "method: targetPlayerAcceptedTradeRequest(" + targetPlayer + ", " + tradeUUID + ")", false, PRINT_DEBUG);
         if (!isValidTrade(targetPlayer, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
@@ -81,6 +87,8 @@ public class TradeManager {
         new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "Trade opened with " + tradeData.tradeStarter.getName() + ".").sendPacket();
         new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_REQUEST_TARGET_ACCEPT)).sendPacket();
+
+        println(getClass(), "method: targetPlayerAcceptedTradeRequest() -> Success", false, PRINT_DEBUG);
     }
 
     /**
@@ -92,6 +100,7 @@ public class TradeManager {
      * @param itemSlot  The slot the item was contained in.
      */
     public void sendItem(Player player, int tradeUUID, byte itemSlot) {
+        println(getClass(), "method: sendItem(" + player + ", " + tradeUUID + ")", false, PRINT_DEBUG);
         if (!isValidTrade(player, tradeUUID)) return;
         if (!slotInsideWindow(itemSlot)) return;
 
@@ -102,10 +111,14 @@ public class TradeManager {
 
         if (tradeData.targetPlayer == player) {
             tradeData.addItem(tradeData.tradeTargetItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(tradeUUID, itemStack)).sendPacket();
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+
+            println(getClass(), "method: sendItem() -> TargetPlayer Add Item", false, PRINT_DEBUG);
         } else {
             tradeData.addItem(tradeData.tradeStarterItems, itemSlot);
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(tradeUUID, itemStack)).sendPacket();
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_ADD, tradeUUID, itemStack)).sendPacket();
+
+            println(getClass(), "method: sendItem() -> TradeStarter Add Item", false, PRINT_DEBUG);
         }
     }
 
@@ -119,7 +132,7 @@ public class TradeManager {
      */
     public void removeItem(Player player, int tradeUUID, byte itemSlot) {
 
-        println(getClass(), "[1] Remove trade item called! Player: " + player.getName());
+        println(getClass(), "[1] Remove trade item called! Player: " + player, false, PRINT_DEBUG);
 
         if (!isValidTrade(player, tradeUUID)) return;
         if (!slotInsideWindow(itemSlot)) return;
@@ -135,14 +148,14 @@ public class TradeManager {
             println(getClass(), "[3] Remove trade item called! Player: " + player.getName());
 // TODO            if (tradeData.tradeTargetItems[itemSlot] != null) return;
             tradeData.tradeTargetItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(tradeUUID, itemSlot)).sendPacket();
+            new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
 
             println(getClass(), "[4] Remove trade item called! Player: " + player.getName());
         } else {
             println(getClass(), "[5] Remove trade item called! Player: " + player.getName());
 // TODO            if (tradeData.tradeStarterItems[itemSlot] != null) return;
             tradeData.tradeStarterItems[itemSlot] = null;
-            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(tradeUUID, itemSlot)).sendPacket();
+            new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_ITEM_REMOVE, tradeUUID, itemSlot)).sendPacket();
 
             println(getClass(), "[6] Remove trade item called! Player: " + player.getName());
         }
@@ -156,6 +169,7 @@ public class TradeManager {
      * @param tradeUUID       The trade window unique reference id.
      */
     public void playerConfirmedTrade(Player confirmedPlayer, int tradeUUID) {
+        println(getClass(), "method: playerConfirmedTrade(" + confirmedPlayer + ", " + tradeUUID + ")", false, PRINT_DEBUG);
         if (!isValidTrade(confirmedPlayer, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
@@ -199,6 +213,7 @@ public class TradeManager {
             updateInventories(tradeData.tradeStarter, tradeData.tradeStarterItems, targetGiveItems);
             updateInventories(tradeData.targetPlayer, tradeData.tradeTargetItems, starterGiveItems);
 
+            println(getClass(), "method: playerConfirmedTrade() -> Trade Success!", false, PRINT_DEBUG);
         } else {
             /*
              * TRADE ITEMS CONFIRMED FOR ONE PLAYER
@@ -207,10 +222,13 @@ public class TradeManager {
             new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "" + confirmedPlayer.getName() + " has confirmed the trade!").sendPacket();
             new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
             new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_CONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
+
+            println(getClass(), "method: playerConfirmedTrade() -> Trade confirmed for single player. Player: " + confirmedPlayer.getName(), false, PRINT_DEBUG);
         }
     }
 
     public void playerUnconfirmedTrade(Player confirmedPlayer, int tradeUUID) {
+        println(getClass(), "method: playerUnconfirmedTrade(" + confirmedPlayer + ", " + tradeUUID + ")", false, PRINT_DEBUG);
         if (!isValidTrade(confirmedPlayer, tradeUUID)) return;
 
         TradeData tradeData = tradeDataMap.get(tradeUUID);
@@ -229,6 +247,8 @@ public class TradeManager {
         new ChatMessagePacketOut(tradeData.targetPlayer, MessageText.SERVER + "" + confirmedPlayer.getName() + " has unconfirmed the trade!").sendPacket();
         new PlayerTradePacketOut(tradeData.tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_OFFER_UNCONFIRM, tradeUUID, confirmedPlayer.getServerEntityId())).sendPacket();
+
+        println(getClass(), "method: playerUnconfirmedTrade() -> trade now unconfirmed", false, PRINT_DEBUG);
     }
 
     /**
@@ -239,6 +259,7 @@ public class TradeManager {
      * @param tradeStatusOpcode The type of trade cancel.
      */
     public void tradeCanceled(Player canceler, int tradeUUID, TradeStatusOpcode tradeStatusOpcode) {
+        println(getClass(), "method: tradeCanceled(" + canceler + ", " + tradeUUID + ")", false, PRINT_DEBUG);
         if (!isValidTrade(canceler, tradeUUID)) return;
         TradeData tradeData = tradeDataMap.get(tradeUUID);
 
@@ -256,6 +277,8 @@ public class TradeManager {
 
         tradeData.tradeActive = false;
         tradeData.timeLeft = 0;
+
+        println(getClass(), "method: tradeCanceled() -> Trade successfully canceled!", false, PRINT_DEBUG);
     }
 
     private boolean checkInventoryForTradeSpace(Player player, List<ItemStack> givingItems, List<ItemStack> receivingItems) {
@@ -268,6 +291,7 @@ public class TradeManager {
      * @param player The packetReceiver were checking against.
      */
     public void ifTradeExistCancel(Player player, String cancelMessage) {
+        println(getClass(), "method: ifTradeExistCancel(" + player + ", " + cancelMessage + ")", false, PRINT_DEBUG);
         if (!tradeDataMap.containsKey(player.getTradeUUID())) return;
         TradeData tradeData = tradeDataMap.get(player.getTradeUUID());
 
@@ -277,6 +301,7 @@ public class TradeManager {
         new PlayerTradePacketOut(tradeData.targetPlayer, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
 
         removeTradeData(player.getTradeUUID(), true);
+        println(getClass(), "method: ifTradeExistCancel() -> Success", false, PRINT_DEBUG);
     }
 
     /**
@@ -306,6 +331,7 @@ public class TradeManager {
         int tradeUUID = traderStarter.getServerEntityId();
         tradeUUID <<= 16;
         tradeUUID |= targetPlayer.getServerEntityId();
+        println(getClass(), "method: generateTradeId(" + traderStarter + ", " + targetPlayer + ", TradeID: " + tradeUUID + ")", false, PRINT_DEBUG);
         return tradeUUID;
     }
 
@@ -334,7 +360,7 @@ public class TradeManager {
 
                     iterator.remove();
 
-                    println(getClass(), "Entries: " + tradeDataMap.size());
+                    println(getClass(), "Open Trade Entries: " + tradeDataMap.size(), false, PRINT_DEBUG);
                 }
             }
         }

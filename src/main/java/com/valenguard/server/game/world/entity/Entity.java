@@ -26,6 +26,6 @@ public class Entity {
 
     @Override
     public String toString() {
-        return "[" + name + "] -> { EntityType=" + entityType.toString() + ", Location=" + currentMapLocation.toString() + " }";
+        return "[" + name + "] -> { DatabaseID=" + databaseId + ", ServerEntityID=" + serverEntityId + ", EntityType=" + entityType.toString() + ", Location=" + currentMapLocation.toString() + " }";
     }
 }

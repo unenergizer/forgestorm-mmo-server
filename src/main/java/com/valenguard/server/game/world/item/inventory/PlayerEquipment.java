@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PlayerEquipment extends AbstractInventory {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     public PlayerEquipment(Player inventoryOwner) {
         super(inventoryOwner, InventoryType.EQUIPMENT, InventoryConstants.EQUIPMENT_SIZE);
@@ -141,7 +141,7 @@ public class PlayerEquipment extends AbstractInventory {
     }
 
     private void updateAppearance(byte slotIndex, boolean sendPacket) {
-        println(getClass(), "Appearance update for slot index: " + slotIndex);
+        println(getClass(), "Appearance update for slot index: " + slotIndex, false, PRINT_DEBUG);
         InventorySlot inventorySlot = inventorySlotArray[slotIndex];
         ItemStackType acceptedItemStackType = requireNonNull(getAcceptedItemStackTypesArray(slotIndex))[0];
         inventoryOwner.getAppearance().updatePlayerAppearance(inventorySlot.getItemStack(), acceptedItemStackType, sendPacket);

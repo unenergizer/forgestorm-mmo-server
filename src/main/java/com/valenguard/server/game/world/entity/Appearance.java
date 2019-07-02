@@ -16,6 +16,8 @@ import static com.valenguard.server.util.Log.println;
 @Setter
 public class Appearance {
 
+    private static final boolean PRINT_DEBUG = false;
+
     private byte monsterBodyTexture = -1;
     private byte hairTexture = 0;
     private byte helmTexture = -1;
@@ -37,33 +39,32 @@ public class Appearance {
 
 
     public void updatePlayerAppearance(ItemStack itemStack, ItemStackType itemStackType, boolean sendPacket) {
-        println(getClass(), "SendPacket: " + sendPacket);
+        println(getClass(), "SendPacket: " + sendPacket, false, PRINT_DEBUG);
 
         if (itemStack != null) {
-            println(getClass(), "Equipping non null item and updating appearance!");
-            println(getClass(), "ItemStack: " + itemStack.toString());
+            println(getClass(), "Equipping non null item and updating appearance!", false, PRINT_DEBUG);
+            println(getClass(), "ItemStack: " + itemStack.toString(), false, PRINT_DEBUG);
 
             if (itemStack instanceof WearableItemStack) {
-                println(getClass(), "Equipping wearable ItemStack!");
+                println(getClass(), "Equipping wearable ItemStack!", false, PRINT_DEBUG);
                 setPlayerBody(itemStackType.getAppearanceType(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
             }
         } else {
-            println(getClass(), "Unequipping due to null item so the appearance becomes black!");
+            println(getClass(), "Unequipping due to null item so the appearance becomes black!", false, PRINT_DEBUG);
 
             if (itemStackType.getAppearanceType() == null) return;
             setPlayerBody(itemStackType.getAppearanceType(), REMOVE_TEXTURE, sendPacket);
         }
 
-
         if (sendPacket) {
-            println(getClass(), "Sending appearance update!");
+            println(getClass(), "Sending appearance update!", false, PRINT_DEBUG);
             Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
                     new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
         }
     }
 
     private void setPlayerBody(AppearanceType appearanceType, byte updateId, boolean sendPacket) {
-        println(getClass(), "AppearanceType: " + appearanceType + ", UpdateID: " + updateId + ", SendPacket: " + sendPacket);
+        println(getClass(), "AppearanceType: " + appearanceType + ", UpdateID: " + updateId + ", SendPacket: " + sendPacket, false, PRINT_DEBUG);
         switch (appearanceType) {
             case MONSTER_BODY_TEXTURE:
                 monsterBodyTexture = updateId;

@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
+import static com.valenguard.server.util.Log.println;
+
 public class PlayerController {
 
     private final GameMap gameMap;
@@ -102,9 +104,11 @@ public class PlayerController {
         player.gameMapRegister(queueData.getWarp());
         playerList.add(player);
         new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
+        println(getClass(), "<Player Join> Name: " + player.getName() + ", ServerEntityID: " + player.getServerEntityId() + ", DatabaseID: " + player.getDatabaseId(), false);
     }
 
     private void playerQuitGameMap(Player player) {
+        println(getClass(), "<Player Quit> Name: " + player.getName() + ", ServerEntityID: " + player.getServerEntityId() + ", DatabaseID: " + player.getDatabaseId(), false);
         player.setTargetEntity(null);
         gameMap.getAiEntityController().releaseEntityTargets(player);
         playerList.remove(player);

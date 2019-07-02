@@ -14,13 +14,15 @@ import static java.util.Objects.requireNonNull;
 @Opcode(getOpcode = Opcodes.PLAYER_TRADE)
 public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.TradePacketIn> {
 
+    private static final boolean PRINT_DEBUG = true;
+
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
 
         final TradeStatusOpcode tradeStatusOpcode = TradeStatusOpcode.getTradeStatusOpcode(clientHandler.readByte());
-        int tradeUUID = 0;
-        short entityUUID = 0;
-        byte slotId = 0;
+        int tradeUUID = -1;
+        short entityUUID = -1;
+        byte slotId = -1;
 
         switch (requireNonNull(tradeStatusOpcode)) {
             case TRADE_REQUEST_INIT_TARGET:
@@ -44,6 +46,10 @@ public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.T
                 println(getClass(), "Decode unused trade status: " + tradeStatusOpcode, true, true);
                 break;
         }
+
+        println(getClass(), "TradeStatusOpcode: " + tradeStatusOpcode, false, PRINT_DEBUG);
+        println(getClass(), "EntityUUID: " + entityUUID, false, PRINT_DEBUG);
+        println(getClass(), "SlotID: " + slotId, false, PRINT_DEBUG);
 
         return new TradePacketIn(tradeStatusOpcode, tradeUUID, entityUUID, slotId);
     }

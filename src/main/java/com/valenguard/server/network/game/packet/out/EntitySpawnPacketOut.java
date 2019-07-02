@@ -9,7 +9,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
 
     public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {

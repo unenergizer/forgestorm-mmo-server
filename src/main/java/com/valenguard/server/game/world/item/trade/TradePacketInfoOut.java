@@ -31,14 +31,14 @@ public class TradePacketInfoOut {
         this.confirmedPlayerUUID = confirmedPlayerUUID;
     }
 
-    TradePacketInfoOut(int tradeUUID, byte tradeSlot) {
-        this.tradeOpcode = TradeStatusOpcode.TRADE_ITEM_REMOVE;
+    TradePacketInfoOut(TradeStatusOpcode tradeOpcode, int tradeUUID, byte tradeSlot) {
+        this.tradeOpcode = tradeOpcode;
         this.tradeUUID = tradeUUID;
         this.tradeSlot = tradeSlot;
     }
 
-    TradePacketInfoOut(int tradeUUID, ItemStack itemStack) {
-        this.tradeOpcode = TradeStatusOpcode.TRADE_ITEM_ADD;
+    TradePacketInfoOut(TradeStatusOpcode tradeOpcode, int tradeUUID, ItemStack itemStack) {
+        this.tradeOpcode = tradeOpcode;
         this.tradeUUID = tradeUUID;
         this.itemStack = itemStack;
     }
