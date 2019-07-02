@@ -104,11 +104,11 @@ public class PlayerController {
         player.gameMapRegister(queueData.getWarp());
         playerList.add(player);
         new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
-        println(getClass(), "<Player Join> Name: " + player.getName() + ", ServerEntityID: " + player.getServerEntityId() + ", DatabaseID: " + player.getDatabaseId(), false);
+        println(getClass(), "<Player Join> " + player, false);
     }
 
     private void playerQuitGameMap(Player player) {
-        println(getClass(), "<Player Quit> Name: " + player.getName() + ", ServerEntityID: " + player.getServerEntityId() + ", DatabaseID: " + player.getDatabaseId(), false);
+        println(getClass(), "<Player Quit> " + player, false);
         player.setTargetEntity(null);
         gameMap.getAiEntityController().releaseEntityTargets(player);
         playerList.remove(player);
