@@ -17,7 +17,7 @@ import static com.valenguard.server.util.Log.println;
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class TradeManager {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     /**
      * The max time to wait before the trade request times out.
@@ -291,8 +291,8 @@ public class TradeManager {
      * @param player The packetReceiver were checking against.
      */
     public void ifTradeExistCancel(Player player, String cancelMessage) {
-        println(getClass(), "method: ifTradeExistCancel(" + player + ", " + cancelMessage + ")", false, PRINT_DEBUG);
         if (!tradeDataMap.containsKey(player.getTradeUUID())) return;
+        println(getClass(), "method: ifTradeExistCancel(" + player + ", " + cancelMessage + ")", false, PRINT_DEBUG);
         TradeData tradeData = tradeDataMap.get(player.getTradeUUID());
 
         new ChatMessagePacketOut(tradeData.tradeStarter, cancelMessage).sendPacket();
