@@ -24,8 +24,12 @@ public class PlayerController {
     private final Queue<QueueData> playerJoinQueue = new ConcurrentLinkedQueue<>();
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
+    @Getter
+    private QueuedIdGenerator queuedIdGenerator;
+
     PlayerController(GameMap gameMap) {
         this.gameMap = gameMap;
+        queuedIdGenerator = new QueuedIdGenerator((short)1000);
     }
 
     public void tickPlayer() {
@@ -92,10 +96,15 @@ public class PlayerController {
     }
 
     public void addPlayer(Player player, Warp warp) {
+        if (!queuedIdGenerator.generateId(player)) {
+            println(getClass(), "Not enough space reserved to spawn player: " + player);
+            return;
+        }
         playerJoinQueue.add(new QueueData(player, warp));
     }
 
     public void removePlayer(Player player) {
+        queuedIdGenerator.deregisterId(player);
         playerQuitQueue.add(player);
     }
 
