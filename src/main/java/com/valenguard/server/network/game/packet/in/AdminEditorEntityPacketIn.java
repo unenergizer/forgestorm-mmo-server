@@ -235,7 +235,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 println(getClass(), "---> Updating NPC in database", false, PRINT_DEBUG);
             } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
                 new GameWorldMonsterSQL().saveSQL((Monster) aiEntity);
-                println(getClass(), "---> Updating NPC in database", false, PRINT_DEBUG);
+                println(getClass(), "---> Updating Monster in database", false, PRINT_DEBUG);
             }
             aiEntity.setInstantRespawn(true);
             aiEntity.killAiEntity(null);
