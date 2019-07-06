@@ -32,7 +32,15 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         // Basic data
         short entityID = clientHandler.readShort();
         String name = clientHandler.readString();
-        String faction = clientHandler.readString();
+
+        EntityAlignment entityAlignment = null;
+        String faction = null;
+        if (entityType == EntityType.MONSTER) {
+            entityAlignment = EntityAlignment.getEntityAlignment(clientHandler.readByte());
+        } else if (entityType == EntityType.NPC) {
+            faction = clientHandler.readString();
+        }
+
         int health = clientHandler.readInt();
         int damage = clientHandler.readInt();
         int expDrop = clientHandler.readInt();
@@ -60,7 +68,9 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         int glovesColor = -1;
 
         // Appearance
-        if (entityType == EntityType.NPC) {
+        if (entityType == EntityType.MONSTER) {
+            monsterBodyTexture = clientHandler.readByte();
+        } else if (entityType == EntityType.NPC) {
             hairTexture = clientHandler.readByte();
             helmTexture = clientHandler.readByte();
             chestTexture = clientHandler.readByte();
@@ -70,8 +80,6 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             eyesColor = clientHandler.readInt();
             skinColor = clientHandler.readInt();
             glovesColor = clientHandler.readInt();
-        } else if (entityType == EntityType.MONSTER) {
-            monsterBodyTexture = clientHandler.readByte();
         }
 
         println(PRINT_DEBUG);
@@ -81,7 +89,8 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         println(getClass(), "EntityType: " + entityType, false, PRINT_DEBUG);
         println(getClass(), "EntityID: " + entityID, false, PRINT_DEBUG);
         println(getClass(), "Name: " + name, false, PRINT_DEBUG);
-        println(getClass(), "Faction: " + faction, false, PRINT_DEBUG);
+        if (faction != null) println(getClass(), "Faction: " + faction, false, PRINT_DEBUG);
+        if (entityAlignment != null) println(getClass(), "Alignment: " + entityAlignment, false, PRINT_DEBUG);
         println(getClass(), "Health: " + health, false, PRINT_DEBUG);
         println(getClass(), "Damage: " + damage, false, PRINT_DEBUG);
         println(getClass(), "ExpDrop: " + expDrop, false, PRINT_DEBUG);
@@ -114,6 +123,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 entityID,
                 name,
                 faction,
+                entityAlignment,
                 health,
                 damage,
                 expDrop,
@@ -177,7 +187,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         if (aiEntity.getEntityType() == EntityType.NPC) {
             ((NPC) aiEntity).setFaction(Server.getInstance().getFactionManager().getFactionByName(packetData.faction));
         } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-            ((Monster) aiEntity).setAlignment(EntityAlignment.FRIENDLY);
+            ((Monster) aiEntity).setAlignment(packetData.entityAlignment);
         }
         aiEntity.setEntityType(aiEntity.getEntityType());
         aiEntity.setCurrentHealth(packetData.health);
@@ -251,6 +261,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         private short entityID;
         private String name;
         private String faction;
+        private EntityAlignment entityAlignment;
         private int health;
         private int damage;
         private int expDrop;

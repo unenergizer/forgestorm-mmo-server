@@ -34,6 +34,7 @@ public class AiEntity extends MovingEntity {
 
     public void killAiEntity(MovingEntity killerEntity) {
         getGameMap().getAiEntityController().queueEntityDespawn(this);
+        setTargetEntity(null);
 
         // If a AI entity kills and AI entity, do not drop ItemStack
         if (killerEntity == null) return;
