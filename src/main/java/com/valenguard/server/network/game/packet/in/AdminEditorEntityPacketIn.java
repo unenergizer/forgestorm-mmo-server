@@ -18,7 +18,7 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.ADMIN_EDITOR_ENTITY)
 public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEntityPacketIn.EntityEditorPacketIn> {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -83,7 +83,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         }
 
         println(PRINT_DEBUG);
-        println(getClass(), "=============== NPC EDITOR PACKET IN =============", false, PRINT_DEBUG);
+        println(getClass(), "=============== ENTITY EDITOR PACKET IN =============", false, PRINT_DEBUG);
         println(getClass(), "Spawn: " + spawn, false, PRINT_DEBUG);
         println(getClass(), "Save: " + save, false, PRINT_DEBUG);
         println(getClass(), "EntityType: " + entityType, false, PRINT_DEBUG);
@@ -156,8 +156,6 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
 
         if (!isAdmin) {
             println(getClass(), "Non admin player attempted to create a NPC! XF Account name: " + authenticatedUser.getXfAccountName(), true);
-        } else {
-            println(getClass(), "Spawning NPC made by NPC Editor");
         }
 
         return isAdmin;
@@ -177,8 +175,10 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         } else {
             if (packetData.entityType == EntityType.NPC) {
                 aiEntity = new NPC();
+                aiEntity.setEntityType(EntityType.NPC);
             } else if (packetData.entityType == EntityType.MONSTER) {
                 aiEntity = new Monster();
+                aiEntity.setEntityType(EntityType.MONSTER);
             }
         }
 
@@ -229,20 +229,25 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         if (packetData.shopId != -1) aiEntity.setShopId(packetData.shopId);
 
         if (packetData.save && packetData.entityID != -1) {
+            // Updating entity in database
             if (aiEntity.getEntityType() == EntityType.NPC) {
                 new GameWorldNpcSQL().saveSQL((NPC) aiEntity);
+                println(getClass(), "---> Updating NPC in database", false, PRINT_DEBUG);
             } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
                 new GameWorldMonsterSQL().saveSQL((Monster) aiEntity);
+                println(getClass(), "---> Updating NPC in database", false, PRINT_DEBUG);
             }
             aiEntity.setInstantRespawn(true);
             aiEntity.killAiEntity(null);
         } else if (packetData.save) {
+            // Saving new entity
             if (aiEntity.getEntityType() == EntityType.NPC) {
                 new GameWorldNpcSQL().firstTimeSaveSQL((NPC) aiEntity);
+                println(getClass(), "---> Saving new NPC to database", false, PRINT_DEBUG);
             } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
                 new GameWorldMonsterSQL().firstTimeSaveSQL((Monster) aiEntity);
+                println(getClass(), "---> Saving new Monster to database", false, PRINT_DEBUG);
             }
-            player.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
         } else {
             if (packetData.spawn) player.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
         }

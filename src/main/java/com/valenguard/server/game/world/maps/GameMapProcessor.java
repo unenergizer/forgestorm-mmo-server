@@ -2,7 +2,6 @@ package com.valenguard.server.game.world.maps;
 
 import com.valenguard.server.database.sql.GameWorldMonsterSQL;
 import com.valenguard.server.database.sql.GameWorldNpcSQL;
-import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
@@ -67,45 +66,64 @@ public class GameMapProcessor {
         fixWarpHeights();
     }
 
-    public void getNpcFromDatabase() {
-        for (String mapName : gameMaps.keySet()) {
-
-            GameWorldNpcSQL gameWorldNpcSQL = new GameWorldNpcSQL();
-            List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(mapName);
-
-            for (Integer i : npcIdList) {
-                NPC npc = new NPC();
-                npc.setFacingDirection(MoveDirection.SOUTH);
-                npc.setEntityType(EntityType.NPC);
-                npc.setAppearance(new Appearance(npc));
-                npc.setDatabaseId(i);
-
-                gameWorldNpcSQL.loadSQL(npc);
-
-                queueAiEntitySpawn(npc);
-            }
+    public void getEntitiesFromDatabase() {
+        for (GameMap gameMap : gameMaps.values()) {
+            loadNPC(gameMap);
+            loadMonster(gameMap);
         }
     }
 
-    public void getMonsterFromDatabase() {
-        for (String mapName : gameMaps.keySet()) {
+    public void loadNPC(GameMap gameMap) {
+        GameWorldNpcSQL gameWorldNpcSQL = new GameWorldNpcSQL();
+        List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(gameMap.getMapName());
 
-            GameWorldMonsterSQL gameWorldMonsterSQL = new GameWorldMonsterSQL();
-            List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(mapName);
+        for (Integer i : npcIdList) {
 
-            for (Integer i : monsterIdList) {
-                Monster monster = new Monster();
-                monster.setAlignment(EntityAlignment.FRIENDLY); // TODO: LOAD FROM DB
-                monster.setFacingDirection(MoveDirection.SOUTH);
-                monster.setEntityType(EntityType.MONSTER);
-                monster.setAppearance(new Appearance(monster));
-                monster.setDatabaseId(i);
+            // Don't spawn the entity if it is already spawned.
+            if (alreadySpawnedCheck(i, gameMap, EntityType.NPC)) continue;
 
-                gameWorldMonsterSQL.loadSQL(monster);
+            NPC npc = new NPC();
+            npc.setFacingDirection(MoveDirection.SOUTH);
+            npc.setEntityType(EntityType.NPC);
+            npc.setAppearance(new Appearance(npc));
+            npc.setDatabaseId(i);
 
-                queueAiEntitySpawn(monster);
+            gameWorldNpcSQL.loadSQL(npc);
+
+            queueAiEntitySpawn(npc);
+        }
+    }
+
+    public void loadMonster(GameMap gameMap) {
+        GameWorldMonsterSQL gameWorldMonsterSQL = new GameWorldMonsterSQL();
+        List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(gameMap.getMapName());
+
+        for (Integer i : monsterIdList) {
+
+            // Don't spawn the entity if it is already spawned.
+            if (alreadySpawnedCheck(i, gameMap, EntityType.MONSTER)) continue;
+
+            Monster monster = new Monster();
+            monster.setFacingDirection(MoveDirection.SOUTH);
+            monster.setEntityType(EntityType.MONSTER);
+            monster.setAppearance(new Appearance(monster));
+            monster.setDatabaseId(i);
+
+            gameWorldMonsterSQL.loadSQL(monster);
+
+            queueAiEntitySpawn(monster);
+        }
+    }
+
+    private boolean alreadySpawnedCheck(int databaseId, GameMap gameMap, EntityType entityType) {
+        boolean continueLoop = false;
+        for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
+            if (aiEntity.getDatabaseId() == databaseId && aiEntity.getEntityType() == entityType) {
+                continueLoop = true;
+                break;
             }
         }
+        return continueLoop;
     }
 
     private void fixWarpHeights() {

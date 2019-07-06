@@ -95,6 +95,8 @@ public class Player extends MovingEntity {
         Location teleportLocation = new Location(PlayerConstants.RESPAWN_LOCATION);
         MoveDirection facingDirection = PlayerConstants.SPAWN_FACING_DIRECTION;
 
+        clearCombatTargets();
+
         // Check to see if the packetReceiver needs to change maps!
         if (!getGameMap().isGraveYardMap()) {
             println(getClass(), "Warping packetReceiver to graveyard map!");

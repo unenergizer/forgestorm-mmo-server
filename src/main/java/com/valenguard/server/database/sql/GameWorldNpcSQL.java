@@ -167,6 +167,9 @@ public class GameWorldNpcSQL {
                     e.printStackTrace();
                 }
             }
+
+            // Now reload and spawn the entity
+            Server.getInstance().getGameManager().getGameMapProcessor().loadNPC(npc.getGameMap());
         }
     }
 

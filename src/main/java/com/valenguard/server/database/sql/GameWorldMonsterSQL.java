@@ -1,9 +1,8 @@
 package com.valenguard.server.database.sql;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.world.entity.AiEntity;
+import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.Monster;
-import com.valenguard.server.game.world.entity.NPC;
 import com.valenguard.server.game.world.maps.Location;
 
 import java.sql.Connection;
@@ -28,6 +27,7 @@ public class GameWorldMonsterSQL {
         float probStill = resultSet.getFloat("prob_still");
         float probWalk = resultSet.getFloat("prob_walk");
         short shopId = resultSet.getShort("shop_id");
+        String alignment = resultSet.getString("alignment");
         byte monsterBodyTexture = resultSet.getByte("monster_body_texture");
 
         Location location = new Location(worldName, worldX, worldY);
@@ -44,6 +44,7 @@ public class GameWorldMonsterSQL {
         monster.setMoveSpeed(walkSpeed);
         monster.setMovementInfo(probStill, probWalk, 0, 0, 96, 54);
         monster.setShopId(shopId);
+        monster.setAlignment(EntityAlignment.valueOf(alignment));
         monster.getAppearance().setMonsterBodyTexture(monsterBodyTexture);
     }
 
@@ -51,7 +52,7 @@ public class GameWorldMonsterSQL {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_monster" +
                 " SET world_name=?, world_x=?, world_y=?, name=?, health=?, damage=?," +
                 " exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
-                " monster_body_texture=? WHERE monster_id=?");
+                " alignment=?, monster_body_texture=? WHERE monster_id=?");
 
         preparedStatement.setString(1, monster.getCurrentMapLocation().getMapName());
         preparedStatement.setInt(2, monster.getCurrentMapLocation().getX());
@@ -65,16 +66,17 @@ public class GameWorldMonsterSQL {
         preparedStatement.setFloat(10, monster.getRandomRegionMoveGenerator().getProbabilityStill());
         preparedStatement.setFloat(11, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
         preparedStatement.setShort(12, monster.getShopId());
-        preparedStatement.setByte(13, monster.getAppearance().getMonsterBodyTexture());
-        preparedStatement.setInt(14, monster.getDatabaseId());
+        preparedStatement.setString(13, monster.getAlignment().toString());
+        preparedStatement.setByte(14, monster.getAppearance().getMonsterBodyTexture());
+        preparedStatement.setInt(15, monster.getDatabaseId());
 
         return preparedStatement;
     }
 
     private PreparedStatement firstTimeSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_monster " +
-                "(world_name, world_x, world_y, name, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, monster_body_texture) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(world_name, world_x, world_y, name, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, alignment, monster_body_texture) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, monster.getCurrentMapLocation().getMapName());
         preparedStatement.setShort(2, monster.getCurrentMapLocation().getX());
@@ -88,7 +90,8 @@ public class GameWorldMonsterSQL {
         preparedStatement.setFloat(10, monster.getRandomRegionMoveGenerator().getProbabilityStill());
         preparedStatement.setFloat(11, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
         preparedStatement.setInt(12, monster.getShopId());
-        preparedStatement.setByte(13, monster.getAppearance().getMonsterBodyTexture());
+        preparedStatement.setString(13, monster.getAlignment().toString());
+        preparedStatement.setByte(14, monster.getAppearance().getMonsterBodyTexture());
 
         return preparedStatement;
     }
@@ -136,6 +139,9 @@ public class GameWorldMonsterSQL {
                     e.printStackTrace();
                 }
             }
+
+            // Now reload and spawn the entity
+            Server.getInstance().getGameManager().getGameMapProcessor().loadMonster(monster.getGameMap());
         }
     }
 
