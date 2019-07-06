@@ -138,7 +138,7 @@ public class MovingEntity extends Entity {
         return getCurrentMapLocation().getX() != getFutureMapLocation().getX() || getCurrentMapLocation().getY() != getFutureMapLocation().getY();
     }
 
-    void clearCombatTargets() {
+    public void clearCombatTargets() {
         if (targetEntity != null && targetEntity.getTargetEntity() == this) targetEntity.setTargetEntity(null); // Clear other entity target
         setTargetEntity(null); // Clear this monsters target
     }

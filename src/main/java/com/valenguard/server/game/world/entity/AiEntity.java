@@ -64,4 +64,8 @@ public class AiEntity extends MovingEntity {
             ));
         }
     }
+
+    public void removeAiEntity() {
+        getGameMap().getAiEntityController().removeEntity(this);
+    }
 }

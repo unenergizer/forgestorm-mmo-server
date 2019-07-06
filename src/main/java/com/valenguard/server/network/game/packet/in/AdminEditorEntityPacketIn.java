@@ -18,7 +18,7 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.ADMIN_EDITOR_ENTITY)
 public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEntityPacketIn.EntityEditorPacketIn> {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -28,6 +28,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         // Editor data
         boolean spawn = clientHandler.readBoolean();
         boolean save = clientHandler.readBoolean();
+        boolean delete = clientHandler.readBoolean();
 
         // Basic data
         short entityID = clientHandler.readShort();
@@ -120,6 +121,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 entityType,
                 spawn,
                 save,
+                delete,
                 entityID,
                 name,
                 faction,
@@ -248,6 +250,17 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 new GameWorldMonsterSQL().firstTimeSaveSQL((Monster) aiEntity);
                 println(getClass(), "---> Saving new Monster to database", false, PRINT_DEBUG);
             }
+        } else if (packetData.delete && packetData.entityID != -1) {
+
+            aiEntity.removeAiEntity(); // Remove entity from map
+
+            if (aiEntity.getEntityType() == EntityType.NPC) {
+                new GameWorldNpcSQL().deleteSQL((NPC) aiEntity);
+                println(getClass(), "---> Deleting NPC from database", false, PRINT_DEBUG);
+            } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
+                new GameWorldMonsterSQL().deleteSQL((Monster) aiEntity);
+                println(getClass(), "---> Deleting Monster from database", false, PRINT_DEBUG);
+            }
         } else {
             if (packetData.spawn) player.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
         }
@@ -261,6 +274,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         // Editor data
         private boolean spawn;
         private boolean save;
+        private boolean delete;
 
         // Basic data
         private short entityID;

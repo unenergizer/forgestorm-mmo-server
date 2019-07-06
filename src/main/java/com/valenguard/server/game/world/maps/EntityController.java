@@ -104,4 +104,10 @@ public abstract class EntityController<T extends Entity> {
             new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
         }
     }
+
+    public void removeEntity(Entity entity) {
+        entityDespawn(entity);
+        if (entity instanceof AiEntity) ((AiEntity) entity).clearCombatTargets();
+        entityHashMap.remove(entity.getServerEntityId());
+    }
 }

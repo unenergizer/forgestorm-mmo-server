@@ -195,4 +195,23 @@ public class GameWorldMonsterSQL {
             }
         }
     }
+
+    public void deleteSQL(Monster monster) {
+        PreparedStatement preparedStatement = null;
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            preparedStatement = connection.prepareStatement("DELETE FROM game_world_monster WHERE monster_id=?");
+            preparedStatement.setInt(1, monster.getDatabaseId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exe) {
+            exe.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

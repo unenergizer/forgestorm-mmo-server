@@ -223,4 +223,23 @@ public class GameWorldNpcSQL {
             }
         }
     }
+
+    public void deleteSQL(NPC npc) {
+        PreparedStatement preparedStatement = null;
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            preparedStatement = connection.prepareStatement("DELETE FROM game_world_npc WHERE npc_id=?");
+            preparedStatement.setInt(1, npc.getDatabaseId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exe) {
+            exe.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
