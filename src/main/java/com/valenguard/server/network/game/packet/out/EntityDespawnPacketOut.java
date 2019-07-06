@@ -8,14 +8,12 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntityDespawnPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = true;
-    private final Player receiver;
+    private static final boolean PRINT_DEBUG = false;
     private final short entityId;
     private final byte entityType;
 
     public EntityDespawnPacketOut(final Player receiver, final Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver.getClientHandler());
-        this.receiver = receiver;
         entityId = despawnTarget.getServerEntityId();
         entityType = despawnTarget.getEntityType().getEntityTypeByte();
         println(getClass(), "###[ DESPAWN OUT -> " + receiver.getName() + " ]################################", false, PRINT_DEBUG);

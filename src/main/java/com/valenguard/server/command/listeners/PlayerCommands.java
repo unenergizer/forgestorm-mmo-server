@@ -49,6 +49,15 @@ public class PlayerCommands {
         player.setCurrentHealth(player.getMaxHealth());
     }
 
+    @Command(base = "teleport", argLenReq = 1)
+    @IncompleteCommand(missing = "teleport <playerName>")
+    public void teleportToPlayer(CommandSource commandSource, String[] args) {
+        Player player = commandSource.getPlayer();
+        Player teleportToPlayer = getPlayer(commandSource, args[0]);
+
+        if (teleportToPlayer == null) return;
+        player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentMapLocation()), MoveDirection.SOUTH));
+    }
 
     @Command(base = "teleport", argLenReq = 4)
     @IncompleteCommand(missing = "teleport <playerName> <mapName> <x> <y>")
