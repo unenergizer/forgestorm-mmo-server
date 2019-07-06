@@ -16,15 +16,5 @@ public class InitScreenPacketOut extends AbstractServerOutPacket {
     @Override
     protected void createPacket(GameOutputStream write) {
         write.writeByte(screenType.getScreenTypeByte());
-
-        switch (screenType) {
-            case LOGIN:
-                break;
-            case CHARACTER_SELECT:
-                break;
-            case GAME:
-                write.writeShort(clientHandler.getPlayer().getServerEntityId());
-                break;
-        }
     }
 }

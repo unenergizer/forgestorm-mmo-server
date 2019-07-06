@@ -31,8 +31,8 @@ public class GameManager {
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayer());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().sendPlayersPacket());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerQuit());
+        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerJoin());
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
         playerProcessor.processPlayerQuit();
         playerProcessor.processPlayerJoinGameWorld();

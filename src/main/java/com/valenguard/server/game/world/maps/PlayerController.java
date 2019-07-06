@@ -17,7 +17,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerController {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     private final GameMap gameMap;
 
@@ -34,42 +34,72 @@ public class PlayerController {
         queuedIdGenerator = new QueuedIdGenerator((short) 1000);
     }
 
-    public void tickPlayer() {
-        // Remove players
+    public void tickPlayerQuit() {
+        // Quitting the game map
         Iterator<Player> quitIterator = playerQuitQueue.iterator();
         int quitsProcessed = 0;
         while (quitIterator.hasNext() && quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
-            playerQuitGameMap(quitIterator.next());
+            Player player = quitIterator.next();
+            println(getClass(), "<Player Quit> " + player, false, PRINT_DEBUG);
+            player.setTargetEntity(null);
+            gameMap.getAiEntityController().releaseEntityTargets(player);
+            playerList.remove(player);
+            player.gameMapDeregister();
             quitsProcessed++;
         }
 
-        // Add players
+        // Sending packets to everyone
+        for (quitsProcessed = 0; quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS; quitsProcessed++) {
+            if (playerQuitQueue.isEmpty()) break;
+
+            // Post player despawn
+            Player entityToDespawn = playerQuitQueue.remove();
+            for (Player packetReceiver : playerList) {
+                if (packetReceiver == entityToDespawn) continue;
+                new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
+            }
+        }
+    }
+
+    public void tickPlayerJoin() {
+        // Joining the game map
         Iterator<QueueData> joinIterator = playerJoinQueue.iterator();
         int joinsProcessed = 0;
         while (joinIterator.hasNext() && joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
-            playerJoinGameMap(joinIterator.next());
+            QueueData queueData = joinIterator.next();
+            Player player = queueData.getPlayer();
+            if (!queuedIdGenerator.generateId(player)) {
+                println(getClass(), "Not enough space reserved to spawn player: " + player, true);
+                return;
+            }
+            player.gameMapRegister(queueData.getWarp());
+            playerList.add(player);
+            new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
+            println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
             joinsProcessed++;
         }
-    }
 
-    public void tickPlayerShuffle(long numberOfTicksPassed) {
-        if (numberOfTicksPassed % 40 == 0) {
-            Collections.shuffle(playerList);
-        }
-    }
-
-    public void sendPlayersPacket() {
-
-        for (int quitsProcessed = 0; quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS; quitsProcessed++) {
-            if (playerQuitQueue.isEmpty()) break;
-            postPlayerDespawn(playerQuitQueue.remove());
-        }
-
-        for (int joinsProcessed = 0; joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS; joinsProcessed++) {
+        // Sending packets to others
+        for (joinsProcessed = 0; joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
+
             // Tell everyone already online about the packetReceiver and the packetReceiver about everyone online.
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
-            postPlayerSpawn(playerWhoJoined);
+
+            // Post player spawn
+            for (Player packetReceiver : playerList) {
+                // Send all online players, the player that just spawned.
+                if (!packetReceiver.equals(playerWhoJoined)) {
+                    new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
+                }
+
+                // Send joined packetReceiver to all online players
+                if (playerWhoJoined.getEntityType() == EntityType.PLAYER) {
+                    new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
+                    new EntityAttributesUpdatePacketOut(playerWhoJoined, packetReceiver).sendPacket();
+                }
+            }
+
             // Tell the packetReceiver about all the mobs currently on the map.
             gameMap.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
             gameMap.getAiEntityController().getEntities().forEach(aiEntity -> {
@@ -97,11 +127,13 @@ public class PlayerController {
         }
     }
 
-    public void addPlayer(Player player, Warp warp) {
-        if (!queuedIdGenerator.generateId(player)) {
-            println(getClass(), "Not enough space reserved to spawn player: " + player, true);
-            return;
+    public void tickPlayerShuffle(long numberOfTicksPassed) {
+        if (numberOfTicksPassed % 40 == 0) {
+            Collections.shuffle(playerList);
         }
+    }
+
+    public void addPlayer(Player player, Warp warp) {
         playerJoinQueue.add(new QueueData(player, warp));
     }
 
@@ -110,51 +142,8 @@ public class PlayerController {
         playerQuitQueue.add(player);
     }
 
-    private void playerJoinGameMap(QueueData queueData) {
-        Player player = queueData.getPlayer();
-        player.gameMapRegister(queueData.getWarp());
-        playerList.add(player);
-        new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
-        println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
-    }
-
-    private void playerQuitGameMap(Player player) {
-        println(getClass(), "<Player Quit> " + player, false, PRINT_DEBUG);
-        player.setTargetEntity(null);
-        gameMap.getAiEntityController().releaseEntityTargets(player);
-        playerList.remove(player);
-        player.gameMapDeregister();
-    }
-
-    private void postPlayerSpawn(Player playerWhoJoined) {
-        for (Player packetReceiver : playerList) {
-
-            // Send all online players, the player that just spawned.
-            if (!packetReceiver.equals(playerWhoJoined)) {
-                new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
-            }
-
-            // Send joined packetReceiver to all online players
-            if (playerWhoJoined.getEntityType() == EntityType.PLAYER) {
-                new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
-                new EntityAttributesUpdatePacketOut(playerWhoJoined, packetReceiver).sendPacket();
-            }
-        }
-    }
-
     private void postPlayerSpawn(Player receiver, Entity entityToSpawn) {
         new EntitySpawnPacketOut(receiver, entityToSpawn).sendPacket();
-    }
-
-    private void postPlayerDespawn(Entity entityToDespawn) {
-        for (Player packetReceiver : playerList) {
-            if (packetReceiver == entityToDespawn) continue;
-            new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
-        }
-    }
-
-    public int getPlayerCount() {
-        return playerList.size();
     }
 
     public Player findPlayer(short uuid) {

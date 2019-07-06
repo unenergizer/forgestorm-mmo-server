@@ -9,11 +9,13 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
     private final Entity entityToSpawn;
+    private final Player packetReciever;
 
     public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player.getClientHandler());
+        packetReciever = player;
         this.entityToSpawn = entityToSpawn;
     }
 
@@ -119,25 +121,26 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         }
 
         if (entityToSpawn.getEntityType() != EntityType.PLAYER) return;
-        println(getClass(), "===================================", false, PRINT_DEBUG);
+        println(getClass(), "===[ SPAWN OUT -> " + packetReciever.getName() + " ]================================", false, PRINT_DEBUG);
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
         println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
-        println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
-        println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
-        println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
-        println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
-
-        println(getClass(), "MonsterBody: " + appearance.getMonsterBodyTexture(), false, PRINT_DEBUG);
-        println(getClass(), "Hair: " + appearance.getHairTexture(), false, PRINT_DEBUG);
-        println(getClass(), "Helm: " + appearance.getHelmTexture(), false, PRINT_DEBUG);
-        println(getClass(), "Chest: " + appearance.getChestTexture(), false, PRINT_DEBUG);
-        println(getClass(), "Pants: " + appearance.getPantsTexture(), false, PRINT_DEBUG);
-        println(getClass(), "Shoes: " + appearance.getShoesTexture(), false, PRINT_DEBUG);
-        println(getClass(), "HairColor: " + appearance.getHairColor(), false, PRINT_DEBUG);
-        println(getClass(), "EyeColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
-        println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
-        println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
+        println(getClass(), "MapName: " + movingEntity.getFutureMapLocation().getMapName(), false, PRINT_DEBUG);
+//        println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
+//        println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
+//        println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
+//        println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
+//
+//        println(getClass(), "MonsterBody: " + appearance.getMonsterBodyTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "Hair: " + appearance.getHairTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "Helm: " + appearance.getHelmTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "Chest: " + appearance.getChestTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "Pants: " + appearance.getPantsTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "Shoes: " + appearance.getShoesTexture(), false, PRINT_DEBUG);
+//        println(getClass(), "HairColor: " + appearance.getHairColor(), false, PRINT_DEBUG);
+//        println(getClass(), "EyeColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
+//        println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
+//        println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
     }
 
     private void spawnStationaryEntity(GameOutputStream write) {

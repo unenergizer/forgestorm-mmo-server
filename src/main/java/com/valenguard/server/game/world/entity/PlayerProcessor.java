@@ -95,6 +95,14 @@ public class PlayerProcessor {
                 new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
+
+        // Send other players join message
+        for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
+            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
+                if (playerSearch == player) continue;
+                new ChatMessagePacketOut(playerSearch, player.getName() + " has joined the server.").sendPacket();
+            }
+        }
     }
 
     public void queuePlayerQuitGameWorld(ClientHandler clientHandler) {
