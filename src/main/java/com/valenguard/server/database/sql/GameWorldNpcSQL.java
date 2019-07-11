@@ -69,7 +69,7 @@ public class GameWorldNpcSQL {
     private PreparedStatement databaseSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_npc" +
                 " SET name=?, world_name=?, world_x=?, world_y=?," +
-                " region_start_x=?, region_start_y=?, region_end_x=?, region_end_y=?, " +
+                " region_start_x=?, region_end_x=?, region_start_y, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " hair_texture=?, helm_texture=?, chest_texture=?, pants_texture=?, shoes_texture=?," +
                 " hair_color=?, eye_color=?, skin_color=?, gloves_color=? WHERE npc_id=?");
@@ -79,8 +79,8 @@ public class GameWorldNpcSQL {
         preparedStatement.setShort(3, npc.getCurrentMapLocation().getX());
         preparedStatement.setShort(4, npc.getCurrentMapLocation().getY());
         preparedStatement.setShort(5, npc.getRegionStartX());
-        preparedStatement.setShort(6, npc.getRegionStartY());
-        preparedStatement.setShort(7, npc.getRegionEndX());
+        preparedStatement.setShort(6, npc.getRegionEndX());
+        preparedStatement.setShort(7, npc.getRegionStartY());
         preparedStatement.setShort(8, npc.getRegionEndY());
         preparedStatement.setInt(9, npc.getMaxHealth());
         preparedStatement.setInt(10, npc.getAttributes().getDamage());
@@ -106,7 +106,7 @@ public class GameWorldNpcSQL {
 
     private PreparedStatement firstTimeSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_npc " +
-                "(world_name, name, world_x, world_y, region_start_x, region_start_y, region_end_x, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
+                "(world_name, name, world_x, world_y, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, npc.getName());
@@ -114,8 +114,8 @@ public class GameWorldNpcSQL {
         preparedStatement.setShort(3, npc.getCurrentMapLocation().getX());
         preparedStatement.setShort(4, npc.getCurrentMapLocation().getY());
         preparedStatement.setShort(5, npc.getRegionStartX());
-        preparedStatement.setShort(6, npc.getRegionStartY());
-        preparedStatement.setShort(7, npc.getRegionEndX());
+        preparedStatement.setShort(6, npc.getRegionEndX());
+        preparedStatement.setShort(7, npc.getRegionStartY());
         preparedStatement.setShort(8, npc.getRegionEndY());
         preparedStatement.setInt(9, npc.getMaxHealth());
         preparedStatement.setInt(10, npc.getAttributes().getDamage());

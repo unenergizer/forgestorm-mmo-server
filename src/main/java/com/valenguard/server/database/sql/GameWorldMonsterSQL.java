@@ -56,7 +56,7 @@ public class GameWorldMonsterSQL {
     private PreparedStatement databaseSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_monster" +
                 " SET name=?, world_name=?, world_x=?, world_y=?, " +
-                " region_start_x=?, region_start_y=?, region_end_x=?, region_end_y=?, " +
+                " region_start_x=?, region_end_x=?, region_start_y, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " alignment=?, monster_body_texture=? WHERE monster_id=?");
 
@@ -65,8 +65,8 @@ public class GameWorldMonsterSQL {
         preparedStatement.setShort(3, monster.getCurrentMapLocation().getX());
         preparedStatement.setShort(4, monster.getCurrentMapLocation().getY());
         preparedStatement.setShort(5, monster.getRegionStartX());
-        preparedStatement.setShort(6, monster.getRegionStartY());
-        preparedStatement.setShort(7, monster.getRegionEndX());
+        preparedStatement.setShort(6, monster.getRegionEndX());
+        preparedStatement.setShort(7, monster.getRegionStartY());
         preparedStatement.setShort(8, monster.getRegionEndY());
         preparedStatement.setInt(9, monster.getMaxHealth());
         preparedStatement.setInt(10, monster.getAttributes().getDamage());
@@ -85,7 +85,7 @@ public class GameWorldMonsterSQL {
 
     private PreparedStatement firstTimeSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_monster " +
-                "(name, world_name, world_x, world_y, region_start_x, region_start_y, region_end_x, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, alignment, monster_body_texture) " +
+                "(name, world_name, world_x, world_y, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, alignment, monster_body_texture) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, monster.getName());
@@ -93,8 +93,8 @@ public class GameWorldMonsterSQL {
         preparedStatement.setShort(3, monster.getCurrentMapLocation().getX());
         preparedStatement.setShort(4, monster.getCurrentMapLocation().getY());
         preparedStatement.setShort(5, monster.getRegionStartX());
-        preparedStatement.setShort(6, monster.getRegionStartY());
-        preparedStatement.setShort(7, monster.getRegionEndX());
+        preparedStatement.setShort(6, monster.getRegionEndX());
+        preparedStatement.setShort(7, monster.getRegionStartY());
         preparedStatement.setShort(8, monster.getRegionEndY());
         preparedStatement.setInt(9, monster.getMaxHealth());
         preparedStatement.setInt(10, monster.getAttributes().getDamage());
