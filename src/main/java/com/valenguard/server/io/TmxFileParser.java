@@ -2,9 +2,10 @@ package com.valenguard.server.io;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.game.GameConstants;
-import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.StationaryTypes;
-import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.entity.Appearance;
+import com.valenguard.server.game.world.entity.EntityType;
+import com.valenguard.server.game.world.entity.StationaryEntity;
 import com.valenguard.server.game.world.maps.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,12 +58,6 @@ public class TmxFileParser {
         NodeList objectGroupTag = tmx.getElementsByTagName("objectgroup");
 
         for (int i = 0; i < objectGroupTag.getLength(); i++) {
-
-            // Get Entities
-//            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("entity")) {
-//                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
-//                processAiEntities(mapHeight, objectTag, fileName);
-//            }
 
             // Get Bank Access
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("bank_access")) {
@@ -153,109 +148,6 @@ public class TmxFileParser {
         }
 
         return map;
-    }
-
-    private static void processAiEntities(short mapHeight, NodeList objectTag, String fileName) {
-        for (int j = 0; j < objectTag.getLength(); j++) {
-            if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
-
-            Element objectTagElement = (Element) objectTag.item(j);
-
-            // Initialize AiEntity vars
-            short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / TILE_SIZE);
-            short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / TILE_SIZE) - 1);
-            short bounds1x = -2;
-            short bounds1y = -2;
-            short bounds2x = -2;
-            short bounds2y = -2;
-            MoveDirection direction = MoveDirection.SOUTH;
-            int aiEntityDataID = -1;
-
-            // Get custom properties
-            NodeList properties = objectTagElement.getElementsByTagName("properties").item(0).getChildNodes();
-            for (int k = 0; k < properties.getLength(); k++) {
-                if (properties.item(k).getNodeType() != Node.ELEMENT_NODE) continue;
-                Element propertyElement = (Element) properties.item(k);
-
-                if (propertyElement.getAttribute("name").equals("direction")) {
-                    direction = MoveDirection.valueOf(propertyElement.getAttribute("value"));
-                }
-                if (propertyElement.getAttribute("name").equals("bounds1x")) {
-                    bounds1x = Short.parseShort(propertyElement.getAttribute("value"));
-                }
-                if (propertyElement.getAttribute("name").equals("bounds1y")) {
-                    bounds1y = Short.parseShort(propertyElement.getAttribute("value"));
-                }
-                if (propertyElement.getAttribute("name").equals("bounds2x")) {
-                    bounds2x = Short.parseShort(propertyElement.getAttribute("value"));
-                }
-                if (propertyElement.getAttribute("name").equals("bounds2y")) {
-                    bounds2y = Short.parseShort(propertyElement.getAttribute("value"));
-                }
-                if (propertyElement.getAttribute("name").equals("aiEntityDataID")) {
-                    aiEntityDataID = Integer.parseInt(propertyElement.getAttribute("value"));
-                }
-            }
-
-            // Build the entity!
-            AiEntityLoader.AiEntityData aiEntityData = Server.getInstance().getAiEntityDataManager().getEntityData(aiEntityDataID);
-
-            AiEntity aiEntity = null;
-
-            if (aiEntityData.getEntityType() == EntityType.MONSTER) {
-                aiEntity = new Monster();
-                ((Monster) aiEntity).setAlignment(aiEntityData.getEntityAlignment());
-            } else if (aiEntityData.getEntityType() == EntityType.NPC) {
-                aiEntity = new NPC();
-                ((NPC) aiEntity).setFaction(Server.getInstance().getFactionManager().getFactionByName(aiEntityData.getFaction()));
-            }
-
-            aiEntity.setName(aiEntityData.getName());
-            aiEntity.setEntityType(aiEntityData.getEntityType());
-            aiEntity.setCurrentHealth(aiEntityData.getHealth());
-            aiEntity.setMaxHealth(aiEntityData.getHealth());
-            aiEntity.setExpDrop(aiEntityData.getExpDrop());
-            aiEntity.setDropTable(aiEntityData.getDropTable());
-            aiEntity.setMoveSpeed(aiEntityData.getWalkSpeed());
-            aiEntity.setBankKeeper(aiEntityData.isBankKeeper());
-
-            aiEntity.setMovementInfo(aiEntityData.getProbabilityStill(), aiEntityData.getProbabilityWalkStart(), bounds1x, mapHeight - bounds1y - 1, bounds2x, mapHeight - bounds2y - 1);
-            aiEntity.setSpawnWarp(new Warp(new Location(fileName, x, y), direction));
-            aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
-
-            // Setup appearance
-            Appearance appearance = new Appearance(aiEntity);
-            aiEntity.setAppearance(appearance);
-
-            if (aiEntityData.getMonsterBodyTexture() != null) {
-                appearance.setMonsterBodyTexture((byte) (int) aiEntityData.getMonsterBodyTexture());
-            } else {
-                if (aiEntityData.getHairTexture() != null) {
-                    appearance.setHairTexture((byte) (int) aiEntityData.getHairTexture());
-                } else {
-                    appearance.setHelmTexture((byte) (int) aiEntityData.getHelmTexture());
-                }
-                appearance.setChestTexture((byte) (int) aiEntityData.getChestTexture());
-                appearance.setPantsTexture((byte) (int) aiEntityData.getPantsTexture());
-                appearance.setShoesTexture((byte) (int) aiEntityData.getShoesTexture());
-                appearance.setHairColor(aiEntityData.getHairColor());
-                appearance.setEyeColor(aiEntityData.getEyeColor());
-                appearance.setSkinColor(aiEntityData.getSkinColor());
-                appearance.setGlovesColor(aiEntityData.getGlovesColor());
-            }
-
-            // Setup basic attributes.
-            Attributes attributes = new Attributes();
-            attributes.setDamage(aiEntityData.getDamage());
-            aiEntity.setAttributes(attributes);
-
-            if (aiEntityData.getShopID() != null) aiEntity.setShopId((short) (int) aiEntityData.getShopID());
-
-            // Queue Mob Spawn
-            Server.getInstance().getGameManager().getGameMapProcessor().queueAiEntitySpawn(aiEntity);
-
-            println(TmxFileParser.class, "[Entity] AiEntityData: " + aiEntityDataID + ", X: " + x + ", Y: " + y + ", b1X: " + bounds1x + ", b1Y: " + bounds1y + ", b2X: " + bounds2x + ", b2Y: " + bounds2y, false, PRINT_DEBUG);
-        }
     }
 
     private static void processBankAccess(short mapHeight, Tile[][] map, NodeList objectTag) {

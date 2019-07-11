@@ -14,10 +14,14 @@ import java.util.List;
 public class GameWorldNpcSQL {
 
     private void databaseLoad(NPC npc, ResultSet resultSet) throws SQLException {
+        String name = resultSet.getString("name");
         String worldName = resultSet.getString("world_name");
         short worldX = resultSet.getShort("world_x");
         short worldY = resultSet.getShort("world_y");
-        String name = resultSet.getString("name");
+        short regionStartX = resultSet.getShort("region_start_x");
+        short regionStartY = resultSet.getShort("region_start_y");
+        short regionEndX = resultSet.getShort("region_end_x");
+        short regionEndY = resultSet.getShort("region_end_y");
         int health = resultSet.getInt("health");
         int damage = resultSet.getInt("damage");
         int expDrop = resultSet.getInt("exp_drop");
@@ -38,17 +42,18 @@ public class GameWorldNpcSQL {
 
         Location location = new Location(worldName, worldX, worldY);
 
+        npc.setName(name);
         npc.setDefaultSpawnLocation(location);
         npc.setCurrentMapLocation(location);
         npc.setFutureMapLocation(location);
-        npc.setName(name);
+        npc.setRegionLocations(regionStartX, regionStartY, regionEndX, regionEndY);
         npc.setCurrentHealth(health);
         npc.setMaxHealth(health);
         npc.getAttributes().setDamage(damage);
         npc.setExpDrop(expDrop);
         npc.setDropTable(dropTable);
         npc.setMoveSpeed(walkSpeed);
-        npc.setMovementInfo(probStill, probWalk, 0, 0, 96, 54);
+        npc.setMovementInfo(probStill, probWalk);
         npc.setShopId(shopId);
         npc.getAppearance().setHairTexture(hairTexture);
         npc.getAppearance().setHelmTexture(helmTexture);
@@ -63,63 +68,72 @@ public class GameWorldNpcSQL {
 
     private PreparedStatement databaseSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_npc" +
-                " SET world_name=?, world_x=?, world_y=?, name=?, health=?, damage=?," +
-                " exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
+                " SET name=?, world_name=?, world_x=?, world_y=?," +
+                " region_start_x=?, region_start_y=?, region_end_x=?, region_end_y=?, " +
+                " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " hair_texture=?, helm_texture=?, chest_texture=?, pants_texture=?, shoes_texture=?," +
                 " hair_color=?, eye_color=?, skin_color=?, gloves_color=? WHERE npc_id=?");
 
-        preparedStatement.setString(1, npc.getCurrentMapLocation().getMapName());
-        preparedStatement.setInt(2, npc.getCurrentMapLocation().getX());
-        preparedStatement.setInt(3, npc.getCurrentMapLocation().getY());
-        preparedStatement.setString(4, npc.getName());
-        preparedStatement.setInt(5, npc.getMaxHealth());
-        preparedStatement.setInt(6, npc.getAttributes().getDamage());
-        preparedStatement.setInt(7, npc.getExpDrop());
-        preparedStatement.setInt(8, npc.getDropTable());
-        preparedStatement.setFloat(9, npc.getMoveSpeed());
-        preparedStatement.setFloat(10, npc.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(11, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setShort(12, npc.getShopId());
-        preparedStatement.setByte(13, npc.getAppearance().getHairTexture());
-        preparedStatement.setByte(14, npc.getAppearance().getHelmTexture());
-        preparedStatement.setByte(15, npc.getAppearance().getChestTexture());
-        preparedStatement.setByte(16, npc.getAppearance().getPantsTexture());
-        preparedStatement.setByte(17, npc.getAppearance().getShoesTexture());
-        preparedStatement.setInt(18, npc.getAppearance().getHairColor());
-        preparedStatement.setInt(19, npc.getAppearance().getEyeColor());
-        preparedStatement.setInt(20, npc.getAppearance().getSkinColor());
-        preparedStatement.setInt(21, npc.getAppearance().getGlovesColor());
-        preparedStatement.setInt(22, npc.getDatabaseId());
+        preparedStatement.setString(1, npc.getName());
+        preparedStatement.setString(2, npc.getCurrentMapLocation().getMapName());
+        preparedStatement.setShort(3, npc.getCurrentMapLocation().getX());
+        preparedStatement.setShort(4, npc.getCurrentMapLocation().getY());
+        preparedStatement.setShort(5, npc.getRegionStartX());
+        preparedStatement.setShort(6, npc.getRegionStartY());
+        preparedStatement.setShort(7, npc.getRegionEndX());
+        preparedStatement.setShort(8, npc.getRegionEndY());
+        preparedStatement.setInt(9, npc.getMaxHealth());
+        preparedStatement.setInt(10, npc.getAttributes().getDamage());
+        preparedStatement.setInt(11, npc.getExpDrop());
+        preparedStatement.setInt(12, npc.getDropTable());
+        preparedStatement.setFloat(13, npc.getMoveSpeed());
+        preparedStatement.setFloat(14, npc.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(15, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setShort(16, npc.getShopId());
+        preparedStatement.setByte(17, npc.getAppearance().getHairTexture());
+        preparedStatement.setByte(18, npc.getAppearance().getHelmTexture());
+        preparedStatement.setByte(19, npc.getAppearance().getChestTexture());
+        preparedStatement.setByte(20, npc.getAppearance().getPantsTexture());
+        preparedStatement.setByte(21, npc.getAppearance().getShoesTexture());
+        preparedStatement.setInt(22, npc.getAppearance().getHairColor());
+        preparedStatement.setInt(23, npc.getAppearance().getEyeColor());
+        preparedStatement.setInt(24, npc.getAppearance().getSkinColor());
+        preparedStatement.setInt(25, npc.getAppearance().getGlovesColor());
+        preparedStatement.setInt(26, npc.getDatabaseId());
 
         return preparedStatement;
     }
 
     private PreparedStatement firstTimeSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_npc " +
-                "(world_name, world_x, world_y, name, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(world_name, name, world_x, world_y, region_start_x, region_start_y, region_end_x, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        preparedStatement.setString(1, npc.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(2, npc.getCurrentMapLocation().getX());
-        preparedStatement.setShort(3, npc.getCurrentMapLocation().getY());
-        preparedStatement.setString(4, npc.getName());
-        preparedStatement.setInt(5, npc.getMaxHealth());
-        preparedStatement.setInt(6, npc.getAttributes().getDamage());
-        preparedStatement.setInt(7, npc.getExpDrop());
-        preparedStatement.setInt(8, npc.getDropTable());
-        preparedStatement.setFloat(9, npc.getMoveSpeed());
-        preparedStatement.setFloat(10, npc.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(11, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setInt(12, npc.getShopId());
-        preparedStatement.setByte(13, npc.getAppearance().getHairTexture());
-        preparedStatement.setByte(14, npc.getAppearance().getHelmTexture());
-        preparedStatement.setByte(15, npc.getAppearance().getChestTexture());
-        preparedStatement.setByte(16, npc.getAppearance().getPantsTexture());
-        preparedStatement.setByte(17, npc.getAppearance().getShoesTexture());
-        preparedStatement.setInt(18, npc.getAppearance().getHairColor());
-        preparedStatement.setInt(19, npc.getAppearance().getEyeColor());
-        preparedStatement.setInt(20, npc.getAppearance().getSkinColor());
-        preparedStatement.setInt(21, npc.getAppearance().getGlovesColor());
+        preparedStatement.setString(1, npc.getName());
+        preparedStatement.setString(2, npc.getCurrentMapLocation().getMapName());
+        preparedStatement.setShort(3, npc.getCurrentMapLocation().getX());
+        preparedStatement.setShort(4, npc.getCurrentMapLocation().getY());
+        preparedStatement.setShort(5, npc.getRegionStartX());
+        preparedStatement.setShort(6, npc.getRegionStartY());
+        preparedStatement.setShort(7, npc.getRegionEndX());
+        preparedStatement.setShort(8, npc.getRegionEndY());
+        preparedStatement.setInt(9, npc.getMaxHealth());
+        preparedStatement.setInt(10, npc.getAttributes().getDamage());
+        preparedStatement.setInt(11, npc.getExpDrop());
+        preparedStatement.setInt(12, npc.getDropTable());
+        preparedStatement.setFloat(13, npc.getMoveSpeed());
+        preparedStatement.setFloat(14, npc.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(15, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setInt(16, npc.getShopId());
+        preparedStatement.setByte(17, npc.getAppearance().getHairTexture());
+        preparedStatement.setByte(18, npc.getAppearance().getHelmTexture());
+        preparedStatement.setByte(19, npc.getAppearance().getChestTexture());
+        preparedStatement.setByte(20, npc.getAppearance().getPantsTexture());
+        preparedStatement.setByte(21, npc.getAppearance().getShoesTexture());
+        preparedStatement.setInt(22, npc.getAppearance().getHairColor());
+        preparedStatement.setInt(23, npc.getAppearance().getEyeColor());
+        preparedStatement.setInt(24, npc.getAppearance().getSkinColor());
+        preparedStatement.setInt(25, npc.getAppearance().getGlovesColor());
 
         return preparedStatement;
     }

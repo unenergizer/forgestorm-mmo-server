@@ -199,7 +199,8 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         aiEntity.setMoveSpeed(packetData.walkSpeed);
         aiEntity.setBankKeeper(packetData.bankKeeper);
 
-        aiEntity.setMovementInfo(packetData.probStop, packetData.probWalk, 0, 0, 96, 54);
+        aiEntity.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
+        aiEntity.setMovementInfo(packetData.probStop, packetData.probWalk);
         Location location = new Location(packetData.worldName, packetData.worldX, packetData.worldY);
         aiEntity.setDefaultSpawnLocation(location);
         aiEntity.setSpawnWarp(new Warp(location, MoveDirection.SOUTH));

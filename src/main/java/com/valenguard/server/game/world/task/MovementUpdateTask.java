@@ -15,7 +15,6 @@ import com.valenguard.server.util.MoveNode;
 import com.valenguard.server.util.PathFinding;
 import com.valenguard.server.util.RandomUtil;
 import lombok.AllArgsConstructor;
-import org.checkerframework.framework.qual.TargetLocations;
 
 import java.util.*;
 
@@ -84,7 +83,7 @@ public class MovementUpdateTask implements AbstractTask {
                 aiEntity -> aiEntity.getTargetEntity() != null);
 
         targetsLocations.forEach((target, trackers) ->
-            trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureMapLocation()) >= 2));
+                trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureMapLocation()) >= 2));
 
     }
 
@@ -295,7 +294,7 @@ public class MovementUpdateTask implements AbstractTask {
         if (distanceAway <= 2 && distanceAway != 0) {
             // They will go ahead and perform A* if they are this close
             if ((distanceAway == 1 && currentLocationIsTaken) ||
-                distanceAway == 2) {
+                    distanceAway == 2) {
                 startAttemptAStar(otherTargetLocations, currentLocation, targetLocation, gameMap, aiEntity, false);
             } else if (distanceAway == 1) {
 
@@ -588,6 +587,10 @@ public class MovementUpdateTask implements AbstractTask {
         }
 
         Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
+
+        // Stopping entity from moving/chasing outside the region
+        if (!aiEntity.isAiEntityInRegion(futureLocation)) return;
+
         aiEntity.setFutureMapLocation(futureLocation);
         aiEntity.setWalkTime(0f);
         aiEntity.setFacingDirection(moveDirection);

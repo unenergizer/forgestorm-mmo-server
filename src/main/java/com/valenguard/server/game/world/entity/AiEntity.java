@@ -28,8 +28,24 @@ public class AiEntity extends MovingEntity {
     private Location defaultSpawnLocation;
     private RandomRegionMoveGenerator randomRegionMoveGenerator;
 
-    public void setMovementInfo(float probabilityStill, float probabilityWalkStart, int bounds1x, int bounds1y, int bounds2x, int bounds2y) {
-        randomRegionMoveGenerator = new RandomRegionMoveGenerator(this, probabilityStill, probabilityWalkStart, bounds1x, bounds1y, bounds2x, bounds2y);
+    private short regionStartX;
+    private short regionStartY;
+    private short regionEndX;
+    private short regionEndY;
+
+    public void setMovementInfo(float probabilityStill, float probabilityWalkStart) {
+        randomRegionMoveGenerator = new RandomRegionMoveGenerator(this, probabilityStill, probabilityWalkStart);
+    }
+
+    public void setRegionLocations(int regionStartX, int regionStartY, int regionEndX, int regionEndY) {
+        this.regionStartX = (short) Math.min(regionStartX, regionEndX);
+        this.regionEndX = (short) Math.max(regionStartX, regionEndX);
+        this.regionStartY = (short) Math.min(regionStartY, regionEndY);
+        this.regionEndY = (short) Math.max(regionStartY, regionEndY);
+    }
+
+    public boolean isAiEntityInRegion(Location attemptLocation) {
+        return attemptLocation.getX() >= regionStartX && attemptLocation.getY() >= regionStartY && attemptLocation.getX() <= regionEndX && attemptLocation.getY() <= regionEndY;
     }
 
     public void killAiEntity(MovingEntity killerEntity) {

@@ -46,7 +46,7 @@ public class AiEntityDataManager {
         aiEntity.setMoveSpeed(aiEntityData.getWalkSpeed());
         aiEntity.setBankKeeper(aiEntityData.isBankKeeper());
 
-        aiEntity.setMovementInfo(aiEntityData.getProbabilityStill(), aiEntityData.getProbabilityWalkStart(), 0, 0, 96, 54);
+        aiEntity.setMovementInfo(aiEntityData.getProbabilityStill(), aiEntityData.getProbabilityWalkStart());
         aiEntity.setSpawnWarp(new Warp(location, MoveDirection.SOUTH));
         aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
 

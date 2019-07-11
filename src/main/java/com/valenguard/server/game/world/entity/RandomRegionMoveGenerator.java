@@ -16,20 +16,10 @@ public class RandomRegionMoveGenerator {
     private final float probabilityStill;
     private final float probabilityWalkStart;
 
-    private final int regionStartX;
-    private final int regionStartY;
-    private final int regionEndX;
-    private final int regionEndY;
-
-    RandomRegionMoveGenerator(AiEntity aiEntity, float probabilityStill, float probabilityWalkStart,
-                              int regionStartX, int regionStartY, int regionEndX, int regionEndY) {
+    RandomRegionMoveGenerator(AiEntity aiEntity, float probabilityStill, float probabilityWalkStart) {
         this.aiEntity = aiEntity;
         this.probabilityStill = probabilityStill;
         this.probabilityWalkStart = probabilityWalkStart;
-        this.regionStartX = Math.min(regionStartX, regionEndX);
-        this.regionEndX = Math.max(regionStartX, regionEndX);
-        this.regionStartY = Math.min(regionStartY, regionEndY);
-        this.regionEndY = Math.max(regionStartY, regionEndY);
     }
 
     private int tickCount = 0;
@@ -91,9 +81,11 @@ public class RandomRegionMoveGenerator {
             moveDirection = MoveDirection.NONE;
         } else {
             // Making sure the entity does not move outside the region.
-            if (attemptLocation.getX() >= regionStartX && attemptLocation.getY() >= regionStartY && attemptLocation.getX() <= regionEndX && attemptLocation.getY() <= regionEndY) {
+            if (aiEntity.isAiEntityInRegion(attemptLocation)) {
+                // Moving in bounds..
                 moveDirection = possibleMoveDirection;
             } else {
+                // Moving out of bounds..
                 moveDirection = MoveDirection.NONE;
             }
         }

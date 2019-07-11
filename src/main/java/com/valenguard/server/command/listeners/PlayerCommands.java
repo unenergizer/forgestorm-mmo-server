@@ -130,8 +130,8 @@ public class PlayerCommands {
         commandSource.sendMessage(" ");
         commandSource.sendMessage("---- Player Information ----");
         commandSource.sendMessage("Account Name: " + authenticatedUser.getXfAccountName());
-        commandSource.sendMessage("Character Id: " + player.getDatabaseId());
-        commandSource.sendMessage("Account Id: " + authenticatedUser.getDatabaseUserId());
+        commandSource.sendMessage("Database Id: " + player.getDatabaseId());
+        commandSource.sendMessage("XF Account Id: " + authenticatedUser.getDatabaseUserId());
         commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
         commandSource.sendMessage("IP: " + authenticatedUser.getIp());
     }
