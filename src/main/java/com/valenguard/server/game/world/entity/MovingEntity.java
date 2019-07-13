@@ -64,8 +64,6 @@ public class MovingEntity extends Entity {
      */
     private MovingEntity targetEntity;
 
-    private Warp spawnWarp;
-
     private MoveDirection previousDirection = MoveDirection.NONE;
 
     private final List<AbstractAbility> abstractAbilityList = new ArrayList<>();

@@ -9,7 +9,6 @@ import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.game.rpg.EntityShopManager;
 import com.valenguard.server.game.rpg.FactionManager;
 import com.valenguard.server.game.rpg.skills.SkillNodeManager;
-import com.valenguard.server.game.world.entity.AiEntityDataManager;
 import com.valenguard.server.game.world.item.DropTableManager;
 import com.valenguard.server.game.world.item.ItemStackManager;
 import com.valenguard.server.game.world.item.trade.TradeManager;
@@ -40,7 +39,6 @@ public class Server {
 
     // Data Loaders
     private final FactionManager factionManager = new FactionManager();
-    private final AiEntityDataManager aiEntityDataManager = new AiEntityDataManager();
     private final ItemStackManager itemStackManager = new ItemStackManager();
     private final DropTableManager dropTableManager = new DropTableManager();
     private final SkillNodeManager skillNodeManager = new SkillNodeManager();
@@ -64,7 +62,6 @@ public class Server {
         println(getClass(), ansi().fgBlue().bgBrightYellow() + "Starting Server!");
 
         // Boot io loaders
-        aiEntityDataManager.start();
         itemStackManager.start();
         dropTableManager.start();
         skillNodeManager.start();

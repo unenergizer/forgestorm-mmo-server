@@ -203,8 +203,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         aiEntity.setMovementInfo(packetData.probStop, packetData.probWalk);
         Location location = new Location(packetData.worldName, packetData.worldX, packetData.worldY);
         aiEntity.setDefaultSpawnLocation(location);
-        aiEntity.setSpawnWarp(new Warp(location, MoveDirection.SOUTH));
-        aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
+        aiEntity.gameMapRegister(new Warp(location, MoveDirection.SOUTH));
 
         // Setup appearance
         Appearance appearance = new Appearance(aiEntity);

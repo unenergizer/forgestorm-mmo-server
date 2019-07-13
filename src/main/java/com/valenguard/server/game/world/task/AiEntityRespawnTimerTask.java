@@ -2,6 +2,8 @@ package com.valenguard.server.game.world.task;
 
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.AiEntity;
+import com.valenguard.server.game.world.maps.MoveDirection;
+import com.valenguard.server.game.world.maps.Warp;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -41,7 +43,7 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
                     AiEntity aiEntity = timer.aiEntity;
 
                     // Spawn to original location
-                    aiEntity.gameMapRegister(aiEntity.getSpawnWarp());
+                    aiEntity.gameMapRegister(new Warp(aiEntity.getDefaultSpawnLocation(), MoveDirection.SOUTH));
 
                     // Reset health
                     aiEntity.setCurrentHealth(aiEntity.getMaxHealth());

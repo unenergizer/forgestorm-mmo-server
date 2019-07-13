@@ -1,6 +1,5 @@
 package com.valenguard.server.command;
 
-import com.valenguard.server.command.listeners.EntityCommands;
 import com.valenguard.server.command.listeners.InventoryCommands;
 import com.valenguard.server.command.listeners.PlayerCommands;
 import com.valenguard.server.command.listeners.ServerCommands;
@@ -16,7 +15,6 @@ public class CommandManager {
 
     public void start() {
         println(getClass(), "Registering commands...");
-        commandProcessor.addListener(new EntityCommands());
         commandProcessor.addListener(new InventoryCommands());
         commandProcessor.addListener(new PlayerCommands());
         commandProcessor.addListener(new ServerCommands());
