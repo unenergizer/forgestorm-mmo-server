@@ -69,7 +69,7 @@ public class GameWorldNpcSQL {
     private PreparedStatement databaseSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_npc" +
                 " SET name=?, world_name=?, world_x=?, world_y=?," +
-                " region_start_x=?, region_end_x=?, region_start_y, region_end_y=?, " +
+                " region_start_x=?, region_end_x=?, region_start_y=?, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " hair_texture=?, helm_texture=?, chest_texture=?, pants_texture=?, shoes_texture=?," +
                 " hair_color=?, eye_color=?, skin_color=?, gloves_color=? WHERE npc_id=?");

@@ -56,7 +56,7 @@ public class GameWorldMonsterSQL {
     private PreparedStatement databaseSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_monster" +
                 " SET name=?, world_name=?, world_x=?, world_y=?, " +
-                " region_start_x=?, region_end_x=?, region_start_y, region_end_y=?, " +
+                " region_start_x=?, region_end_x=?, region_start_y=?, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " alignment=?, monster_body_texture=? WHERE monster_id=?");
 
