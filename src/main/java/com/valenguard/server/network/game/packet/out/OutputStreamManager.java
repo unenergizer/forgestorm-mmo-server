@@ -69,10 +69,12 @@ public class OutputStreamManager {
 
     public void addClient(ClientHandler clientHandler) {
         outputContexts.put(clientHandler, new LinkedList<>());
+        println(getClass(), " + Server Join: " + clientHandler.getAuthenticatedUser().getXfAccountName());
         println(getClass(), " + Connected clients: " + clientsOnline());
     }
 
     public void removeClient(ClientHandler clientHandler) {
+        println(getClass(), " - Server Quit: " + clientHandler.getAuthenticatedUser().getXfAccountName());
         outputContexts.remove(clientHandler);
         println(getClass(), " - Connected clients: " + clientsOnline());
     }

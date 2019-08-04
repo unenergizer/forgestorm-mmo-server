@@ -2,6 +2,7 @@ package com.valenguard.server;
 
 import com.valenguard.server.command.CommandManager;
 import com.valenguard.server.database.DatabaseManager;
+import com.valenguard.server.discord.DiscordManager;
 import com.valenguard.server.game.GameLoop;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.abilities.AbilityManager;
@@ -14,10 +15,8 @@ import com.valenguard.server.game.world.item.ItemStackManager;
 import com.valenguard.server.game.world.item.trade.TradeManager;
 import com.valenguard.server.network.NetworkManager;
 import lombok.Getter;
-import org.fusesource.jansi.AnsiConsole;
 
 import static com.valenguard.server.util.Log.println;
-import static org.fusesource.jansi.Ansi.ansi;
 
 @Getter
 public class Server {
@@ -27,10 +26,11 @@ public class Server {
     public static final long SERVER_START_TIME = System.currentTimeMillis();
 
     // Framework
-    private final GameLoop gameLoop = new GameLoop();
-    private final CommandManager commandManager = new CommandManager();
+    private final DiscordManager discordManager = new DiscordManager();
     private final DatabaseManager databaseManager = new DatabaseManager();
+    private final CommandManager commandManager = new CommandManager();
     private final NetworkManager networkManager = new NetworkManager();
+    private final GameLoop gameLoop = new GameLoop();
 
     // System
     private final TradeManager tradeManager = new TradeManager();
@@ -58,8 +58,9 @@ public class Server {
     }
 
     private void startServer() {
-        AnsiConsole.systemInstall();
-        println(getClass(), ansi().fgBlue().bgBrightYellow() + "Starting Server!");
+        discordManager.start();
+        println(true);
+        println(getClass(), "Starting Server!");
 
         // Boot io loaders
         itemStackManager.start();
@@ -85,7 +86,6 @@ public class Server {
         networkManager.exit();
         databaseManager.exit();
 
-        AnsiConsole.systemUninstall();
         System.exit(0);
     }
 }

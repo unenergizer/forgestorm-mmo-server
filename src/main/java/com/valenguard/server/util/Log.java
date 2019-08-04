@@ -1,5 +1,8 @@
 package com.valenguard.server.util;
 
+import com.valenguard.server.Server;
+import com.valenguard.server.discord.DiscordManager;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,8 +24,15 @@ public class Log {
 
     public static void println(Class clazz, String message, boolean isError, boolean print) {
         if (!print) return;
-        if (isError) System.err.println(buildMessage(clazz, message));
-        else System.out.println(buildMessage(clazz, message));
+        DiscordManager discordManager = Server.getInstance().getDiscordManager();
+        String builtMessage = buildMessage(clazz, message);
+        if (isError) {
+            System.err.println(builtMessage);
+            discordManager.sendDiscordMessage("<@&266430645776023562> [ERROR LOGGED] ```" + builtMessage + "```");
+        } else {
+            System.out.println(builtMessage);
+            discordManager.sendDiscordMessage(builtMessage);
+        }
     }
 
     private static String buildMessage(Class clazz, String message) {
@@ -30,6 +40,8 @@ public class Log {
     }
 
     public static void println(boolean print) {
-        if (print) System.out.println();
+        if (!print) return;
+        System.out.println();
+        Server.getInstance().getDiscordManager().sendDiscordMessage("*** ***");
     }
 }

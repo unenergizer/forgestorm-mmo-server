@@ -20,17 +20,23 @@ task fatJar(type: Jar) {
 //Get dependencies from Maven central repository
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
+    // MySQL related with bcrypt to do XenForo login
     compile 'at.favre.lib:bcrypt:0.7.0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
     compile 'mysql:mysql-connector-java:5.1.6'
     compile 'com.zaxxer:HikariCP:3.3.1'
 
-    compile 'org.fusesource.jansi:jansi:1.18'
+    // Discord Bot Integration
+    compile 'net.dv8tion:JDA:3.8.3_464'
 
-    compile 'com.google.guava:guava:27.0.1-jre'
+    // Config
     compile 'org.yaml:snakeyaml:1.23:android'
+
+    // Helpers
+    compile 'com.google.guava:guava:27.0.1-jre'
     compileOnly 'org.projectlombok:lombok:1.18.8'
 }
