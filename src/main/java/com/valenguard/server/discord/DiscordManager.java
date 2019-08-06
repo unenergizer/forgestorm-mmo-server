@@ -1,6 +1,5 @@
 package com.valenguard.server.discord;
 
-
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -34,7 +33,6 @@ public class DiscordManager {
                             jdaEvent = event.getJDA();
                             isReady = true;
 
-
                             println(DiscordManager.class, "error test!", true);
                         }
                     })
@@ -56,6 +54,7 @@ public class DiscordManager {
      * @param message The message that will be sent.
      */
     public void sendDiscordMessage(String message) {
+        if (!isReady) return;
         if (!USE_DISCORD_LOGGING) return;
         sendDiscordMessage(jdaEvent.getTextChannelById(CONSOLE_CHANNEL), message);
     }
@@ -70,7 +69,6 @@ public class DiscordManager {
         if (!isReady) return;
         textChannel.sendMessage(message).queue();
     }
-
 
     class DiscordListeners extends ListenerAdapter {
 

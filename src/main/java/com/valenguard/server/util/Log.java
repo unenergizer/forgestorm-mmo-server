@@ -28,10 +28,11 @@ public class Log {
         String builtMessage = buildMessage(clazz, message);
         if (isError) {
             System.err.println(builtMessage);
-            discordManager.sendDiscordMessage("<@&266430645776023562> [ERROR LOGGED] ```" + builtMessage + "```");
+            if (discordManager != null)
+                discordManager.sendDiscordMessage("<@&266430645776023562> [ERROR LOGGED] ```" + builtMessage + "```");
         } else {
             System.out.println(builtMessage);
-            discordManager.sendDiscordMessage(builtMessage);
+            if (discordManager != null) discordManager.sendDiscordMessage(builtMessage);
         }
     }
 
@@ -41,7 +42,8 @@ public class Log {
 
     public static void println(boolean print) {
         if (!print) return;
+        DiscordManager discordManager = Server.getInstance().getDiscordManager();
         System.out.println();
-        Server.getInstance().getDiscordManager().sendDiscordMessage("*** ***");
+        if (discordManager != null) discordManager.sendDiscordMessage("*** ***");
     }
 }

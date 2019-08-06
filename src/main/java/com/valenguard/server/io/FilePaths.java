@@ -2,6 +2,8 @@ package com.valenguard.server.io;
 
 import lombok.AllArgsConstructor;
 
+import java.io.File;
+
 @AllArgsConstructor
 public enum FilePaths {
 
@@ -28,6 +30,11 @@ public enum FilePaths {
     private String filePath;
 
     public String getFilePath() {
-        return "src/main/resources/data/" + filePath;
+        boolean useLocal = false;
+        if (useLocal) {
+            return ResourcePathLoader.getResourcePath() + File.separator + filePath.replace("/", File.separator);
+        } else {
+            return "src/main/resources/data/" + filePath;
+        }
     }
 }
