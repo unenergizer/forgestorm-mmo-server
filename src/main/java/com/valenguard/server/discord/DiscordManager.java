@@ -19,12 +19,16 @@ public class DiscordManager {
 
     private static final String BOT_TOKEN = "NDgwMTc0NzE1OTgyNDQ2NjM4.XUa7uQ.ZhBHLlMFh1AQW9ELkXOrEKCsDAc";
     private static final String CONSOLE_CHANNEL = "607537864275656724";
-    private static final boolean USE_DISCORD_LOGGING = true;
+    private static final boolean USE_DISCORD_LOGGING = false;
 
     private JDA jdaEvent;
     private boolean isReady = false;
 
     public void start() {
+
+        // TODO: Put option in config and/or use commands to start/stop discord output
+        if (!USE_DISCORD_LOGGING) return;
+
         try {
             JDA jda = new JDABuilder(BOT_TOKEN)
                     .addEventListener(new ListenerAdapter() {

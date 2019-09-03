@@ -41,6 +41,7 @@ public class NetworkManager {
             eventBus.registerListener(new BankManagePacketIn());
             eventBus.registerListener(new AbilityRequestPacketIn());
             eventBus.registerListener(new AdminEditorEntityPacketIn());
+            eventBus.registerListener(new InspectPlayerPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();
