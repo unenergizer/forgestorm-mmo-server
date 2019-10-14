@@ -10,7 +10,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntityRehealTask implements AbstractTask {
 
-    private static final boolean DEBUG_PRINT = false;
+    private static final boolean DEBUG_PRINT = true;
     private static final long REHEAL_INTERVAL = 120;
     private static final int REHEAL_AMOUNT = 1;
 

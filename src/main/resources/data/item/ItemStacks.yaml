@@ -187,11 +187,20 @@
   health: 10
   consume: false
 23:
-  name: "Basic PANTS"
+  name: "Basic pants"
   desc: "ICON DONT MAKE NO SENSE- YA I KNOW..."
   type: PANTS
   atlas: ITEMS
   region: skill_055
+  wearable: 23
+  health: 10
+  consume: false
+24:
+  name: "Wooden Planks"
+  desc: "Harvested from a tree or something."
+  type: MATERIAL
+  atlas: ITEMS
+  region: material_14
   wearable: 23
   health: 10
   consume: false

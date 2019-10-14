@@ -59,6 +59,7 @@ public class MovementUpdateTask implements AbstractTask {
         Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
     }
 
+
     private void continueFromMoveNodes(AiEntity aiEntity) {
         MoveNode moveNode = aiEntity.getMoveNodes().remove();
         Location currentLocation = aiEntity.getCurrentMapLocation();

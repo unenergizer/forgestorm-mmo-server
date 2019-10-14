@@ -28,13 +28,9 @@ public class AbilityUpdateTask implements AbstractTask {
         List<Player> playerList = gameMap.getPlayerController().getPlayerList();
 
         // Checks for every tick
-
         aiEntityList.forEach(this::updateCooldowns);
         playerList.forEach(this::updateCooldowns);
 
-        // TODO: Stagger enemy vs enemy attack (somewhere)
-
-        // TODO: Generalize when brain starts working again
         for (AiEntity aiEntity : aiEntityList) {
             if (aiEntity.getTargetEntity() == null) continue;
 
@@ -42,14 +38,15 @@ public class AbilityUpdateTask implements AbstractTask {
 
             if (aiEntity.getCurrentHealth() <= 0) {
                 processEntityDeath(gameMap, targetEntity, aiEntity);
+            } else {
+                // Do AiEntity combat
+                Server.getInstance().getAbilityManager().performAiEntityAbility(aiEntity, targetEntity);
             }
 
             if (targetEntity.getCurrentHealth() <= 0) {
                 processEntityDeath(gameMap, aiEntity, targetEntity);
             }
         }
-
-
     }
 
     private void updateCooldowns(MovingEntity movingEntity) {
@@ -64,7 +61,7 @@ public class AbilityUpdateTask implements AbstractTask {
                     // We saved the ability cast and will perform it now for the player.
                     WaitingAbility queuedAbility = ((Player) movingEntity).getQueuedAbilities().get(cooldown.getKey());
                     if (queuedAbility != null) {
-                        Server.getInstance().getAbilityManager().performAbility(cooldown.getKey(), movingEntity, queuedAbility.getTargetEntity());
+                        Server.getInstance().getAbilityManager().performPlayerAbility(cooldown.getKey(), movingEntity, queuedAbility.getTargetEntity());
                         ((Player) movingEntity).getQueuedAbilities().remove(cooldown.getKey());
                     }
                 }

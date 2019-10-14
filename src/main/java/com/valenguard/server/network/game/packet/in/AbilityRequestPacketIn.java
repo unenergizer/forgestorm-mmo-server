@@ -47,7 +47,7 @@ public class AbilityRequestPacketIn implements PacketListener<AbilityRequestPack
             return;
         }
 
-        Server.getInstance().getAbilityManager().performAbility(
+        Server.getInstance().getAbilityManager().performPlayerAbility(
                 packetData.abilityId,
                 attacker,
                 movingEntity);

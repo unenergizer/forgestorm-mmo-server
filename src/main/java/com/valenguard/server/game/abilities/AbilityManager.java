@@ -1,5 +1,6 @@
 package com.valenguard.server.game.abilities;
 
+import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
@@ -11,17 +12,34 @@ import java.util.Map;
 public class AbilityManager {
 
     private Map<Short, Ability> combatAbilities;
+    private Ability genericAiEntityAbility;
 
     public void start() {
         combatAbilities = new AbilityLoader().loadCombatAbilities();
+        genericAiEntityAbility = new Ability();
+        genericAiEntityAbility.setAbilityId((short) -1);
+        genericAiEntityAbility.setAbilityType(AbilityType.MELEE_ATTACK);
+        genericAiEntityAbility.setCooldown(2);
+        genericAiEntityAbility.setDamageMin(0);
+        genericAiEntityAbility.setDamageMax(1);
+        genericAiEntityAbility.setDistanceMin(0);
+        genericAiEntityAbility.setDistanceMax(1);
     }
 
-    public void performAbility(short abilityId, MovingEntity casterEntity, MovingEntity targetEntity) {
-        Ability ability = combatAbilities.get(abilityId);
+    public void performAiEntityAbility(AiEntity aiEntity, MovingEntity targetEntity) {
+        genericAiEntityAbility.setDamageMax(aiEntity.getAttributes().getDamage());
+        performAbility(genericAiEntityAbility, aiEntity, targetEntity);
+    }
+
+    public void performPlayerAbility(short abilityId, MovingEntity casterEntity, MovingEntity targetEntity) {
+        performAbility(combatAbilities.get(abilityId), casterEntity, targetEntity);
+    }
+
+    private void performAbility(Ability ability, MovingEntity casterEntity, MovingEntity targetEntity) {
         if (ability == null) return;
         if (casterEntity.isAbilityOnCooldown(ability)) {
             if (casterEntity instanceof Player) {
-                ((Player) casterEntity).getQueuedAbilities().put(abilityId, new WaitingAbility(targetEntity));
+                ((Player) casterEntity).getQueuedAbilities().put(ability.getAbilityId(), new WaitingAbility(targetEntity));
             }
             return;
         }
@@ -53,7 +71,6 @@ public class AbilityManager {
         // todo: now do calculations
         int damageToDeal = RandomUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
         targetEntity.dealDamage(damageToDeal, casterEntity);
-
     }
 
     private void performRangeAbility(Ability ability, MovingEntity casterEntity, MovingEntity targetEntity) {
@@ -68,9 +85,7 @@ public class AbilityManager {
             int damageToDeal = RandomUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
             targetEntity.dealDamage(damageToDeal, casterEntity);
         }
-
     }
-
 
     private void setInCombat(MovingEntity attackerEntity, MovingEntity targetEntity) {
         if (!attackerEntity.isInCombat()) {
