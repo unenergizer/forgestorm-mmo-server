@@ -30,8 +30,8 @@ public class PlayerEquipment extends AbstractInventory {
         inventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
         fromInventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
 
-        // TODO: Update attributes
-//        if (!insideEquipmentSwap) updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
+        // Update attributes
+        updatePlayerAttributes(true);
 
         println(getClass(), "Special check...", false, PRINT_DEBUG);
         updateAppearance(toPositionIndex, true);
@@ -72,8 +72,8 @@ public class PlayerEquipment extends AbstractInventory {
         inventorySlotArray[fromPositionIndex].setItemStack(toItemStack);
         toInventorySlotArray[toPositionIndex].setItemStack(fromItemStack);
 
-        // TODO: Update attributes
-//        if (!insideEquipmentSwap) updatePlayerAttributes(bagItemStack, equipmentItemStack, equipItem, true);
+        // Update attributes
+        updatePlayerAttributes(true);
 
         println(getClass(), "Overridden check...", false, PRINT_DEBUG);
         updateAppearance(fromPositionIndex, true);
@@ -90,54 +90,42 @@ public class PlayerEquipment extends AbstractInventory {
     /**
      * Update the {@link Player} with the {@link Attributes} found on equipped item.
      */
-    private void updatePlayerAttributes(ItemStack fromItemStack, ItemStack toItemStack, boolean equipItem, boolean sendAttributePacket) {
-
+    private void updatePlayerAttributes(boolean sendAttributePacket) {
         Attributes playerClientAttributes = inventoryOwner.getAttributes();
-        Attributes itemStackAttributes = equipItem ? fromItemStack.getAttributes() : toItemStack.getAttributes();
 
-        println(PRINT_DEBUG);
-        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), false, PRINT_DEBUG);
-        println(getClass(), "PC Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
-        println(getClass(), "IS Armor: " + itemStackAttributes.getArmor(), false, PRINT_DEBUG);
-        println(getClass(), "IS Damage: " + itemStackAttributes.getDamage(), false, PRINT_DEBUG);
+        playerClientAttributes.setArmor(0);
+        playerClientAttributes.setDamage(0);
 
-        // TODO: Instead of manually adding the new values, we should possible loop through all equipped items and get values this way.
-        if (equipItem) {
-            // Player Equipped an Item. Update attributes!
-            playerClientAttributes.setArmor(playerClientAttributes.getArmor() + itemStackAttributes.getArmor());
-            playerClientAttributes.setDamage(playerClientAttributes.getDamage() + itemStackAttributes.getDamage());
+        int armorUpdated = 0;
+        int damageUpdated = 0;
 
-            if (toItemStack != null) {
-                println(getClass(), "SWAPPING ITEM STATES", false, PRINT_DEBUG);
+        for (InventorySlot inventorySlot : inventorySlotArray) {
+            if (inventorySlot == null) continue;
 
-                Attributes removedAttributes = toItemStack.getAttributes();
-                playerClientAttributes.setArmor(playerClientAttributes.getArmor() - removedAttributes.getArmor());
-                playerClientAttributes.setDamage(playerClientAttributes.getDamage() - removedAttributes.getDamage());
-            } else {
-                println(getClass(), "ADDING ITEM STATES", false, PRINT_DEBUG);
-            }
+            ItemStack itemStack = inventorySlot.getItemStack();
+            if (itemStack == null) continue;
 
-        } else {
+            Attributes attributes = itemStack.getAttributes();
+            if (attributes == null) continue;
 
-            println(getClass(), "REMOVING ITEM STATES", false, PRINT_DEBUG);
-
-            // Player Unequipped an Item. Update attributes!
-            playerClientAttributes.setArmor(playerClientAttributes.getArmor() - itemStackAttributes.getArmor());
-            playerClientAttributes.setDamage(playerClientAttributes.getDamage() - itemStackAttributes.getDamage());
-
-            if (fromItemStack != null) {
-                Attributes addAttributes = fromItemStack.getAttributes();
-                playerClientAttributes.setArmor(playerClientAttributes.getArmor() + addAttributes.getArmor());
-                playerClientAttributes.setDamage(playerClientAttributes.getDamage() + addAttributes.getDamage());
-            }
+            armorUpdated = armorUpdated + attributes.getArmor();
+            damageUpdated = damageUpdated + attributes.getDamage();
         }
 
-        println(getClass(), "PC Armor: " + playerClientAttributes.getArmor(), false, PRINT_DEBUG);
-        println(getClass(), "PC Final Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
+        playerClientAttributes.setArmor(armorUpdated);
+        playerClientAttributes.setDamage(damageUpdated);
+
         println(PRINT_DEBUG);
+        println(getClass(), "ItemStack Armor: " + armorUpdated, false, PRINT_DEBUG);
+        println(getClass(), "ItemStack Damage: " + damageUpdated, false, PRINT_DEBUG);
+        println(getClass(), "Player Armor: " + playerClientAttributes.getArmor(), false, PRINT_DEBUG);
+        println(getClass(), "Player Damage: " + playerClientAttributes.getDamage(), false, PRINT_DEBUG);
 
         // Send attributes packet
-        if (sendAttributePacket) new EntityAttributesUpdatePacketOut(inventoryOwner, inventoryOwner).sendPacket();
+        if (sendAttributePacket) {
+            println(getClass(), "Sending EntityAttributesUpdatePacketOut...", false, PRINT_DEBUG);
+            new EntityAttributesUpdatePacketOut(inventoryOwner, inventoryOwner).sendPacket();
+        }
     }
 
     private void updateAppearance(byte slotIndex, boolean sendPacket) {
@@ -169,7 +157,7 @@ public class PlayerEquipment extends AbstractInventory {
         if (sendPacket) println(getClass(), "Primarily used by SQL. Do not send packets now!", true);
         inventorySlotArray[slotIndex].setItemStack(itemStack);
 
-        updatePlayerAttributes(itemStack, null, true, sendPacket);
+        updatePlayerAttributes(sendPacket);
         updateAppearance(slotIndex, sendPacket);
     }
 }

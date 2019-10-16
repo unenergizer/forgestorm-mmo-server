@@ -5,13 +5,13 @@ import com.valenguard.server.database.sql.GameWorldNpcSQL;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.io.FilePaths;
 import com.valenguard.server.io.TmxFileParser;
-import com.valenguard.server.util.Log;
 import lombok.Getter;
 
 import java.io.File;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.valenguard.server.util.Log.println;
 
 public class GameMapProcessor {
 
@@ -62,18 +62,25 @@ public class GameMapProcessor {
             gameMaps.put(mapName, TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
         }
 
-        Log.println(getClass(), "Tmx Maps Loaded: " + files.length);
+        println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
     }
 
     public void getEntitiesFromDatabase() {
+        println(getClass(), "Loading entities from database has started...");
         for (GameMap gameMap : gameMaps.values()) {
-            loadNPC(gameMap);
-            loadMonster(gameMap);
+            int npcSize = loadNPC(gameMap);
+            int monsterSize = loadMonster(gameMap);
+            int entityTotal = npcSize + monsterSize;
+            println(getClass(), "Map:" + gameMap.getMapName() +
+                    ", NPCs Total: " + npcSize +
+                    ", Monsters Total: " + monsterSize +
+                    ", Entity Total: " + entityTotal);
         }
+        println(getClass(), "Loading entities from database finished!");
     }
 
-    public void loadNPC(GameMap gameMap) {
+    public int loadNPC(GameMap gameMap) {
         GameWorldNpcSQL gameWorldNpcSQL = new GameWorldNpcSQL();
         List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(gameMap.getMapName());
 
@@ -92,9 +99,11 @@ public class GameMapProcessor {
 
             queueAiEntitySpawn(npc);
         }
+
+        return npcIdList.size();
     }
 
-    public void loadMonster(GameMap gameMap) {
+    public int loadMonster(GameMap gameMap) {
         GameWorldMonsterSQL gameWorldMonsterSQL = new GameWorldMonsterSQL();
         List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(gameMap.getMapName());
 
@@ -113,6 +122,8 @@ public class GameMapProcessor {
 
             queueAiEntitySpawn(monster);
         }
+
+        return monsterIdList.size();
     }
 
     private boolean alreadySpawnedCheck(int databaseId, GameMap gameMap, EntityType entityType) {

@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.valenguard.server.util.Log.println;
-
 @Getter
 @Setter
 public class MovingEntity extends Entity {
@@ -85,7 +83,7 @@ public class MovingEntity extends Entity {
 
     public void addAbilityCooldown(Ability ability) {
         // Ability cooldown time * 20 ticks (20 ticks = 1 second)
-        println(getClass(), "Adding a cooldown with time: " + (ability.getCooldown() * GameConstants.TICKS_PER_SECOND));
+//        println(getClass(), "Adding a cooldown with time: " + (ability.getCooldown() * GameConstants.TICKS_PER_SECOND));
         abilitiesToCooldown.put(ability.getAbilityId(), ability.getCooldown() * GameConstants.TICKS_PER_SECOND);
     }
 

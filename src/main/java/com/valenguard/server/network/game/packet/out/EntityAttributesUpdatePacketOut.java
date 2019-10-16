@@ -26,6 +26,7 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
         write.writeInt(attributes.getArmor());
         write.writeInt(attributes.getDamage());
 
+        println(getClass(), "Receiver: " + movingEntity.getName() + ", Type: " + movingEntity.getEntityType());
         println(getClass(), "Armor: " + attributes.getArmor(), false, PRINT_DEBUG);
         println(getClass(), "Damage: " + attributes.getDamage(), false, PRINT_DEBUG);
     }
