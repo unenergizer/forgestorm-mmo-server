@@ -6,7 +6,6 @@ import com.valenguard.server.io.DropTableLoader;
 import java.util.List;
 import java.util.Random;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.valenguard.server.util.Log.println;
 
 public class DropTableManager {
@@ -23,6 +22,11 @@ public class DropTableManager {
     }
 
     public ItemStack getItemStack(Integer dropTableID, int amount) {
+
+        if (dropTableID > dropTables.length) {
+            println(getClass(), "Tried to use a DropTable that doesn't exist... DropTable: " + dropTableID, true);
+            dropTableID = 0; // Setting to default drop table
+        }
 
         DropTableLoader.DropTable dropTable = dropTables[dropTableID];
         int[] itemStackIDs = dropTable.getItemStackIDs();
