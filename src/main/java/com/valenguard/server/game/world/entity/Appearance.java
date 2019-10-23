@@ -28,6 +28,8 @@ public class Appearance {
     private int eyeColor = Color.rgba8888(ColorList.ROYAL.getColor());
     private int skinColor = Color.rgba8888(ColorList.PLAYER_DEFAULT.getColor());
     private int glovesColor = Color.rgba8888(ColorList.CLEAR.getColor());
+    private byte leftHandTexture = -1;
+    private byte rightHandTexture = -1;
 
     private static final byte REMOVE_TEXTURE = -1;
 
@@ -95,6 +97,12 @@ public class Appearance {
                 break;
             case GLOVES_COLOR:
 //                glovesColor = updateId;
+                break;
+            case LEFT_HAND:
+                leftHandTexture = updateId;
+                break;
+            case RIGHT_HAND:
+                rightHandTexture = updateId;
                 break;
         }
     }

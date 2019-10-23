@@ -100,6 +100,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeInt(appearance.getEyeColor());
                 write.writeInt(appearance.getSkinColor());
                 write.writeInt(appearance.getGlovesColor());
+                write.writeByte(appearance.getLeftHandTexture());
+                write.writeByte(appearance.getRightHandTexture());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:
@@ -117,6 +119,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeInt(appearance.getEyeColor());
                 write.writeInt(appearance.getSkinColor());
                 write.writeInt(appearance.getGlovesColor());
+                write.writeByte(appearance.getLeftHandTexture());
+                write.writeByte(appearance.getRightHandTexture());
                 break;
         }
 
@@ -141,6 +145,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         println(getClass(), "EyeColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
         println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
         println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
+        println(getClass(), "LeftHand: " + appearance.getLeftHandTexture(), false, PRINT_DEBUG);
+        println(getClass(), "RightHand: " + appearance.getRightHandTexture(), false, PRINT_DEBUG);
     }
 
     private void spawnStationaryEntity(GameOutputStream write) {

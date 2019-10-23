@@ -38,6 +38,8 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
                 write.writeInt(appearance.getEyeColor());
                 write.writeInt(appearance.getSkinColor());
                 write.writeInt(appearance.getGlovesColor());
+                write.writeByte(appearance.getLeftHandTexture());
+                write.writeByte(appearance.getRightHandTexture());
 
                 println(getClass(), "HairTexture: " + appearance.getHairTexture(), false, PRINT_DEBUG);
                 println(getClass(), "HelmTexture: " + appearance.getHelmTexture(), false, PRINT_DEBUG);
@@ -48,6 +50,8 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
                 println(getClass(), "EyesColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
                 println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
                 println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
+                println(getClass(), "LeftHandTexture: " + appearance.getLeftHandTexture(), false, PRINT_DEBUG);
+                println(getClass(), "RightHandTexture: " + appearance.getRightHandTexture(), false, PRINT_DEBUG);
                 break;
             case MONSTER:
             case ITEM_STACK:

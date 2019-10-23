@@ -21,9 +21,9 @@ public enum ItemStackType {
     NECKLACE,
 
     // Weapons
-    SWORD,
-    BOW,
-    SHIELD,
+    SWORD(AppearanceType.LEFT_HAND),
+    BOW(AppearanceType.LEFT_HAND),
+    SHIELD(AppearanceType.RIGHT_HAND),
     ARROW,
 
     // Generic
