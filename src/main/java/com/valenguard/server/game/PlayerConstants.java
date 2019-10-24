@@ -23,12 +23,12 @@ public class PlayerConstants {
     /**
      * First player join spawn location.
      */
-    public static final Location START_SPAWN_LOCATION = new Location("game_start", (short) 50, (short) 32);
+    public static final Location START_SPAWN_LOCATION = new Location("game_start", (short) 39, (short) 5);
 
     /**
      * Player death spawn location.
      */
-    public static final Location RESPAWN_LOCATION = new Location("game_start", (short) 50, (short) 32);
+    public static final Location RESPAWN_LOCATION = new Location("game_start", (short) 39, (short) 5);
 
     /**
      * Player Starting health points
