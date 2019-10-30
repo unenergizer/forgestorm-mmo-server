@@ -139,6 +139,7 @@ public class GameMapProcessor {
 
     private void fixWarpHeights() {
         for (GameMap gameMap : gameMaps.values()) {
+            println(getClass(), "Fixing warps for: " + gameMap.getMapName());
             for (short i = 0; i < gameMap.getMapWidth(); i++) {
                 for (short j = 0; j < gameMap.getMapHeight(); j++) {
                     if (gameMap.isOutOfBounds(i, j)) continue;
