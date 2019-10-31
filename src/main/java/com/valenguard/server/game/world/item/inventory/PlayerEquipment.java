@@ -1,5 +1,6 @@
 package com.valenguard.server.game.world.item.inventory;
 
+import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
@@ -93,11 +94,8 @@ public class PlayerEquipment extends AbstractInventory {
     private void updatePlayerAttributes(boolean sendAttributePacket) {
         Attributes playerClientAttributes = inventoryOwner.getAttributes();
 
-        playerClientAttributes.setArmor(0);
-        playerClientAttributes.setDamage(0);
-
-        int armorUpdated = 0;
-        int damageUpdated = 0;
+        int armorUpdated = PlayerConstants.BASE_ARMOR;
+        int damageUpdated = PlayerConstants.BASE_DAMAGE;
 
         for (InventorySlot inventorySlot : inventorySlotArray) {
             if (inventorySlot == null) continue;

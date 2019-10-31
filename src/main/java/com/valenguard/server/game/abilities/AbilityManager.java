@@ -20,7 +20,7 @@ public class AbilityManager {
         genericAiEntityAbility.setAbilityId((short) -1);
         genericAiEntityAbility.setAbilityType(AbilityType.MELEE_ATTACK);
         genericAiEntityAbility.setCooldown(2);
-        genericAiEntityAbility.setDamageMin(0);
+        genericAiEntityAbility.setDamageMin(1);
         genericAiEntityAbility.setDamageMax(1);
         genericAiEntityAbility.setDistanceMin(0);
         genericAiEntityAbility.setDistanceMax(1);

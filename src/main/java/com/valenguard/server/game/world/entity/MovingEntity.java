@@ -10,6 +10,7 @@ import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityDamagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
+import com.valenguard.server.util.MathUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -113,20 +114,26 @@ public class MovingEntity extends Entity {
     }
 
     public void dealDamage(int amount, MovingEntity attackerEntity) {
-        if (currentHealth - amount <= 0) {
-            //
-            currentHealth = 0;
-        } else {
-            currentHealth -= amount;
-        }
 
+        int armor = this.getAttributes().getArmor();
+        int damage = MathUtil.applyArmor(amount, armor);
+
+        // Don't let damage go into negatives
+        if (damage < 0) damage = 0;
+
+        // Prevent health from going below zero. It causes graphical bugs in client.
+        if (currentHealth - damage <= 0) currentHealth = 0;
+        else currentHealth -= damage;
+
+
+        int finalDamage = damage;
         getGameMap().getPlayerController().forAllPlayers(player ->
-                new EntityDamagePacketOut(player, this, currentHealth, amount).sendPacket());
+                new EntityDamagePacketOut(player, this, currentHealth, finalDamage).sendPacket());
         if (this instanceof Player) {
-            new ChatMessagePacketOut((Player) this, "[RED]" + attackerEntity.getName() + " hit you for " + amount + ".").sendPacket();
+            new ChatMessagePacketOut((Player) this, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
         }
         if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, "You hit " + getName() + " for " + amount + ".").sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, "You hit " + getName() + " for " + damage + ".").sendPacket();
         }
     }
 
@@ -135,7 +142,8 @@ public class MovingEntity extends Entity {
     }
 
     public void clearCombatTargets() {
-        if (targetEntity != null && targetEntity.getTargetEntity() == this) targetEntity.setTargetEntity(null); // Clear other entity target
+        if (targetEntity != null && targetEntity.getTargetEntity() == this)
+            targetEntity.setTargetEntity(null); // Clear other entity target
         setTargetEntity(null); // Clear this monsters target
     }
 }

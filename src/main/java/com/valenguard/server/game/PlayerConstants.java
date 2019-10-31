@@ -38,7 +38,7 @@ public class PlayerConstants {
     /**
      * Player starting base armor
      */
-    public static final int BASE_ARMOR = 2;
+    public static final int BASE_ARMOR = 0;
 
     /**
      * Player Starting Damage

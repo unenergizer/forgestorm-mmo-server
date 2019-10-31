@@ -9,7 +9,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     private final MovingEntity movingEntity;
 
