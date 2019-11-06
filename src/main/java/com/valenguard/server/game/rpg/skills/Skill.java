@@ -21,6 +21,11 @@ public class Skill {
 
     public void addExperience(int experience) {
         this.experience += experience;
+        sendSkillExperience();
+    }
+
+    public void sendSkillExperience() {
+        if (!player.isLoggedInGameWorld()) return;
         new SkillExperiencePacketOut(player, new ExperiencePacketInfo(skillOpcode, experience)).sendPacket();
     }
 }

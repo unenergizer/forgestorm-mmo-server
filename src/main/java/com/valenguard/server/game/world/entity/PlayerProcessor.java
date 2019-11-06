@@ -103,6 +103,10 @@ public class PlayerProcessor {
                 new ChatMessagePacketOut(playerSearch, player.getName() + " has joined the server.").sendPacket();
             }
         }
+
+        // Send player Skill Experience
+        player.getSkills().MELEE.sendSkillExperience();
+        player.getSkills().MINING.sendSkillExperience();
     }
 
     public void queuePlayerQuitGameWorld(ClientHandler clientHandler) {
