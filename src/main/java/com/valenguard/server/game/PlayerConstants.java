@@ -6,7 +6,7 @@ import com.valenguard.server.game.world.maps.MoveDirection;
 public class PlayerConstants {
 
     /**
-     * How fast our packetReceiver can move around the map.
+     * How fast our player can move around the map.
      */
     public static final float DEFAULT_MOVE_SPEED = .4f;
 

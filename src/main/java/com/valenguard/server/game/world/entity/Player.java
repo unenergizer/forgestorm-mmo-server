@@ -97,14 +97,14 @@ public class Player extends MovingEntity {
 
         clearCombatTargets();
 
-        // Check to see if the packetReceiver needs to change maps!
+        // Check to see if the player needs to change maps!
         if (!getGameMap().isGraveYardMap()) {
-            println(getClass(), "Warping packetReceiver to graveyard map!");
+            println(getClass(), "Warping player to graveyard map!");
 
-            // Warp packetReceiver to graveyard
+            // Warp player to graveyard
             setWarp(new Warp(teleportLocation, facingDirection));
         } else {
-            println(getClass(), "Teleporting packetReceiver to graveyard!");
+            println(getClass(), "Teleporting player to graveyard!");
 
             // Teleport packetReceiver
             getLatestMoveRequests().clear();

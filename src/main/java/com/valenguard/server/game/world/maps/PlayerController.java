@@ -83,7 +83,7 @@ public class PlayerController {
         for (joinsProcessed = 0; joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS; joinsProcessed++) {
             if (playerJoinQueue.isEmpty()) break;
 
-            // Tell everyone already online about the packetReceiver and the packetReceiver about everyone online.
+            // Tell everyone already online about the player and the player about everyone online.
             Player playerWhoJoined = playerJoinQueue.remove().getPlayer();
 
             // Post player spawn
@@ -93,14 +93,14 @@ public class PlayerController {
                     new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
                 }
 
-                // Send joined packetReceiver to all online players
+                // Send joined player to all online players
                 if (playerWhoJoined.getEntityType() == EntityType.PLAYER) {
                     new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
                     new EntityAttributesUpdatePacketOut(playerWhoJoined, packetReceiver).sendPacket();
                 }
             }
 
-            // Tell the packetReceiver about all the mobs currently on the map.
+            // Tell the player about all the mobs currently on the map.
             gameMap.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
             gameMap.getAiEntityController().getEntities().forEach(aiEntity -> {
                 // Sending additional information for the AI entity.

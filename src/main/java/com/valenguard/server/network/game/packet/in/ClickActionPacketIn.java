@@ -31,7 +31,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
     @Override
     public void onEvent(ClickActionPacket packetData) {
-        // TODO: Anti-Hack Check: Check that packetReceiver is exitServer.
+        // TODO: Anti-Hack Check: Check that player is exitServer.
 
         Player player = packetData.getClientHandler().getPlayer();
         GameMap gameMap = player.getGameMap();
@@ -117,7 +117,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 playerBag.giveItemStack(itemStack, true);
             }
         } else {
-            // Send the packetReceiver the item
+            // Send the player the item
             playerBag.giveItemStack(itemStack, true);
         }
 

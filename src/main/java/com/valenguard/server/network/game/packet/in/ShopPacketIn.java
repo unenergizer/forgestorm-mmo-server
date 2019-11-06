@@ -32,7 +32,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
     public boolean sanitizePacket(ShopPacket packetData) {
         Player player = packetData.getClientHandler().getPlayer();
 
-        // The packetReceiver cannot move and shop at the same time.
+        // The player cannot move and shop at the same time.
         if (player.isEntityMoving()) {
             player.setCurrentShoppingEntity(null);
             return false;

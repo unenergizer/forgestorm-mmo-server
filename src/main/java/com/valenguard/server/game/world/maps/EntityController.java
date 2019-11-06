@@ -90,7 +90,7 @@ public abstract class EntityController<T extends Entity> {
                 }
             }
 
-            // Send joined packetReceiver to all online players
+            // Send joined player to all online players
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
                 new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
                 new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();

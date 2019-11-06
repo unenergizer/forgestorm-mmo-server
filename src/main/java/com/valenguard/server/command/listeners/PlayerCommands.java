@@ -33,7 +33,7 @@ public class PlayerCommands {
         if (findById) {
             player = Server.getInstance().getGameManager().findPlayer(playerId);
             if (player == null) {
-                commandSource.sendMessage("Could not find a packetReceiver for id: " + playerId);
+                commandSource.sendMessage("Could not find a player for id: " + playerId);
                 return;
             }
         } else {
@@ -41,7 +41,7 @@ public class PlayerCommands {
             if (player == null) return;
         }
 
-        commandSource.sendMessage("Healed packetReceiver " + player.getName());
+        commandSource.sendMessage("Healed player " + player.getName());
 
         final Player sendPlayer = player;
         player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->

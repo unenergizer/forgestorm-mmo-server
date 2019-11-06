@@ -68,7 +68,7 @@ public class AiEntity extends MovingEntity {
             killerPlayer.getReputation().addReputation(((NPC) this).getFaction(), (short) 1000);
         }
 
-        // Give packetReceiver drop table item
+        // Give player drop table item
         if (this.getDropTable() != null) {
             ItemStack itemStack = Server.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
 
