@@ -30,7 +30,7 @@ public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacket
         if (player != null) {
             new InspectPlayerPacketOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
         } else {
-            new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), "[RED] Could not find player.").sendPacket();
+            new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), "[RED]Could not find player.").sendPacket();
         }
     }
 

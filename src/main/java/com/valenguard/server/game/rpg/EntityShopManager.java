@@ -19,6 +19,12 @@ public class EntityShopManager {
         InventorySlot inventorySlot = player.getPlayerBag().getGoldInventorySlot();
         if (inventorySlot == null) return; // The player has no gold.
 
+        // Make sure the player can only buy items within a certain distance.
+        if (!player.getCurrentShoppingEntity().getFutureMapLocation().isWithinDistance(player, (short) 5)) {
+            player.setCurrentShoppingEntity(null);
+            return;
+        }
+
         if (shopSlot >= entityShopMap.get(shopID).size() || shopSlot < 0) return;
 
         EntityShopLoader.ShopItemStackInfo shopItemStackInfo = entityShopMap.get(shopID).get(shopSlot);
