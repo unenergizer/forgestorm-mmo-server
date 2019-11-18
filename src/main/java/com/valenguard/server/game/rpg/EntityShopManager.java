@@ -1,6 +1,7 @@
 package com.valenguard.server.game.rpg;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
@@ -20,7 +21,7 @@ public class EntityShopManager {
         if (inventorySlot == null) return; // The player has no gold.
 
         // Make sure the player can only buy items within a certain distance.
-        if (!player.getCurrentShoppingEntity().getFutureMapLocation().isWithinDistance(player, (short) 5)) {
+        if (!player.getCurrentShoppingEntity().getFutureMapLocation().isWithinDistance(player, GameConstants.MAX_SHOP_DISTANCE)) {
             player.setCurrentShoppingEntity(null);
             return;
         }
