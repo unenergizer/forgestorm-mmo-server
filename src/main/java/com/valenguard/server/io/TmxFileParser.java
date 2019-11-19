@@ -1,7 +1,6 @@
 package com.valenguard.server.io;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.rpg.StationaryTypes;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
@@ -58,12 +57,6 @@ public class TmxFileParser {
         NodeList objectGroupTag = tmx.getElementsByTagName("objectgroup");
 
         for (int i = 0; i < objectGroupTag.getLength(); i++) {
-
-            // Get Bank Access
-            if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("bank_access")) {
-                NodeList objectTag = ((Element) objectGroupTag.item(i)).getElementsByTagName("object");
-                processBankAccess(mapHeight, map, objectTag);
-            }
 
             // Get Skill Nodes
             if (((Element) objectGroupTag.item(i)).getAttribute("name").equals("skill")) {
@@ -148,20 +141,6 @@ public class TmxFileParser {
         }
 
         return map;
-    }
-
-    private static void processBankAccess(short mapHeight, Tile[][] map, NodeList objectTag) {
-        for (int j = 0; j < objectTag.getLength(); j++) {
-            if (objectTag.item(j).getNodeType() != Node.ELEMENT_NODE) continue;
-
-            Element objectTagElement = (Element) objectTag.item(j);
-
-            short x = (short) (Short.parseShort(objectTagElement.getAttribute("x")) / GameConstants.TILE_SIZE);
-            short y = (short) (mapHeight - (Short.parseShort(objectTagElement.getAttribute("y")) / GameConstants.TILE_SIZE) - 1);
-
-            // Making it's associated tile non-traversable
-            map[x][y].setBankAccess(true);
-        }
     }
 
     private static void processSkillNodes(short mapHeight, Tile[][] map, NodeList objectTag, String fileName) {

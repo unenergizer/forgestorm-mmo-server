@@ -10,7 +10,7 @@ public class GameMap {
 
     private final String mapName;
     private final int mapWidth, mapHeight;
-    private final Tile map[][];
+    private final Tile[][] map;
     private final PlayerController playerController = new PlayerController(this);
     private final AiEntityController aiEntityController = new AiEntityController(this);
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
@@ -44,11 +44,6 @@ public class GameMap {
 
     public Warp getWarpFromLocation(Location location) {
         return location.getGameMap().getMap()[location.getX()][location.getY()].getWarp();
-    }
-
-    public boolean locationHasBankAccess(Location location) {
-        Tile tile = getTileByLocation(location);
-        return tile != null && tile.isBankAccess();
     }
 
     public boolean locationHasWarp(Location location) {

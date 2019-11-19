@@ -7,6 +7,5 @@ import lombok.Setter;
 @Setter
 public class Tile {
     private boolean isTraversable;
-    private boolean isBankAccess;
     private Warp warp;
 }
