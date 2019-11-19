@@ -82,6 +82,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 }
 
                 write.writeShort(((AiEntity) entityToSpawn).getShopId());
+                write.writeBoolean(((AiEntity) entityToSpawn).isBankKeeper());
 
                 write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
                 write.writeByte(((NPC) entityToSpawn).getFaction());
