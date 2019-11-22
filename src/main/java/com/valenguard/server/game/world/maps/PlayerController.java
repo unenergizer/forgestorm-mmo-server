@@ -116,11 +116,11 @@ public class PlayerController {
 
             // Spawn itemStack drops!
             for (ItemStackDrop itemStackDrop : gameMap.getItemStackDropEntityController().getEntities()) {
-                if (playerWhoJoined.getClientHandler().getAuthenticatedUser() == itemStackDrop.getDropOwner().getClientHandler().getAuthenticatedUser()) {
-                    // ItemStackDrop Owner killed something, disconnected and reconnected. Send them the entity again.
-                    postPlayerSpawn(playerWhoJoined, itemStackDrop);
-                } else if (itemStackDrop.isSpawnedForAll()) {
+                if (itemStackDrop.isSpawnedForAll()) {
                     // Spawn items for joined players, only if the item has been spawned for all players.
+                    postPlayerSpawn(playerWhoJoined, itemStackDrop);
+                } else if (playerWhoJoined.getClientHandler().getAuthenticatedUser() == itemStackDrop.getDropOwner().getClientHandler().getAuthenticatedUser()) {
+                    // ItemStackDrop Owner killed something, disconnected and reconnected. Send them the entity again.
                     postPlayerSpawn(playerWhoJoined, itemStackDrop);
                 }
             }

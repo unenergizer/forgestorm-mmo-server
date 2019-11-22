@@ -7,7 +7,6 @@ import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
-import com.valenguard.server.network.game.packet.out.EntitySpawnPacketOut;
 
 public class ItemStackDropEntityController extends EntityController<ItemStackDrop> {
 
@@ -43,7 +42,8 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = entitySpawnQueue.poll()) != null) {
             Server.getInstance().getGameLoop().getGroundItemTimerTask().addItemToGround(itemStackDrop);
-            new EntitySpawnPacketOut(itemStackDrop.getDropOwner(), itemStackDrop).sendPacket();
+//            new EntitySpawnPacketOut(itemStackDrop.getDropOwner(), itemStackDrop).sendPacket();
+            entitySpawn(itemStackDrop);
         }
 
         while ((itemStackDrop = entityDespawnQueue.poll()) != null) {

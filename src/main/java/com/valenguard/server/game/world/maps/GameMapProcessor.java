@@ -1,5 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
+import com.valenguard.server.database.sql.GameWorldItemStackDropSQL;
 import com.valenguard.server.database.sql.GameWorldMonsterSQL;
 import com.valenguard.server.database.sql.GameWorldNpcSQL;
 import com.valenguard.server.game.world.entity.*;
@@ -24,6 +25,7 @@ public class GameMapProcessor {
      */
     private final Queue<AiEntity> aiEntitySpawnQueue = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntitySpawnQueue = new LinkedList<>();
+    private final Queue<ItemStackDrop> ItemStackDropSpawnQueue = new LinkedList<>();
 
     public void queueAiEntitySpawn(AiEntity aiEntity) {
         aiEntitySpawnQueue.add(aiEntity);
@@ -31,6 +33,10 @@ public class GameMapProcessor {
 
     public void queueStationaryEntitySpawn(StationaryEntity stationaryEntity) {
         stationaryEntitySpawnQueue.add(stationaryEntity);
+    }
+
+    public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
+        ItemStackDropSpawnQueue.add(itemStackDrop);
     }
 
     public void spawnEntities() {
@@ -41,6 +47,10 @@ public class GameMapProcessor {
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntitySpawnQueue.poll()) != null) {
             stationaryEntity.getGameMap().getStationaryEntityController().queueEntitySpawn(stationaryEntity);
+        }
+        ItemStackDrop itemStackDrop;
+        while ((itemStackDrop = ItemStackDropSpawnQueue.poll()) != null) {
+            itemStackDrop.getGameMap().getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
         }
     }
 
@@ -71,10 +81,12 @@ public class GameMapProcessor {
         for (GameMap gameMap : gameMaps.values()) {
             int npcSize = loadNPC(gameMap);
             int monsterSize = loadMonster(gameMap);
-            int entityTotal = npcSize + monsterSize;
+            int itemStackDropSize = loadItemStackDrop(gameMap);
+            int entityTotal = npcSize + monsterSize + itemStackDropSize;
             println(getClass(), "Map:" + gameMap.getMapName() +
                     ", NPCs Total: " + npcSize +
                     ", Monsters Total: " + monsterSize +
+                    ", ItemStackDrop Total: " + itemStackDropSize +
                     ", Entity Total: " + entityTotal);
         }
         println(getClass(), "Loading entities from database finished!");
@@ -121,6 +133,27 @@ public class GameMapProcessor {
             gameWorldMonsterSQL.loadSQL(monster);
 
             queueAiEntitySpawn(monster);
+        }
+
+        return monsterIdList.size();
+    }
+
+    private int loadItemStackDrop(GameMap gameMap) {
+        GameWorldItemStackDropSQL gameWorldItemStackDropSQL = new GameWorldItemStackDropSQL();
+        List<Integer> monsterIdList = gameWorldItemStackDropSQL.searchItemStackDrop(gameMap.getMapName());
+
+        for (Integer i : monsterIdList) {
+
+            // Don't spawn the entity if it is already spawned.
+            if (alreadySpawnedCheck(i, gameMap, EntityType.MONSTER)) continue;
+
+            ItemStackDrop itemStackDrop = new ItemStackDrop();
+            itemStackDrop.setEntityType(EntityType.ITEM_STACK);
+            itemStackDrop.setDatabaseId(i);
+
+            gameWorldItemStackDropSQL.loadSQL(itemStackDrop);
+
+            queueItemStackDropSpawn(itemStackDrop);
         }
 
         return monsterIdList.size();

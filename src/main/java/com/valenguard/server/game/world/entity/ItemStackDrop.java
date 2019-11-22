@@ -28,4 +28,7 @@ public class ItemStackDrop extends Entity {
      */
     private boolean spawnedForAll = false;
 
+    private int respawnTimeMin;
+    private int respawnTimeMax;
+
 }
