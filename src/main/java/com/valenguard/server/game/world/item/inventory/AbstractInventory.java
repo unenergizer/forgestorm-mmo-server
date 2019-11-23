@@ -52,7 +52,7 @@ public abstract class AbstractInventory {
         ItemStack fromItemStack = inventorySlotArray[fromPositionIndex].getItemStack();
         ItemStack toItemStack = toInventory[toPositionIndex].getItemStack();
 
-        if (toItemStack != null && fromItemStack.getStackable() > 0 && toItemStack.getStackable() > 0
+        if (toItemStack != null && fromItemStack.getStackable() > 1 && toItemStack.getStackable() > 1
                 && fromItemStack.getItemStackType() == toItemStack.getItemStackType()) {
 
             // TODO: Check max size
