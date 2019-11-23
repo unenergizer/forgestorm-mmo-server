@@ -48,49 +48,51 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
             case MONSTER:
+                Monster monster = (Monster) entityToSpawn;
                 if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
                     write.writeInt(movingEntity.getAttributes().getDamage());
-                    write.writeInt(((Monster) entityToSpawn).getExpDrop());
-                    write.writeInt(((Monster) entityToSpawn).getDropTable());
-                    write.writeFloat(((Monster) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityStill());
-                    write.writeFloat(((Monster) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityWalkStart());
-                    write.writeString(((Monster) entityToSpawn).getDefaultSpawnLocation().getMapName());
-                    write.writeShort(((Monster) entityToSpawn).getDefaultSpawnLocation().getX());
-                    write.writeShort(((Monster) entityToSpawn).getDefaultSpawnLocation().getY());
+                    write.writeInt(monster.getExpDrop());
+                    write.writeInt(monster.getDropTable());
+                    write.writeFloat(monster.getRandomRegionMoveGenerator().getProbabilityStill());
+                    write.writeFloat(monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+                    write.writeString(monster.getDefaultSpawnLocation().getMapName());
+                    write.writeShort(monster.getDefaultSpawnLocation().getX());
+                    write.writeShort(monster.getDefaultSpawnLocation().getY());
                 }
-                write.writeShort(((AiEntity) entityToSpawn).getShopId());
+                write.writeShort(monster.getShopId());
 
-                write.writeByte(((Monster) entityToSpawn).getAlignment().getEntityAlignmentByte());
+                write.writeByte(monster.getAlignment().getEntityAlignmentByte());
 
-                write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
-                write.writeFloat(movingEntity.getMoveSpeed());
-                write.writeInt(movingEntity.getMaxHealth());
-                write.writeInt(movingEntity.getCurrentHealth());
+                write.writeByte(monster.getFacingDirection().getDirectionByte());
+                write.writeFloat(monster.getMoveSpeed());
+                write.writeInt(monster.getMaxHealth());
+                write.writeInt(monster.getCurrentHealth());
 
                 write.writeByte(appearance.getMonsterBodyTexture());
                 break;
             case NPC:
+                NPC npc = (NPC) entityToSpawn;
                 if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
-                    write.writeInt(movingEntity.getAttributes().getDamage());
-                    write.writeInt(((NPC) entityToSpawn).getExpDrop());
-                    write.writeInt(((NPC) entityToSpawn).getDropTable());
-                    write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityStill());
-                    write.writeFloat(((NPC) entityToSpawn).getRandomRegionMoveGenerator().getProbabilityWalkStart());
-                    write.writeString(((NPC) entityToSpawn).getDefaultSpawnLocation().getMapName());
-                    write.writeShort(((NPC) entityToSpawn).getDefaultSpawnLocation().getX());
-                    write.writeShort(((NPC) entityToSpawn).getDefaultSpawnLocation().getY());
+                    write.writeInt(npc.getAttributes().getDamage());
+                    write.writeInt(npc.getExpDrop());
+                    write.writeInt(npc.getDropTable());
+                    write.writeFloat(npc.getRandomRegionMoveGenerator().getProbabilityStill());
+                    write.writeFloat(npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+                    write.writeString(npc.getDefaultSpawnLocation().getMapName());
+                    write.writeShort(npc.getDefaultSpawnLocation().getX());
+                    write.writeShort(npc.getDefaultSpawnLocation().getY());
                 }
 
-                write.writeShort(((AiEntity) entityToSpawn).getShopId());
-                write.writeBoolean(((AiEntity) entityToSpawn).isBankKeeper());
+                write.writeShort((npc).getShopId());
+                write.writeBoolean((npc).isBankKeeper());
 
-                write.writeByte(((NPC) entityToSpawn).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
-                write.writeByte(((NPC) entityToSpawn).getFaction());
+                write.writeByte(npc.getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
+                write.writeByte(npc.getFaction());
 
-                write.writeByte(movingEntity.getFacingDirection().getDirectionByte());
-                write.writeFloat(movingEntity.getMoveSpeed());
-                write.writeInt(movingEntity.getMaxHealth());
-                write.writeInt(movingEntity.getCurrentHealth());
+                write.writeByte(npc.getFacingDirection().getDirectionByte());
+                write.writeFloat(npc.getMoveSpeed());
+                write.writeInt(npc.getMaxHealth());
+                write.writeInt(npc.getCurrentHealth());
 
                 write.writeByte(appearance.getHairTexture());
                 write.writeByte(appearance.getHelmTexture());
@@ -160,11 +162,20 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     }
 
     private void spawnItemStackDrop(GameOutputStream write) {
-        write.writeShort(entityToSpawn.getServerEntityId());
-        write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
-        write.writeString(entityToSpawn.getName());
-        write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
-        write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
-        write.writeByte(entityToSpawn.getAppearance().getMonsterBodyTexture());
+        ItemStackDrop itemStackDrop = (ItemStackDrop) entityToSpawn;
+        write.writeShort(itemStackDrop.getServerEntityId());
+        write.writeByte(itemStackDrop.getEntityType().getEntityTypeByte());
+        write.writeString(itemStackDrop.getName());
+        write.writeShort(itemStackDrop.getCurrentMapLocation().getX());
+        write.writeShort(itemStackDrop.getCurrentMapLocation().getY());
+
+        if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+            write.writeInt(itemStackDrop.getItemStack().getItemId());
+            write.writeInt(itemStackDrop.getItemStack().getAmount());
+            write.writeInt(itemStackDrop.getRespawnTimeMin());
+            write.writeInt(itemStackDrop.getRespawnTimeMax());
+        }
+
+        write.writeByte(itemStackDrop.getAppearance().getMonsterBodyTexture());
     }
 }

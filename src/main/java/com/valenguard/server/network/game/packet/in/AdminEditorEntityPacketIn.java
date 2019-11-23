@@ -336,7 +336,10 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 monster.killAiEntity(null);
             } else if (entity.getEntityType() == EntityType.ITEM_STACK) {
                 println(getClass(), "---> Updating ItemStackDrop in database", false, PRINT_DEBUG);
-                new GameWorldItemStackDropSQL().saveSQL((ItemStackDrop) entity);
+                ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
+                new GameWorldItemStackDropSQL().saveSQL(itemStackDrop);
+                itemStackDrop.removeItemStackDrop();
+                Server.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
             }
         } else if (packetData.save) {
             // Saving new entity
@@ -352,7 +355,9 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             }
         } else if (packetData.delete && packetData.entityID != -1) {
 
-            if (entity instanceof AiEntity) ((AiEntity) entity).removeAiEntity(); // Remove entity from map
+            // Remove entity from map
+            if (entity instanceof AiEntity) ((AiEntity) entity).removeAiEntity();
+            if (entity instanceof ItemStackDrop) ((ItemStackDrop) entity).removeItemStackDrop();
 
             if (entity.getEntityType() == EntityType.NPC) {
                 println(getClass(), "---> Deleting NPC from database", false, PRINT_DEBUG);

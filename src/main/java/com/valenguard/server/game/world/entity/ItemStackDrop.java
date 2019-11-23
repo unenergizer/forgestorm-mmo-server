@@ -31,4 +31,8 @@ public class ItemStackDrop extends Entity {
     private int respawnTimeMin;
     private int respawnTimeMax;
 
+
+    public void removeItemStackDrop() {
+        getCurrentMapLocation().getGameMap().getItemStackDropEntityController().queueEntityDespawn(this);
+    }
 }

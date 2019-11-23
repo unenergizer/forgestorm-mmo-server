@@ -43,7 +43,7 @@ public class GameWorldItemStackDropSQL {
     private PreparedStatement databaseSave(ItemStackDrop itemStackDrop, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_itemstack_drop" +
                 " SET world_name=?, world_x=?, world_y=?, " +
-                " itemstack_id=?, amount=?, respawn_time_min=?, respawn_time_max=?, " +
+                " itemstack_id=?, amount=?, respawn_time_min=?, respawn_time_max=? " +
                 " WHERE drop_id=?");
 
         preparedStatement.setString(1, itemStackDrop.getCurrentMapLocation().getMapName());
