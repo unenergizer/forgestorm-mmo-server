@@ -2,11 +2,13 @@ package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
 import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.database.sql.GameWorldItemStackDropSQL;
 import com.valenguard.server.database.sql.GameWorldMonsterSQL;
 import com.valenguard.server.database.sql.GameWorldNpcSQL;
 import com.valenguard.server.game.rpg.Attributes;
 import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.*;
+import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
@@ -30,33 +32,29 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         boolean save = clientHandler.readBoolean();
         boolean delete = clientHandler.readBoolean();
 
-        // Basic data
-        short entityID = clientHandler.readShort();
-        String name = clientHandler.readString();
-
-        EntityAlignment entityAlignment = null;
-        String faction = null;
-        if (entityType == EntityType.MONSTER) {
-            entityAlignment = EntityAlignment.getEntityAlignment(clientHandler.readByte());
-        } else if (entityType == EntityType.NPC) {
-            faction = clientHandler.readString();
-        }
-
-        int health = clientHandler.readInt();
-        int damage = clientHandler.readInt();
-        int expDrop = clientHandler.readInt();
-        int dropTable = clientHandler.readInt();
-        float walkSpeed = clientHandler.readFloat();
-        float probStop = clientHandler.readFloat();
-        float probWalk = clientHandler.readFloat();
-        short shopId = clientHandler.readShort();
-        boolean bankKeeper = clientHandler.readBoolean();
-
         // World data
         String worldName = clientHandler.readString();
         short worldX = clientHandler.readShort();
         short worldY = clientHandler.readShort();
 
+        // Basic data
+        short entityID = clientHandler.readShort();
+        String name = null;
+
+        String faction = null;
+        EntityAlignment entityAlignment = null;
+
+        int health = 0;
+        int damage = 0;
+        int expDrop = 0;
+        int dropTable = 0;
+        float walkSpeed = 0;
+        float probStop = 0;
+        float probWalk = 0;
+        short shopId = -1;
+        boolean bankKeeper = false;
+
+        // Appearance
         byte monsterBodyTexture = -1;
         byte hairTexture = -1;
         byte helmTexture = -1;
@@ -68,20 +66,59 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         int skinColor = -1;
         int glovesColor = -1;
 
-        // Appearance
-        if (entityType == EntityType.MONSTER) {
-            monsterBodyTexture = clientHandler.readByte();
-        } else if (entityType == EntityType.NPC) {
-            hairTexture = clientHandler.readByte();
-            helmTexture = clientHandler.readByte();
-            chestTexture = clientHandler.readByte();
-            pantsTexture = clientHandler.readByte();
-            shoesTexture = clientHandler.readByte();
-            hairColor = clientHandler.readInt();
-            eyesColor = clientHandler.readInt();
-            skinColor = clientHandler.readInt();
-            glovesColor = clientHandler.readInt();
+        // ItemStackDrop
+        int itemStackId = 0;
+        int amount = 0;
+        int respawnTimeMin = 0;
+        int respawnTimeMax = 0;
+
+        switch (entityType) {
+            case NPC:
+                name = clientHandler.readString();
+                faction = clientHandler.readString();
+                health = clientHandler.readInt();
+                damage = clientHandler.readInt();
+                expDrop = clientHandler.readInt();
+                dropTable = clientHandler.readInt();
+                walkSpeed = clientHandler.readFloat();
+                probStop = clientHandler.readFloat();
+                probWalk = clientHandler.readFloat();
+                shopId = clientHandler.readShort();
+                bankKeeper = clientHandler.readBoolean();
+
+                hairTexture = clientHandler.readByte();
+                helmTexture = clientHandler.readByte();
+                chestTexture = clientHandler.readByte();
+                pantsTexture = clientHandler.readByte();
+                shoesTexture = clientHandler.readByte();
+                hairColor = clientHandler.readInt();
+                eyesColor = clientHandler.readInt();
+                skinColor = clientHandler.readInt();
+                glovesColor = clientHandler.readInt();
+                break;
+            case MONSTER:
+                name = clientHandler.readString();
+                entityAlignment = EntityAlignment.getEntityAlignment(clientHandler.readByte());
+                health = clientHandler.readInt();
+                damage = clientHandler.readInt();
+                expDrop = clientHandler.readInt();
+                dropTable = clientHandler.readInt();
+                walkSpeed = clientHandler.readFloat();
+                probStop = clientHandler.readFloat();
+                probWalk = clientHandler.readFloat();
+                shopId = clientHandler.readShort();
+                bankKeeper = clientHandler.readBoolean();
+
+                monsterBodyTexture = clientHandler.readByte();
+                break;
+            case ITEM_STACK:
+                itemStackId = clientHandler.readInt();
+                amount = clientHandler.readInt();
+                respawnTimeMin = clientHandler.readInt();
+                respawnTimeMax = clientHandler.readInt();
+                break;
         }
+
 
         println(PRINT_DEBUG);
         println(getClass(), "=============== ENTITY EDITOR PACKET IN =============", false, PRINT_DEBUG);
@@ -102,10 +139,11 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         println(getClass(), "ShopID: " + shopId, false, PRINT_DEBUG);
         println(getClass(), "BankKeeper: " + bankKeeper, false, PRINT_DEBUG);
         println(getClass(), "Spawn: " + worldName + " X: " + worldX + ", Y: " + worldY, false, PRINT_DEBUG);
-        println(getClass(), " *** Appearance Data ***", false, PRINT_DEBUG);
         if (entityType == EntityType.MONSTER) {
+            println(getClass(), " *** Appearance Data ***", false, PRINT_DEBUG);
             println(getClass(), "MonsterBodyTexture: " + monsterBodyTexture, false, PRINT_DEBUG);
         } else if (entityType == EntityType.NPC) {
+            println(getClass(), " *** Appearance Data ***", false, PRINT_DEBUG);
             println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
             println(getClass(), "HelmTexture: " + helmTexture, false, PRINT_DEBUG);
             println(getClass(), "ChestTexture: " + chestTexture, false, PRINT_DEBUG);
@@ -116,6 +154,10 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
             println(getClass(), "GlovesColor: " + glovesColor, false, PRINT_DEBUG);
         }
+        println(getClass(), "ItemStackID: " + itemStackId, false, PRINT_DEBUG);
+        println(getClass(), "Stack Size: " + amount, false, PRINT_DEBUG);
+        println(getClass(), "MinRespawnTime: " + respawnTimeMin, false, PRINT_DEBUG);
+        println(getClass(), "MaxRespawnTime: " + respawnTimeMax, false, PRINT_DEBUG);
 
         return new EntityEditorPacketIn(
                 entityType,
@@ -147,7 +189,11 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 hairColor,
                 eyesColor,
                 skinColor,
-                glovesColor
+                glovesColor,
+                itemStackId,
+                amount,
+                respawnTimeMin,
+                respawnTimeMax
         );
     }
 
@@ -166,103 +212,166 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
     @Override
     public void onEvent(EntityEditorPacketIn packetData) {
         Player player = packetData.getClientHandler().getPlayer();
-        AiEntity aiEntity = null;
+        Entity entity = null;
 
         if (packetData.entityID != -1) {
             if (packetData.entityType == EntityType.NPC) {
-                aiEntity = (NPC) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+                entity = (NPC) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
             } else if (packetData.entityType == EntityType.MONSTER) {
-                aiEntity = (Monster) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+                entity = (Monster) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+            } else if (packetData.entityType == EntityType.ITEM_STACK) {
+                entity = (ItemStackDrop) packetData.getClientHandler().getPlayer().getGameMap().getItemStackDropEntityController().getEntity(packetData.entityID);
             }
         } else {
             if (packetData.entityType == EntityType.NPC) {
-                aiEntity = new NPC();
-                aiEntity.setEntityType(EntityType.NPC);
+                entity = new NPC();
+                entity.setEntityType(EntityType.NPC);
             } else if (packetData.entityType == EntityType.MONSTER) {
-                aiEntity = new Monster();
-                aiEntity.setEntityType(EntityType.MONSTER);
+                entity = new Monster();
+                entity.setEntityType(EntityType.MONSTER);
+            } else if (packetData.entityType == EntityType.ITEM_STACK) {
+                entity = new ItemStackDrop();
+                entity.setEntityType(EntityType.ITEM_STACK);
             }
         }
 
-        aiEntity.setName(packetData.name);
+        // World Data
+        Location spawnLocation = new Location(packetData.worldName, packetData.worldX, packetData.worldY);        // Setup appearance
 
-        if (aiEntity.getEntityType() == EntityType.NPC) {
-            ((NPC) aiEntity).setFaction(Server.getInstance().getFactionManager().getFactionByName(packetData.faction));
-        } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-            ((Monster) aiEntity).setAlignment(packetData.entityAlignment);
-        }
-        aiEntity.setEntityType(aiEntity.getEntityType());
-        aiEntity.setCurrentHealth(packetData.health);
-        aiEntity.setMaxHealth(packetData.health);
-        aiEntity.setExpDrop(packetData.expDrop);
-        aiEntity.setDropTable(packetData.dropTable);
-        aiEntity.setMoveSpeed(packetData.walkSpeed);
-        aiEntity.setBankKeeper(packetData.bankKeeper);
-
-        aiEntity.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
-        aiEntity.setMovementInfo(packetData.probStop, packetData.probWalk);
-        Location location = new Location(packetData.worldName, packetData.worldX, packetData.worldY);
-        aiEntity.setDefaultSpawnLocation(location);
-        aiEntity.gameMapRegister(new Warp(location, MoveDirection.SOUTH));
-
-        // Setup appearance
-        Appearance appearance = new Appearance(aiEntity);
-        aiEntity.setAppearance(appearance);
-
-        if (aiEntity.getEntityType() == EntityType.MONSTER) {
-            appearance.setMonsterBodyTexture(packetData.monsterBodyTexture);
-        } else if (aiEntity.getEntityType() == EntityType.NPC) {
-            appearance.setHairTexture(packetData.hairTexture);
-            appearance.setHelmTexture(packetData.helmTexture);
-            appearance.setChestTexture(packetData.chestTexture);
-            appearance.setPantsTexture(packetData.pantsTexture);
-            appearance.setShoesTexture(packetData.shoesTexture);
-            appearance.setHairColor(packetData.hairColor);
-            appearance.setEyeColor(packetData.eyesColor);
-            appearance.setSkinColor(packetData.skinColor);
-            appearance.setGlovesColor(packetData.glovesColor);
-        }
+        // Appearance
+        Appearance appearance = new Appearance(entity);
+        entity.setAppearance(appearance);
 
         // Setup basic attributes.
         Attributes attributes = new Attributes();
         attributes.setDamage(packetData.damage);
-        aiEntity.setAttributes(attributes);
 
-        if (packetData.shopId != -1) aiEntity.setShopId(packetData.shopId);
+        switch (packetData.entityType) {
+            case NPC:
+                NPC npc = (NPC) entity;
+                npc.setName(packetData.name);
+                npc.setFaction(Server.getInstance().getFactionManager().getFactionByName(packetData.faction));
+                npc.setCurrentHealth(packetData.health);
+                npc.setMaxHealth(packetData.health);
+                npc.setExpDrop(packetData.expDrop);
+                npc.setDropTable(packetData.dropTable);
+                npc.setMoveSpeed(packetData.walkSpeed);
+                npc.setBankKeeper(packetData.bankKeeper);
 
+                // World Data
+                npc.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
+                npc.setMovementInfo(packetData.probStop, packetData.probWalk);
+                npc.setDefaultSpawnLocation(spawnLocation);
+                npc.gameMapRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
+
+                // Appearance
+                appearance.setHairTexture(packetData.hairTexture);
+                appearance.setHelmTexture(packetData.helmTexture);
+                appearance.setChestTexture(packetData.chestTexture);
+                appearance.setPantsTexture(packetData.pantsTexture);
+                appearance.setShoesTexture(packetData.shoesTexture);
+                appearance.setHairColor(packetData.hairColor);
+                appearance.setEyeColor(packetData.eyesColor);
+                appearance.setSkinColor(packetData.skinColor);
+                appearance.setGlovesColor(packetData.glovesColor);
+
+                // Combat
+                npc.setAttributes(attributes);
+
+                // Shop
+                if (packetData.shopId != -1) npc.setShopId(packetData.shopId);
+                break;
+            case MONSTER:
+                Monster monster = (Monster) entity;
+                monster.setName(packetData.name);
+                monster.setAlignment(packetData.entityAlignment);
+                monster.setCurrentHealth(packetData.health);
+                monster.setMaxHealth(packetData.health);
+                monster.setExpDrop(packetData.expDrop);
+                monster.setDropTable(packetData.dropTable);
+                monster.setMoveSpeed(packetData.walkSpeed);
+                monster.setBankKeeper(packetData.bankKeeper);
+
+                // World Data
+                monster.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
+                monster.setMovementInfo(packetData.probStop, packetData.probWalk);
+                monster.setDefaultSpawnLocation(spawnLocation);
+                monster.gameMapRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
+
+                // Appearance
+                appearance.setMonsterBodyTexture(packetData.monsterBodyTexture);
+
+                // Combat
+                monster.setAttributes(attributes);
+
+                // Shop
+                if (packetData.shopId != -1) monster.setShopId(packetData.shopId);
+                break;
+            case ITEM_STACK:
+                ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
+                itemStackDrop.setCurrentMapLocation(spawnLocation);
+                ItemStack itemStack = Server.getInstance().getItemStackManager().makeItemStack(packetData.itemStackId, packetData.amount);
+                itemStackDrop.setItemStack(itemStack);
+                itemStackDrop.setSpawnedForAll(true);
+                itemStackDrop.setRespawnTimeMin(packetData.respawnTimeMin);
+                itemStackDrop.setRespawnTimeMax(packetData.respawnTimeMax);
+                appearance.setMonsterBodyTexture((byte) itemStack.getItemId());
+                break;
+        }
+
+        // Database
         if (packetData.save && packetData.entityID != -1) {
             // Updating entity in database
-            if (aiEntity.getEntityType() == EntityType.NPC) {
-                new GameWorldNpcSQL().saveSQL((NPC) aiEntity);
+            if (entity.getEntityType() == EntityType.NPC) {
                 println(getClass(), "---> Updating NPC in database", false, PRINT_DEBUG);
-            } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-                new GameWorldMonsterSQL().saveSQL((Monster) aiEntity);
+                NPC npc = (NPC) entity;
+                new GameWorldNpcSQL().saveSQL(npc);
+                npc.setInstantRespawn(true);
+                npc.killAiEntity(null);
+            } else if (entity.getEntityType() == EntityType.MONSTER) {
                 println(getClass(), "---> Updating Monster in database", false, PRINT_DEBUG);
+                Monster monster = (Monster) entity;
+                new GameWorldMonsterSQL().saveSQL(monster);
+                monster.setInstantRespawn(true);
+                monster.killAiEntity(null);
+            } else if (entity.getEntityType() == EntityType.ITEM_STACK) {
+                println(getClass(), "---> Updating ItemStackDrop in database", false, PRINT_DEBUG);
+                new GameWorldItemStackDropSQL().saveSQL((ItemStackDrop) entity);
             }
-            aiEntity.setInstantRespawn(true);
-            aiEntity.killAiEntity(null);
         } else if (packetData.save) {
             // Saving new entity
-            if (aiEntity.getEntityType() == EntityType.NPC) {
-                new GameWorldNpcSQL().firstTimeSaveSQL((NPC) aiEntity);
+            if (entity.getEntityType() == EntityType.NPC) {
                 println(getClass(), "---> Saving new NPC to database", false, PRINT_DEBUG);
-            } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-                new GameWorldMonsterSQL().firstTimeSaveSQL((Monster) aiEntity);
+                new GameWorldNpcSQL().firstTimeSaveSQL((NPC) entity);
+            } else if (entity.getEntityType() == EntityType.MONSTER) {
                 println(getClass(), "---> Saving new Monster to database", false, PRINT_DEBUG);
+                new GameWorldMonsterSQL().firstTimeSaveSQL((Monster) entity);
+            } else if (entity.getEntityType() == EntityType.ITEM_STACK) {
+                println(getClass(), "---> Saving new ItemStackDrop to database", false, PRINT_DEBUG);
+                new GameWorldItemStackDropSQL().firstTimeSaveSQL((ItemStackDrop) entity);
             }
         } else if (packetData.delete && packetData.entityID != -1) {
 
-            aiEntity.removeAiEntity(); // Remove entity from map
+            if (entity instanceof AiEntity) ((AiEntity) entity).removeAiEntity(); // Remove entity from map
 
-            if (aiEntity.getEntityType() == EntityType.NPC) {
-                new GameWorldNpcSQL().deleteSQL((NPC) aiEntity);
+            if (entity.getEntityType() == EntityType.NPC) {
                 println(getClass(), "---> Deleting NPC from database", false, PRINT_DEBUG);
-            } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-                new GameWorldMonsterSQL().deleteSQL((Monster) aiEntity);
+                new GameWorldNpcSQL().deleteSQL((NPC) entity);
+            } else if (entity.getEntityType() == EntityType.MONSTER) {
                 println(getClass(), "---> Deleting Monster from database", false, PRINT_DEBUG);
+                new GameWorldMonsterSQL().deleteSQL((Monster) entity);
+            } else if (entity.getEntityType() == EntityType.ITEM_STACK) {
+                println(getClass(), "---> Deleting ItemStackDrop from database", false, PRINT_DEBUG);
+                new GameWorldItemStackDropSQL().deleteSQL((ItemStackDrop) entity);
             }
         } else {
-            if (packetData.spawn) player.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
+            if (packetData.spawn) {
+                if (entity instanceof AiEntity) {
+                    player.getGameMap().getAiEntityController().queueEntitySpawn((AiEntity) entity);
+                } else if (entity instanceof ItemStackDrop) {
+                    player.getGameMap().getItemStackDropEntityController().queueEntitySpawn((ItemStackDrop) entity);
+                }
+            }
         }
     }
 
@@ -307,5 +416,11 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         private int eyesColor;
         private int skinColor;
         private int glovesColor;
+
+        // ItemStackDrop
+        private int itemStackId;
+        private int amount;
+        private int respawnTimeMin;
+        private int respawnTimeMax;
     }
 }

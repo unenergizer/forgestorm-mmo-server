@@ -119,7 +119,7 @@ public class GameWorldItemStackDropSQL {
             }
 
             // Now reload and spawn the entity
-            Server.getInstance().getGameManager().getGameMapProcessor().loadMonster(itemStackDrop.getGameMap());
+            Server.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
         }
     }
 

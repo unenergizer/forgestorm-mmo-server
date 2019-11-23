@@ -138,7 +138,7 @@ public class GameMapProcessor {
         return monsterIdList.size();
     }
 
-    private int loadItemStackDrop(GameMap gameMap) {
+    public int loadItemStackDrop(GameMap gameMap) {
         GameWorldItemStackDropSQL gameWorldItemStackDropSQL = new GameWorldItemStackDropSQL();
         List<Integer> monsterIdList = gameWorldItemStackDropSQL.searchItemStackDrop(gameMap.getMapName());
 
