@@ -170,6 +170,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(itemStackDrop.getCurrentMapLocation().getY());
 
         if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+            write.writeBoolean(itemStackDrop.isSpawnedFromDropTable());
             write.writeInt(itemStackDrop.getItemStack().getItemId());
             write.writeInt(itemStackDrop.getItemStack().getAmount());
             write.writeInt(itemStackDrop.getRespawnTimeMin());
