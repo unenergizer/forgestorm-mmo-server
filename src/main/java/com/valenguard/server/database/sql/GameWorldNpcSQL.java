@@ -41,6 +41,8 @@ public class GameWorldNpcSQL {
         int eyesColor = resultSet.getInt("eye_color");
         int skinColor = resultSet.getInt("skin_color");
         int glovesColor = resultSet.getInt("gloves_color");
+        // TODO: byte scriptId = resultSet.getInt("script_id");
+        int scriptId = 0;
 
         Location location = new Location(worldName, worldX, worldY);
 
@@ -68,6 +70,7 @@ public class GameWorldNpcSQL {
         npc.getAppearance().setEyeColor(eyesColor);
         npc.getAppearance().setSkinColor(skinColor);
         npc.getAppearance().setGlovesColor(glovesColor);
+        npc.setScriptId(scriptId);
     }
 
     private PreparedStatement databaseSave(NPC npc, Connection connection) throws SQLException {
@@ -106,6 +109,7 @@ public class GameWorldNpcSQL {
         preparedStatement.setInt(26, npc.getAppearance().getSkinColor());
         preparedStatement.setInt(27, npc.getAppearance().getGlovesColor());
         preparedStatement.setInt(28, npc.getDatabaseId());
+        // TODO: preparedStatement.setInt(29, npc.getScriptId());
 
         return preparedStatement;
     }
@@ -142,6 +146,7 @@ public class GameWorldNpcSQL {
         preparedStatement.setInt(25, npc.getAppearance().getEyeColor());
         preparedStatement.setInt(26, npc.getAppearance().getSkinColor());
         preparedStatement.setInt(27, npc.getAppearance().getGlovesColor());
+        // TODO: preparedStatement.setInt(28, npc.getScriptId());
 
         return preparedStatement;
     }

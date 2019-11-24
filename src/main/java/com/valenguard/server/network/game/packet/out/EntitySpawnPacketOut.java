@@ -105,6 +105,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 write.writeInt(appearance.getGlovesColor());
                 write.writeByte(appearance.getLeftHandTexture());
                 write.writeByte(appearance.getRightHandTexture());
+
+                write.writeInt(npc.getScriptId());
                 break;
             case CLIENT_PLAYER:
             case PLAYER:

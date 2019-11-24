@@ -9,6 +9,7 @@ import lombok.Setter;
 public class NPC extends AiEntity {
 
     private byte faction;
+    private int scriptId;
 
     public EntityAlignment getAlignmentByPlayer(Player player) {
         return player.getReputation().getAlignment(faction);
