@@ -3,7 +3,7 @@ package com.valenguard.server.game.character;
 import com.valenguard.server.Server;
 import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
 import com.valenguard.server.game.PlayerConstants;
-import com.valenguard.server.game.ScreenType;
+import com.valenguard.server.game.UserInterfaceType;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.Location;
@@ -105,7 +105,7 @@ public class CharacterManager {
 
     private void sendToCharacterScreen(ClientHandler clientHandler) {
         // Send player to the character select screen
-        new InitScreenPacketOut(clientHandler, ScreenType.CHARACTER_SELECT).sendPacket();
+        new InitScreenPacketOut(clientHandler, UserInterfaceType.CHARACTER_SELECT).sendPacket();
 
         // Load all basic character information
         List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getAuthenticatedUser().getDatabaseUserId());

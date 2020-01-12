@@ -8,7 +8,7 @@ import com.valenguard.server.database.sql.GamePlayerReputationSQL;
 import com.valenguard.server.game.GameManager;
 import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.PlayerConstants;
-import com.valenguard.server.game.ScreenType;
+import com.valenguard.server.game.UserInterfaceType;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.game.world.maps.GameMap;
@@ -68,7 +68,7 @@ public class PlayerProcessor {
     private void playerWorldJoin(Player player) {
         player.setLoggedInGameWorld(true);
 
-        new InitScreenPacketOut(player.getClientHandler(), ScreenType.GAME).sendPacket();
+        new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
         new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to Valenguard: Retro MMO!").sendPacket();
 
