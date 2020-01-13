@@ -36,8 +36,9 @@ public class NetworkManager {
             eventBus.registerListener(new PlayerTradePacketIn());
             eventBus.registerListener(new ShopPacketIn());
             eventBus.registerListener(new CharacterCreatorPacketIn());
-            eventBus.registerListener(new CharacterSelectPacketIn());
+            eventBus.registerListener(new CharacterDeletePacketIn());
             eventBus.registerListener(new CharacterLogoutPacketIn());
+            eventBus.registerListener(new CharacterSelectPacketIn());
             eventBus.registerListener(new BankManagePacketIn());
             eventBus.registerListener(new AbilityRequestPacketIn());
             eventBus.registerListener(new AdminEditorEntityPacketIn());

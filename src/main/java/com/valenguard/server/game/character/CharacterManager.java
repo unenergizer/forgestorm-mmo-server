@@ -74,8 +74,9 @@ public class CharacterManager {
         sendToCharacterScreen(clientHandler);
     }
 
-    public void deleteCharacter(Player player, int characterId) {
-        // TODO: Soft delete the players character / place deleted flag on character, but do NOT remove entry (for recovery purposes)
+    public void deleteCharacter(ClientHandler clientHandler, byte characterId) {
+        Player player = clientHandler.getLoadedPlayers().get(characterId);
+        new GamePlayerCharacterSQL().softDelete(player);
     }
 
     public void characterLogin(ClientHandler clientHandler, byte characterId) {

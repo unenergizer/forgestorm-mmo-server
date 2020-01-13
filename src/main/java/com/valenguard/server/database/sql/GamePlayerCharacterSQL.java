@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.valenguard.server.util.Log.println;
@@ -122,7 +124,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public List<CharacterDataOut> searchCharacters(int databaseUserId) {
 
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
-        String query = "SELECT character_id, name, hair_texture, hair_color, eye_color, skin_color FROM game_player_characters WHERE user_id = ?";
+        String query = "SELECT character_id, name, hair_texture, hair_color, eye_color, skin_color, is_deleted FROM game_player_characters WHERE user_id = ?";
 
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -137,6 +139,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 int hairColor = resultSet.getInt("hair_color");
                 int eyeColor = resultSet.getInt("eye_color");
                 int skinColor = resultSet.getInt("skin_color");
+                boolean deletedCharacter = resultSet.getBoolean("is_deleted");
 
                 println(PRINT_DEBUG);
                 println(getClass(), "==[ CHARACTER SEARCH ]====================================", false, PRINT_DEBUG);
@@ -145,7 +148,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
                 println(getClass(), "EyeColor: " + eyeColor, false, PRINT_DEBUG);
                 println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
+                println(getClass(), "Deleted? " + deletedCharacter, false, PRINT_DEBUG);
 
+                if (deletedCharacter) continue;
                 characterDataOuts.add(new CharacterDataOut(
                         characterId,
                         name,
@@ -161,6 +166,25 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         }
 
         return characterDataOuts;
+    }
+
+    public void softDelete(Player player) {
+        String query = "UPDATE game_player_characters SET is_deleted=?, delete_date=? WHERE character_id=?";
+
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String characterDeleteDate = simpleDateFormat.format(date);
+
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setString(2, characterDeleteDate);
+            preparedStatement.setInt(3, player.getDatabaseId());
+
+            preparedStatement.execute();
+        } catch (SQLException exe) {
+            exe.printStackTrace();
+        }
     }
 
     public void firstTimeSaveSQL(Player player) {
