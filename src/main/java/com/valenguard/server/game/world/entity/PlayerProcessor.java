@@ -70,7 +70,7 @@ public class PlayerProcessor {
 
         new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
-        new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to Valenguard: Retro MMO!").sendPacket();
+        new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
 
         // Add player to World
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
