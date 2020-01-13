@@ -45,7 +45,7 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
             write.writeByte(appearance.getRightHandTexture());
 
             println(PRINT_DEBUG);
-            println(getClass(), "------------------------------------------");
+            println(getClass(), "------------------------------------------", false, PRINT_DEBUG);
             println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
             println(getClass(), "CharacterIndex: " + index, false, PRINT_DEBUG);
             println(getClass(), "HairTexture: " + appearance.getHairTexture(), false, PRINT_DEBUG);

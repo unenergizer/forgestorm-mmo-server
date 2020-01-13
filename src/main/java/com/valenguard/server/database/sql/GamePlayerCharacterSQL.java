@@ -42,7 +42,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         appearance.setSkinColor(skinColor);
 
         println(PRINT_DEBUG);
-        println(getClass(), "==[ DATABASE LOAD ]====================================");
+        println(getClass(), "==[ DATABASE LOAD ]====================================", false, PRINT_DEBUG);
         println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
         println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
         println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
@@ -71,7 +71,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
 
         println(PRINT_DEBUG);
-        println(getClass(), "==[ DATABASE SAVE ]====================================");
+        println(getClass(), "==[ DATABASE SAVE ]====================================", false, PRINT_DEBUG);
         println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
         println(getClass(), "HairTexture: " + player.getAppearance().getHairTexture(), false, PRINT_DEBUG);
         println(getClass(), "HairColor: " + player.getAppearance().getHairColor(), false, PRINT_DEBUG);
@@ -104,7 +104,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(15, player.getAppearance().getSkinColor());
 
         println(PRINT_DEBUG);
-        println(getClass(), "==[ FIRST TIME SAVE ]====================================");
+        println(getClass(), "==[ FIRST TIME SAVE ]====================================", false, PRINT_DEBUG);
         println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
         println(getClass(), "HairTexture: " + player.getAppearance().getHairTexture(), false, PRINT_DEBUG);
         println(getClass(), "HairColor: " + player.getAppearance().getHairColor(), false, PRINT_DEBUG);
@@ -139,7 +139,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 int skinColor = resultSet.getInt("skin_color");
 
                 println(PRINT_DEBUG);
-                println(getClass(), "==[ CHARACTER SEARCH ]====================================");
+                println(getClass(), "==[ CHARACTER SEARCH ]====================================", false, PRINT_DEBUG);
                 println(getClass(), "Name: " + name, false, PRINT_DEBUG);
                 println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
                 println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
