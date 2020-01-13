@@ -35,8 +35,24 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
 
         if (!attemptCommand(packetData)) {
             // TODO : Use StringBuilder
+
+            ClientHandler messageSender = packetData.getClientHandler();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            if (messageSender.getAuthenticatedUser().isAdmin()) {
+                stringBuilder.append("[RED]");
+            } else if (messageSender.getAuthenticatedUser().isModerator()) {
+                stringBuilder.append("[PURPLE]");
+            } else {
+                stringBuilder.append("[LIGHT_GRAY]");
+            }
+
+            stringBuilder.append(messageSender.getPlayer().getName());
+            stringBuilder.append("[DARK_GRAY]: [WHITE]");
+            stringBuilder.append(packetData.text);
+
             Server.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
-                    new ChatMessagePacketOut(onlinePlayer, packetData.getClientHandler().getPlayer().getName() + ": " + packetData.text).sendPacket());
+                    new ChatMessagePacketOut(onlinePlayer, stringBuilder.toString()).sendPacket());
         }
     }
 
