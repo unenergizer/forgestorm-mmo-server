@@ -1,5 +1,6 @@
 package com.valenguard.server.database.sql;
 
+import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.util.Base64Util;
@@ -54,5 +55,28 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
     @Override
     SqlSearchData searchForData(Player player) {
         return new SqlSearchData("game_player_inventory", "character_id", player.getDatabaseId());
+    }
+
+    public InventorySlot[] databaseLoadAppearance(Player player) {
+        InventorySlot[] inventorySlots = new InventorySlot[0];
+
+        String query = "SELECT equipment FROM game_player_inventory WHERE character_id = ?";
+
+        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, player.getDatabaseId());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String inventory = resultSet.getString("equipment");
+                inventorySlots = (InventorySlot[]) Base64Util.deserializeObjectFromBase64(inventory);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return inventorySlots;
     }
 }

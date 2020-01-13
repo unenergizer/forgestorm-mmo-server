@@ -1,9 +1,14 @@
 package com.valenguard.server.network.game.shared;
 
 import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.database.sql.GamePlayerInventorySQL;
 import com.valenguard.server.game.character.CharacterDataOut;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.WearableItemStack;
+import com.valenguard.server.game.world.item.inventory.EquipmentSlotTypes;
+import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.util.Log;
@@ -56,14 +61,42 @@ public class ClientHandler {
             player.setName(characterDataOut.getName());
             player.setDatabaseId(characterDataOut.getCharacterId());
 
+            // Here we access the players inventory via SQL. Load it in, and get the items the player is wearing.
+            // We could do well here by optimizing this. This inventory is loaded twice.
+            InventorySlot[] playerEquipment = new GamePlayerInventorySQL().databaseLoadAppearance(player);
+
             Appearance appearance = new Appearance(player);
             player.setAppearance(appearance);
+
+            appearance.setHairTexture(characterDataOut.getHeadTexture());
+            appearance.setHelmTexture(getTextureID(playerEquipment, EquipmentSlotTypes.HELM));
+            appearance.setChestTexture(getTextureID(playerEquipment, EquipmentSlotTypes.CHEST));
+            appearance.setPantsTexture(getTextureID(playerEquipment, EquipmentSlotTypes.PANTS));
+            appearance.setShoesTexture(getTextureID(playerEquipment, EquipmentSlotTypes.BOOTS));
             appearance.setHairTexture(characterDataOut.getHeadTexture());
             appearance.setHairColor(characterDataOut.getHairColor());
             appearance.setEyeColor(characterDataOut.getEyeColor());
             appearance.setSkinColor(characterDataOut.getSkinColor());
+            // TODO : Send glove data/color?
+            appearance.setLeftHandTexture(getTextureID(playerEquipment, EquipmentSlotTypes.WEAPON));
+            appearance.setRightHandTexture(getTextureID(playerEquipment, EquipmentSlotTypes.SHIELD));
 
             loadedPlayers.put(i, player);
+        }
+    }
+
+    private byte getTextureID(InventorySlot[] playerEquipment, EquipmentSlotTypes equipmentSlotTypes) {
+        if (playerEquipment.length == 0) {
+            // This is a hacky fix. When a new character is created, they will not yet
+            // have an Equipment inventory to load from. Thus the size of the array is 0.
+            // This prevents an ArrayOutOfBoundsException.
+            return -1;
+        }
+        ItemStack itemStack = playerEquipment[equipmentSlotTypes.getSlotIndex()].getItemStack();
+        if (itemStack == null) {
+            return -1;
+        } else {
+            return ((WearableItemStack) itemStack).getTextureId();
         }
     }
 
