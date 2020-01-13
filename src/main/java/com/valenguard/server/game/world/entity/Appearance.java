@@ -24,9 +24,9 @@ public class Appearance {
     private byte chestTexture = -1;
     private byte pantsTexture = -1;
     private byte shoesTexture = -1;
-    private int hairColor = Color.rgba8888(ColorList.CORAL.getColor());
-    private int eyeColor = Color.rgba8888(ColorList.ROYAL.getColor());
-    private int skinColor = Color.rgba8888(ColorList.PLAYER_DEFAULT.getColor());
+    private Integer hairColor;
+    private Integer eyeColor;
+    private Integer skinColor;
     private int glovesColor = Color.rgba8888(ColorList.CLEAR.getColor());
     private byte leftHandTexture = -1;
     private byte rightHandTexture = -1;

@@ -1,33 +1,35 @@
 package com.valenguard.server.network.game.packet.in;
 
 import com.valenguard.server.Server;
-import com.valenguard.server.game.character.CharacterClasses;
-import com.valenguard.server.game.character.CharacterGenders;
 import com.valenguard.server.game.character.CharacterManager;
-import com.valenguard.server.game.character.CharacterRaces;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
-import com.valenguard.server.util.ColorList;
 import lombok.AllArgsConstructor;
+
+import static com.valenguard.server.util.Log.println;
 
 @AllowNullPlayer
 @Opcode(getOpcode = Opcodes.CHARACTER_CREATOR)
 public class CharacterCreatorPacketIn implements PacketListener<CharacterCreatorPacketIn.NewCharacterDataPacket> {
 
+    private static final boolean PRINT_DEBUG = false;
+
     @Override
-    public PacketData decodePacket(ClientHandler clientHandler) {
+    public NewCharacterDataPacket decodePacket(ClientHandler clientHandler) {
 
-        byte characterClass = clientHandler.readByte();
-        byte characterGender = clientHandler.readByte();
-        byte characterRace = clientHandler.readByte();
-        byte characterColor = clientHandler.readByte();
         String characterName = clientHandler.readString();
+        byte hairTexture = clientHandler.readByte();
+        byte hairColor = clientHandler.readByte();
+        byte eyeColor = clientHandler.readByte();
+        byte skinColor = clientHandler.readByte();
 
-        return new NewCharacterDataPacket(CharacterClasses.getType(characterClass),
-                CharacterGenders.getType(characterGender),
-                CharacterRaces.getType(characterRace),
-                ColorList.getType(characterColor),
-                characterName);
+        println(getClass(), "Name: " + characterName, false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + hairColor + " (Ordinal)", false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + eyeColor + " (Ordinal)", false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinColor + " (Ordinal)", false, PRINT_DEBUG);
+
+        return new NewCharacterDataPacket(characterName, hairTexture, hairColor, eyeColor, skinColor);
     }
 
     @Override
@@ -49,11 +51,11 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
             // Character name is unique, allow creation
             Server.getInstance().getCharacterManager().createCharacter(
                     packetData.getClientHandler(),
-                    packetData.characterClass,
-                    packetData.characterGender,
-                    packetData.characterRace,
-                    packetData.characterColor,
-                    packetData.characterName);
+                    packetData.characterName,
+                    packetData.hairTexture,
+                    packetData.hairColor,
+                    packetData.eyeColor,
+                    packetData.skinColor);
         } else {
             // TODO: Character name is not unique, send error response
 //            new CharacterCreatorPacketOut(packetData.getPlayer(), CharacterCreatorErrors.NAME_TAKEN).sendPacket();
@@ -62,10 +64,10 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
 
     @AllArgsConstructor
     class NewCharacterDataPacket extends PacketData {
-        private CharacterClasses characterClass;
-        private CharacterGenders characterGender;
-        private CharacterRaces characterRace;
-        private ColorList characterColor;
         private String characterName;
+        private byte hairTexture;
+        private byte hairColor;
+        private byte eyeColor;
+        private byte skinColor;
     }
 }

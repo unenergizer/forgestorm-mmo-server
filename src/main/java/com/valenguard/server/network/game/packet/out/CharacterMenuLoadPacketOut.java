@@ -7,7 +7,11 @@ import com.valenguard.server.network.game.shared.Opcodes;
 
 import java.util.Map;
 
+import static com.valenguard.server.util.Log.println;
+
 public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
+
+    private static final boolean PRINT_DEBUG = false;
 
     public CharacterMenuLoadPacketOut(ClientHandler clientHandler) {
         super(Opcodes.CHARACTERS_MENU_LOAD, clientHandler);
@@ -39,6 +43,22 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
             write.writeInt(appearance.getGlovesColor());
             write.writeByte(appearance.getLeftHandTexture());
             write.writeByte(appearance.getRightHandTexture());
+
+            println(PRINT_DEBUG);
+            println(getClass(), "------------------------------------------");
+            println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
+            println(getClass(), "CharacterIndex: " + index, false, PRINT_DEBUG);
+            println(getClass(), "HairTexture: " + appearance.getHairTexture(), false, PRINT_DEBUG);
+            println(getClass(), "HelmTexture: " + appearance.getHelmTexture(), false, PRINT_DEBUG);
+            println(getClass(), "ChestTexture: " + appearance.getChestTexture(), false, PRINT_DEBUG);
+            println(getClass(), "PantsTexture: " + appearance.getPantsTexture(), false, PRINT_DEBUG);
+            println(getClass(), "ShoesTexture: " + appearance.getShoesTexture(), false, PRINT_DEBUG);
+            println(getClass(), "HairColor: " + appearance.getHairColor(), false, PRINT_DEBUG);
+            println(getClass(), "EyeColor: " + appearance.getEyeColor(), false, PRINT_DEBUG);
+            println(getClass(), "SkinColor: " + appearance.getSkinColor(), false, PRINT_DEBUG);
+            println(getClass(), "GlovesColor: " + appearance.getGlovesColor(), false, PRINT_DEBUG);
+            println(getClass(), "LeftHandTexture: " + appearance.getLeftHandTexture(), false, PRINT_DEBUG);
+            println(getClass(), "RightHandTexture: " + appearance.getRightHandTexture(), false, PRINT_DEBUG);
         }
     }
 }

@@ -14,7 +14,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.valenguard.server.util.Log.println;
+
 public class GamePlayerCharacterSQL extends AbstractSingleSQL implements AbstractSQL {
+
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
@@ -26,11 +30,24 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         player.setCurrentMapLocation(new Location(loginLocation));
         player.setFutureMapLocation(new Location(loginLocation));
 
+        byte hairTexture = resultSet.getByte("hair_texture");
+        int hairColor = resultSet.getInt("hair_color");
+        int eyeColor = resultSet.getInt("eye_color");
+        int skinColor = resultSet.getInt("skin_color");
+
         Appearance appearance = player.getAppearance();
-        appearance.setHairTexture(resultSet.getByte("hair_texture"));
-        appearance.setHairColor(resultSet.getInt("hair_color"));
-        appearance.setEyeColor(resultSet.getInt("eye_color"));
-        appearance.setSkinColor(resultSet.getInt("skin_color"));
+        appearance.setHairTexture(hairTexture);
+        appearance.setHairColor(hairColor);
+        appearance.setEyeColor(eyeColor);
+        appearance.setSkinColor(skinColor);
+
+        println(PRINT_DEBUG);
+        println(getClass(), "==[ DATABASE LOAD ]====================================");
+        println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + eyeColor, false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
     }
 
     @Override
@@ -52,6 +69,15 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(11, player.getAppearance().getSkinColor());
         preparedStatement.setInt(12, player.getDatabaseId());
 
+
+        println(PRINT_DEBUG);
+        println(getClass(), "==[ DATABASE SAVE ]====================================");
+        println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + player.getAppearance().getHairTexture(), false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + player.getAppearance().getHairColor(), false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + player.getAppearance().getEyeColor(), false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + player.getAppearance().getSkinColor(), false, PRINT_DEBUG);
+
         return preparedStatement;
     }
 
@@ -63,19 +89,27 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
         preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
-        preparedStatement.setInt(3, player.getCharacterClass().getTypeByte());
-        preparedStatement.setInt(4, player.getCharacterGender().getTypeByte());
-        preparedStatement.setInt(5, player.getCharacterRace().getTypeByte());
-        preparedStatement.setInt(6, player.getFaction());
+        preparedStatement.setByte(3, player.getCharacterClass().getTypeByte());
+        preparedStatement.setByte(4, player.getCharacterGender().getTypeByte());
+        preparedStatement.setByte(5, player.getCharacterRace().getTypeByte());
+        preparedStatement.setByte(6, player.getFaction());
         preparedStatement.setInt(7, player.getCurrentHealth());
         preparedStatement.setString(8, player.getFacingDirection().toString());
         preparedStatement.setString(9, player.getCurrentMapLocation().getMapName());
         preparedStatement.setInt(10, player.getCurrentMapLocation().getX());
         preparedStatement.setInt(11, player.getCurrentMapLocation().getY());
-        preparedStatement.setInt(12, player.getAppearance().getHairTexture());
+        preparedStatement.setByte(12, player.getAppearance().getHairTexture());
         preparedStatement.setInt(13, player.getAppearance().getHairColor());
         preparedStatement.setInt(14, player.getAppearance().getEyeColor());
         preparedStatement.setInt(15, player.getAppearance().getSkinColor());
+
+        println(PRINT_DEBUG);
+        println(getClass(), "==[ FIRST TIME SAVE ]====================================");
+        println(getClass(), "Name: " + player.getName(), false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + player.getAppearance().getHairTexture(), false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + player.getAppearance().getHairColor(), false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + player.getAppearance().getEyeColor(), false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + player.getAppearance().getSkinColor(), false, PRINT_DEBUG);
 
         return preparedStatement;
     }
@@ -99,14 +133,23 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
             while (resultSet.next()) {
                 int characterId = resultSet.getInt("character_id");
                 String name = resultSet.getString("name");
-                byte headId = resultSet.getByte("hair_texture");
+                byte hairTexture = resultSet.getByte("hair_texture");
                 int hairColor = resultSet.getInt("hair_color");
                 int eyeColor = resultSet.getInt("eye_color");
                 int skinColor = resultSet.getInt("skin_color");
+
+                println(PRINT_DEBUG);
+                println(getClass(), "==[ CHARACTER SEARCH ]====================================");
+                println(getClass(), "Name: " + name, false, PRINT_DEBUG);
+                println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
+                println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
+                println(getClass(), "EyeColor: " + eyeColor, false, PRINT_DEBUG);
+                println(getClass(), "SkinColor: " + skinColor, false, PRINT_DEBUG);
+
                 characterDataOuts.add(new CharacterDataOut(
                         characterId,
                         name,
-                        headId,
+                        hairTexture,
                         hairColor,
                         eyeColor,
                         skinColor
@@ -121,6 +164,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     }
 
     public void firstTimeSaveSQL(Player player) {
+
         PreparedStatement preparedStatement = null;
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(player, connection);

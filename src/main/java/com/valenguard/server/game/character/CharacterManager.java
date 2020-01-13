@@ -12,7 +12,10 @@ import com.valenguard.server.network.game.packet.out.CharacterMenuLoadPacketOut;
 import com.valenguard.server.network.game.packet.out.InitClientPrivilegePacketOut;
 import com.valenguard.server.network.game.packet.out.InitScreenPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
-import com.valenguard.server.util.ColorList;
+import com.valenguard.server.util.color.EyeColorList;
+import com.valenguard.server.util.color.HairColorList;
+import com.valenguard.server.util.color.SkinColorList;
+import com.valenguard.server.util.libgdx.Color;
 
 import java.util.List;
 
@@ -20,21 +23,29 @@ import static com.valenguard.server.util.Log.println;
 
 public class CharacterManager {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     public boolean isNameUnique(String name) {
         // TODO: check to make sure the players chosen name is unique
         return true;
     }
 
-    public void createCharacter(ClientHandler clientHandler, CharacterClasses characterClass, CharacterGenders characterGender, CharacterRaces characterRace, ColorList characterColor, String characterName) {
+    public void createCharacter(ClientHandler clientHandler, String characterName, byte hairTexture, byte hairColor, byte eyeColor, byte skinColor) {
         Player player = clientHandler.getPlayer();
 
-        println(getClass(), "Class: " + characterClass.name(), false, PRINT_DEBUG);
-        println(getClass(), "Gender: " + characterGender.name(), false, PRINT_DEBUG);
-        println(getClass(), "Race: " + characterRace.name(), false, PRINT_DEBUG);
-        println(getClass(), "Color: " + characterColor.name(), false, PRINT_DEBUG);
         println(getClass(), "Name: " + characterName, false, PRINT_DEBUG);
+        println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
+        println(getClass(), "HairColor: " + hairColor + " (Ordinal)", false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + eyeColor + " (Ordinal)", false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinColor + " (Ordinal)", false, PRINT_DEBUG);
+
+        int hairValue = Color.rgba8888(HairColorList.getColorFromOrdinal(hairColor));
+        int eyeValue = Color.rgba8888(EyeColorList.getColorFromOrdinal(eyeColor));
+        int skinValue = Color.rgba8888(SkinColorList.getColorFromOrdinal(skinColor));
+
+        println(getClass(), "HairColor: " + hairValue + " (int)", false, PRINT_DEBUG);
+        println(getClass(), "EyeColor: " + eyeValue + " (int)", false, PRINT_DEBUG);
+        println(getClass(), "SkinColor: " + skinValue + " (int)", false, PRINT_DEBUG);
 
         // Set
         player.setName(characterName);
@@ -44,16 +55,16 @@ public class CharacterManager {
         player.setCurrentMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
         player.setFutureMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
 
-        player.setCharacterClass(characterClass);
-        player.setCharacterGender(characterGender);
-        player.setCharacterRace(characterRace);
+        player.setCharacterClass(CharacterClasses.FIGHTER);
+        player.setCharacterGender(CharacterGenders.MALE);
+        player.setCharacterRace(CharacterRaces.HUMAN);
 
         // TODO: Get bodyID and headID from client!
         Appearance appearance = new Appearance(player);
-        appearance.setHairTexture((byte) 0);
-        appearance.setHairColor(-11501569);
-        appearance.setEyeColor(-2004671);
-        appearance.setSkinColor(-3872513);
+        appearance.setHairTexture(hairTexture);
+        appearance.setHairColor(hairValue);
+        appearance.setEyeColor(eyeValue);
+        appearance.setSkinColor(skinValue);
         player.setAppearance(appearance);
 
         // Insert into SQL and then load player defaults!

@@ -13,9 +13,9 @@ public class CharacterDataOut {
     private final int characterId;
     private final String name;
     private final byte headTexture;
-    private final int hairColor;
-    private final int eyeColor;
-    private final int skinColor;
+    private final Integer hairColor;
+    private final Integer eyeColor;
+    private final Integer skinColor;
 
     public CharacterDataOut(int characterId, String name, byte headTexture, int hairColor, int eyeColor, int skinColor) {
         this.characterId = characterId;

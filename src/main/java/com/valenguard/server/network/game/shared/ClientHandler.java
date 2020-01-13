@@ -59,6 +59,8 @@ public class ClientHandler {
             Appearance appearance = new Appearance(player);
             player.setAppearance(appearance);
             appearance.setHairTexture(characterDataOut.getHeadTexture());
+            appearance.setHairColor(characterDataOut.getHairColor());
+            appearance.setEyeColor(characterDataOut.getEyeColor());
             appearance.setSkinColor(characterDataOut.getSkinColor());
 
             loadedPlayers.put(i, player);

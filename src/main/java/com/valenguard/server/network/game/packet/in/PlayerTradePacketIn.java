@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 @Opcode(getOpcode = Opcodes.PLAYER_TRADE)
 public class PlayerTradePacketIn implements PacketListener<PlayerTradePacketIn.TradePacketIn> {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {

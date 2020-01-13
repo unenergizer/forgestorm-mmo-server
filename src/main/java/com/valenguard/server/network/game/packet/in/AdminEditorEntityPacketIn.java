@@ -20,7 +20,7 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.ADMIN_EDITOR_ENTITY)
 public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEntityPacketIn.EntityEditorPacketIn> {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
