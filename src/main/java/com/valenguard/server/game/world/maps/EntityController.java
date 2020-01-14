@@ -1,9 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
-import com.valenguard.server.game.world.entity.AiEntity;
-import com.valenguard.server.game.world.entity.Entity;
-import com.valenguard.server.game.world.entity.EntityType;
-import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.network.game.packet.out.AiEntityDataUpdatePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityDespawnPacketOut;
@@ -75,7 +72,24 @@ public abstract class EntityController<T extends Entity> {
 
             // Send all online players, the entity that just spawned.
             if (!packetReceiver.equals(entityToSpawn)) {
-                new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+
+                // We need to see if the entity to spawn is an ItemStackDrop
+                if (entityToSpawn instanceof ItemStackDrop) {
+                    ItemStackDrop itemStackDrop = (ItemStackDrop) entityToSpawn;
+
+                    // If the item is available to everyone, send it to them.
+                    if (itemStackDrop.isSpawnedForAll()) {
+                        new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                    } else {
+                        // Does this item have an owner? If so, only send them the item.
+                        if (packetReceiver == itemStackDrop.getDropOwner()) {
+                            new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                        }
+                    }
+                } else {
+                    // Entity to spawn is not an ItemStackDrop
+                    new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                }
 
                 // Sending additional information for the AI entity.
                 if (entityToSpawn instanceof AiEntity) {

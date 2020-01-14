@@ -29,7 +29,7 @@ public class GameWorldItemStackDropSQL {
         ItemStack itemStack = Server.getInstance().getItemStackManager().makeItemStack(itemStackId, amount);
 
         itemStackDrop.setSpawnedForAll(true);
-        itemStackDrop.setSpawnedFromDropTable(false);
+        itemStackDrop.setSpawnedFromMonster(false);
         itemStackDrop.setEntityType(EntityType.ITEM_STACK);
         itemStackDrop.setName(itemStack.getName());
         itemStackDrop.setCurrentMapLocation(location);

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.valenguard.server.util.Log.println;
+
 public class GroundItemTimerTask implements AbstractTask {
 
     private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
@@ -26,12 +28,12 @@ public class GroundItemTimerTask implements AbstractTask {
             if (groundItemTimer.itemStackDrop.isPickedUp()) {
                 itemTimerIterator.remove();
             } else {
-                if (groundItemTimer.timePassed > TIME_TO_DESPAWN) {
+                if (groundItemTimer.timePassed == TIME_TO_DESPAWN) {
                     groundItemTimer.itemStackDrop.getGameMap().getItemStackDropEntityController().queueEntityDespawn(groundItemTimer.itemStackDrop);
                     itemTimerIterator.remove();
                 }
 
-                if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed > TIME_TO_SPAWN_TO_ALL) {
+                if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed == TIME_TO_SPAWN_TO_ALL) {
                     for (Player player : groundItemTimer.itemStackDrop.getGameMap().getPlayerController().getPlayerList()) {
                         if (player.equals(groundItemTimer.itemStackDrop.getDropOwner())) continue;
                         new EntitySpawnPacketOut(player, groundItemTimer.itemStackDrop).sendPacket();
@@ -40,10 +42,13 @@ public class GroundItemTimerTask implements AbstractTask {
                 }
                 groundItemTimer.timePassed++;
             }
+            println(getClass(), "ItemStackID: " + groundItemTimer.itemStackDrop.getItemStack().getItemId() + ", TimePassed: " + groundItemTimer.timePassed);
         }
     }
 
     public void addItemToGround(ItemStackDrop itemStackDrop) {
+        // If this item was not spawned by a monster, then we skip this..
+        if (!itemStackDrop.isSpawnedFromMonster()) return;
         groundItemTimers.add(new GroundItemTimer(itemStackDrop));
     }
 

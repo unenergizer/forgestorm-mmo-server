@@ -28,7 +28,12 @@ public class ItemStackDrop extends Entity {
      */
     private boolean spawnedForAll = false;
 
-    private boolean spawnedFromDropTable = true;
+    /**
+     * Denotes if this item was spawned by a monster kill. If it was, we will use a timer to
+     * remove the item from the ground after a certain amount of time. Otherwise we will
+     * assume this is an item from the Database that will spawn every time the server restarts.
+     */
+    private boolean spawnedFromMonster = true;
     private int respawnTimeMin;
     private int respawnTimeMax;
 

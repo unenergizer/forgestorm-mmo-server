@@ -313,6 +313,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 ItemStack itemStack = Server.getInstance().getItemStackManager().makeItemStack(packetData.itemStackId, packetData.amount);
                 itemStackDrop.setItemStack(itemStack);
                 itemStackDrop.setSpawnedForAll(true);
+                itemStackDrop.setSpawnedFromMonster(false);
                 itemStackDrop.setRespawnTimeMin(packetData.respawnTimeMin);
                 itemStackDrop.setRespawnTimeMax(packetData.respawnTimeMax);
                 appearance.setMonsterBodyTexture((byte) itemStack.getItemId());
