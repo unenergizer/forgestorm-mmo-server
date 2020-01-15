@@ -86,9 +86,10 @@ public class CharacterManager {
     }
 
     public void characterLogout(ClientHandler clientHandler) {
+        println(getClass(), "Character Logout Initialized..");
         Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
 
-        sendToCharacterScreen(clientHandler);
+//        sendToCharacterScreen(clientHandler);
     }
 
     public void clientConnect(PlayerSessionData playerSessionData) {
@@ -104,6 +105,8 @@ public class CharacterManager {
     }
 
     public void clientDisconnect(ClientHandler clientHandler) {
+        clientHandler.setPlayerQuitServer(true);
+
         // Make sure we save player data!
         for (Player player : clientHandler.getLoadedPlayers().values()) {
             if (player.isLoggedInGameWorld()) {
@@ -115,7 +118,13 @@ public class CharacterManager {
         clientHandler.closeConnection();
     }
 
-    private void sendToCharacterScreen(ClientHandler clientHandler) {
+    public void sendToCharacterScreen(ClientHandler clientHandler) {
+        println(getClass(), "Sending client to the character screen.");
+
+        // Used when logging out of a character and going to the character screen.
+        clientHandler.getLoadedPlayers().clear();
+        clientHandler.setCurrentPlayerId(null);
+
         // Send player to the character select screen
         new InitScreenPacketOut(clientHandler, UserInterfaceType.CHARACTER_SELECT).sendPacket();
 

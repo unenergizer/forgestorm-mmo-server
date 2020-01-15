@@ -1,6 +1,7 @@
 package com.valenguard.server.network.game.shared;
 
 import com.valenguard.server.database.AuthenticatedUser;
+import com.valenguard.server.database.CharacterSaveProgress;
 import com.valenguard.server.database.sql.GamePlayerInventorySQL;
 import com.valenguard.server.game.character.CharacterDataOut;
 import com.valenguard.server.game.world.entity.Appearance;
@@ -13,6 +14,7 @@ import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.util.Log;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -32,11 +34,25 @@ public class ClientHandler {
     private GameOutputStream gameOutputStream;
     private DataInputStream inputStream;
 
+    /**
+     * If the player is quitting the server, we set this to true.
+     * Otherwise if they logout they are going to the character select screen.
+     * Before we send them data for this screen we need to wait for the database
+     * to finish saving their game progress.
+     */
+    @Setter
+    private boolean playerQuitServer = false;
+
+    /**
+     * This is used to track the stats of the saving the players game progress.
+     */
+    private CharacterSaveProgress characterSaveProgress = new CharacterSaveProgress(this);
+
     @Getter
     private final Map<Byte, Player> loadedPlayers = new HashMap<>();
 
     @Getter
-    private byte currentPlayerId = 0;
+    private Byte currentPlayerId = 0;
 
     public void loadAllPlayers(List<CharacterDataOut> characterDataOutList) {
         for (byte i = 0; i < characterDataOutList.size(); i++) {
@@ -110,7 +126,7 @@ public class ClientHandler {
         return player;
     }
 
-    public void setCurrentPlayerId(byte characterId) {
+    public void setCurrentPlayerId(Byte characterId) {
         currentPlayerId = characterId;
     }
 

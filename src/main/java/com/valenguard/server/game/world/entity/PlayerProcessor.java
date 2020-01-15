@@ -1,6 +1,7 @@
 package com.valenguard.server.game.world.entity;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.database.CharacterSaveProgressType;
 import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
 import com.valenguard.server.database.sql.GamePlayerExperienceSQL;
 import com.valenguard.server.database.sql.GamePlayerInventorySQL;
@@ -39,12 +40,13 @@ public class PlayerProcessor {
     public void processPlayerJoinGameWorld() {
         ClientHandler clientHandler;
         while ((clientHandler = playerJoinServerQueue.poll()) != null) {
-            Player player = playerLoad(clientHandler.getPlayer());
+            Player player = playerLoad(clientHandler);
             playerWorldJoin(player);
         }
     }
 
-    private Player playerLoad(Player player) {
+    private Player playerLoad(ClientHandler clientHandler) {
+        Player player = clientHandler.getPlayer();
 
         // Setting Entity Specific Data
         player.setEntityType(EntityType.PLAYER);
@@ -57,10 +59,10 @@ public class PlayerProcessor {
         player.setMoveSpeed(PlayerConstants.DEFAULT_MOVE_SPEED);
 
         // Setting Player Specific Data
-        new GamePlayerCharacterSQL().loadSQL(player);
-        new GamePlayerInventorySQL().loadSQL(player);
-        new GamePlayerExperienceSQL().loadSQL(player);
-        new GamePlayerReputationSQL().loadSQL(player);
+        new GamePlayerCharacterSQL().loadSQL(clientHandler);
+        new GamePlayerInventorySQL().loadSQL(clientHandler);
+        new GamePlayerExperienceSQL().loadSQL(clientHandler);
+        new GamePlayerReputationSQL().loadSQL(clientHandler);
 
         return player;
     }
@@ -119,17 +121,17 @@ public class PlayerProcessor {
 
             if (player == null) return;
 
-            savePlayer(player);
             playerWorldQuit(player);
+            savePlayer(clientHandler);
         }
         playerQuitServerQueue.clear();
     }
 
-    private void savePlayer(Player player) {
-        new GamePlayerCharacterSQL().saveSQL(player);
-        new GamePlayerInventorySQL().saveSQL(player);
-        new GamePlayerExperienceSQL().saveSQL(player);
-        new GamePlayerReputationSQL().saveSQL(player);
+    private void savePlayer(ClientHandler clientHandler) {
+        new GamePlayerCharacterSQL().saveSQL(clientHandler, CharacterSaveProgressType.CHARACTER_SAVED);
+        new GamePlayerInventorySQL().saveSQL(clientHandler, CharacterSaveProgressType.INVENTORY_SAVED);
+        new GamePlayerExperienceSQL().saveSQL(clientHandler, CharacterSaveProgressType.EXPERIENCE_SAVED);
+        new GamePlayerReputationSQL().saveSQL(clientHandler, CharacterSaveProgressType.REPUTATION_SAVED);
     }
 
     private void playerWorldQuit(Player player) {

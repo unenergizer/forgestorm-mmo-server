@@ -1,7 +1,9 @@
 package com.valenguard.server.database.sql;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.database.CharacterSaveProgressType;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.network.game.shared.ClientHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +23,8 @@ public abstract class AbstractVariantSQL<T> implements AbstractSQL {
     abstract VariantData<T> getVariantData(Player player);
 
     @Override
-    public void loadSQL(Player player) {
+    public void loadSQL(ClientHandler clientHandler) {
+        Player player = clientHandler.getPlayer();
 
         VariantData<T> variantData = getVariantData(player);
         PreparedStatement searchStatement = null;
@@ -74,14 +77,23 @@ public abstract class AbstractVariantSQL<T> implements AbstractSQL {
     }
 
     @Override
-    public void saveSQL(Player player) {
-
+    public void saveSQL(ClientHandler clientHandler, CharacterSaveProgressType saveProgressType) {
+        Player player = clientHandler.getPlayer();
         PreparedStatement[] preparedStatements = null;
+
+        // Track to make sure everything was saved
+        Boolean[] progressSaved = new Boolean[0];
+
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             preparedStatements = databaseSave(player, connection);
-            for (PreparedStatement preparedStatement : preparedStatements) {
-                preparedStatement.execute();
+            progressSaved = new Boolean[preparedStatements.length];
+
+            for (int i = 0; i < preparedStatements.length; i++) {
+
+                // Run prepared statement and save execution progress
+                int sqlSave = preparedStatements[i].executeUpdate();
+                progressSaved[i] = sqlSave > 0;
             }
 
         } catch (SQLException e) {
@@ -96,6 +108,20 @@ public abstract class AbstractVariantSQL<T> implements AbstractSQL {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+
+            // Set to true automatically. If anything returns false, then we set to false.
+            boolean allSaved = true;
+
+            // Test to see if we have any false booleans (unsaved data)
+            for (Boolean b : progressSaved) {
+                if (!b) {
+                    allSaved = false;
+                    break;
+                }
+            }
+
+            // Finally if everything was saved, then we do the following...
+            if (allSaved) clientHandler.getCharacterSaveProgress().saveProgress(saveProgressType);
         }
     }
 }

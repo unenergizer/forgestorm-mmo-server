@@ -1,7 +1,9 @@
 package com.valenguard.server.database.sql;
 
 import com.valenguard.server.Server;
+import com.valenguard.server.database.CharacterSaveProgressType;
 import com.valenguard.server.game.world.entity.Player;
+import com.valenguard.server.network.game.shared.ClientHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +21,8 @@ public abstract class AbstractSingleSQL implements AbstractSQL {
     abstract SqlSearchData searchForData(Player player);
 
     @Override
-    public void loadSQL(Player player) {
+    public void loadSQL(ClientHandler clientHandler) {
+        Player player = clientHandler.getPlayer();
 
         ResultSet resultSet = null;
         PreparedStatement searchStatement = null;
@@ -53,11 +56,14 @@ public abstract class AbstractSingleSQL implements AbstractSQL {
     }
 
     @Override
-    public void saveSQL(Player player) {
+    public void saveSQL(ClientHandler clientHandler, CharacterSaveProgressType saveProgressType) {
+        Player player = clientHandler.getPlayer();
         PreparedStatement preparedStatement = null;
+        boolean saved = false;
         try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = databaseSave(player, connection);
-            preparedStatement.execute();
+            int sqlSave = preparedStatement.executeUpdate();
+            if (sqlSave > 0) saved = true;
         } catch (SQLException exe) {
             exe.printStackTrace();
         } finally {
@@ -68,6 +74,7 @@ public abstract class AbstractSingleSQL implements AbstractSQL {
                     e.printStackTrace();
                 }
             }
+            if (saved) clientHandler.getCharacterSaveProgress().saveProgress(saveProgressType);
         }
     }
 }
