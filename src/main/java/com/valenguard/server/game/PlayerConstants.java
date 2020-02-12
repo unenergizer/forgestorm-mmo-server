@@ -33,7 +33,7 @@ public class PlayerConstants {
     /**
      * Player Starting health points
      */
-    public static final int BASE_HP = 1000;
+    public static final int BASE_HP = 60;
 
     /**
      * Player starting base armor
