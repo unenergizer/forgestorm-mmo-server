@@ -10,8 +10,12 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.valenguard.server.util.Log.println;
+
 @Opcode(getOpcode = Opcodes.INSPECT_PLAYER)
 public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacketIn.InspectPlayerPacket>, PacketInCancelable {
+
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -29,8 +33,10 @@ public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacket
         Player player = Server.getInstance().getGameManager().findPlayer(packetData.entityId);
         if (player != null) {
             new InspectPlayerPacketOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
+            println(getClass(), "Sending inspection data!", false, PRINT_DEBUG);
         } else {
             new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), "[RED]Could not find player.").sendPacket();
+            println(getClass(), "NOT sending inspection data!", false, PRINT_DEBUG);
         }
     }
 

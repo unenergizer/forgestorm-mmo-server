@@ -5,7 +5,11 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.network.game.shared.Opcodes;
 
+import static com.valenguard.server.util.Log.println;
+
 public class InspectPlayerPacketOut extends AbstractServerOutPacket {
+
+    private static final boolean PRINT_DEBUG = false;
 
     private final Player targetPlayer;
 
@@ -26,5 +30,7 @@ public class InspectPlayerPacketOut extends AbstractServerOutPacket {
                 write.writeInt(-1);
             }
         }
+
+        println(getClass(), "Sending inspection packet!", false, PRINT_DEBUG);
     }
 }
