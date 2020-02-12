@@ -13,6 +13,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class GroundItemTimerTask implements AbstractTask {
 
+    private static final boolean PRINT_DEBUG = false;
     private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
     private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min
 
@@ -42,7 +43,7 @@ public class GroundItemTimerTask implements AbstractTask {
                 }
                 groundItemTimer.timePassed++;
             }
-            println(getClass(), "ItemStackID: " + groundItemTimer.itemStackDrop.getItemStack().getItemId() + ", TimePassed: " + groundItemTimer.timePassed);
+            println(getClass(), "ItemStackID: " + groundItemTimer.itemStackDrop.getItemStack().getItemId() + ", TimePassed: " + groundItemTimer.timePassed, false, PRINT_DEBUG);
         }
     }
 
