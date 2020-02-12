@@ -31,6 +31,7 @@ public class AbilityUpdateTask implements AbstractTask {
         aiEntityList.forEach(this::updateCooldowns);
         playerList.forEach(this::updateCooldowns);
 
+        // Update AiEntity
         for (AiEntity aiEntity : aiEntityList) {
             if (aiEntity.getTargetEntity() == null) continue;
 
@@ -45,6 +46,26 @@ public class AbilityUpdateTask implements AbstractTask {
 
             if (targetEntity.getCurrentHealth() <= 0) {
                 processEntityDeath(gameMap, aiEntity, targetEntity);
+            }
+        }
+
+        // Update Player
+        for (Player playerAttacker : playerList) {
+            if (playerAttacker.getTargetEntity() == null) continue;
+
+            MovingEntity targetEntity = playerAttacker.getTargetEntity();
+
+            if (playerAttacker.getCurrentHealth() <= 0) {
+                processEntityDeath(gameMap, targetEntity, playerAttacker);
+            } else {
+                // TODO: Does this need to happen for players? Currently happens in "AbilityRequestPacketIn"
+                // Do Ability combat
+//                Server.getInstance().getAbilityManager().performAiEntityAbility(playerAttacker, targetEntity);
+//                Server.getInstance().getAbilityManager().performPlayerAbility(playerAttacker, targetEntity);
+            }
+
+            if (targetEntity.getCurrentHealth() <= 0) {
+                processEntityDeath(gameMap, playerAttacker, targetEntity);
             }
         }
     }
