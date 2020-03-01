@@ -13,6 +13,7 @@ import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.network.game.packet.out.AbstractServerOutPacket;
 import com.valenguard.server.network.game.packet.out.GameOutputStream;
 import com.valenguard.server.util.Log;
+import com.valenguard.server.util.libgdx.Color;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -93,7 +94,7 @@ public class ClientHandler {
             appearance.setHairColor(characterDataOut.getHairColor());
             appearance.setEyeColor(characterDataOut.getEyeColor());
             appearance.setSkinColor(characterDataOut.getSkinColor());
-            // TODO : Send glove data/color?
+            appearance.setGlovesColor(getColor(playerEquipment, EquipmentSlotTypes.GLOVES));
             appearance.setLeftHandTexture(getTextureID(playerEquipment, EquipmentSlotTypes.WEAPON));
             appearance.setRightHandTexture(getTextureID(playerEquipment, EquipmentSlotTypes.SHIELD));
 
@@ -102,17 +103,34 @@ public class ClientHandler {
     }
 
     private byte getTextureID(InventorySlot[] playerEquipment, EquipmentSlotTypes equipmentSlotTypes) {
+        final int noItem = -1;
         if (playerEquipment.length == 0) {
             // This is a hacky fix. When a new character is created, they will not yet
             // have an Equipment inventory to load from. Thus the size of the array is 0.
             // This prevents an ArrayOutOfBoundsException.
-            return -1;
+            return noItem;
         }
         ItemStack itemStack = playerEquipment[equipmentSlotTypes.getSlotIndex()].getItemStack();
         if (itemStack == null) {
-            return -1;
+            return noItem;
         } else {
             return ((WearableItemStack) itemStack).getTextureId();
+        }
+    }
+
+    private int getColor(InventorySlot[] playerEquipment, EquipmentSlotTypes equipmentSlotTypes) {
+        final int noItem = Color.rgba8888(Color.CLEAR);
+        if (playerEquipment.length == 0) {
+            // This is a hacky fix. When a new character is created, they will not yet
+            // have an Equipment inventory to load from. Thus the size of the array is 0.
+            // This prevents an ArrayOutOfBoundsException.
+            return noItem;
+        }
+        ItemStack itemStack = playerEquipment[equipmentSlotTypes.getSlotIndex()].getItemStack();
+        if (itemStack == null) {
+            return noItem;
+        } else {
+            return ((WearableItemStack) itemStack).getColor();
         }
     }
 

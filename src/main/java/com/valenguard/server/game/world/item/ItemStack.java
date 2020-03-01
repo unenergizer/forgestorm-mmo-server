@@ -53,9 +53,4 @@ public class ItemStack implements Cloneable, Serializable {
     ItemStack generateCloneableInstance() {
         return new ItemStack(itemId);
     }
-
-    @Override
-    public String toString() {
-        return "{ ID = " + itemId + ", Name = " + name + ", Amount = " + amount + " }";
-    }
 }

@@ -5,7 +5,6 @@ import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
 import com.valenguard.server.network.game.packet.out.EntityAppearancePacketOut;
-import com.valenguard.server.util.ColorList;
 import com.valenguard.server.util.libgdx.Color;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,7 @@ import static com.valenguard.server.util.Log.println;
 @Setter
 public class Appearance {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     private byte monsterBodyTexture = -1;
     private byte hairTexture = 0;
@@ -27,7 +26,7 @@ public class Appearance {
     private Integer hairColor;
     private Integer eyeColor;
     private Integer skinColor;
-    private int glovesColor = Color.rgba8888(ColorList.CLEAR.getColor());
+    private int glovesColor = Color.rgba8888(Color.CLEAR);
     private byte leftHandTexture = -1;
     private byte rightHandTexture = -1;
 
@@ -45,17 +44,18 @@ public class Appearance {
 
         if (itemStack != null) {
             println(getClass(), "Equipping non null item and updating appearance!", false, PRINT_DEBUG);
-            println(getClass(), "ItemStack: " + itemStack.toString(), false, PRINT_DEBUG);
 
             if (itemStack instanceof WearableItemStack) {
                 println(getClass(), "Equipping wearable ItemStack!", false, PRINT_DEBUG);
-                setPlayerBody(itemStackType.getAppearanceType(), ((WearableItemStack) itemStack).getTextureId(), sendPacket);
+                WearableItemStack wearableItemStack = (WearableItemStack) itemStack;
+                println(getClass(), "ItemStack: " + wearableItemStack.toString(), false, PRINT_DEBUG);
+                setPlayerBody(wearableItemStack, itemStackType.getAppearanceType(), wearableItemStack.getTextureId(), sendPacket);
             }
         } else {
             println(getClass(), "Unequipping due to null item so the appearance becomes black!", false, PRINT_DEBUG);
 
             if (itemStackType.getAppearanceType() == null) return;
-            setPlayerBody(itemStackType.getAppearanceType(), REMOVE_TEXTURE, sendPacket);
+            setPlayerBody(null, itemStackType.getAppearanceType(), REMOVE_TEXTURE, sendPacket);
         }
 
         if (sendPacket) {
@@ -65,7 +65,7 @@ public class Appearance {
         }
     }
 
-    private void setPlayerBody(AppearanceType appearanceType, byte updateId, boolean sendPacket) {
+    private void setPlayerBody(WearableItemStack itemStack, AppearanceType appearanceType, byte updateId, boolean sendPacket) {
         println(getClass(), "AppearanceType: " + appearanceType + ", UpdateID: " + updateId + ", SendPacket: " + sendPacket, false, PRINT_DEBUG);
         switch (appearanceType) {
             case MONSTER_BODY_TEXTURE:
@@ -96,7 +96,12 @@ public class Appearance {
 //                skinColor = updateId;
                 break;
             case GLOVES_COLOR:
-//                glovesColor = updateId;
+                if (itemStack == null) {
+                    glovesColor = Color.rgba8888(Color.CLEAR);
+                } else {
+                    glovesColor = itemStack.getColor();
+                }
+                println(getClass(), "Gloves: " + glovesColor, false, PRINT_DEBUG);
                 break;
             case LEFT_HAND:
                 leftHandTexture = updateId;
