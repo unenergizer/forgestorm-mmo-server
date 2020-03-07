@@ -98,6 +98,13 @@ public class PlayerProcessor {
             }
         }
 
+        // Send player equipment ItemStacks
+        for (InventorySlot inventorySlot : player.getPlayerHotBar().getInventorySlotArray()) {
+            if (inventorySlot.getItemStack() != null) {
+                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+            }
+        }
+
         // Send other players join message
         for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {

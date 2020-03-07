@@ -10,7 +10,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerMoveInventoryEvents {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     private final Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
 
@@ -23,7 +23,7 @@ public class PlayerMoveInventoryEvents {
         while ((inventoryEvent = inventoryEvents.poll()) != null) {
             InventoryMoveType inventoryMoveType = inventoryEvent.getInventoryMoveType();
             boolean isBankMove = inventoryMoveType.getToWindow() == InventoryType.BANK
-                    || inventoryMoveType.getFromWindow()  == InventoryType.BANK;
+                    || inventoryMoveType.getFromWindow() == InventoryType.BANK;
 
             if (!doesItemStackExist(inventoryEvent.getInventoryMoveType().getFromWindow(), inventoryEvent) ||
                     /* The player is trying to move item in their bank but their bank is not open */
@@ -56,10 +56,13 @@ public class PlayerMoveInventoryEvents {
         PlayerBag playerBag = player.getPlayerBag();
         PlayerBank playerBank = player.getPlayerBank();
         PlayerEquipment playerEquipment = player.getPlayerEquipment();
+        PlayerHotBar playerHotBar = player.getPlayerHotBar();
 
         boolean sendPacket = false;
 
         switch (inventoryEvent.getInventoryMoveType()) {
+
+            // Bag
             case FROM_BAG_TO_BAG:
                 sendPacket = playerBag.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
@@ -69,6 +72,11 @@ public class PlayerMoveInventoryEvents {
             case FROM_BAG_TO_EQUIPMENT:
                 sendPacket = playerEquipment.performItemStackMoveSpecial(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
+            case FROM_BAG_TO_HOT_BAR:
+                sendPacket = playerBag.performItemStackMove(playerHotBar, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+
+            // Bank
             case FROM_BANK_TO_BAG:
                 sendPacket = playerBank.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
@@ -78,6 +86,11 @@ public class PlayerMoveInventoryEvents {
             case FROM_BANK_TO_EQUIPMENT:
                 sendPacket = playerEquipment.performItemStackMoveSpecial(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
+            case FROM_BANK_TO_HOT_BAR:
+                sendPacket = playerBank.performItemStackMove(playerHotBar, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+
+            // Equipment
             case FROM_EQUIPMENT_TO_BAG:
                 sendPacket = playerEquipment.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
@@ -86,6 +99,23 @@ public class PlayerMoveInventoryEvents {
                 break;
             case FROM_EQUIPMENT_TO_EQUIPMENT:
                 sendPacket = playerEquipment.performItemStackMove(playerEquipment, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+            case FROM_EQUIPMENT_TO_HOT_BAR:
+                sendPacket = playerEquipment.performItemStackMove(playerHotBar, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+
+            // HotBar
+            case FROM_HOT_BAR_TO_BAG:
+                sendPacket = playerHotBar.performItemStackMove(playerBag, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+            case FROM_HOT_BAR_TO_BANK:
+                sendPacket = playerHotBar.performItemStackMove(playerBank, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+            case FROM_HOT_BAR_TO_EQUIPMENT:
+                sendPacket = playerEquipment.performItemStackMoveSpecial(playerHotBar, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
+                break;
+            case FROM_HOT_BAR_TO_HOT_BAR:
+                sendPacket = playerHotBar.performItemStackMove(playerHotBar, inventoryEvent.getFromPositionIndex(), inventoryEvent.getToPositionIndex());
                 break;
         }
 
@@ -125,6 +155,8 @@ public class PlayerMoveInventoryEvents {
                 return player.getPlayerBag().getItemStack(fromPosition) != null;
             case BANK:
                 return player.getPlayerBank().getItemStack(fromPosition) != null;
+            case HOT_BAR:
+                return player.getPlayerHotBar().getItemStack(fromPosition) != null;
             default:
                 return false;
         }
@@ -142,6 +174,8 @@ public class PlayerMoveInventoryEvents {
             abstractInventory = player.getPlayerEquipment();
         } else if (fromWindowType == InventoryType.BANK) {
             abstractInventory = player.getPlayerBank();
+        } else if (fromWindowType == InventoryType.HOT_BAR) {
+            abstractInventory = player.getPlayerHotBar();
         }
 
         if (abstractInventory == null) {

@@ -10,6 +10,7 @@ import com.valenguard.server.game.rpg.skills.Skills;
 import com.valenguard.server.game.world.item.inventory.PlayerBag;
 import com.valenguard.server.game.world.item.inventory.PlayerBank;
 import com.valenguard.server.game.world.item.inventory.PlayerEquipment;
+import com.valenguard.server.game.world.item.inventory.PlayerHotBar;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
@@ -39,6 +40,7 @@ public class Player extends MovingEntity {
     private final PlayerBag playerBag = new PlayerBag(this);
     private final PlayerBank playerBank = new PlayerBank(this);
     private final PlayerEquipment playerEquipment = new PlayerEquipment(this);
+    private final PlayerHotBar playerHotBar = new PlayerHotBar(this);
     private final Reputation reputation = new Reputation(this);
     private final Deque<Location> latestMoveRequests = new LinkedList<>();
 

@@ -40,6 +40,7 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
             case SET_BAG:
             case SET_BANK:
             case SET_EQUIPMENT:
+            case SET_HOT_BAR:
                 write.writeByte(inventoryActions.getSlotIndex());
                 write.writeInt(inventoryActions.getItemStack().getItemId());
                 write.writeInt(inventoryActions.getItemStack().getAmount());

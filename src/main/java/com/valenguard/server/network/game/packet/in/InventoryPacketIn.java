@@ -11,6 +11,8 @@ import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
+import static com.valenguard.server.util.Log.println;
+
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
 public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
 
@@ -83,9 +85,17 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         InventoryType fromWindow = InventoryType.values()[packetData.fromWindow];
         InventoryType toWindow = InventoryType.values()[packetData.toWindow];
 
-        if (!doesNotExceedInventoryLimit(fromWindow, toWindow, packetData)) return;
+        println(getClass(), "FROM WINDOW => " + fromWindow);
+        println(getClass(), "TO WINDOW => " + toWindow);
+
+        if (!doesNotExceedInventoryLimit(fromWindow, toWindow, packetData)) {
+            println(getClass(), "doesNotExceedInventoryLimit: true!");
+            return;
+        }
 
         InventoryMoveType inventoryMoveType = InventoryMovementUtil.getWindowMovementInfo(fromWindow, toWindow);
+
+        System.out.println("what we are moving: " + inventoryMoveType);
 
         PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
         playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getClientHandler().getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
@@ -131,7 +141,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             return;
         }
 
-        if (inventoryType != InventoryType.EQUIPMENT && inventoryType != InventoryType.BANK) {
+        if (inventoryType == InventoryType.BAG_1) {
 
             ItemStack itemStack = player.getPlayerBag().getItemStack(packetData.slotIndex);
 
@@ -151,11 +161,11 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
 
-        if (!doesNotExceedInventoryLimit(fromWindow, packetData.fromWindow)) {
+        if (!doesNotExceedInventoryLimit(fromWindow, packetData.fromPosition)) {
             return false;
         }
 
-        if (!doesNotExceedInventoryLimit(toWindow, packetData.toWindow)) {
+        if (!doesNotExceedInventoryLimit(toWindow, packetData.toPosition)) {
             return false;
         }
 
@@ -169,6 +179,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             return slotIndex < InventoryConstants.EQUIPMENT_SIZE && slotIndex >= 0;
         } else if (inventoryType == InventoryType.BANK) {
             return slotIndex < InventoryConstants.BANK_SIZE && slotIndex >= 0;
+        } else if (inventoryType == InventoryType.HOT_BAR) {
+            return slotIndex < InventoryConstants.HOT_BAR_SIZE && slotIndex >= 0;
         }
         return true;
     }
