@@ -114,11 +114,11 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
             } else {
                 // Giving the player the ItemStack of gold since they don't have any gold on them.
-                playerBag.giveItemStack(itemStack, true);
+                player.give(itemStack, true);
             }
         } else {
             // Send the player the item
-            playerBag.giveItemStack(itemStack, true);
+            player.give(itemStack, true);
         }
 
     }

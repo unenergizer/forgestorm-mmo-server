@@ -17,8 +17,7 @@ public class EntityShopManager {
     // TODO: add playerSellItemStack functionality
 
     public void playerBuyItemStack(short shopID, short shopSlot, Player player) {
-        InventorySlot inventorySlot = player.getPlayerBag().getGoldInventorySlot();
-        if (inventorySlot == null) return; // The player has no gold.
+        List<InventorySlot> goldSlots = player.getAllGoldSlots();
 
         // Make sure the player can only buy items within a certain distance.
         if (!player.getCurrentShoppingEntity().getFutureMapLocation().isWithinDistance(player, GameConstants.MAX_SHOP_DISTANCE)) {
@@ -33,21 +32,52 @@ public class EntityShopManager {
         int itemId = shopItemStackInfo.getItemId();
 
         // The player cannot buy items if they don't have the space for the item.
-        if (player.getPlayerBag().isInventoryFull()) return;
+        boolean bagFull = player.getPlayerBag().isInventoryFull();
+        boolean hotBarFull = player.getPlayerHotBar().isInventoryFull();
+        if (bagFull && hotBarFull) return;
 
         // The player does not have enough gold.
-        if (buyPrice > inventorySlot.getItemStack().getAmount()) return;
-
-        ItemStack newGoldStack = inventorySlot.getItemStack();
-        newGoldStack.setAmount(newGoldStack.getAmount() - buyPrice);
-
-        // Only adding the gold stack back if it is greater than zero.
-        if (newGoldStack.getAmount() > 0) {
-            player.getPlayerBag().setItemStack(inventorySlot.getSlotIndex(), newGoldStack, true);
-        } else {
-            player.getPlayerBag().removeItemStack(inventorySlot.getSlotIndex(), true);
+        if (buyPrice > getGoldAmount(goldSlots)) {
+            System.out.println("DO NOT HAVE ENOUGH GOLD");
+            System.out.println("BUY PRICE: " + buyPrice);
+            System.out.println("GOLD AMOUNT: " + getGoldAmount(goldSlots));
+            return;
         }
 
-        player.getPlayerBag().giveItemStack(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true);
+        removeGold(goldSlots, buyPrice);
+
+        player.give(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true);
+    }
+
+    private void removeGold(List<InventorySlot> goldSlots, final int buyPrice) {
+        int runningTotal = 0;
+
+        // 100
+        // 0
+        // 101
+        //
+
+        for (InventorySlot slot : goldSlots) {
+            int stackAmount = slot.getItemStack().getAmount();
+            if (buyPrice - runningTotal >= stackAmount) {
+                runningTotal += slot.getItemStack().getAmount();
+                slot.getInventory().removeItemStack(slot.getSlotIndex(), true);
+                System.out.println("WE REMOVING FOR TYPE: " + slot.getInventory().getInventoryType());
+                if (runningTotal == buyPrice) break;
+            } else {
+                ItemStack newGoldStack = slot.getItemStack();
+                newGoldStack.setAmount(stackAmount - (buyPrice - runningTotal));
+                slot.getInventory().setItemStack(slot.getSlotIndex(), newGoldStack, true);
+                break;
+            }
+        }
+    }
+
+    private int getGoldAmount(List<InventorySlot> goldSlots) {
+        int total = 0;
+        for (InventorySlot slot : goldSlots) {
+            total += slot.getItemStack().getAmount();
+        }
+        return total;
     }
 }

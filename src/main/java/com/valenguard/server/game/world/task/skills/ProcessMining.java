@@ -96,7 +96,7 @@ public class ProcessMining implements AbstractTask {
                         player
                 ));
             } else {
-                player.getPlayerBag().giveItemStack(giveItemStack, true);
+                player.give(giveItemStack, true);
             }
 
             clickedEntity.setUsedThisTick(true);

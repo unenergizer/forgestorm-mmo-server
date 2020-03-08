@@ -4,7 +4,12 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackManager;
+import com.valenguard.server.game.world.item.ItemStackType;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public abstract class AbstractInventory {
@@ -22,15 +27,22 @@ public abstract class AbstractInventory {
         // Setup inventory slots
         inventorySlotArray = new InventorySlot[inventorySize];
         for (byte slotIndex = 0; slotIndex < inventorySlotArray.length; slotIndex++) {
-            inventorySlotArray[slotIndex] = new InventorySlot(slotIndex);
+            inventorySlotArray[slotIndex] = new InventorySlot(this, slotIndex);
         }
     }
 
-    public abstract void giveItemStack(final ItemStack itemStack, boolean sendPacket);
+    public void removeItemStack(final byte slotIndex, boolean sendPacket) {
+        inventorySlotArray[slotIndex].setItemStack(null);
+        if (sendPacket)
+            new InventoryPacketOut(inventoryOwner, new InventoryActions().remove(inventoryType, slotIndex)).sendPacket();
+    }
 
-    public abstract void removeItemStack(final byte slotIndex, boolean sendPacket);
-
-    public abstract void setItemStack(final byte slotIndex, final ItemStack itemStack, boolean sendPacket);
+    public void setItemStack(final byte slotIndex, final ItemStack itemStack, boolean sendPacket) {
+        inventorySlotArray[slotIndex].setItemStack(itemStack);
+        if (sendPacket) {
+            new InventoryPacketOut(inventoryOwner, new InventoryActions().set(inventoryType, slotIndex, itemStack)).sendPacket();
+        }
+    }
 
     public void setInventory(InventorySlot[] inventoryStacks) {
         if (inventoryStacks == null) return;
@@ -71,7 +83,7 @@ public abstract class AbstractInventory {
         return true;
     }
 
-    InventorySlot findEmptySlot() {
+    public InventorySlot findEmptySlot() {
         for (InventorySlot inventorySlot : inventorySlotArray) {
             if (inventorySlot.getItemStack() == null) return inventorySlot;
         }
@@ -88,5 +100,17 @@ public abstract class AbstractInventory {
             if (inventorySlot.getItemStack() != null) takenSlots++;
         }
         return takenSlots;
+    }
+
+    public List<InventorySlot> getGoldSlots() {
+        List<InventorySlot> slots = new ArrayList<>();
+        for (InventorySlot inventorySlot : inventorySlotArray) {
+            ItemStack itemStack = inventorySlot.getItemStack();
+            if (itemStack == null) continue;
+            if (itemStack.getItemStackType() == ItemStackType.GOLD) {
+                slots.add(inventorySlot);
+            }
+        }
+        return slots;
     }
 }

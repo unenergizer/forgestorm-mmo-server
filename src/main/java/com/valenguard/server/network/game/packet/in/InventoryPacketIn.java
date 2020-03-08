@@ -128,7 +128,6 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         } else if (inventoryType == InventoryType.EQUIPMENT) {
 
 
-
         }
     }
 
@@ -151,8 +150,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
             itemStackConsumerManager.consumeItem(player, itemStack);
 
-            new InventoryPacketOut(player, new InventoryActions(
-                    InventoryActions.ActionType.CONSUME,
+            new InventoryPacketOut(player, new InventoryActions().consume(
                     packetData.interactInventory,
                     packetData.slotIndex
             )).sendPacket();
@@ -160,15 +158,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
-
-        if (!doesNotExceedInventoryLimit(fromWindow, packetData.fromPosition)) {
-            return false;
-        }
-
-        if (!doesNotExceedInventoryLimit(toWindow, packetData.toPosition)) {
-            return false;
-        }
-
+        if (!doesNotExceedInventoryLimit(fromWindow, packetData.fromPosition)) return false;
+        if (!doesNotExceedInventoryLimit(toWindow, packetData.toPosition)) return false;
         return true;
     }
 

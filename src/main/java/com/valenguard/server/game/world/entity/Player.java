@@ -7,24 +7,20 @@ import com.valenguard.server.game.character.CharacterGenders;
 import com.valenguard.server.game.character.CharacterRaces;
 import com.valenguard.server.game.rpg.Reputation;
 import com.valenguard.server.game.rpg.skills.Skills;
-import com.valenguard.server.game.world.item.inventory.PlayerBag;
-import com.valenguard.server.game.world.item.inventory.PlayerBank;
-import com.valenguard.server.game.world.item.inventory.PlayerEquipment;
-import com.valenguard.server.game.world.item.inventory.PlayerHotBar;
+import com.valenguard.server.game.world.item.ItemStack;
+import com.valenguard.server.game.world.item.inventory.*;
 import com.valenguard.server.game.world.maps.Location;
 import com.valenguard.server.game.world.maps.MoveDirection;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.EntityHealPacketOut;
+import com.valenguard.server.network.game.packet.out.InventoryPacketOut;
 import com.valenguard.server.network.game.packet.out.MovingEntityTeleportPacketOut;
 import com.valenguard.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 import static com.valenguard.server.util.Log.println;
 
@@ -123,5 +119,31 @@ public class Player extends MovingEntity {
         setCurrentHealth(getMaxHealth());
 
         new ChatMessagePacketOut(this, "You died! Respawning you in graveyard!").sendPacket();
+    }
+
+    public List<InventorySlot> getAllGoldSlots() {
+        List<InventorySlot> bagSlots = playerBag.getGoldSlots();
+        List<InventorySlot> hotBarSlots = playerHotBar.getGoldSlots();
+        bagSlots.addAll(hotBarSlots);
+        return bagSlots;
+    }
+
+    public void give(ItemStack itemStack, boolean sendPacket) {
+        InventorySlot slot = null;
+
+        slot = playerBag.findEmptySlot();
+        if (slot == null) {
+            slot = playerHotBar.findEmptySlot();
+        }
+
+        if (slot == null) {
+            throw new RuntimeException("The inventory size should be checked before giving items.");
+        }
+
+        slot.setItemStack(itemStack);
+        if (sendPacket) {
+            new InventoryPacketOut(this, new InventoryActions()
+                    .set(slot.getInventory().getInventoryType(), slot.getSlotIndex(), itemStack)).sendPacket();
+        }
     }
 }

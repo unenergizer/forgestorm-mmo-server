@@ -12,6 +12,7 @@ import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.UserInterfaceType;
 import com.valenguard.server.game.world.item.inventory.InventoryActions;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
+import com.valenguard.server.game.world.item.inventory.InventoryType;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.Warp;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
@@ -80,28 +81,28 @@ public class PlayerProcessor {
         // Send player bag ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBag().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_BAG, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.BAG_1, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player bank ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBank().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_BANK, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.BANK, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player equipment ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerEquipment().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player equipment ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerHotBar().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOut(player, new InventoryActions(InventoryActions.ActionType.SET_HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 

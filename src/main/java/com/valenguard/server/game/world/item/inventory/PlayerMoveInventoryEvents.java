@@ -30,12 +30,13 @@ public class PlayerMoveInventoryEvents {
                     (isBankMove && !inventoryEvent.getPlayer().isBankOpen())) {
 
                 // Sending back a response to the client telling them not to move anything.
-                new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions(
-                        inventoryEvent.getInventoryMoveType().getFromWindow(),
-                        inventoryEvent.getInventoryMoveType().getFromWindow(),
-                        inventoryEvent.getFromPositionIndex(),
-                        inventoryEvent.getFromPositionIndex()
-                )).sendPacket();
+                new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions()
+                        .move(
+                                inventoryEvent.getInventoryMoveType().getFromWindow(),
+                                inventoryEvent.getInventoryMoveType().getToWindow(),
+                                inventoryEvent.getFromPositionIndex(),
+                                inventoryEvent.getFromPositionIndex()
+                        )).sendPacket();
 
                 continue;
             }
@@ -133,7 +134,7 @@ public class PlayerMoveInventoryEvents {
         println(getClass(), "ToIndex: " + inventoryEvent.getToPositionIndex(), false, PRINT_DEBUG);
 
         // Perform client move
-        new InventoryPacketOut(player, new InventoryActions(
+        new InventoryPacketOut(player, new InventoryActions().move(
                 inventoryEvent.getInventoryMoveType().getFromWindow(),
                 inventoryEvent.getInventoryMoveType().getToWindow(),
                 inventoryEvent.getFromPositionIndex(),

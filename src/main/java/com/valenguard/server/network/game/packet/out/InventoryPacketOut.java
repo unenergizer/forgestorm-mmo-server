@@ -30,17 +30,12 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
                 break;
             case USE:
                 break;
-            case GIVE:
-                write.writeInt(inventoryActions.getItemStack().getItemId());
-                write.writeInt(inventoryActions.getItemStack().getAmount());
-                break;
             case REMOVE:
+                write.writeByte(inventoryActions.getInteractInventory());
                 write.writeByte(inventoryActions.getSlotIndex());
                 break;
-            case SET_BAG:
-            case SET_BANK:
-            case SET_EQUIPMENT:
-            case SET_HOT_BAR:
+            case SET:
+                write.writeByte(inventoryActions.getInteractInventory());
                 write.writeByte(inventoryActions.getSlotIndex());
                 write.writeInt(inventoryActions.getItemStack().getItemId());
                 write.writeInt(inventoryActions.getItemStack().getAmount());

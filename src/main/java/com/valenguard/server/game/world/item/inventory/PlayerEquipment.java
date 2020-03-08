@@ -141,16 +141,6 @@ public class PlayerEquipment extends AbstractInventory {
     }
 
     @Override
-    public void giveItemStack(ItemStack itemStack, boolean sendPacket) {
-        // TODO
-    }
-
-    @Override
-    public void removeItemStack(byte positionIndex, boolean sendPacket) {
-        // TODO
-    }
-
-    @Override
     public void setItemStack(byte slotIndex, ItemStack itemStack, boolean sendPacket) {
         if (sendPacket) println(getClass(), "Primarily used by SQL. Do not send packets now!", true);
         inventorySlotArray[slotIndex].setItemStack(itemStack);

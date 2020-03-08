@@ -487,7 +487,7 @@ public class TradeManager {
 
         // Send the trade starter the target player items
         for (ItemStack itemStack : itemsToAdd) {
-            playerToUpdate.getPlayerBag().giveItemStack(itemStack, true);
+            playerToUpdate.give(itemStack, true);
         }
     }
 

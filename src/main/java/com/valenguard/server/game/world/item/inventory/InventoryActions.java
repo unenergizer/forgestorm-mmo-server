@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class InventoryActions {
 
-    private final ActionType inventoryActionType;
+    private ActionType inventoryActionType;
     private ItemStack itemStack;
     private byte slotIndex;
     private byte fromPosition;
@@ -16,34 +16,34 @@ public class InventoryActions {
     private byte toWindow;
     private byte interactInventory;
 
-    InventoryActions(ItemStack itemStack) {
-        this.inventoryActionType = InventoryActions.ActionType.GIVE;
-        this.itemStack = new ItemStack(itemStack);
-    }
-
-    public InventoryActions(ActionType inventoryActionType, byte slotIndex, ItemStack itemStack) {
-        this.inventoryActionType = inventoryActionType;
-        this.itemStack = new ItemStack(itemStack);
-        this.slotIndex = slotIndex;
-    }
-
-    public InventoryActions(ActionType inventoryActionType, byte interactInventory, byte slotIndex) {
-        this.inventoryActionType = inventoryActionType;
-        this.interactInventory = interactInventory;
-        this.slotIndex = slotIndex;
-    }
-
-    InventoryActions(byte slotIndex) {
+    public InventoryActions remove(InventoryType interactInventory, byte slotIndex) {
         this.inventoryActionType = InventoryActions.ActionType.REMOVE;
         this.slotIndex = slotIndex;
+        this.interactInventory = interactInventory.getInventoryTypeIndex();
+        return this;
     }
 
-    InventoryActions(InventoryType fromWindow, InventoryType toWindow, byte fromPosition, byte toPosition) {
+    public InventoryActions move(InventoryType fromWindow, InventoryType toWindow, byte fromPosition, byte toPosition) {
         this.inventoryActionType = InventoryActions.ActionType.MOVE;
         this.fromWindow = fromWindow.getInventoryTypeIndex();
         this.toWindow = toWindow.getInventoryTypeIndex();
         this.fromPosition = fromPosition;
         this.toPosition = toPosition;
+        return this;
+    }
+
+    public InventoryActions set(InventoryType interactInventory, byte slotIndex, ItemStack itemStack) {
+        this.inventoryActionType = InventoryActions.ActionType.SET;
+        this.interactInventory = interactInventory.getInventoryTypeIndex();
+        this.slotIndex = slotIndex;
+        this.itemStack = itemStack;
+        return this;
+    }
+
+    public InventoryActions consume(byte interactInventory, byte slotIndex) {
+        this.interactInventory = interactInventory;
+        this.slotIndex = slotIndex;
+        return this;
     }
 
     @Getter
@@ -64,12 +64,8 @@ public class InventoryActions {
         /**
          * SERVER -> CLIENT
          */
-        GIVE((byte) 0x04),
-        REMOVE((byte) 0x05),
-        SET_BAG((byte) 0x06),
-        SET_BANK((byte) 0x07),
-        SET_EQUIPMENT((byte) 0x08),
-        SET_HOT_BAR((byte) 0x09);
+        REMOVE((byte) 0x04),
+        SET((byte) 0x05);
 
         private byte getActionType;
 
