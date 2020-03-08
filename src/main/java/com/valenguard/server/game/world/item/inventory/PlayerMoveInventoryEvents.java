@@ -10,7 +10,7 @@ import static com.valenguard.server.util.Log.println;
 
 public class PlayerMoveInventoryEvents {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     private final Queue<InventoryEvent> inventoryEvents = new LinkedList<>();
 

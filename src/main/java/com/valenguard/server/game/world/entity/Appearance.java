@@ -15,7 +15,7 @@ import static com.valenguard.server.util.Log.println;
 @Setter
 public class Appearance {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     private byte monsterBodyTexture = -1;
     private byte hairTexture = 0;

@@ -16,6 +16,8 @@ import static com.valenguard.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.INVENTORY_UPDATE)
 public class InventoryPacketIn implements PacketListener<InventoryPacketIn.InventoryActionsPacket> {
 
+    private static final boolean PRINT_DEBUG = false;
+
     private ItemStackConsumerManager itemStackConsumerManager = new ItemStackConsumerManager();
 
     @Override
@@ -85,17 +87,17 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         InventoryType fromWindow = InventoryType.values()[packetData.fromWindow];
         InventoryType toWindow = InventoryType.values()[packetData.toWindow];
 
-        println(getClass(), "FROM WINDOW => " + fromWindow);
-        println(getClass(), "TO WINDOW => " + toWindow);
+        println(getClass(), "FROM WINDOW => " + fromWindow, false, PRINT_DEBUG);
+        println(getClass(), "TO WINDOW => " + toWindow, false, PRINT_DEBUG);
 
         if (!doesNotExceedInventoryLimit(fromWindow, toWindow, packetData)) {
-            println(getClass(), "doesNotExceedInventoryLimit: true!");
+            println(getClass(), "doesNotExceedInventoryLimit: true!", false, PRINT_DEBUG);
             return;
         }
 
         InventoryMoveType inventoryMoveType = InventoryMovementUtil.getWindowMovementInfo(fromWindow, toWindow);
 
-        System.out.println("what we are moving: " + inventoryMoveType);
+        println(getClass(), "InventoryMoveType: " + inventoryMoveType, false, PRINT_DEBUG);
 
         PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
         playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getClientHandler().getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
