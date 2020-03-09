@@ -69,27 +69,35 @@ public class GameMapProcessor {
 
         for (File file : files) {
             String mapName = file.getName().replace(".tmx", "");
-            gameMaps.put(mapName, TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
+            loadMap(TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
         }
 
         println(getClass(), "Tmx Maps Loaded: " + files.length);
         fixWarpHeights();
     }
 
+    public void loadMap(GameMap gameMap) {
+        gameMaps.put(gameMap.getMapName(), gameMap);
+    }
+
     public void getEntitiesFromDatabase() {
         println(getClass(), "Loading entities from database has started...");
         for (GameMap gameMap : gameMaps.values()) {
-            int npcSize = loadNPC(gameMap);
-            int monsterSize = loadMonster(gameMap);
-            int itemStackDropSize = loadItemStackDrop(gameMap);
-            int entityTotal = npcSize + monsterSize + itemStackDropSize;
-            println(getClass(), "Map:" + gameMap.getMapName() +
-                    ", NPCs Total: " + npcSize +
-                    ", Monsters Total: " + monsterSize +
-                    ", ItemStackDrop Total: " + itemStackDropSize +
-                    ", Entity Total: " + entityTotal);
+            loadEntities(gameMap);
         }
         println(getClass(), "Loading entities from database finished!");
+    }
+
+    public void loadEntities(GameMap gameMap) {
+        int npcSize = loadNPC(gameMap);
+        int monsterSize = loadMonster(gameMap);
+        int itemStackDropSize = loadItemStackDrop(gameMap);
+        int entityTotal = npcSize + monsterSize + itemStackDropSize;
+        println(getClass(), "Map:" + gameMap.getMapName() +
+                ", NPCs Total: " + npcSize +
+                ", Monsters Total: " + monsterSize +
+                ", ItemStackDrop Total: " + itemStackDropSize +
+                ", Entity Total: " + entityTotal);
     }
 
     public int loadNPC(GameMap gameMap) {
