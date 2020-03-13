@@ -42,7 +42,7 @@ public class MapCommands {
         }
 
         GameMap gameMap = new GameMap(mapName, width, height, tiles); //teleport <playerName> <mapName> <x> <y>
-        gameMapProcessor.loadMap(mapName, gameMap);
+        gameMapProcessor.loadMap(gameMap);
         gameMapProcessor.loadEntities(gameMap);
         new ChatMessagePacketOut(commandSource.getPlayer(), "[GREEN]Map " + mapName + " was successfully created. Use the following command to warp to the map").sendPacket();
         new ChatMessagePacketOut(commandSource.getPlayer(), "[YELLOW] /teleport " + commandSource.getPlayer().getName() + " " + mapName + " 0 0").sendPacket();
