@@ -76,6 +76,14 @@ public class PlayerProcessor {
         new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
 
         // Add player to World
+        if (player.getGameMap() == null) {
+            // If the game map returns null here, we are trying to
+            // add the player to a world that no longer exists.
+            // Instead let's send them to the default spawn.
+            player.setCurrentMapLocation(PlayerConstants.RESPAWN_LOCATION);
+            player.setFutureMapLocation(PlayerConstants.RESPAWN_LOCATION);
+            new ChatMessagePacketOut(player, MessageText.ERROR + "The map you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
+        }
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
 
         // Send player bag ItemStacks
