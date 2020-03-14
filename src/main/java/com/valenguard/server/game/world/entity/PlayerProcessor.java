@@ -107,7 +107,7 @@ public class PlayerProcessor {
             }
         }
 
-        // Send player equipment ItemStacks
+        // Send player hot bar ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerHotBar().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
                 new InventoryPacketOut(player, new InventoryActions().set(InventoryType.HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();

@@ -112,25 +112,20 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             return;
         }
 
-        if (inventoryType == InventoryType.BAG_1) {
+        AbstractInventory inventory = InventoryUtil.getItemSlotContainer(packetData.interactInventory, player);
 
-            ItemStack itemStack = player.getPlayerBag().getInventorySlotArray()[packetData.slotIndex].getItemStack();
-            player.getPlayerBag().removeItemStack(packetData.slotIndex, true);
+        ItemStack itemStack = inventory.getInventorySlotArray()[packetData.slotIndex].getItemStack();
+        inventory.removeItemStack(packetData.slotIndex, true);
 
-            GameMap gameMap = player.getGameMap();
+        GameMap gameMap = player.getGameMap();
 
-            ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
-            itemStackDropEntityController.queueEntitySpawn(
-                    itemStackDropEntityController.makeItemStackDrop(
-                            itemStack,
-                            player.getCurrentMapLocation(),
-                            player
-                    ));
-
-        } else if (inventoryType == InventoryType.EQUIPMENT) {
-
-
-        }
+        ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
+        itemStackDropEntityController.queueEntitySpawn(
+                itemStackDropEntityController.makeItemStackDrop(
+                        itemStack,
+                        player.getCurrentMapLocation(),
+                        player
+                ));
     }
 
     private void consumeItem(InventoryActionsPacket packetData) {
@@ -142,21 +137,19 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             return;
         }
 
-        if (inventoryType == InventoryType.BAG_1) {
+        AbstractInventory inventory = InventoryUtil.getItemSlotContainer(packetData.interactInventory, player);
+        ItemStack itemStack = inventory.getItemStack(packetData.slotIndex);
 
-            ItemStack itemStack = player.getPlayerBag().getItemStack(packetData.slotIndex);
-
-            if (!itemStack.isConsumable()) {
-                return;
-            }
-
-            itemStackConsumerManager.consumeItem(player, itemStack);
-
-            new InventoryPacketOut(player, new InventoryActions().consume(
-                    packetData.interactInventory,
-                    packetData.slotIndex
-            )).sendPacket();
+        if (!itemStack.isConsumable()) {
+            return;
         }
+
+        itemStackConsumerManager.consumeItem(player, itemStack);
+
+        new InventoryPacketOut(player, new InventoryActions().consume(
+                packetData.interactInventory,
+                packetData.slotIndex
+        )).sendPacket();
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {
