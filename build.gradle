@@ -34,7 +34,7 @@ dependencies {
     compile 'net.dv8tion:JDA:3.8.3_464'
 
     // Config
-    compile 'org.yaml:snakeyaml:1.23:android'
+    compile 'org.yaml:snakeyaml:1.26:android'
 
     // Helpers
     compile 'com.google.guava:guava:27.0.1-jre'
