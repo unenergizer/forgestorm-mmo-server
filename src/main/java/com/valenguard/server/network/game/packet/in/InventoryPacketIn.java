@@ -23,6 +23,9 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
 
+
+        println(getClass(), "Inventory packet received.", false, PRINT_DEBUG);
+
         byte inventoryAction = clientHandler.readByte();
         byte fromPosition = -1;
         byte toPosition = -1;
@@ -34,6 +37,8 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         InventoryActions.ActionType actionType = InventoryActions.ActionType.getActionType(inventoryAction);
 
+        println(getClass(), "ActionType: " + actionType, false, PRINT_DEBUG);
+
         switch (actionType) {
             case MOVE:
                 fromPosition = clientHandler.readByte();
@@ -44,6 +49,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 break;
             case DROP:
             case CONSUME:
+            case REMOVE:
                 interactInventory = clientHandler.readByte();
                 slotIndex = clientHandler.readByte();
                 break;
@@ -66,7 +72,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             }
         }
 
-        boolean validInventoryAction = packetData.actionType.getGetActionType() <= 3;
+        boolean validInventoryAction = packetData.actionType.getGetActionType() <= 4;
 
         // TODO this should be cleaner
         return validInventoryAction;
@@ -74,12 +80,17 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
     @Override
     public void onEvent(InventoryActionsPacket packetData) {
+
+        println(getClass(), "onEvent() called. ActionType: " + packetData.actionType, false, PRINT_DEBUG);
+
         if (packetData.actionType == InventoryActions.ActionType.MOVE) {
             moveItemStack(packetData);
         } else if (packetData.actionType == InventoryActions.ActionType.DROP) {
             dropItemStack(packetData);
         } else if (packetData.actionType == InventoryActions.ActionType.CONSUME) {
             consumeItem(packetData);
+        } else if (packetData.actionType == InventoryActions.ActionType.REMOVE) {
+            removeItemStack(packetData);
         }
     }
 
@@ -150,6 +161,24 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
                 packetData.interactInventory,
                 packetData.slotIndex
         )).sendPacket();
+    }
+
+    private void removeItemStack(InventoryActionsPacket packetData) {
+        println(getClass(), "removeItemStack() called!", true, PRINT_DEBUG);
+
+        Player player = packetData.getClientHandler().getPlayer();
+
+        InventoryType inventoryType = InventoryType.values()[packetData.interactInventory];
+
+        if (!doesNotExceedInventoryLimit(inventoryType, packetData.slotIndex)) {
+            return;
+        }
+
+        AbstractInventory inventory = InventoryUtil.getItemSlotContainer(packetData.interactInventory, player);
+
+        inventory.removeItemStack(packetData.slotIndex, true);
+
+        println(getClass(), "removeItemStack() end!", true, PRINT_DEBUG);
     }
 
     private boolean doesNotExceedInventoryLimit(InventoryType fromWindow, InventoryType toWindow, InventoryActionsPacket packetData) {

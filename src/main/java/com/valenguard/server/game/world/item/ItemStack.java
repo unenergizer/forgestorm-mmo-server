@@ -16,6 +16,10 @@ public class ItemStack implements Cloneable, Serializable {
     private int amount;
     private transient boolean isConsumable;
 
+    // Any regular item can have a skill ID attached to it.
+    // A skill could be a player skill or a special item with a cool down.
+    private transient Integer skillID;
+
     private transient Attributes attributes;
 
     public ItemStack(int itemId) {
@@ -31,6 +35,7 @@ public class ItemStack implements Cloneable, Serializable {
         this.attributes = itemStack.getAttributes();
         this.amount = itemStack.getAmount();
         this.isConsumable = itemStack.isConsumable();
+        this.skillID = itemStack.getSkillID();
     }
 
     @Override
@@ -47,6 +52,7 @@ public class ItemStack implements Cloneable, Serializable {
         itemStack.setAttributes(attributes);
         if (keepAmount) itemStack.setAmount(amount);
         itemStack.setConsumable(isConsumable);
+        itemStack.setSkillID(skillID);
         return itemStack;
     }
 

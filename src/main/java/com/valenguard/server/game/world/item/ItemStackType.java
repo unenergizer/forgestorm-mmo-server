@@ -29,10 +29,10 @@ public enum ItemStackType {
     // Generic
     GOLD,
     POTION,
-    MATERIAL;
+    MATERIAL,
 
-    // Trade Items
     // Skill Items
+    BOOK_SKILL;
 
     private AppearanceType appearanceType;
 

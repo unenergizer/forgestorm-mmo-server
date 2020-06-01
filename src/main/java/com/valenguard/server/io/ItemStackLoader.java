@@ -67,6 +67,14 @@ public class ItemStackLoader {
             }
 
             /*
+             * Get Skill Information
+             */
+            Integer skillID = (Integer) itemNode.get("skillID");
+            if (skillID != null) {
+                itemStack.setSkillID(skillID);
+            }
+
+            /*
              * Get item stats
              */
             Attributes attributes = new Attributes();
@@ -103,6 +111,7 @@ public class ItemStackLoader {
                 println(getClass(), "TextureId: " + ((WearableItemStack) itemStack).getTextureId(), false, PRINT_DEBUG);
                 println(getClass(), "Color: " + ((WearableItemStack) itemStack).getColor(), false, PRINT_DEBUG);
             }
+            println(getClass(), "SkillId: " + skillID, false, PRINT_DEBUG && skillID != null);
             println(PRINT_DEBUG);
 
             itemStacks.add(itemStack);
