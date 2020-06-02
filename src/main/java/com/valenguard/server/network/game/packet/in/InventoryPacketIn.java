@@ -4,6 +4,7 @@ import com.valenguard.server.Server;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackConsumerManager;
+import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.inventory.*;
 import com.valenguard.server.game.world.maps.GameMap;
 import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
@@ -70,6 +71,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
             if (packetData.interactInventory >= InventoryType.values().length) {
                 return false;
             }
+        } else if (packetData.actionType == InventoryActions.ActionType.REMOVE) {
+            // Only allow the player to send Remove action type if they are deleting a BOOK_SKILL
+            Player player = packetData.getClientHandler().getPlayer();
+            AbstractInventory inventory = InventoryUtil.getItemSlotContainer(packetData.interactInventory, player);
+            ItemStack itemStack = inventory.getItemStack(packetData.slotIndex);
+            if (itemStack == null) return false;
+            if (itemStack.getItemStackType() != ItemStackType.BOOK_SKILL) return false;
         }
 
         boolean validInventoryAction = packetData.actionType.getGetActionType() <= 4;
