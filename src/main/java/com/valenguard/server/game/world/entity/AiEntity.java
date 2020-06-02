@@ -62,6 +62,7 @@ public class AiEntity extends MovingEntity {
 
         // Give experience
         killerPlayer.getSkills().MELEE.addExperience(this.getExpDrop());
+        new ChatMessagePacketOut(killerPlayer, "[GREEN]You gained " + this.getExpDrop() + " experience.").sendPacket();
 
         // Adding/Subtracting reputation
         if (this.getEntityType() == EntityType.NPC) {
