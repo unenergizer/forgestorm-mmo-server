@@ -123,8 +123,8 @@ public class PlayerProcessor {
         }
 
         // Send player Skill Experience
-        player.getSkills().MELEE.sendSkillExperience();
-        player.getSkills().MINING.sendSkillExperience();
+        player.getSkills().MELEE.sendExperienceTotal();
+        player.getSkills().MINING.sendExperienceTotal();
     }
 
     public void queuePlayerQuitGameWorld(ClientHandler clientHandler) {

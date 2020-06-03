@@ -7,12 +7,24 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.valenguard.server.util.Log.println;
+
 public class GamePlayerExperienceSQL extends AbstractSingleSQL {
+
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
-        player.getSkills().MELEE.addExperience(resultSet.getInt("attack_exp"));
-        player.getSkills().MINING.addExperience(resultSet.getInt("mining_exp"));
+        println(getClass(), "Loading EXP for " + player.getName(), false, PRINT_DEBUG);
+
+        int melee = resultSet.getInt("attack_exp");
+        int mining = resultSet.getInt("mining_exp");
+
+        player.getSkills().MELEE.initExperience(melee);
+        player.getSkills().MINING.initExperience(mining);
+
+        println(getClass(), "LOADING MELEE: " + melee, false, PRINT_DEBUG);
+        println(getClass(), "LOADING MINING: " + mining, false, PRINT_DEBUG);
     }
 
     @Override
@@ -20,9 +32,17 @@ public class GamePlayerExperienceSQL extends AbstractSingleSQL {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_player_experience" +
                 " SET attack_exp=?, mining_exp=? WHERE character_id=?");
 
-        preparedStatement.setInt(1, player.getSkills().MELEE.getExperience());
-        preparedStatement.setInt(2, player.getSkills().MINING.getExperience());
+        println(getClass(), "Saving EXP for " + player.getName(), false, PRINT_DEBUG);
+
+        int melee = player.getSkills().MELEE.getExperience();
+        int mining = player.getSkills().MINING.getExperience();
+
+        preparedStatement.setInt(1, melee);
+        preparedStatement.setInt(2, mining);
         preparedStatement.setInt(3, player.getDatabaseId());
+
+        println(getClass(), "SAVING MELEE: " + melee, false, PRINT_DEBUG);
+        println(getClass(), "SAVING MINING: " + mining, false, PRINT_DEBUG);
 
         return preparedStatement;
     }
