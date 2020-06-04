@@ -71,14 +71,18 @@ public class AiEntity extends MovingEntity {
 
         // Give player drop table item
         if (this.getDropTable() != null) {
-            ItemStack itemStack = Server.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
+            ItemStack[] itemStacks = Server.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
 
             ItemStackDropEntityController itemStackDropEntityController = getGameMap().getItemStackDropEntityController();
-            itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
-                    itemStack,
-                    this.getCurrentMapLocation(),
-                    (Player) killerEntity
-            ));
+
+            for (ItemStack itemStack : itemStacks) {
+                if (itemStack == null) continue;
+                itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
+                        itemStack,
+                        this.getCurrentMapLocation(),
+                        (Player) killerEntity
+                ));
+            }
         }
     }
 

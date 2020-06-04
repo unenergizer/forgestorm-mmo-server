@@ -86,17 +86,24 @@ public class ProcessMining implements AbstractTask {
                 return true; // Remove them since the skill node is out of usages
             }
 
-            ItemStack giveItemStack = server.getDropTableManager().getItemStack(skillNodeData.getDropTableId(), 1);
+            ItemStack[] itemStacks = server.getDropTableManager().getItemStack(skillNodeData.getDropTableId(), 1);
 
             if (player.getPlayerBag().isInventoryFull()) {
                 ItemStackDropEntityController itemStackDropEntityController = player.getGameMap().getItemStackDropEntityController();
-                itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
-                        giveItemStack,
-                        player.getCurrentMapLocation(),
-                        player
-                ));
+
+                for (ItemStack itemStack : itemStacks) {
+                    if (itemStack == null) continue;
+                    itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
+                            itemStack,
+                            player.getCurrentMapLocation(),
+                            player
+                    ));
+                }
             } else {
-                player.give(giveItemStack, true);
+                for (ItemStack itemStack : itemStacks) {
+                    if (itemStack == null) continue;
+                    player.give(itemStack, true);
+                }
             }
 
             clickedEntity.setUsedThisTick(true);

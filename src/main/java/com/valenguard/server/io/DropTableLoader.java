@@ -38,19 +38,22 @@ public class DropTableLoader {
             Map<Integer, Map<String, Object>> dropNode = entry.getValue();
 
             DropTable dropTable = new DropTable(dropTableID);
+            println(getClass(), "DropTableID: " + dropTableID, false, PRINT_DEBUG);
 
             int[] itemStackIDs = new int[dropNode.size()];
             float[] probabilities = new float[dropNode.size()];
+
             for (Map.Entry<Integer, Map<String, Object>> itemDrop : dropNode.entrySet()) {
                 Map<String, Object> itemInfo = itemDrop.getValue();
                 probabilities[itemDrop.getKey()] = (float) (double) (Double) itemInfo.get("prob");
                 itemStackIDs[itemDrop.getKey()] = (int) itemInfo.get("item");
+                println(getClass(), " - Item: " + itemStackIDs[itemDrop.getKey()], false, PRINT_DEBUG);
+                println(getClass(), " - Prob: " + probabilities[itemDrop.getKey()], false, PRINT_DEBUG);
             }
 
             dropTable.setItemStackIDs(itemStackIDs);
             dropTable.setProbabilities(probabilities);
 
-            println(getClass(), "DropTableID: " + dropTableID, false, PRINT_DEBUG);
             //println(getClass(), "ItemStackID: " + itemID, false, PRINT_DEBUG);
             println(PRINT_DEBUG);
 

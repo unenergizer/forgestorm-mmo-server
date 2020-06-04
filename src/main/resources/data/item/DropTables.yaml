@@ -1,7 +1,10 @@
 0:
   0:
     item: 0
-    prob: 100.0
+    prob: 50.0
+  1:
+    item: 1
+    prob: 50.0
 1:
   0:
     item: 0

@@ -21,7 +21,7 @@ public class DropTableManager {
         loadedDropTables.toArray(dropTables);
     }
 
-    public ItemStack getItemStack(Integer dropTableID, int amount) {
+    public ItemStack[] getItemStack(Integer dropTableID, int amount) {
 
         if (dropTableID > dropTables.length) {
             println(getClass(), "Tried to use a DropTable that doesn't exist... DropTable: " + dropTableID, true);
@@ -32,13 +32,17 @@ public class DropTableManager {
         int[] itemStackIDs = dropTable.getItemStackIDs();
         float[] probabilities = dropTable.getProbabilities();
 
-        for (int i = 0; i < itemStackIDs.length - 1; i++) {
+        println(getClass(), "Number of items: " + itemStackIDs.length);
+
+        ItemStack[] itemStacks = new ItemStack[itemStackIDs.length];
+
+        for (int i = 0; i < itemStackIDs.length; i++) {
             if (random.nextFloat() * 100 < probabilities[i]) {
-                return makeItemStack(itemStackIDs[i], amount);
+                itemStacks[i] = makeItemStack(itemStackIDs[i], amount);
             }
         }
 
-        return makeItemStack(itemStackIDs[itemStackIDs.length - 1], amount);
+        return itemStacks;
     }
 
     private ItemStack makeItemStack(int itemStackID, int amount) {
