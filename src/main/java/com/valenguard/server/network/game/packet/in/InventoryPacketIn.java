@@ -166,7 +166,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         itemStackConsumerManager.consumeItem(player, itemStack);
 
         new InventoryPacketOut(player, new InventoryActions().consume(
-                packetData.interactInventory,
+                inventoryType,
                 packetData.slotIndex
         )).sendPacket();
     }

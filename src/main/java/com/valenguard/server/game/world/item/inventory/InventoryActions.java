@@ -40,8 +40,9 @@ public class InventoryActions {
         return this;
     }
 
-    public InventoryActions consume(byte interactInventory, byte slotIndex) {
-        this.interactInventory = interactInventory;
+    public InventoryActions consume(InventoryType interactInventory, byte slotIndex) {
+        this.inventoryActionType = InventoryActions.ActionType.CONSUME;
+        this.interactInventory = interactInventory.getInventoryTypeIndex();
         this.slotIndex = slotIndex;
         return this;
     }
