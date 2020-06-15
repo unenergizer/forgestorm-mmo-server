@@ -15,6 +15,7 @@ import com.valenguard.server.game.world.item.ItemStackManager;
 import com.valenguard.server.game.world.item.trade.TradeManager;
 import com.valenguard.server.io.ResourcePathLoader;
 import com.valenguard.server.network.NetworkManager;
+import com.valenguard.server.profile.XenforoProfileManager;
 import lombok.Getter;
 
 import static com.valenguard.server.util.Log.println;
@@ -52,6 +53,7 @@ public class Server {
     private final TradeManager tradeManager = new TradeManager();
     private final GameManager gameManager = new GameManager();
     private final CharacterManager characterManager = new CharacterManager();
+    private final XenforoProfileManager xenforoProfileManager = new XenforoProfileManager();
 
     private Server() {
     }

@@ -43,6 +43,7 @@ public class NetworkManager {
             eventBus.registerListener(new AbilityRequestPacketIn());
             eventBus.registerListener(new AdminEditorEntityPacketIn());
             eventBus.registerListener(new InspectPlayerPacketIn());
+            eventBus.registerListener(new ProfileRequestPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();
