@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.task;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.inventory.BankActions;
@@ -13,7 +13,7 @@ public class WarpTask implements AbstractTask {
 
     @Override
     public void tick(long ticksPassed) {
-        Server.getInstance().getGameManager().forAllPlayersFiltered(this::warpPlayer, player ->
+        ServerMain.getInstance().getGameManager().forAllPlayersFiltered(this::warpPlayer, player ->
                 player.getWarp() != null && !player.isEntityMoving());
     }
 
@@ -32,7 +32,7 @@ public class WarpTask implements AbstractTask {
             player.setBankOpen(false);
         }
 
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player warping.");
-        Server.getInstance().getGameManager().getGameMapProcessor().playerSwitchGameMap(player);
+        ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player warping.");
+        ServerMain.getInstance().getGameManager().getGameMapProcessor().playerSwitchGameMap(player);
     }
 }

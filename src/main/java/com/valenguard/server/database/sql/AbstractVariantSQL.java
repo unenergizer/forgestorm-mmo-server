@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.database.CharacterSaveProgressType;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.ClientHandler;
@@ -29,7 +29,7 @@ public abstract class AbstractVariantSQL<T> implements AbstractSQL {
         VariantData<T> variantData = getVariantData(player);
         PreparedStatement searchStatement = null;
         ResultSet resultSet = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             SqlSearchData sqlSearchData = searchForData(player);
 
@@ -84,7 +84,7 @@ public abstract class AbstractVariantSQL<T> implements AbstractSQL {
         // Track to make sure everything was saved
         Boolean[] progressSaved = new Boolean[0];
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             preparedStatements = databaseSave(player, connection);
             progressSaved = new Boolean[preparedStatements.length];

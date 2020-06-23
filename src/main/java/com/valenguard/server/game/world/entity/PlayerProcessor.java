@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.entity;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.database.CharacterSaveProgressType;
 import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
 import com.valenguard.server.database.sql.GamePlayerExperienceSQL;
@@ -162,6 +162,6 @@ public class PlayerProcessor {
 
         GameMap gameMap = player.getGameMap();
         gameMap.getPlayerController().removePlayer(player);
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player quit server.");
+        ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player quit server.");
     }
 }

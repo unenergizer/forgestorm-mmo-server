@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.NPC;
 import com.valenguard.server.game.world.maps.Location;
 
@@ -160,7 +160,7 @@ public class GameWorldNpcSQL {
         List<Integer> gameWorldNpcIds = new ArrayList<>();
         String query = "SELECT npc_id FROM game_world_npc WHERE world_name=?";
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, worldName);
 
@@ -181,7 +181,7 @@ public class GameWorldNpcSQL {
 
     public void firstTimeSaveSQL(NPC npc) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(npc, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -196,7 +196,7 @@ public class GameWorldNpcSQL {
             }
 
             // Now reload and spawn the entity
-            Server.getInstance().getGameManager().getGameMapProcessor().loadNPC(npc.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameMapProcessor().loadNPC(npc.getGameMap());
         }
     }
 
@@ -205,7 +205,7 @@ public class GameWorldNpcSQL {
         ResultSet resultSet = null;
         PreparedStatement searchStatement = null;
         PreparedStatement firstTimeSaveStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             SqlSearchData sqlSearchData = searchForData(npc);
 
@@ -235,7 +235,7 @@ public class GameWorldNpcSQL {
 
     public void saveSQL(NPC npc) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = databaseSave(npc, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -253,7 +253,7 @@ public class GameWorldNpcSQL {
 
     public void deleteSQL(NPC npc) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = connection.prepareStatement("DELETE FROM game_world_npc WHERE npc_id=?");
             preparedStatement.setInt(1, npc.getDatabaseId());
             preparedStatement.executeUpdate();

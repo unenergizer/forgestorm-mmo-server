@@ -1,6 +1,6 @@
 package com.valenguard.server.command.listeners;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.IncompleteCommand;
@@ -31,7 +31,7 @@ public class PlayerCommands {
 
         Player player;
         if (findById) {
-            player = Server.getInstance().getGameManager().findPlayer(playerId);
+            player = ServerMain.getInstance().getGameManager().findPlayer(playerId);
             if (player == null) {
                 commandSource.sendMessage("Could not find a player for id: " + playerId);
                 return;
@@ -76,7 +76,7 @@ public class PlayerCommands {
             return;
         }
 
-        GameMapProcessor gameMapProcessor = Server.getInstance().getGameManager().getGameMapProcessor();
+        GameMapProcessor gameMapProcessor = ServerMain.getInstance().getGameManager().getGameMapProcessor();
         Location location = new Location(mapName, x, y);
 
         if (!gameMapProcessor.doesGameMapExist(mapName)) {
@@ -103,8 +103,8 @@ public class PlayerCommands {
         Player player = getPlayer(commandSource, playerName);
         if (player == null) return;
 
-        Server.getInstance().getGameManager().kickPlayer(player);
-        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
+        ServerMain.getInstance().getGameManager().kickPlayer(player);
+        ServerMain.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
         player.getClientHandler().closeConnection();
     }
 
@@ -153,7 +153,7 @@ public class PlayerCommands {
     }
 
     private Player getPlayer(CommandSource commandSource, String playerName) {
-        Player player = Server.getInstance().getGameManager().findPlayer(playerName);
+        Player player = ServerMain.getInstance().getGameManager().findPlayer(playerName);
 
         if (player == null) {
             commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");

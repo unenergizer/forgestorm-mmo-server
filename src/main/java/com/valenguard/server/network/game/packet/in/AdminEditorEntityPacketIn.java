@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.database.AuthenticatedUser;
 import com.valenguard.server.database.sql.GameWorldItemStackDropSQL;
 import com.valenguard.server.database.sql.GameWorldMonsterSQL;
@@ -250,7 +250,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             case NPC:
                 NPC npc = (NPC) entity;
                 npc.setName(packetData.name);
-                npc.setFaction(Server.getInstance().getFactionManager().getFactionByName(packetData.faction));
+                npc.setFaction(ServerMain.getInstance().getFactionManager().getFactionByName(packetData.faction));
                 npc.setCurrentHealth(packetData.health);
                 npc.setMaxHealth(packetData.health);
                 npc.setExpDrop(packetData.expDrop);
@@ -310,7 +310,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             case ITEM_STACK:
                 ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
                 itemStackDrop.setCurrentMapLocation(spawnLocation);
-                ItemStack itemStack = Server.getInstance().getItemStackManager().makeItemStack(packetData.itemStackId, packetData.amount);
+                ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(packetData.itemStackId, packetData.amount);
                 itemStackDrop.setItemStack(itemStack);
                 itemStackDrop.setSpawnedForAll(true);
                 itemStackDrop.setSpawnedFromMonster(false);
@@ -340,7 +340,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
                 new GameWorldItemStackDropSQL().saveSQL(itemStackDrop);
                 itemStackDrop.removeItemStackDrop();
-                Server.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
+                ServerMain.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
             }
         } else if (packetData.save) {
             // Saving new entity

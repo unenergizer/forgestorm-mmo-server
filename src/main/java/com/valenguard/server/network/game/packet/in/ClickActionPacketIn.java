@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.*;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
@@ -72,7 +72,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
         switch (clickedOnEntity.getStationaryType()) {
             case ORE:
-                Server.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
+                ServerMain.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
                 break;
         }
     }

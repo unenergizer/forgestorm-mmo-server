@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackConsumerManager;
@@ -118,7 +118,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         println(getClass(), "InventoryMoveType: " + inventoryMoveType, false, PRINT_DEBUG);
 
-        PlayerMoveInventoryEvents playerMoveInventoryEvents = Server.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
+        PlayerMoveInventoryEvents playerMoveInventoryEvents = ServerMain.getInstance().getGameLoop().getPlayerMoveInventoryEvents();
         playerMoveInventoryEvents.addInventoryEvent(new InventoryEvent(packetData.getClientHandler().getPlayer(), packetData.fromPosition, packetData.toPosition, inventoryMoveType));
     }
 

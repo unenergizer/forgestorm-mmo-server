@@ -1,6 +1,6 @@
 package com.valenguard.server.command.listeners;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.IncompleteCommand;
@@ -23,7 +23,7 @@ public class InventoryCommands {
             return;
         }
 
-        Player player = Server.getInstance().getGameManager().findPlayer(playerId);
+        Player player = ServerMain.getInstance().getGameManager().findPlayer(playerId);
 
         if (player == null) {
             commandSource.sendMessage("Could not find player for Id: " + playerId);
@@ -42,8 +42,8 @@ public class InventoryCommands {
         int itemId = parseItemId(commandSource, args[0]);
         if (itemId < 0) return;
 
-        Server.getInstance().getGameManager().forAllPlayers(player ->
-                player.give(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true));
+        ServerMain.getInstance().getGameManager().forAllPlayers(player ->
+                player.give(ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 1), true));
 
     }
 
@@ -62,8 +62,8 @@ public class InventoryCommands {
                 return;
             }
 
-            Server.getInstance().getGameManager().forAllPlayers(player ->
-                    player.give(Server.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount), true));
+            ServerMain.getInstance().getGameManager().forAllPlayers(player ->
+                    player.give(ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount), true));
 
         } catch (NumberFormatException e) {
             commandSource.sendMessage("Must provide an itemAmount as a number.");
@@ -78,7 +78,7 @@ public class InventoryCommands {
 
             itemId = Integer.parseInt(argument);
 
-            int maxItems = Server.getInstance().getItemStackManager().numberOfItems() - 1;
+            int maxItems = ServerMain.getInstance().getItemStackManager().numberOfItems() - 1;
             if (itemId < 0) {
                 commandSource.sendMessage("The itemId number cannot be below zero.");
                 return -1;

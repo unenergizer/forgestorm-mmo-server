@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.ItemStackDrop;
@@ -26,7 +26,7 @@ public class GameWorldItemStackDropSQL {
         int respawnTimeMax = resultSet.getInt("respawn_time_min");
 
         Location location = new Location(worldName, worldX, worldY);
-        ItemStack itemStack = Server.getInstance().getItemStackManager().makeItemStack(itemStackId, amount);
+        ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(itemStackId, amount);
 
         itemStackDrop.setSpawnedForAll(true);
         itemStackDrop.setSpawnedFromMonster(false);
@@ -84,7 +84,7 @@ public class GameWorldItemStackDropSQL {
         List<Integer> gameWorldNpcIds = new ArrayList<>();
         String query = "SELECT drop_id FROM game_world_itemstack_drop WHERE world_name=?";
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, worldName);
 
@@ -105,7 +105,7 @@ public class GameWorldItemStackDropSQL {
 
     public void firstTimeSaveSQL(ItemStackDrop itemStackDrop) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(itemStackDrop, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -120,7 +120,7 @@ public class GameWorldItemStackDropSQL {
             }
 
             // Now reload and spawn the entity
-            Server.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
         }
     }
 
@@ -129,7 +129,7 @@ public class GameWorldItemStackDropSQL {
         ResultSet resultSet = null;
         PreparedStatement searchStatement = null;
         PreparedStatement firstTimeSaveStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             SqlSearchData sqlSearchData = searchForData(itemStackDrop);
 
@@ -159,7 +159,7 @@ public class GameWorldItemStackDropSQL {
 
     public void saveSQL(ItemStackDrop itemStackDrop) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = databaseSave(itemStackDrop, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -177,7 +177,7 @@ public class GameWorldItemStackDropSQL {
 
     public void deleteSQL(ItemStackDrop itemStackDrop) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = connection.prepareStatement("DELETE FROM game_world_itemstack_drop WHERE drop_id=?");
             preparedStatement.setInt(1, itemStackDrop.getDatabaseId());
             preparedStatement.executeUpdate();

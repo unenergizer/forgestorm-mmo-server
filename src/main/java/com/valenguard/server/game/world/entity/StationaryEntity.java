@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.entity;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.rpg.StationaryTypes;
 import com.valenguard.server.game.rpg.skills.SkillNodeData;
 import lombok.Getter;
@@ -14,7 +14,7 @@ public class StationaryEntity extends Entity {
     private boolean usedThisTick;
 
     public SkillNodeData getSkillNodeData() {
-        return Server.getInstance().getSkillNodeManager().getSkillNodeData(skillNodeId);
+        return ServerMain.getInstance().getSkillNodeManager().getSkillNodeData(skillNodeId);
     }
 
     public byte getBodyId() {

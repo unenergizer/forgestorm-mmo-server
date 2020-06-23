@@ -21,9 +21,9 @@ import lombok.Getter;
 import static com.valenguard.server.util.Log.println;
 
 @Getter
-public class Server {
+public class ServerMain {
 
-    private static Server instance = null;
+    private static ServerMain instance = null;
 
     public static final long SERVER_START_TIME = System.currentTimeMillis();
 
@@ -55,15 +55,15 @@ public class Server {
     private final CharacterManager characterManager = new CharacterManager();
     private final XenforoProfileManager xenforoProfileManager = new XenforoProfileManager();
 
-    private Server() {
+    private ServerMain() {
     }
 
     public static void main(String[] args) {
-        Server.getInstance().startServer();
+        ServerMain.getInstance().startServer();
     }
 
-    public static Server getInstance() {
-        if (instance == null) instance = new Server();
+    public static ServerMain getInstance() {
+        if (instance == null) instance = new ServerMain();
         return instance;
     }
 

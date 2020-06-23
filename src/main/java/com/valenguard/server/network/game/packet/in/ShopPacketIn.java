@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.rpg.ShopOpcodes;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.Player;
@@ -63,7 +63,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
             player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
-            Server.getInstance().getEntityShopManager()
+            ServerMain.getInstance().getEntityShopManager()
                     .playerBuyItemStack(player.getCurrentShoppingEntity().getShopId(), packetData.shopSlot, player);
         } else if (packetData.shopOpcode == ShopOpcodes.STOP_SHOPPING) {
             player.setCurrentShoppingEntity(null);

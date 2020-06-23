@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.item.inventory;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackManager;
@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 public abstract class AbstractInventory {
 
-    private final ItemStackManager itemStackManager = Server.getInstance().getItemStackManager();
+    private final ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
 
     protected final Player inventoryOwner;
     protected final InventoryType inventoryType;

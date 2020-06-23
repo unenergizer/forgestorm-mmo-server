@@ -1,6 +1,6 @@
 package com.valenguard.server.game.character;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.database.sql.GamePlayerCharacterSQL;
 import com.valenguard.server.game.PlayerConstants;
 import com.valenguard.server.game.UserInterfaceType;
@@ -82,12 +82,12 @@ public class CharacterManager {
     public void characterLogin(ClientHandler clientHandler, byte characterId) {
         if (clientHandler.getPlayer().isLoggedInGameWorld()) return;
         clientHandler.setCurrentPlayerId(characterId);
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerEnterGameWorld(clientHandler);
+        ServerMain.getInstance().getGameManager().getPlayerProcessor().queuePlayerEnterGameWorld(clientHandler);
     }
 
     public void characterLogout(ClientHandler clientHandler) {
         println(getClass(), "Character Logout Initialized..");
-        Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
+        ServerMain.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
 
 //        sendToCharacterScreen(clientHandler);
     }
@@ -95,7 +95,7 @@ public class CharacterManager {
     public void clientConnect(PlayerSessionData playerSessionData) {
         ClientHandler clientHandler = playerSessionData.getClientHandler();
 
-        Server.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
+        ServerMain.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
 
         // Tell the client its privileges
         new InitClientPrivilegePacketOut(clientHandler).sendPacket();
@@ -110,11 +110,11 @@ public class CharacterManager {
         // Make sure we save player data!
         for (Player player : clientHandler.getLoadedPlayers().values()) {
             if (player.isLoggedInGameWorld()) {
-                Server.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
+                ServerMain.getInstance().getGameManager().getPlayerProcessor().queuePlayerQuitGameWorld(clientHandler);
             }
         }
 
-        Server.getInstance().getNetworkManager().getOutStreamManager().removeClient(clientHandler);
+        ServerMain.getInstance().getNetworkManager().getOutStreamManager().removeClient(clientHandler);
         clientHandler.closeConnection();
     }
 

@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.rpg.EntityAlignment;
 import com.valenguard.server.game.world.entity.Monster;
 import com.valenguard.server.game.world.maps.Location;
@@ -119,7 +119,7 @@ public class GameWorldMonsterSQL {
         List<Integer> gameWorldNpcIds = new ArrayList<>();
         String query = "SELECT monster_id FROM game_world_monster WHERE world_name=?";
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, worldName);
 
@@ -140,7 +140,7 @@ public class GameWorldMonsterSQL {
 
     public void firstTimeSaveSQL(Monster monster) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(monster, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -155,7 +155,7 @@ public class GameWorldMonsterSQL {
             }
 
             // Now reload and spawn the entity
-            Server.getInstance().getGameManager().getGameMapProcessor().loadMonster(monster.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameMapProcessor().loadMonster(monster.getGameMap());
         }
     }
 
@@ -164,7 +164,7 @@ public class GameWorldMonsterSQL {
         ResultSet resultSet = null;
         PreparedStatement searchStatement = null;
         PreparedStatement firstTimeSaveStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             SqlSearchData sqlSearchData = searchForData(monster);
 
@@ -194,7 +194,7 @@ public class GameWorldMonsterSQL {
 
     public void saveSQL(Monster monster) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = databaseSave(monster, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {
@@ -212,7 +212,7 @@ public class GameWorldMonsterSQL {
 
     public void deleteSQL(Monster monster) {
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = connection.prepareStatement("DELETE FROM game_world_monster WHERE monster_id=?");
             preparedStatement.setInt(1, monster.getDatabaseId());
             preparedStatement.executeUpdate();

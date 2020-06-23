@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.character.CharacterDataOut;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.Player;
@@ -126,7 +126,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
         String query = "SELECT character_id, name, hair_texture, hair_color, eye_color, skin_color, is_deleted FROM game_player_characters WHERE user_id = ?";
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, databaseUserId);
 
@@ -175,7 +175,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String characterDeleteDate = simpleDateFormat.format(date);
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setBoolean(1, true);
             preparedStatement.setString(2, characterDeleteDate);
@@ -190,7 +190,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public void firstTimeSaveSQL(Player player) {
 
         PreparedStatement preparedStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(player, connection);
             preparedStatement.execute();
         } catch (SQLException exe) {

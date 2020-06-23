@@ -1,6 +1,6 @@
 package com.valenguard.server.command.listeners;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.EndlessArguments;
@@ -16,17 +16,17 @@ public class ServerCommands {
 
     @Command(base = "tps")
     public void getTps(CommandSource commandSource) {
-        commandSource.sendMessage("TPS: " + Server.getInstance().getGameLoop().getCurrentTPS());
+        commandSource.sendMessage("TPS: " + ServerMain.getInstance().getGameLoop().getCurrentTPS());
     }
 
     @Command(base = "stop")
     public void onStop(CommandSource commandSource) {
-        Server.getInstance().exitServer();
+        ServerMain.getInstance().exitServer();
     }
 
     @Command(base = "online")
     public void accountsOnline(CommandSource commandSource) {
-        commandSource.sendMessage("Accounts Online: " + Server.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
+        commandSource.sendMessage("Accounts Online: " + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
     }
 
     @Command(base = "time")
@@ -39,7 +39,7 @@ public class ServerCommands {
     @Command(base = "uptime")
     public void getServerUpTime(CommandSource commandSource) {
 
-        long upTime = System.currentTimeMillis() - Server.SERVER_START_TIME;
+        long upTime = System.currentTimeMillis() - ServerMain.SERVER_START_TIME;
 
         long days = TimeUnit.MILLISECONDS.toDays(upTime);
         upTime -= TimeUnit.DAYS.toMillis(days);
@@ -58,7 +58,7 @@ public class ServerCommands {
     @IncompleteCommand(missing = "say <Message...>")
     @EndlessArguments
     public void serverSay(CommandSource commandSource, String[] args) {
-        Server.getInstance().getGameManager().forAllPlayers(anyPlayer ->
+        ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
                 new ChatMessagePacketOut(anyPlayer, MessageText.SERVER + String.join(" ", args)).sendPacket());
     }
 }

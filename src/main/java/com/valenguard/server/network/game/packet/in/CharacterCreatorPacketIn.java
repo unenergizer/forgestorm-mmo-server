@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
@@ -41,7 +41,7 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
 
     @Override
     public void onEvent(NewCharacterDataPacket packetData) {
-        CharacterManager characterManager = Server.getInstance().getCharacterManager();
+        CharacterManager characterManager = ServerMain.getInstance().getCharacterManager();
 
         // TODO: Make sure we have not exceeded max number of characters allowed
 
@@ -49,7 +49,7 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
         // TODO: check list of unacceptable names
         if (characterManager.isNameUnique(packetData.characterName)) {
             // Character name is unique, allow creation
-            Server.getInstance().getCharacterManager().createCharacter(
+            ServerMain.getInstance().getCharacterManager().createCharacter(
                     packetData.getClientHandler(),
                     packetData.characterName,
                     packetData.hairTexture,

@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.inventory.InventorySlot;
 import com.valenguard.server.util.Base64Util;
@@ -67,7 +67,7 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
 
         String query = "SELECT equipment FROM game_player_inventory WHERE character_id = ?";
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, player.getDatabaseId());
 

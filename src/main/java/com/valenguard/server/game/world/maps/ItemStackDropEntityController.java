@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
@@ -41,7 +41,7 @@ public class ItemStackDropEntityController extends EntityController<ItemStackDro
 
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = entitySpawnQueue.poll()) != null) {
-            Server.getInstance().getGameLoop().getGroundItemTimerTask().addItemToGround(itemStackDrop);
+            ServerMain.getInstance().getGameLoop().getGroundItemTimerTask().addItemToGround(itemStackDrop);
 //            new EntitySpawnPacketOut(itemStackDrop.getDropOwner(), itemStackDrop).sendPacket();
             entitySpawn(itemStackDrop);
         }

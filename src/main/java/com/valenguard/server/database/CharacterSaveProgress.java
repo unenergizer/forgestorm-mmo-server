@@ -1,6 +1,6 @@
 package com.valenguard.server.database;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.network.game.shared.ClientHandler;
 
 import static com.valenguard.server.util.Log.println;
@@ -49,7 +49,7 @@ public class CharacterSaveProgress {
         if (clientHandler.isPlayerQuitServer()) return;
 
         // Send the player to the character screen.
-        Server.getInstance().getCharacterManager().sendToCharacterScreen(clientHandler);
+        ServerMain.getInstance().getCharacterManager().sendToCharacterScreen(clientHandler);
 
         // Reset booleans
         characterSaved = false;

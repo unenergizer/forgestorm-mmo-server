@@ -1,6 +1,6 @@
 package com.valenguard.server.game;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.item.inventory.PlayerMoveInventoryEvents;
 import com.valenguard.server.game.world.task.*;
 import com.valenguard.server.game.world.task.skills.ProcessMining;
@@ -54,15 +54,15 @@ public class GameLoop extends Thread {
 
         long numberOfTicksPassed = 0;
 
-        Server server = Server.getInstance();
+        ServerMain serverMain = ServerMain.getInstance();
 
-        while (server.getNetworkManager().getGameServerConnection().isRunning()) {
+        while (serverMain.getNetworkManager().getGameServerConnection().isRunning()) {
             startTime = System.nanoTime();
 
             // WARNING: Maintain tick order!
             // Update Start
-            server.getCommandManager().getCommandProcessor().executeCommands();
-            server.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();
+            serverMain.getCommandManager().getCommandProcessor().executeCommands();
+            serverMain.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();
             playerMoveInventoryEvents.processInventoryEvents();
             movementUpdateTask.tick(numberOfTicksPassed);
             warpTask.tick(numberOfTicksPassed);
@@ -71,9 +71,9 @@ public class GameLoop extends Thread {
             entityRehealTask.tick(numberOfTicksPassed);
             processMining.tick(numberOfTicksPassed);
             aiEntityRespawnTimerTask.tick(numberOfTicksPassed);
-            server.getGameManager().tickWorld(numberOfTicksPassed);
-            server.getNetworkManager().getOutStreamManager().sendPackets();
-            server.getTradeManager().tickTime(numberOfTicksPassed);
+            serverMain.getGameManager().tickWorld(numberOfTicksPassed);
+            serverMain.getNetworkManager().getOutStreamManager().sendPackets();
+            serverMain.getTradeManager().tickTime(numberOfTicksPassed);
             // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);

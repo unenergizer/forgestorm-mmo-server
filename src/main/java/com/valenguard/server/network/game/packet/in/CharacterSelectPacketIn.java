@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class CharacterSelectPacketIn implements PacketListener<CharacterSelectPa
 
     @Override
     public void onEvent(CharacterSelectDataPacket packetData) {
-        Server.getInstance().getCharacterManager().characterLogin(packetData.getClientHandler(), packetData.characterId);
+        ServerMain.getInstance().getCharacterManager().characterLogin(packetData.getClientHandler(), packetData.characterId);
     }
 
     @AllArgsConstructor

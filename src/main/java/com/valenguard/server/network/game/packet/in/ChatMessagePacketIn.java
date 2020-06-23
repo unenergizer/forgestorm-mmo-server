@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.CommandState;
 import com.valenguard.server.game.MessageText;
@@ -51,7 +51,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             stringBuilder.append("[DARK_GRAY]: [WHITE]");
             stringBuilder.append(packetData.text);
 
-            Server.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
+            ServerMain.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
                     new ChatMessagePacketOut(onlinePlayer, stringBuilder.toString()).sendPacket());
         }
     }
@@ -67,11 +67,11 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
 
         CommandState commandState;
         if (content.length == 1) {
-            commandState = Server.getInstance().getCommandManager().getCommandProcessor().publish(new CommandSource(packetData.getClientHandler().getPlayer()), content[0], new String[0]);
+            commandState = ServerMain.getInstance().getCommandManager().getCommandProcessor().publish(new CommandSource(packetData.getClientHandler().getPlayer()), content[0], new String[0]);
         } else {
             String[] args = new String[content.length - 1];
             System.arraycopy(content, 1, args, 0, content.length - 1);
-            commandState = Server.getInstance().getCommandManager().getCommandProcessor().publish(new CommandSource(packetData.getClientHandler().getPlayer()), content[0], args);
+            commandState = ServerMain.getInstance().getCommandManager().getCommandProcessor().publish(new CommandSource(packetData.getClientHandler().getPlayer()), content[0], args);
         }
 
         Player player = packetData.getClientHandler().getPlayer();

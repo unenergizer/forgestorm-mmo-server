@@ -1,7 +1,7 @@
 package com.valenguard.server.database.sql;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.network.login.LoginState;
 
 import java.io.IOException;
@@ -28,11 +28,11 @@ public class XFUserAuthenticateSQL {
         boolean isAdmin;
         boolean isModerator;
 
-        if (Server.getInstance().getNetworkManager().getOutStreamManager().isAccountOnline(xfAccountName)) {
+        if (ServerMain.getInstance().getNetworkManager().getOutStreamManager().isAccountOnline(xfAccountName)) {
             return new LoginState().failState("User already logged in.");
         }
 
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             getUserIdStatement = connection.prepareStatement(GET_USER_ID);
             getUserIdStatement.setString(1, xfAccountName);

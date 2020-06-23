@@ -1,6 +1,6 @@
 package com.valenguard.server.util;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.discord.DiscordManager;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ public class Log {
 
     public static void println(Class clazz, String message, boolean isError, boolean print) {
         if (!print) return;
-        DiscordManager discordManager = Server.getInstance().getDiscordManager();
+        DiscordManager discordManager = ServerMain.getInstance().getDiscordManager();
         String builtMessage = buildMessage(clazz, message);
         if (isError) {
             System.err.println(builtMessage);
@@ -42,7 +42,7 @@ public class Log {
 
     public static void println(boolean print) {
         if (!print) return;
-        DiscordManager discordManager = Server.getInstance().getDiscordManager();
+        DiscordManager discordManager = ServerMain.getInstance().getDiscordManager();
         System.out.println();
         if (discordManager != null) discordManager.sendDiscordMessage("*** ***");
     }

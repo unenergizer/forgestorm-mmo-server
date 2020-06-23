@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.entity;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.item.ItemStackType;
 import com.valenguard.server.game.world.item.WearableItemStack;
@@ -60,7 +60,7 @@ public class Appearance {
 
         if (sendPacket) {
             println(getClass(), "Sending appearance update!", false, PRINT_DEBUG);
-            Server.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
+            ServerMain.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
                     new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
         }
     }

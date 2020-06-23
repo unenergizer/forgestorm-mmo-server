@@ -1,6 +1,6 @@
 package com.valenguard.server.io;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
@@ -26,7 +26,7 @@ public class ResourcePathLoader {
     public ResourcePathLoader() {
         // Define local path
         try {
-            localFilePath = new File(Server.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+            localFilePath = new File(ServerMain.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.io.NetworkSettingsLoader;
 import com.valenguard.server.network.AuthenticationManager;
 import com.valenguard.server.network.NetworkManager;
@@ -148,7 +148,7 @@ public class GameServerConnection {
 
                 // Adding the client handle to a list of current client handles
                 // TODO: this needs to be ran on the gamethread. Not the client's thread
-                Server.getInstance().getCharacterManager().clientConnect(new PlayerSessionData(tempID, clientHandler));
+                ServerMain.getInstance().getCharacterManager().clientConnect(new PlayerSessionData(tempID, clientHandler));
                 tempID++;
 
                 // Reading in a byte which represents an opcode that the client sent to the
@@ -177,7 +177,7 @@ public class GameServerConnection {
                     if (clientHandler != null && running) {
 
                         // The client has disconnected
-                        Server.getInstance().getCharacterManager().clientDisconnect(clientHandler);
+                        ServerMain.getInstance().getCharacterManager().clientDisconnect(clientHandler);
                     }
                 } else {
                     e.printStackTrace();

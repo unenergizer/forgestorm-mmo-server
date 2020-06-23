@@ -1,6 +1,6 @@
 package com.valenguard.server.database.sql;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.database.AuthenticatedUser;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.profile.XenforoProfile;
@@ -30,7 +30,7 @@ public class XFUserProfileSQL {
     public XenforoProfile loadSQL(Player player) {
         ResultSet resultSet = null;
         PreparedStatement searchStatement = null;
-        try (Connection connection = Server.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
 
             searchStatement = connection.prepareStatement("SELECT * FROM xf_user WHERE user_id=?");
             searchStatement.setObject(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());

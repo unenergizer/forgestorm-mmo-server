@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.task;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.maps.GameMap;
@@ -20,7 +20,7 @@ public class EntityRehealTask implements AbstractTask {
 
             println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
-            for (GameMap gameMap : Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
+            for (GameMap gameMap : ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
                 // Reheal players
                 for (Player player : gameMap.getPlayerController().getPlayerList()) {
                     if (player.isInCombat()) continue; // Don't reheal entities in active.

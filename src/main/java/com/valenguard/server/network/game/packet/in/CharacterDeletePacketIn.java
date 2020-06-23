@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -20,7 +20,7 @@ public class CharacterDeletePacketIn implements PacketListener<CharacterDeletePa
 
     @Override
     public void onEvent(CharacterDeleteDataPacket packetData) {
-        Server.getInstance().getCharacterManager().deleteCharacter(packetData.getClientHandler(), packetData.characterId);
+        ServerMain.getInstance().getCharacterManager().deleteCharacter(packetData.getClientHandler(), packetData.characterId);
     }
 
     @AllArgsConstructor

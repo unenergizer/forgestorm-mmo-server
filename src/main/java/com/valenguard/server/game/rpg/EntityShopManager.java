@@ -1,6 +1,6 @@
 package com.valenguard.server.game.rpg;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.game.world.item.ItemStack;
@@ -46,7 +46,7 @@ public class EntityShopManager {
 
         removeGold(goldSlots, buyPrice);
 
-        player.give(Server.getInstance().getItemStackManager().makeItemStack(itemId, 1), true);
+        player.give(ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 1), true);
     }
 
     private void removeGold(List<InventorySlot> goldSlots, final int buyPrice) {

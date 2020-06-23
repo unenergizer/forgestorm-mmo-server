@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.maps;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
@@ -23,7 +23,7 @@ public class AiEntityController extends EntityController<AiEntity> {
 
     @Override
     public void postEntityDespawn(AiEntity entity) {
-        Server.getInstance().getGameLoop().getAiEntityRespawnTimerTask().addAiEntity(entity);
+        ServerMain.getInstance().getGameLoop().getAiEntityRespawnTimerTask().addAiEntity(entity);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class AiEntityController extends EntityController<AiEntity> {
             entitySpawn(entity);
 
             // Find AiEntity a active target
-            MovementUpdateTask movementUpdateTask = Server.getInstance().getGameLoop().getMovementUpdateTask();
+            MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
             movementUpdateTask.initEntityTargeting(entity);
         }
 

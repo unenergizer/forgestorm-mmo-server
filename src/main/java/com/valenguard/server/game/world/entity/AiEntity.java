@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.entity;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.item.ItemStack;
 import com.valenguard.server.game.world.maps.ItemStackDropEntityController;
 import com.valenguard.server.game.world.maps.Location;
@@ -71,7 +71,7 @@ public class AiEntity extends MovingEntity {
 
         // Give player drop table item
         if (this.getDropTable() != null) {
-            ItemStack[] itemStacks = Server.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
+            ItemStack[] itemStacks = ServerMain.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
 
             ItemStackDropEntityController itemStackDropEntityController = getGameMap().getItemStackDropEntityController();
 

@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -26,12 +26,12 @@ public class ProfileRequestPacketIn implements PacketListener<ProfileRequestPack
     @Override
     public void onEvent(ProfileRequestPacket packetData) {
         Player playerRequester = packetData.getClientHandler().getPlayer();
-        Player profileToGet = Server.getInstance().getGameManager().findPlayer(packetData.serverEntityID);
+        Player profileToGet = ServerMain.getInstance().getGameManager().findPlayer(packetData.serverEntityID);
 
         println(getClass(), "PlayerRequester: " + playerRequester.getName(), false, PRINT_DEBUG);
         println(getClass(), "ProfileToGet: " + profileToGet.getName(), false, PRINT_DEBUG);
 
-        Server.getInstance().getXenforoProfileManager().sendXenforoProfile(profileToGet, playerRequester);
+        ServerMain.getInstance().getXenforoProfileManager().sendXenforoProfile(profileToGet, playerRequester);
     }
 
     @AllArgsConstructor

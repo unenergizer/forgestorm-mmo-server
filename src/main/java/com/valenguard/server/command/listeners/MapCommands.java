@@ -1,6 +1,6 @@
 package com.valenguard.server.command.listeners;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.command.Command;
 import com.valenguard.server.command.CommandSource;
 import com.valenguard.server.command.IncompleteCommand;
@@ -14,7 +14,7 @@ public class MapCommands {
     @Command(base = "create", argLenReq = 3)
     @IncompleteCommand(missing = "create <mapName> <width> <height>")
     public void createWorld(CommandSource commandSource, String[] args) {
-        GameMapProcessor gameMapProcessor = Server.getInstance().getGameManager().getGameMapProcessor();
+        GameMapProcessor gameMapProcessor = ServerMain.getInstance().getGameManager().getGameMapProcessor();
         final int minSize = 10;
         String mapName = args[0];
         int width = Integer.parseInt(args[1]);

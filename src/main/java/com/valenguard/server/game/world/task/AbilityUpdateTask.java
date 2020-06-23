@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.task;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.abilities.WaitingAbility;
 import com.valenguard.server.game.world.entity.AiEntity;
 import com.valenguard.server.game.world.entity.MovingEntity;
@@ -18,7 +18,7 @@ public class AbilityUpdateTask implements AbstractTask {
 
     @Override
     public void tick(long ticksPassed) {
-        for (GameMap gameMap : Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
+        for (GameMap gameMap : ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
             tickGameMapCombat(gameMap, ticksPassed);
         }
     }
@@ -41,7 +41,7 @@ public class AbilityUpdateTask implements AbstractTask {
                 processEntityDeath(gameMap, targetEntity, aiEntity);
             } else {
                 // Do AiEntity combat
-                Server.getInstance().getAbilityManager().performAiEntityAbility(aiEntity, targetEntity);
+                ServerMain.getInstance().getAbilityManager().performAiEntityAbility(aiEntity, targetEntity);
             }
 
             if (targetEntity.getCurrentHealth() <= 0) {
@@ -82,7 +82,7 @@ public class AbilityUpdateTask implements AbstractTask {
                     // We saved the ability cast and will perform it now for the player.
                     WaitingAbility queuedAbility = ((Player) movingEntity).getQueuedAbilities().get(cooldown.getKey());
                     if (queuedAbility != null) {
-                        Server.getInstance().getAbilityManager().performPlayerAbility(cooldown.getKey(), movingEntity, queuedAbility.getTargetEntity());
+                        ServerMain.getInstance().getAbilityManager().performPlayerAbility(cooldown.getKey(), movingEntity, queuedAbility.getTargetEntity());
                         ((Player) movingEntity).getQueuedAbilities().remove(cooldown.getKey());
                     }
                 }

@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.task.skills;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.rpg.StationaryTypes;
 import com.valenguard.server.game.rpg.skills.SkillNodeData;
 import com.valenguard.server.game.world.entity.Appearance;
@@ -50,7 +50,7 @@ public class ProcessMining implements AbstractTask {
 
     private void growBack() {
 
-        Server.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values().forEach(map ->
+        ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values().forEach(map ->
                 map.getStationaryEntityController().getEntities()
                         .stream()
                         .filter(stationaryEntity -> stationaryEntity.getStationaryType() == StationaryTypes.ORE)
@@ -77,7 +77,7 @@ public class ProcessMining implements AbstractTask {
         // 0.0f-1.0f (20% chance)
         if (random.nextFloat() >= .8f) {
 
-            Server server = Server.getInstance();
+            ServerMain serverMain = ServerMain.getInstance();
             SkillNodeData skillNodeData = clickedEntity.getSkillNodeData();
 
             int numberOfUsages = skillNodeData.getNumberOfUsages();
@@ -86,7 +86,7 @@ public class ProcessMining implements AbstractTask {
                 return true; // Remove them since the skill node is out of usages
             }
 
-            ItemStack[] itemStacks = server.getDropTableManager().getItemStack(skillNodeData.getDropTableId(), 1);
+            ItemStack[] itemStacks = serverMain.getDropTableManager().getItemStack(skillNodeData.getDropTableId(), 1);
 
             if (player.getPlayerBag().isInventoryFull()) {
                 ItemStackDropEntityController itemStackDropEntityController = player.getGameMap().getItemStackDropEntityController();

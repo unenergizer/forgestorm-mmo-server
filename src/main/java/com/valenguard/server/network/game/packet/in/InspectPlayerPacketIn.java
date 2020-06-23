@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Player;
 import com.valenguard.server.network.game.packet.out.ChatMessagePacketOut;
 import com.valenguard.server.network.game.packet.out.InspectPlayerPacketOut;
@@ -30,7 +30,7 @@ public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacket
 
     @Override
     public void onEvent(InspectPlayerPacket packetData) {
-        Player player = Server.getInstance().getGameManager().findPlayer(packetData.entityId);
+        Player player = ServerMain.getInstance().getGameManager().findPlayer(packetData.entityId);
         if (player != null) {
             new InspectPlayerPacketOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
             println(getClass(), "Sending inspection data!", false, PRINT_DEBUG);

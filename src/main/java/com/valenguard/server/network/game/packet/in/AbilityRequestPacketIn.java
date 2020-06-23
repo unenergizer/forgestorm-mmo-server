@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.MovingEntity;
 import com.valenguard.server.game.world.entity.Player;
@@ -47,7 +47,7 @@ public class AbilityRequestPacketIn implements PacketListener<AbilityRequestPack
             return;
         }
 
-        Server.getInstance().getAbilityManager().performPlayerAbility(
+        ServerMain.getInstance().getAbilityManager().performPlayerAbility(
                 packetData.abilityId,
                 attacker,
                 movingEntity);

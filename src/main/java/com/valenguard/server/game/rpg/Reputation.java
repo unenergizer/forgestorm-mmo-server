@@ -1,6 +1,6 @@
 package com.valenguard.server.game.rpg;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.game.world.entity.NPC;
 import com.valenguard.server.game.world.entity.Player;
@@ -18,7 +18,7 @@ public class Reputation {
     }
 
     @Getter
-    private final short[] reputationData = new short[Server.getInstance().getFactionManager().getNumberOfFactions()];
+    private final short[] reputationData = new short[ServerMain.getInstance().getFactionManager().getNumberOfFactions()];
 
     private short getReputations(byte faction) {
         return reputationData[faction];
@@ -37,7 +37,7 @@ public class Reputation {
             updateEntitiesForFaction(faction);
         }
 
-        byte[] enemyTypes = Server.getInstance().getFactionManager().getFactionEnemies(faction);
+        byte[] enemyTypes = ServerMain.getInstance().getFactionManager().getFactionEnemies(faction);
         for (byte index = 0; index < reputationData.length; index++) {
             if (index == faction) continue;
             for (byte enemyType : enemyTypes) {

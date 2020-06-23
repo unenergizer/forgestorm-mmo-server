@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.task;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.GameConstants;
 import com.valenguard.server.game.MessageText;
 import com.valenguard.server.game.rpg.EntityAlignment;
@@ -45,18 +45,18 @@ public class MovementUpdateTask implements AbstractTask {
 
         mapTargets();
 
-        Server.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
+        ServerMain.getInstance().getGameManager().forAllPlayersFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
 
         // Try and start an entity move
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::generateNewAIMovements,
+        ServerMain.getInstance().getGameManager().forAllAiEntitiesFiltered(this::generateNewAIMovements,
                 entity -> !entity.isEntityMoving() && entity.getMoveNodes().isEmpty());
 
         // Try and continue move from move nodes
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::continueFromMoveNodes,
+        ServerMain.getInstance().getGameManager().forAllAiEntitiesFiltered(this::continueFromMoveNodes,
                 aiEntity -> !aiEntity.isEntityMoving() && !aiEntity.getMoveNodes().isEmpty());
 
         // Continue entity movement
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
+        ServerMain.getInstance().getGameManager().forAllAiEntitiesFiltered(this::updateEntitiesPosition, MovingEntity::isEntityMoving);
     }
 
 
@@ -70,7 +70,7 @@ public class MovementUpdateTask implements AbstractTask {
 
     private void mapTargets() {
         targetsLocations.clear();
-        Server.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
+        ServerMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
                     Location location = aiEntity.getFutureMapLocation();
                     MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, location);
                     if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
@@ -241,7 +241,7 @@ public class MovementUpdateTask implements AbstractTask {
                          * NPC vs NPC
                          */
 
-                        byte[] factionEnemies = Server.getInstance().getFactionManager().getFactionEnemies(attackerFaction);
+                        byte[] factionEnemies = ServerMain.getInstance().getFactionManager().getFactionEnemies(attackerFaction);
                         byte targetEntityFaction = ((NPC) targetEntity).getFaction();
 
                         for (byte enemy : factionEnemies) {
@@ -552,16 +552,16 @@ public class MovementUpdateTask implements AbstractTask {
     public void performPlayerMove(Player player, Location attemptLocation) {
 
         // Canceling trade for the packetReceiver.
-        Server.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
+        ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
         if (player.getGameMap().locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
         }
 
-        StationaryEntity stationaryEntity = Server.getInstance().getGameLoop().getProcessMining().getMiningNode(player);
+        StationaryEntity stationaryEntity = ServerMain.getInstance().getGameLoop().getProcessMining().getMiningNode(player);
         if (stationaryEntity != null) {
             if (!stationaryEntity.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                Server.getInstance().getGameLoop().getProcessMining().removePlayer(player);
+                ServerMain.getInstance().getGameLoop().getProcessMining().removePlayer(player);
             }
         }
 
@@ -576,7 +576,7 @@ public class MovementUpdateTask implements AbstractTask {
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));
 
-        Server.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+        ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
     }
 

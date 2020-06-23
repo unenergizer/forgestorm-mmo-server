@@ -1,6 +1,6 @@
 package com.valenguard.server.io;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.rpg.StationaryTypes;
 import com.valenguard.server.game.world.entity.Appearance;
 import com.valenguard.server.game.world.entity.EntityType;
@@ -177,7 +177,7 @@ public class TmxFileParser {
             stationaryEntity.setAppearance(appearance);
             appearance.setMonsterBodyTexture((byte) 0);// TODO: Determine texture id
             stationaryEntity.setName(""); // Empty name
-            Server.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);
+            ServerMain.getInstance().getGameManager().getGameMapProcessor().queueStationaryEntitySpawn(stationaryEntity);
 
             // Making it's associated tile non-traversable
             map[x][y].setTraversable(false);

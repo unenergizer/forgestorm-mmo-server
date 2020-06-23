@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.in;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.character.CharacterLogout;
 import com.valenguard.server.game.character.CharacterManager;
 import com.valenguard.server.network.game.packet.AllowNullPlayer;
@@ -24,7 +24,7 @@ public class CharacterLogoutPacketIn implements PacketListener<CharacterLogoutPa
 
     @Override
     public void onEvent(CharacterLogoutDataPacket packetData) {
-        CharacterManager characterManager = Server.getInstance().getCharacterManager();
+        CharacterManager characterManager = ServerMain.getInstance().getCharacterManager();
 
         switch (packetData.logoutType) {
             case LOGOUT_CHARACTER:

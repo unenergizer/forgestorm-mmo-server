@@ -1,6 +1,6 @@
 package com.valenguard.server.network.game.packet.out;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.game.world.entity.Entity;
 import com.valenguard.server.game.world.entity.EntityType;
 import com.valenguard.server.network.game.shared.ClientHandler;
@@ -25,7 +25,7 @@ public abstract class AbstractServerOutPacket {
      * Sends the packet to the packetReceiver.
      */
     public void sendPacket() {
-        Server.getInstance().getNetworkManager().getOutStreamManager().addServerOutPacket(this);
+        ServerMain.getInstance().getNetworkManager().getOutStreamManager().addServerOutPacket(this);
     }
 
     /**

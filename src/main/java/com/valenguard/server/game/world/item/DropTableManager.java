@@ -1,6 +1,6 @@
 package com.valenguard.server.game.world.item;
 
-import com.valenguard.server.Server;
+import com.valenguard.server.ServerMain;
 import com.valenguard.server.io.DropTableLoader;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class DropTableManager {
     }
 
     private ItemStack makeItemStack(int itemStackID, int amount) {
-        ItemStackManager itemStackManager = Server.getInstance().getItemStackManager();
+        ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
         ItemStack itemStack = itemStackManager.makeItemStack(itemStackID, amount);
         itemStack.setAmount(amount);
         return itemStack;
