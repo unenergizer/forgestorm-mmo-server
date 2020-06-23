@@ -1,0 +1,48 @@
+package com.forgestorm.server.game.world.combat;
+
+import com.forgestorm.server.game.GameConstants;
+import com.forgestorm.server.game.GameManager;
+import com.forgestorm.server.game.world.entity.AiEntity;
+import com.forgestorm.server.game.world.entity.MovingEntity;
+import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.GameMap;
+
+public class AbilityManager {
+
+    private final GameManager gameManager;
+
+    public AbilityManager(final GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
+
+    public void tick(long ticksPassed) {
+        if (ticksPassed % GameConstants.TICKS_PER_SECOND == 0) {
+            for (GameMap gameMap : gameManager.getGameMapProcessor().getGameMaps().values()) {
+                for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
+                    processEntity(aiEntity);
+                }
+                for (Player player : gameMap.getPlayerController().getPlayerList()) {
+                    processEntity(player);
+                }
+            }
+        }
+    }
+
+    private void processEntity(MovingEntity movingEntity) {
+        for (AbstractAbility ability : movingEntity.getAbstractAbilityList()) {
+            ability.processCooldownTime();
+            switch (ability.getAbilityType()) {
+                case ACTIVE:
+                    if (ability.isReady() && ability.isActive()) {
+                        ability.doAbilityActions(movingEntity);
+                        ability.resetAbility();
+                    }
+                    break;
+                case PASSIVE:
+                    ability.doAbilityActions(movingEntity);
+                    break;
+            }
+        }
+    }
+
+}
