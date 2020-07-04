@@ -12,15 +12,21 @@ public class ChatMessagePacketOut extends AbstractServerOutPacket {
     private final ChatChannelType chatChannelType;
     private final String message;
 
+    public ChatMessagePacketOut(final Player player, final ChatChannelType chatChannelType, final String message) {
+        super(Opcodes.CHAT, player.getClientHandler());
+        this.chatChannelType = chatChannelType;
+        this.message = message;
+    }
+
     public ChatMessagePacketOut(final Player player, final String message) {
         super(Opcodes.CHAT, player.getClientHandler());
-        this. chatChannelType = ChatChannelType.GENERAL;
+        this.chatChannelType = ChatChannelType.GENERAL;
         this.message = message;
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        write.writeByte((byte) chatChannelType.ordinal());
+        write.writeByte(ChatChannelType.getByte(chatChannelType));
         write.writeString(message);
         Log.println(getClass(), chatChannelType.name(), false, PRINT_DEBUG);
         Log.println(getClass(), message, false, PRINT_DEBUG);

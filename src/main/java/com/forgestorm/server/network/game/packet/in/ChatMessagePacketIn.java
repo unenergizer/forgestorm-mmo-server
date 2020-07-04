@@ -3,6 +3,7 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandState;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
@@ -18,7 +19,9 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
-        return new TextMessage(clientHandler.readString());
+        ChatChannelType chatChannelType = ChatChannelType.getChannelType(clientHandler.readByte());
+        String message = clientHandler.readString();
+        return new TextMessage(chatChannelType, message);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             stringBuilder.append(packetData.text);
 
             ServerMain.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
-                    new ChatMessagePacketOut(onlinePlayer, stringBuilder.toString()).sendPacket());
+                    new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket());
         }
     }
 
@@ -84,18 +87,18 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         CommandState.CommandType commandType = commandState.getCommandType();
 
         if (commandType == CommandState.CommandType.NOT_FOUND) {
-            new ChatMessagePacketOut(player, MessageText.ERROR + "Unknown Command").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, MessageText.ERROR + "Unknown Command").sendPacket();
             println(getClass(), playerName + "Unknown Command");
 
         } else if (commandType == CommandState.CommandType.SINGE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, MessageText.ERROR + "[Command] -> " + commandState.getIncompleteMessage()).sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, MessageText.ERROR + "[Command] -> " + commandState.getIncompleteMessage()).sendPacket();
             println(getClass(), playerName + " [Command] -> " + commandState.getIncompleteMessage());
 
         } else if (commandType == CommandState.CommandType.MULTIPLE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, "[YELLOW]Suggested Alternatives:").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, "[YELLOW]Suggested Alternatives:").sendPacket();
             println(getClass(), playerName + " Suggested Alternatives:");
             for (String incompleteMsg : commandState.getMultipleIncompleteMessages()) {
-                new ChatMessagePacketOut(player, "[YELLOW] - [Command] -> " + incompleteMsg).sendPacket();
+                new ChatMessagePacketOut(player, packetData.chatChannelType, "[YELLOW] - [Command] -> " + incompleteMsg).sendPacket();
                 println(getClass(), playerName + " - [Command] -> " + incompleteMsg);
             }
         }
@@ -103,7 +106,8 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     }
 
     @AllArgsConstructor
-    class TextMessage extends PacketData {
-        private String text;
+    static class TextMessage extends PacketData {
+        private final ChatChannelType chatChannelType;
+        private final String text;
     }
 }
