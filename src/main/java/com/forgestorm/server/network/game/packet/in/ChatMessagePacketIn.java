@@ -28,6 +28,9 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     public boolean sanitizePacket(TextMessage packetData) {
         String text = packetData.text;
 
+        // Client can not send Combat chat channel messages
+        if (packetData.chatChannelType == ChatChannelType.COMBAT) return false;
+
         if (text == null) return false;
         text = text.trim();
 
