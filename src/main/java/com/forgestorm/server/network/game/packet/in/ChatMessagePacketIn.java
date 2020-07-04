@@ -14,6 +14,8 @@ import static com.forgestorm.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.CHAT)
 public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.TextMessage> {
 
+    private static final boolean PRINT_DEBUG = true;
+
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         return new TextMessage(clientHandler.readString());
@@ -27,6 +29,9 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         text = text.trim();
 
         if (text.isEmpty()) return false;
+
+        println(getClass(), "Message: " + text, false, PRINT_DEBUG);
+
         return !text.contains("\n") && !text.contains("\r") && !text.contains("\t");
     }
 
