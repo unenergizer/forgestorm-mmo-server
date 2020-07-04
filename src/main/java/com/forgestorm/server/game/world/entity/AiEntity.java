@@ -1,6 +1,7 @@
 package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.maps.ItemStackDropEntityController;
 import com.forgestorm.server.game.world.maps.Location;
@@ -58,11 +59,11 @@ public class AiEntity extends MovingEntity {
         if (killerEntity.getEntityType() != EntityType.PLAYER) return;
 
         Player killerPlayer = (Player) killerEntity;
-        new ChatMessagePacketOut(killerPlayer, "[YELLOW]You killed " + getName() + ".").sendPacket();
+        new ChatMessagePacketOut(killerPlayer, ChatChannelType.COMBAT, "[YELLOW]You killed " + getName() + ".").sendPacket();
 
         // Give experience
         killerPlayer.getSkills().MELEE.addExperience(this.getExpDrop());
-        new ChatMessagePacketOut(killerPlayer, "[GREEN]You gained " + this.getExpDrop() + " experience.").sendPacket();
+        new ChatMessagePacketOut(killerPlayer, ChatChannelType.COMBAT, "[GREEN]You gained " + this.getExpDrop() + " experience.").sendPacket();
 
         // Adding/Subtracting reputation
         if (this.getEntityType() == EntityType.NPC) {

@@ -5,6 +5,7 @@ import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.EndlessArguments;
 import com.forgestorm.server.command.IncompleteCommand;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 
@@ -59,6 +60,6 @@ public class ServerCommands {
     @EndlessArguments
     public void serverSay(CommandSource commandSource, String[] args) {
         ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
-                new ChatMessagePacketOut(anyPlayer, MessageText.SERVER + String.join(" ", args)).sendPacket());
+                new ChatMessagePacketOut(anyPlayer, ChatChannelType.GENERAL, MessageText.SERVER + String.join(" ", args)).sendPacket());
     }
 }

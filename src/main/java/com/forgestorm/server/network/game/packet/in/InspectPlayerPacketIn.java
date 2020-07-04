@@ -1,6 +1,7 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.packet.out.InspectPlayerPacketOut;
@@ -35,7 +36,7 @@ public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacket
             new InspectPlayerPacketOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
             println(getClass(), "Sending inspection data!", false, PRINT_DEBUG);
         } else {
-            new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), "[RED]Could not find player.").sendPacket();
+            new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), ChatChannelType.GENERAL, "[RED]Could not find player.").sendPacket();
             println(getClass(), "NOT sending inspection data!", false, PRINT_DEBUG);
         }
     }

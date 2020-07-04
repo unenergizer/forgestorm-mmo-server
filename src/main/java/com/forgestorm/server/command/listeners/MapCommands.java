@@ -4,6 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.IncompleteCommand;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.maps.GameMap;
 import com.forgestorm.server.game.world.maps.GameMapProcessor;
 import com.forgestorm.server.game.world.maps.Tile;
@@ -22,13 +23,13 @@ public class MapCommands {
 
         // Check to make sure the map name doesn't already exist
         if (gameMapProcessor.doesGameMapExist(mapName)) {
-            new ChatMessagePacketOut(commandSource.getPlayer(), "[RED]Map name already been used. Try a different name").sendPacket();
+            new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED]Map name already been used. Try a different name").sendPacket();
             return;
         }
 
         // Check map sizes
         if (width < minSize || height < minSize) {
-            new ChatMessagePacketOut(commandSource.getPlayer(), "[RED]Map width and height must be larger than " + minSize + ".").sendPacket();
+            new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED]Map width and height must be larger than " + minSize + ".").sendPacket();
             return;
         }
 
@@ -44,7 +45,7 @@ public class MapCommands {
         GameMap gameMap = new GameMap(mapName, width, height, tiles); //teleport <playerName> <mapName> <x> <y>
         gameMapProcessor.loadMap(gameMap);
         gameMapProcessor.loadEntities(gameMap);
-        new ChatMessagePacketOut(commandSource.getPlayer(), "[GREEN]Map " + mapName + " was successfully created. Use the following command to warp to the map").sendPacket();
-        new ChatMessagePacketOut(commandSource.getPlayer(), "[YELLOW] /teleport " + commandSource.getPlayer().getName() + " " + mapName + " 0 0").sendPacket();
+        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[GREEN]Map " + mapName + " was successfully created. Use the following command to warp to the map").sendPacket();
+        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[YELLOW] /teleport " + commandSource.getPlayer().getName() + " " + mapName + " 0 0").sendPacket();
     }
 }

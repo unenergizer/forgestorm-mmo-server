@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.entity;
 
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.abilities.Ability;
 import com.forgestorm.server.game.rpg.Attributes;
@@ -130,10 +131,10 @@ public class MovingEntity extends Entity {
         getGameMap().getPlayerController().forAllPlayers(player ->
                 new EntityDamagePacketOut(player, this, currentHealth, finalDamage).sendPacket());
         if (this instanceof Player) {
-            new ChatMessagePacketOut((Player) this, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
+            new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
         }
         if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, "You hit " + getName() + " for " + damage + ".").sendPacket();
+            new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You hit " + getName() + " for " + damage + ".").sendPacket();
         }
     }
 

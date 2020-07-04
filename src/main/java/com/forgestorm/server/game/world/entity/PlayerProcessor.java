@@ -6,10 +6,7 @@ import com.forgestorm.server.database.sql.GamePlayerCharacterSQL;
 import com.forgestorm.server.database.sql.GamePlayerExperienceSQL;
 import com.forgestorm.server.database.sql.GamePlayerInventorySQL;
 import com.forgestorm.server.database.sql.GamePlayerReputationSQL;
-import com.forgestorm.server.game.GameManager;
-import com.forgestorm.server.game.MessageText;
-import com.forgestorm.server.game.PlayerConstants;
-import com.forgestorm.server.game.UserInterfaceType;
+import com.forgestorm.server.game.*;
 import com.forgestorm.server.game.world.item.inventory.InventoryActions;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.item.inventory.InventoryType;
@@ -73,7 +70,7 @@ public class PlayerProcessor {
 
         new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
         new PingPacketOut(player).sendPacket();
-        new ChatMessagePacketOut(player, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
+        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
 
         // Add player to World
         if (player.getGameMap() == null) {
@@ -82,7 +79,7 @@ public class PlayerProcessor {
             // Instead let's send them to the default spawn.
             player.setCurrentMapLocation(PlayerConstants.RESPAWN_LOCATION);
             player.setFutureMapLocation(PlayerConstants.RESPAWN_LOCATION);
-            new ChatMessagePacketOut(player, MessageText.ERROR + "The map you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
+            new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.ERROR + "The map you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
         }
         player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
 
@@ -118,7 +115,7 @@ public class PlayerProcessor {
         for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
-                new ChatMessagePacketOut(playerSearch, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
+                new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
             }
         }
 
@@ -156,7 +153,7 @@ public class PlayerProcessor {
         for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
-                new ChatMessagePacketOut(playerSearch, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
+                new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
             }
         }
 

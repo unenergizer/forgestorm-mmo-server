@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.entity;
 
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.abilities.WaitingAbility;
 import com.forgestorm.server.game.character.CharacterClasses;
@@ -118,7 +119,7 @@ public class Player extends MovingEntity {
         // Reheal Player
         setCurrentHealth(getMaxHealth());
 
-        new ChatMessagePacketOut(this, "You died! Respawning you in graveyard!").sendPacket();
+        new ChatMessagePacketOut(this, ChatChannelType.COMBAT, "You died! Respawning you in graveyard!").sendPacket();
     }
 
     public List<InventorySlot> getAllGoldSlots() {
