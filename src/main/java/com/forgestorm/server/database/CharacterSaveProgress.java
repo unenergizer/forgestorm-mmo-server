@@ -10,7 +10,7 @@ import static com.forgestorm.server.util.Log.println;
  */
 public class CharacterSaveProgress {
 
-    private final static boolean PRINT_DEBUG = true;
+    private final static boolean PRINT_DEBUG = false;
     private final ClientHandler clientHandler;
     private boolean characterSaved = false;
     private boolean inventorySaved = false;

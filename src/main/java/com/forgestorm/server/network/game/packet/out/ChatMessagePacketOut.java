@@ -7,7 +7,7 @@ import com.forgestorm.server.util.Log;
 
 public class ChatMessagePacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     private final ChatChannelType chatChannelType;
     private final String message;
