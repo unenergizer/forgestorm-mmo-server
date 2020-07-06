@@ -28,6 +28,10 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     public boolean sanitizePacket(TextMessage packetData) {
         String text = packetData.text;
 
+        // Make sure the incoming byte value isn't higher than the allowed
+        if (packetData.chatChannelType.ordinal() >= ChatChannelType.values().length) return false;
+        if (packetData.chatChannelType.ordinal() < 0) return false;
+
         // Client can not send Combat chat channel messages
         if (packetData.chatChannelType == ChatChannelType.COMBAT) return false;
 
