@@ -3,6 +3,7 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandState;
+import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
@@ -66,8 +67,19 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             stringBuilder.append("[DARK_GRAY]: [WHITE]");
             stringBuilder.append(packetData.text);
 
-            ServerMain.getInstance().getGameManager().forAllPlayers(onlinePlayer ->
-                    new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket());
+            // Send the message to the client!
+            ServerMain.getInstance().getGameManager().forAllPlayers(onlinePlayer -> {
+                // If the message is a staff message, make sure we send it to the correct clients!
+                if (packetData.chatChannelType == ChatChannelType.STAFF) {
+                    AuthenticatedUser authenticatedUser = onlinePlayer.getClientHandler().getAuthenticatedUser();
+                    if (authenticatedUser.isAdmin() || authenticatedUser.isModerator()) {
+                        new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
+                    }
+                } else {
+                    // All other messages
+                    new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
+                }
+            });
         }
     }
 
