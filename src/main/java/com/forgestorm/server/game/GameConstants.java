@@ -20,4 +20,5 @@ public class GameConstants {
 
     public static final short MAX_SHOP_DISTANCE = 5;
     public static final short MAX_BANK_DISTANCE = 5;
+    public static final byte MAX_CHAT_LENGTH = 127; // Max chat length is 0x7F.
 }

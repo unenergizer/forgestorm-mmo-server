@@ -1,9 +1,14 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.ChatChannelType;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.shared.Opcodes;
-import com.forgestorm.server.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.forgestorm.server.util.Log.println;
 
 public class ChatMessagePacketOut extends AbstractServerOutPacket {
 
@@ -20,9 +25,22 @@ public class ChatMessagePacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        List<String> stringList = new ArrayList<>();
+        int index = 0;
+        while (index < message.length()) {
+            stringList.add(message.substring(index, Math.min(index + GameConstants.MAX_CHAT_LENGTH, message.length())));
+            index += GameConstants.MAX_CHAT_LENGTH;
+        }
+
+        println(getClass(), "Chat Channel: " + chatChannelType.name(), false, PRINT_DEBUG);
+        println(getClass(), "Message Count: " + stringList.size(), false, PRINT_DEBUG);
+
         write.writeByte(ChatChannelType.getByte(chatChannelType));
-        write.writeString(message);
-        Log.println(getClass(), chatChannelType.name(), false, PRINT_DEBUG);
-        Log.println(getClass(), message, false, PRINT_DEBUG);
+        write.writeByte((byte) stringList.size());
+
+        for (String string : stringList) {
+            write.writeString(string);
+            println(getClass(), "String Wrote: " + string, false, PRINT_DEBUG);
+        }
     }
 }

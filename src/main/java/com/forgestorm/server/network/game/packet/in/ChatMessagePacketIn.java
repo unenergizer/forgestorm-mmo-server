@@ -21,8 +21,19 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
         ChatChannelType chatChannelType = ChatChannelType.getChannelType(clientHandler.readByte());
-        String message = clientHandler.readString();
-        return new TextMessage(chatChannelType, message);
+        byte messageCount = clientHandler.readByte();
+        StringBuilder message = new StringBuilder();
+
+        println(getClass(), "Chat Channel: " + chatChannelType.name(), false, PRINT_DEBUG);
+        println(getClass(), "Message Count: " + messageCount, false, PRINT_DEBUG);
+
+        for (byte i = 0; i < messageCount; i++) {
+            String string = clientHandler.readString();
+            message.append(string);
+            println(getClass(), "String Read: " + string, false, PRINT_DEBUG);
+        }
+
+        return new TextMessage(chatChannelType, message.toString());
     }
 
     @Override
