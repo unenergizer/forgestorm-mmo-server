@@ -7,13 +7,13 @@ public class LoginState {
 
     private Integer userId;
     private Boolean loginSuccess;
-    private String failReason;
+    private LoginFailReason loginFailReason;
     private String username;
     private boolean isAdmin;
     private boolean isModerator;
 
-    public LoginState failState(String failReason) {
-        this.failReason = failReason;
+    public LoginState failState(LoginFailReason loginFailReason) {
+        this.loginFailReason = loginFailReason;
         loginSuccess = false;
         return this;
     }

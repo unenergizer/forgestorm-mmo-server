@@ -106,7 +106,7 @@ public class LoginServerConnection {
                     outputStream.writeUTF(uuid.toString());
                 } else {
                     // Write Failure io
-                    outputStream.writeUTF(loginState.getFailReason());
+                    outputStream.writeByte(LoginFailReason.getByte(loginState.getLoginFailReason()));
                 }
 
                 outputStream.flush();

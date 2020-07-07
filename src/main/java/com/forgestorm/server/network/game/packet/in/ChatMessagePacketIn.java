@@ -7,7 +7,6 @@ import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
-import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.shared.*;
