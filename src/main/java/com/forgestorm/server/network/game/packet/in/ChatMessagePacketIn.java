@@ -5,7 +5,9 @@ import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandState;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.ChatChannelType;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
+import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.shared.*;
@@ -43,6 +45,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         // Make sure the incoming byte value isn't higher than the allowed
         if (packetData.chatChannelType.ordinal() >= ChatChannelType.values().length) return false;
         if (packetData.chatChannelType.ordinal() < 0) return false;
+        if (packetData.text.length() > GameConstants.MAX_CHAT_LENGTH) return false;
 
         // Client can not send Combat chat channel messages
         if (packetData.chatChannelType == ChatChannelType.COMBAT) return false;
@@ -67,15 +70,15 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             StringBuilder stringBuilder = new StringBuilder();
 
             if (messageSender.getAuthenticatedUser().isAdmin()) {
-                stringBuilder.append("[RED]");
+                stringBuilder.append(MessageText.ADMIN_COLOR);
             } else if (messageSender.getAuthenticatedUser().isModerator()) {
-                stringBuilder.append("[PURPLE]");
+                stringBuilder.append(MessageText.MOD_COLOR);
             } else {
-                stringBuilder.append("[LIGHT_GRAY]");
+                stringBuilder.append(MessageText.PLAYER_COLOR);
             }
 
             stringBuilder.append(messageSender.getPlayer().getName());
-            stringBuilder.append("[DARK_GRAY]: [WHITE]");
+            stringBuilder.append(MessageText.CHAT_FORMATTING);
             stringBuilder.append(packetData.text);
 
             // Send the message to the client!
