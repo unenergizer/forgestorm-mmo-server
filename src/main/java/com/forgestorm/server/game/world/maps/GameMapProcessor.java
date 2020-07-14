@@ -16,6 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameMapProcessor {
 
+    private static final boolean PRINT_DEBUG = false;
+
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
 
@@ -93,11 +95,11 @@ public class GameMapProcessor {
         int monsterSize = loadMonster(gameMap);
         int itemStackDropSize = loadItemStackDrop(gameMap);
         int entityTotal = npcSize + monsterSize + itemStackDropSize;
-        println(getClass(), "Map:" + gameMap.getMapName() +
+        println(getClass(), "Map: " + gameMap.getMapName() +
                 ", NPCs Total: " + npcSize +
                 ", Monsters Total: " + monsterSize +
                 ", ItemStackDrop Total: " + itemStackDropSize +
-                ", Entity Total: " + entityTotal);
+                ", Entity Total: " + entityTotal, false, PRINT_DEBUG);
     }
 
     public int loadNPC(GameMap gameMap) {
@@ -180,7 +182,7 @@ public class GameMapProcessor {
 
     private void fixWarpHeights() {
         for (GameMap gameMap : gameMaps.values()) {
-            println(getClass(), "Fixing warps for: " + gameMap.getMapName());
+            println(getClass(), "Fixing warps for: " + gameMap.getMapName(), false, PRINT_DEBUG);
             for (short i = 0; i < gameMap.getMapWidth(); i++) {
                 for (short j = 0; j < gameMap.getMapHeight(); j++) {
                     if (gameMap.isOutOfBounds(i, j)) continue;
