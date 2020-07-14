@@ -13,13 +13,11 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import javax.security.auth.login.LoginException;
 import java.util.List;
 
-import static com.forgestorm.server.util.Log.println;
-
 public class DiscordManager {
 
     private static final String BOT_TOKEN = "NDgwMTc0NzE1OTgyNDQ2NjM4.XUa7uQ.ZhBHLlMFh1AQW9ELkXOrEKCsDAc";
     private static final String CONSOLE_CHANNEL = "607537864275656724";
-    private static final boolean USE_DISCORD_LOGGING = false;
+    private static final boolean USE_DISCORD_LOGGING = true;
 
     private JDA jdaEvent;
     private boolean isReady = false;
@@ -36,8 +34,6 @@ public class DiscordManager {
                         public void onReady(ReadyEvent event) {
                             jdaEvent = event.getJDA();
                             isReady = true;
-
-                            println(DiscordManager.class, "error test!", true);
                         }
                     })
                     .addEventListener(new DiscordListeners())
