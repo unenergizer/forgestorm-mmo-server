@@ -31,7 +31,7 @@ public class ServerMain {
     private static ResourcePathLoader resourcePathLoader;
 
     static {
-        resourcePathLoader = new ResourcePathLoader();
+//        resourcePathLoader = new ResourcePathLoader();
     }
 
     // Framework
@@ -58,7 +58,14 @@ public class ServerMain {
     private ServerMain() {
     }
 
+    public static boolean ideRun = false;
+
     public static void main(String[] args) {
+
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("ideRun")) ideRun = true;
+        }
+
         ServerMain.getInstance().startServer();
     }
 

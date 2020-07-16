@@ -1,10 +1,12 @@
 package com.forgestorm.server.game.world.maps;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.database.sql.GameWorldItemStackDropSQL;
 import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.FilePaths;
+import com.forgestorm.server.io.ResourceList;
 import com.forgestorm.server.io.TmxFileParser;
 import lombok.Getter;
 
@@ -16,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameMapProcessor {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final boolean PRINT_DEBUG = true;
 
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
@@ -66,16 +68,39 @@ public class GameMapProcessor {
     }
 
     public void loadAllMaps() {
-        File[] files = new File(FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(".tmx"));
+        int mapCount;
+
+        if (ServerMain.ideRun) {
+            mapCount = loadIdeVersion();
+        } else {
+            mapCount = loadJarVersion();
+        }
+        println(getClass(), "Tmx Maps Loaded: " + mapCount);
+
+        fixWarpHeights();
+    }
+
+    private int loadIdeVersion() {
+        File[] files = new File("src/main/resources/" + FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(".tmx"));
         checkNotNull(files, "No game maps were loaded.");
 
         for (File file : files) {
-            String mapName = file.getName().replace(".tmx", "");
-            loadMap(TmxFileParser.parseGameMap(FilePaths.MAPS.getFilePath(), mapName));
+            loadMap(TmxFileParser.parseGameMap(file.getName()));
         }
 
-        println(getClass(), "Tmx Maps Loaded: " + files.length);
-        fixWarpHeights();
+        return files.length;
+    }
+
+    private int loadJarVersion() {
+        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.MAPS.getFilePath(), ".tmx");
+        checkNotNull(files, "No game maps were loaded.");
+
+        for (String fileName : files) {
+            String[] temp = fileName.split("/"); // Removes the path
+            loadMap(TmxFileParser.parseGameMap(temp[temp.length - 1]));
+        }
+
+        return files.size();
     }
 
     public void loadMap(GameMap gameMap) {

@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
@@ -28,18 +29,22 @@ public class TmxFileParser {
      * This takes in a TMX map and gets the collision elements from it and builds a collision
      * array for checking entity collision server side.
      *
-     * @param directory The directory that contains this map.
      * @param fileName  The name of the TMX map file.
      * @return A map io class with information about this map.
      */
-    public static GameMap parseGameMap(String directory, String fileName) {
+    public static GameMap parseGameMap(String fileName) {
         Document document = null;
+
+        println(TmxFileParser.class, "PATH: " + fileName);
+
+        InputStream inputStream = TmxFileParser.class.getResourceAsStream(FilePaths.MAPS.getFilePath() + fileName);
 
         // Lets get the document
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(directory + fileName + ".tmx");
+            document = builder.parse(inputStream);
+
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }

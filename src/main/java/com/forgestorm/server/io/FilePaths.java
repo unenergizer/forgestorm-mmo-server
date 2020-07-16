@@ -2,8 +2,6 @@ package com.forgestorm.server.io;
 
 import lombok.AllArgsConstructor;
 
-import java.io.File;
-
 @AllArgsConstructor
 public enum FilePaths {
 
@@ -30,11 +28,6 @@ public enum FilePaths {
     private String filePath;
 
     public String getFilePath() {
-        boolean useLocal = false;
-        if (useLocal) {
-            return ResourcePathLoader.getResourcePath() + File.separator + filePath.replace("/", File.separator);
-        } else {
-            return "src/main/resources/data/" + filePath;
-        }
+        return "/data/" + filePath;
     }
 }

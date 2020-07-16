@@ -6,9 +6,6 @@ import com.forgestorm.server.game.world.item.ItemStackType;
 import com.forgestorm.server.game.world.item.WearableItemStack;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +22,7 @@ public class ItemStackLoader {
 
         Yaml yaml = new Yaml();
 
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(FilePaths.ITEM_STACK.getFilePath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = getClass().getResourceAsStream(FilePaths.ITEM_STACK.getFilePath());
 
         Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
 

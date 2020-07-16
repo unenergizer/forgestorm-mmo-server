@@ -4,9 +4,6 @@ import com.forgestorm.server.game.abilities.Ability;
 import com.forgestorm.server.game.abilities.AbilityType;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +19,7 @@ public class AbilityLoader {
 
         Yaml yaml = new Yaml();
 
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(FilePaths.COMBAT_ABILITIES.getFilePath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = getClass().getResourceAsStream(FilePaths.COMBAT_ABILITIES.getFilePath());
 
         Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
 

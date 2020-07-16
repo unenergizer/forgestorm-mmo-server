@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +19,7 @@ public class DropTableLoader {
         println(getClass(), "====== START LOADING DROP TABLES ======", false, PRINT_DEBUG);
         Yaml yaml = new Yaml();
 
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(FilePaths.DROP_TABLE.getFilePath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = getClass().getResourceAsStream(FilePaths.DROP_TABLE.getFilePath());
 
         Map<Integer, Map<Integer, Map<String, Object>>> root = yaml.load(inputStream);
 

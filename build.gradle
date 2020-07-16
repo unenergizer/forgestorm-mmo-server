@@ -1,23 +1,22 @@
+plugins {
+    id 'java'
+}
+
 group 'com.forgestorm.server'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
-
 sourceCompatibility = 1.8
+//skipJarSign = true;
 
-//create a single Jar with all dependencies
-task fatJar(type: Jar) {
+jar {
     manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File Example',
-                'Implementation-Version': version,
-                'Main-Class': 'com.forgestorm.server.ServerMain'
+        attributes 'Main-Class': 'com.forgestorm.server.ServerMain'
     }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA' // REMOVE FOR BCRYPT
+    }
 }
 
-//Get dependencies from Maven central repository
 repositories {
     mavenCentral()
     jcenter()
@@ -25,18 +24,22 @@ repositories {
 
 dependencies {
     // MySQL related with bcrypt to do XenForo login
-    compile 'at.favre.lib:bcrypt:0.7.0'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
-    compile 'mysql:mysql-connector-java:5.1.6'
-    compile 'com.zaxxer:HikariCP:3.3.1'
+    compile 'at.favre.lib:bcrypt:0.9.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
+    compile 'mysql:mysql-connector-java:8.0.21' //5.1.6
+    compile 'com.zaxxer:HikariCP:3.4.5'
 
     // Discord Bot Integration
-    compile 'net.dv8tion:JDA:3.8.3_464'
+    compile ('net.dv8tion:JDA:4.2.0_179') {
+        exclude module: 'opus-java' // Remove Audio dependency
+    }
 
     // Config
     compile 'org.yaml:snakeyaml:1.26:android'
 
     // Helpers
-    compile 'com.google.guava:guava:27.0.1-jre'
+    compile 'com.google.guava:guava:29.0-jre'
     compileOnly 'org.projectlombok:lombok:1.18.8'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
+
 }

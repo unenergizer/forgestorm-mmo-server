@@ -1,23 +1,23 @@
 package com.forgestorm.server.discord;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
 
 public class DiscordManager {
 
+    private static final boolean USE_DISCORD_LOGGING = false;
     private static final String BOT_TOKEN = "NDgwMTc0NzE1OTgyNDQ2NjM4.XUa7uQ.ZhBHLlMFh1AQW9ELkXOrEKCsDAc";
     private static final String CONSOLE_CHANNEL = "607537864275656724";
-    private static final boolean USE_DISCORD_LOGGING = true;
 
     private JDA jdaEvent;
     private boolean isReady = false;
@@ -28,15 +28,15 @@ public class DiscordManager {
         if (!USE_DISCORD_LOGGING) return;
 
         try {
-            JDA jda = new JDABuilder(BOT_TOKEN)
-                    .addEventListener(new ListenerAdapter() {
+            JDA jda = JDABuilder.createDefault(BOT_TOKEN)
+                    .addEventListeners(new ListenerAdapter() {
                         @Override
                         public void onReady(ReadyEvent event) {
                             jdaEvent = event.getJDA();
                             isReady = true;
                         }
                     })
-                    .addEventListener(new DiscordListeners())
+                    .addEventListeners(new DiscordListeners())
                     .build();
             try {
                 jda.awaitReady();

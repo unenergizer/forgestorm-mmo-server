@@ -27,8 +27,7 @@ public class DatabaseManager {
         println(getClass(), "Initializing database...");
 
         HikariConfig config = new HikariConfig();
-        config.setDriverClassName("com.mysql.jdbc.Driver");
-        config.setJdbcUrl("jdbc:mysql://" + databaseSettings.getIp() + ":" + databaseSettings.getPort() + "/" + databaseSettings.getDatabase());
+        config.setJdbcUrl("jdbc:mysql://" + databaseSettings.getIp() + ":" + databaseSettings.getPort() + "/" + databaseSettings.getDatabase() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
         config.setUsername(databaseSettings.getUsername());
         config.setPassword(databaseSettings.getPassword());
         config.addDataSourceProperty("cachePrepStmts", "true");

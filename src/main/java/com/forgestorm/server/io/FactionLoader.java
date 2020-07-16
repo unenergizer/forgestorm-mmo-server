@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,12 +33,9 @@ public class FactionLoader {
     public Map<Byte, FactionData> loadFactionInfo() {
         Yaml yaml = new Yaml();
 
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(FilePaths.FACTIONS.getFilePath()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = getClass().getResourceAsStream(FilePaths.FACTIONS.getFilePath());
+
+        System.out.println("PATH: " + inputStream.toString());
 
         Map<Byte, FactionData> factionDataMap = new HashMap<>();
         Map<Integer, Map<String, Object>> root = yaml.load(inputStream);
