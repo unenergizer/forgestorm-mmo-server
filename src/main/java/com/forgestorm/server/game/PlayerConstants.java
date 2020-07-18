@@ -8,7 +8,7 @@ public class PlayerConstants {
     /**
      * How fast our player can move around the map.
      */
-    public static final float DEFAULT_MOVE_SPEED = .4f;
+    public static final float DEFAULT_MOVE_SPEED = 2F;
 
     /**
      * The faction that the player begins as. This will probably be changed.

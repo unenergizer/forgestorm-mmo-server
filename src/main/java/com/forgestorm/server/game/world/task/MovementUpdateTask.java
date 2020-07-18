@@ -108,7 +108,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         moveEntity(movingEntity);
 
-        if (movingEntity.getWalkTime() <= movingEntity.getMoveSpeed()) return;
+        if (movingEntity.getWalkTime() < 1.0F) return;
 
         if (movingEntity instanceof Player) {
 
@@ -145,9 +145,7 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private void moveEntity(MovingEntity movingEntity) {
-        float delta = 1.0f / 20.0f;
-
-        movingEntity.setWalkTime(movingEntity.getWalkTime() + delta);
+        float delta = 1.0f / 20.0f; // TODO: Might want to get the actual delta (error incurred ter tick)
 
         int currentX = movingEntity.getCurrentMapLocation().getX();
         int currentY = movingEntity.getCurrentMapLocation().getY();
@@ -155,8 +153,12 @@ public class MovementUpdateTask implements AbstractTask {
         int futureX = movingEntity.getFutureMapLocation().getX();
         int futureY = movingEntity.getFutureMapLocation().getY();
 
-        movingEntity.setRealX(linearInterpolate(currentX, futureX, movingEntity.getWalkTime() / movingEntity.getMoveSpeed()) * GameConstants.TILE_SIZE);
-        movingEntity.setRealY(linearInterpolate(currentY, futureY, movingEntity.getWalkTime() / movingEntity.getMoveSpeed()) * GameConstants.TILE_SIZE);
+        float frameMove = movingEntity.getMoveSpeed() / GameConstants.TICKS_PER_SECOND;
+
+        movingEntity.setWalkTime(movingEntity.getWalkTime() + frameMove);
+
+        movingEntity.setRealX(linearInterpolate(currentX, futureX, movingEntity.getWalkTime()) * GameConstants.TILE_SIZE);
+        movingEntity.setRealY(linearInterpolate(currentY, futureY, movingEntity.getWalkTime()) * GameConstants.TILE_SIZE);
     }
 
     private float linearInterpolate(float start, float end, float a) {
