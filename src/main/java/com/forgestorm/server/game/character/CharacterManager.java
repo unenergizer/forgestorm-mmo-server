@@ -2,10 +2,13 @@ package com.forgestorm.server.game.character;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.database.sql.GamePlayerCharacterSQL;
+import com.forgestorm.server.database.sql.GamePlayerInventorySQL;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.UserInterfaceType;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.network.game.PlayerSessionData;
 import com.forgestorm.server.network.game.packet.out.CharacterMenuLoadPacketOut;
@@ -67,8 +70,28 @@ public class CharacterManager {
         appearance.setSkinColor(skinValue);
         player.setAppearance(appearance);
 
+        // Give the player beginner items
+        ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
+
+        // Default Armor and Weapons
+        ItemStack sword = itemStackManager.makeItemStack(4, 1);
+        ItemStack chest = itemStackManager.makeItemStack(2, 1);
+        ItemStack pants = itemStackManager.makeItemStack(23, 1);
+        ItemStack shoes = itemStackManager.makeItemStack(7, 1);
+        player.getPlayerEquipment().setItemStack((byte) 10, sword, false);
+        player.getPlayerEquipment().setItemStack((byte) 1, chest, false);
+        player.getPlayerEquipment().setItemStack((byte) 2, pants, false);
+        player.getPlayerEquipment().setItemStack((byte) 3, shoes, false);
+
+        // HotBar Spell Setup
+        ItemStack meleeSpell = itemStackManager.makeItemStack(25, 1);
+        ItemStack rangedSpell = itemStackManager.makeItemStack(26, 1);
+        player.getPlayerHotBar().setItemStack((byte) 0, meleeSpell, false);
+        player.getPlayerHotBar().setItemStack((byte) 1, rangedSpell, false);
+
         // Insert into SQL and then load player defaults!
-        new GamePlayerCharacterSQL().firstTimeSaveSQL(player);
+        new GamePlayerCharacterSQL().firstTimeSaveSQL(player); // Goes first, sets player.databaseId (returned from first time save)
+        new GamePlayerInventorySQL().firstTimeSaveSQL(player); // Goes second, needs player.getDatabaseId();
 
         // Send player back to character select screen and show them all characters (including the one just made)
         sendToCharacterScreen(clientHandler);

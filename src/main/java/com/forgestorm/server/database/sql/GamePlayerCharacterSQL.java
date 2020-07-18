@@ -7,10 +7,7 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,7 +84,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_characters " +
                 "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, hair_texture, hair_color, eye_color, skin_color) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 
         preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
@@ -193,6 +190,19 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             preparedStatement = firstTimeSave(player, connection);
             preparedStatement.execute();
+
+            // Set the players database ID
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int databaseId = generatedKeys.getInt(1);
+                    player.setDatabaseId(databaseId);
+                    println(getClass(), "Player Database ID: " + databaseId);
+                }
+                else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
+
         } catch (SQLException exe) {
             exe.printStackTrace();
         } finally {

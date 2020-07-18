@@ -84,4 +84,23 @@ public class GamePlayerInventorySQL extends AbstractSingleSQL {
 
         return inventorySlots;
     }
+
+    public void firstTimeSaveSQL(Player player) {
+
+        PreparedStatement preparedStatement = null;
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            preparedStatement = firstTimeSave(player, connection);
+            preparedStatement.execute();
+        } catch (SQLException exe) {
+            exe.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
