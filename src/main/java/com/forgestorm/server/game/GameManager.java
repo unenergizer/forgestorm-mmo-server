@@ -45,6 +45,12 @@ public class GameManager {
         });
     }
 
+    public void sendToAll(Player player, Consumer<ClientHandler> callback) {
+        player.getGameMap().getPlayerController().getPlayerList().forEach(playerOnMap -> {
+            callback.accept(playerOnMap.getClientHandler());
+        });
+    }
+
     public void forAllPlayers(Consumer<Player> callback) {
         gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
     }

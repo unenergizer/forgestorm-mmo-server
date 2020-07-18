@@ -144,12 +144,24 @@ public class PlayerCommands {
         if (player == null) return;
 
         float oldMoveSpeed = player.getMoveSpeed();
-        float moveSpeed = Float.parseFloat(args[1]);
-        player.setMoveSpeed(moveSpeed);
-        commandSource.sendMessage(MessageText.SERVER + playerName + " move speed set to " + player.getMoveSpeed() + " from " + oldMoveSpeed + ".");
 
-        player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
-                new EntityUpdatePacketOut(anyPlayer, player, moveSpeed).sendPacket());
+        try {
+            float moveSpeed = Float.parseFloat(args[1]);
+
+            if (moveSpeed > 59F) {
+                commandSource.sendMessage(MessageText.SERVER + "Speed cannot be above 59.");
+                return;
+            }
+
+            player.setMoveSpeed(moveSpeed);
+            commandSource.sendMessage(MessageText.SERVER + playerName + " move speed set to " + player.getMoveSpeed() + " from " + oldMoveSpeed + ".");
+
+            player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+                    new EntityUpdatePacketOut(anyPlayer, player, moveSpeed).sendPacket());
+
+        } catch (NumberFormatException e) {
+            commandSource.sendMessage(MessageText.SERVER + "Second argument must be a float.");
+        }
     }
 
     private Player getPlayer(CommandSource commandSource, String playerName) {

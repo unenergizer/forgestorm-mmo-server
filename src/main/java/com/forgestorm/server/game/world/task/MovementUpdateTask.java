@@ -10,6 +10,7 @@ import com.forgestorm.server.game.world.maps.GameMap;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
+import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
 import com.forgestorm.server.util.MoveNode;
 import com.forgestorm.server.util.PathFinding;
@@ -507,6 +508,7 @@ public class MovementUpdateTask implements AbstractTask {
             }
         }
 
+        //    RESYNCING
         // Trying to make sure they move to a tile beside themselves.
         // Cases:
         // 1. The player is not moving -> the tile beside them is the tile beside their current location
@@ -515,18 +517,18 @@ public class MovementUpdateTask implements AbstractTask {
 
         if (!playerIsMoving) {
             if (!player.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
                 return false;
             }
         } else {
             if (moveQueueEmpty) {
                 if (!player.getFutureMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                    new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                    new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
                     return false;
                 }
             } else {
                 if (!player.getLatestMoveRequests().getLast().isWithinDistance(attemptLocation, (short) 1)) {
-                    new EntityMovePacketOut(player, player, player.getFutureMapLocation()).sendPacket();
+                    new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
                     return false;
                 }
             }
@@ -578,8 +580,9 @@ public class MovementUpdateTask implements AbstractTask {
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));
 
-        ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+        ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
+
     }
 
     private void performAiEntityMove(AiEntity aiEntity, MoveDirection moveDirection) {
