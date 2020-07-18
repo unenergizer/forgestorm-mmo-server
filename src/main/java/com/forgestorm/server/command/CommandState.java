@@ -26,6 +26,7 @@ public class CommandState {
         NOT_FOUND,
         SINGE_INCOMPLETE,
         MULTIPLE_INCOMPLETE,
+        INVALID_PERMISSION,
         FOUND
     }
 }

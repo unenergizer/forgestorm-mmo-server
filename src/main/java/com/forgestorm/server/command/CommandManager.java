@@ -18,6 +18,7 @@ public class CommandManager {
         commandProcessor.addListener(new PlayerCommands());
         commandProcessor.addListener(new ServerCommands());
         commandProcessor.addListener(new MapCommands());
+        commandProcessor.addListener(new MessageCommands());
 
         consoleCommandManager.start();
     }

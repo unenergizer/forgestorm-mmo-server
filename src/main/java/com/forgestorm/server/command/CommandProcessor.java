@@ -1,5 +1,6 @@
 package com.forgestorm.server.command;
 
+import com.forgestorm.server.game.world.entity.Player;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +29,7 @@ public class CommandProcessor {
         private int reqArgs;
         private String incompleteMsg;
         boolean endlessArguments;
+        private CommandPermStatus permission;
     }
 
     void addListener(Object listener) {
@@ -59,8 +61,13 @@ public class CommandProcessor {
             IncompleteCommand[] incompleteCms = method.getAnnotationsByType(IncompleteCommand.class);
             if (incompleteCms.length == 1) incompleteMsg = incompleteCms[0].missing();
 
+            CommandPermStatus permission = CommandPermStatus.ADMIN;
+            CommandPermission[] permissions = method.getAnnotationsByType(CommandPermission.class);
+            if (permissions.length == 1) permission = permissions[0].status();
+
             CommandInfo commandInfo = new CommandInfo(
-                    listener, method, cmdAnnotations[0].argLenReq(), incompleteMsg, endlessArguments);
+                    listener, method, cmdAnnotations[0].argLenReq(), incompleteMsg, endlessArguments,
+                    permission);
 
             if (endlessArguments) {
 
@@ -98,6 +105,8 @@ public class CommandProcessor {
 
             for (Map.Entry<Integer, CommandInfo> commandInfo : commandInfoMap.entrySet()) {
                 if (args.length <= commandInfo.getKey()) continue;
+                if (!checkPermission(commandSource, commandInfo.getValue()))
+                    return new CommandState(CommandState.CommandType.INVALID_PERMISSION);
                 publishedCommands.add(new PublishInfo(commandSource, args, commandInfo.getValue()));
                 return new CommandState(CommandState.CommandType.FOUND);
             }
@@ -131,8 +140,27 @@ public class CommandProcessor {
                 return new CommandState(CommandState.CommandType.MULTIPLE_INCOMPLETE, incompleteCommands);
             }
         }
+
+        if (!checkPermission(commandSource, commandInfo))
+            return new CommandState(CommandState.CommandType.INVALID_PERMISSION);
+
         publishedCommands.add(new PublishInfo(commandSource, args, commandInfo));
         return new CommandState(CommandState.CommandType.FOUND);
+    }
+
+    private boolean checkPermission(CommandSource commandSource, CommandInfo commandInfo) {
+        // Must be the console
+        if (commandSource.getPlayer() == null) return true;
+        Player player = commandSource.getPlayer();
+        if (commandInfo.permission == CommandPermStatus.ADMIN) {
+            return player.getClientHandler().getAuthenticatedUser().isAdmin();
+        } else if (commandInfo.permission == CommandPermStatus.MOD) {
+            return player.getClientHandler().getAuthenticatedUser().isModerator() ||
+                    player.getClientHandler().getAuthenticatedUser().isAdmin();
+        } else if (commandInfo.permission == CommandPermStatus.ALL) {
+            return true;
+        }
+        return false;
     }
 
     private String[] getCommandSuggestions(Map<Integer, CommandInfo> commandInfoMap) {

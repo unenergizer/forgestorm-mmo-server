@@ -97,7 +97,6 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     }
 
     private boolean attemptCommand(TextMessage packetData) {
-        if (!packetData.getClientHandler().getAuthenticatedUser().isAdmin()) return false;
         if (!packetData.text.startsWith("/")) return false;
 
         String[] content = packetData.text.split("\\s+");
@@ -133,6 +132,8 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
                 new ChatMessagePacketOut(player, packetData.chatChannelType, "[YELLOW] - [Command] -> " + incompleteMsg).sendPacket();
                 println(getClass(), playerName + " - [Command] -> " + incompleteMsg);
             }
+        } else if (commandType == CommandState.CommandType.INVALID_PERMISSION) {
+            return false;
         }
         return true;
     }
