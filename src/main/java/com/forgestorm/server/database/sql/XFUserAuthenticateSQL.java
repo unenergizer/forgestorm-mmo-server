@@ -90,7 +90,6 @@ public class XFUserAuthenticateSQL {
             e.printStackTrace();
             return new LoginState().failState(LoginFailReason.INCORRECT_ACCOUNT_DETAILS);
         } finally {
-            println(XFUserAuthenticateSQL.class, "Finally called...");
             try {
                 if (userIdResult != null) userIdResult.close();
                 if (hashResult != null) hashResult.close();
