@@ -10,6 +10,7 @@ public class BankManagePacketOut extends AbstractServerOutPacket {
 
     public BankManagePacketOut(final Player player, BankActions bankAction) {
         super(Opcodes.BANK_MANAGEMENT, player.getClientHandler());
+
         this.bankAction = bankAction;
     }
 

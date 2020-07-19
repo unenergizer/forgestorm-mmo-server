@@ -20,6 +20,7 @@ public class InspectPlayerPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        // TODO: Remove object reference from createPacket method
         InventorySlot[] inventorySlotArray = targetPlayer.getPlayerEquipment().getInventorySlotArray();
         for (InventorySlot inventorySlot : inventorySlotArray) {
             ItemStack itemStack = inventorySlot.getItemStack();

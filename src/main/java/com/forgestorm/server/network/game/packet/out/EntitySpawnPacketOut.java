@@ -21,6 +21,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        // TODO: Remove object reference from createPacket method
         if (entityToSpawn instanceof MovingEntity) {
             spawnMovingEntity(write);
         } else if (entityToSpawn instanceof StationaryEntity) {

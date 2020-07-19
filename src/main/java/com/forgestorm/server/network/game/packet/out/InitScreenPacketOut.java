@@ -10,6 +10,7 @@ public class InitScreenPacketOut extends AbstractServerOutPacket {
 
     public InitScreenPacketOut(final ClientHandler clientHandler, UserInterfaceType userInterfaceType) {
         super(Opcodes.INIT_SCREEN, clientHandler);
+
         this.userInterfaceType = userInterfaceType;
     }
 
