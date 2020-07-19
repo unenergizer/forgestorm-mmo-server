@@ -16,7 +16,7 @@ public class EntityDamagePacketOut extends AbstractServerOutPacket {
         super(Opcodes.ENTITY_DAMAGE_OUT, receiver.getClientHandler());
 
         this.serverEntityId = damagedEntity.getServerEntityId();
-        this.entityType = damagedEntity.getEntityType();
+        this.entityType = detectEntityType(damagedEntity);
         this.health = health;
         this.damageTaken = damageTaken;
     }

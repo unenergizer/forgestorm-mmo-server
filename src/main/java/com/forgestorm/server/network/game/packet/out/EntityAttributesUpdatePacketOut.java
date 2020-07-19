@@ -22,7 +22,7 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
 
         this.entityName = movingEntity.getName();
         this.serverEntityId = movingEntity.getServerEntityId();
-        this.entityType = movingEntity.getEntityType();
+        this.entityType = detectEntityType(movingEntity);
         this.armor = movingEntity.getAttributes().getArmor();
         this.damage = movingEntity.getAttributes().getDamage();
     }
@@ -34,7 +34,9 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
         write.writeInt(armor);
         write.writeInt(damage);
 
-        println(getClass(), "Receiver: " + entityName + ", Type: " + entityType, false, PRINT_DEBUG);
+        println(getClass(), "EntityName: " + entityName, false, PRINT_DEBUG);
+        println(getClass(), "EntityId: " + serverEntityId, false, PRINT_DEBUG);
+        println(getClass(), "EntityType: " + entityType, false, PRINT_DEBUG);
         println(getClass(), "Armor: " + armor, false, PRINT_DEBUG);
         println(getClass(), "Damage: " + damage, false, PRINT_DEBUG);
     }

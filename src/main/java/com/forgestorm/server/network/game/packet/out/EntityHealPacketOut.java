@@ -15,7 +15,7 @@ public class EntityHealPacketOut extends AbstractServerOutPacket {
         super(Opcodes.ENTITY_HEAL_OUT, receiver.getClientHandler());
 
         this.serverEntityId = healingEntity.getServerEntityId();
-        this.entityType = healingEntity.getEntityType();
+        this.entityType = detectEntityType(healingEntity);
         this.healthGiven = healthGiven;
     }
 

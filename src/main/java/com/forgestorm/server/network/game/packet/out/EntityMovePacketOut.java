@@ -26,7 +26,7 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
 
         this.entityName = movingEntity.getName();
         this.serverEntityId = movingEntity.getServerEntityId();
-        this.entityType = movingEntity.getEntityType();
+        this.entityType = detectEntityType(movingEntity);
         this.moveDirection = movingEntity.getFacingDirection();
         this.x = attemptLocation.getX();
         this.y = attemptLocation.getY();

@@ -32,7 +32,7 @@ public class EntityAppearancePacketOut extends AbstractServerOutPacket {
         super(Opcodes.APPEARANCE, receiver.getClientHandler());
 
         this.serverEntityId = entity.getServerEntityId();
-        this.entityType = entity.getEntityType();
+        this.entityType = detectEntityType(entity);
 
         Appearance appearance = entity.getAppearance();
         this.monsterBodyTexture = appearance.getMonsterBodyTexture();

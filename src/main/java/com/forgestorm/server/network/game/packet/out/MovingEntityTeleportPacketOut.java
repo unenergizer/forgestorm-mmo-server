@@ -22,7 +22,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
         super(Opcodes.PLAYER_TELEPORT, receiver.getClientHandler());
 
         this.serverEntityId = teleportedEntity.getServerEntityId();
-        this.entityType = teleportedEntity.getEntityType();
+        this.entityType = detectEntityType(teleportedEntity);
         this.mapName = teleportLocation.getMapName();
         this.x = teleportLocation.getX();
         this.y = teleportLocation.getY();

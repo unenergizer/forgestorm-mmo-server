@@ -15,7 +15,7 @@ public class EntityUpdatePacketOut extends AbstractServerOutPacket {
         super(Opcodes.ENTITY_UPDATE_SPEED, player.getClientHandler());
 
         this.serverEntityId = updateTarget.getServerEntityId();
-        this.entityType = updateTarget.getEntityType();
+        this.entityType = detectEntityType(updateTarget);
         this.moveSpeed = moveSpeed;
     }
 
