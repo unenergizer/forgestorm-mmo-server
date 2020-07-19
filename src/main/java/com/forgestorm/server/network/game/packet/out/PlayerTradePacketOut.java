@@ -1,6 +1,7 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.trade.TradePacketInfoOut;
 import com.forgestorm.server.game.world.item.trade.TradeStatusOpcode;
 import com.forgestorm.server.network.game.shared.Opcodes;
@@ -14,9 +15,10 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
     private final short tradeStarterUUID;
     private final short tradeTargetUUID;
     private final short confirmedPlayerUUID;
-    private final int itemStackId;
-    private final int itemStackAmount;
     private final byte tradeSlot;
+
+    private int itemStackId;
+    private int itemStackAmount;
 
     public PlayerTradePacketOut(final Player receiver, final TradePacketInfoOut tradePacketInfoOut) {
         super(Opcodes.PLAYER_TRADE, receiver.getClientHandler());
@@ -26,9 +28,12 @@ public class PlayerTradePacketOut extends AbstractServerOutPacket {
         this.tradeStarterUUID = tradePacketInfoOut.getTradeStarterUUID();
         this.tradeTargetUUID = tradePacketInfoOut.getTradeTargetUUID();
         this.confirmedPlayerUUID = tradePacketInfoOut.getConfirmedPlayerUUID();
-        this.itemStackId = tradePacketInfoOut.getItemStack().getItemId();
-        this.itemStackAmount = tradePacketInfoOut.getItemStack().getAmount();
         this.tradeSlot = tradePacketInfoOut.getTradeSlot();
+
+        ItemStack itemStack = tradePacketInfoOut.getItemStack();
+        if (itemStack == null) return;
+        this.itemStackId = itemStack.getItemId();
+        this.itemStackAmount = itemStack.getAmount();
     }
 
     @Override

@@ -1,14 +1,13 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.inventory.InventoryActions;
 import com.forgestorm.server.network.game.shared.Opcodes;
 
 public class InventoryPacketOut extends AbstractServerOutPacket {
 
     private final InventoryActions.ActionType inventoryActionType;
-    private final int itemStackId;
-    private final int itemStackAmount;
     private final byte slotIndex;
     private final byte fromPosition;
     private final byte toPosition;
@@ -16,18 +15,24 @@ public class InventoryPacketOut extends AbstractServerOutPacket {
     private final byte toWindow;
     private final byte interactInventory;
 
+    private int itemStackId;
+    private int itemStackAmount;
+
     public InventoryPacketOut(final Player player, final InventoryActions inventoryActions) {
         super(Opcodes.INVENTORY_UPDATE, player.getClientHandler());
 
         this.inventoryActionType = inventoryActions.getInventoryActionType();
-        this.itemStackId = inventoryActions.getItemStack().getItemId();
-        this.itemStackAmount = inventoryActions.getItemStack().getAmount();
         this.slotIndex = inventoryActions.getSlotIndex();
         this.fromPosition = inventoryActions.getFromPosition();
         this.toPosition = inventoryActions.getToPosition();
         this.fromWindow = inventoryActions.getFromWindow();
         this.toWindow = inventoryActions.getToWindow();
         this.interactInventory = inventoryActions.getInteractInventory();
+
+        ItemStack itemStack = inventoryActions.getItemStack();
+        if (itemStack == null) return;
+        this.itemStackId = itemStack.getItemId();
+        this.itemStackAmount = itemStack.getAmount();
     }
 
     @Override
