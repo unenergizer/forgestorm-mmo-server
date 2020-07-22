@@ -20,6 +20,11 @@ import com.forgestorm.server.util.color.HairColorList;
 import com.forgestorm.server.util.color.SkinColorList;
 import com.forgestorm.server.util.libgdx.Color;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.forgestorm.server.util.Log.println;
@@ -28,8 +33,40 @@ public class CharacterManager {
 
     private static final boolean PRINT_DEBUG = false;
 
+    private final List<String> blackListedNames = new ArrayList<>();
+
+    public CharacterManager() {
+        // TODO: Load blacklist of names from database
+        blackListedNames.add("admin");
+        blackListedNames.add("administrator");
+        blackListedNames.add("mod");
+        blackListedNames.add("moderator");
+        blackListedNames.add("staff");
+        blackListedNames.add("owner");
+        // TODO: Add more unaccepted names...
+    }
+
+    public boolean isNameBlacklisted(String name) {
+        for (String s : blackListedNames) {
+            if (s.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isNameUnique(String name) {
-        // TODO: check to make sure the players chosen name is unique
+        // Check to make sure the players chosen name is unique
+        try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from game_player_characters where name = ?");
+            preparedStatement.setString(1, name);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
