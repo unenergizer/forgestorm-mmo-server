@@ -1,8 +1,10 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.character.CharacterCreatorResponses;
 import com.forgestorm.server.game.character.CharacterManager;
 import com.forgestorm.server.network.game.packet.AllowNullPlayer;
+import com.forgestorm.server.network.game.packet.out.CharacterCreatorPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -45,21 +47,27 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
 
         // TODO: Make sure we have not exceeded max number of characters allowed
 
-        // TODO: first check username
-        // TODO: check list of unacceptable names
-        if (characterManager.isNameUnique(packetData.characterName)) {
-            // Character name is unique, allow creation
-            ServerMain.getInstance().getCharacterManager().createCharacter(
-                    packetData.getClientHandler(),
-                    packetData.characterName,
-                    packetData.hairTexture,
-                    packetData.hairColor,
-                    packetData.eyeColor,
-                    packetData.skinColor);
-        } else {
-            // TODO: Character name is not unique, send error response
-//            new CharacterCreatorPacketOut(packetData.getPlayer(), CharacterCreatorErrors.NAME_TAKEN).sendPacket();
+        // Check black list of unacceptable names
+        if (characterManager.isNameBlacklisted(packetData.characterName)) {
+            new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_BLACKLIST_NAME).sendPacket();
+            return;
         }
+
+        // Character name is not unique, send error response
+        if (!characterManager.isNameUnique(packetData.characterName)) {
+            new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_NAME_TAKEN).sendPacket();
+            return;
+        }
+
+        // Character name is good, create the character
+        new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.SUCCESS).sendPacket();
+        ServerMain.getInstance().getCharacterManager().createCharacter(
+                packetData.getClientHandler(),
+                packetData.characterName,
+                packetData.hairTexture,
+                packetData.hairColor,
+                packetData.eyeColor,
+                packetData.skinColor);
     }
 
     @AllArgsConstructor

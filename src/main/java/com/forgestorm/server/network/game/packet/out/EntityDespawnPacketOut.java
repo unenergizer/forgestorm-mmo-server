@@ -14,6 +14,7 @@ public class EntityDespawnPacketOut extends AbstractServerOutPacket {
 
     public EntityDespawnPacketOut(final Player receiver, final Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver.getClientHandler());
+
         entityId = despawnTarget.getServerEntityId();
         entityType = despawnTarget.getEntityType().getEntityTypeByte();
         println(getClass(), "###[ DESPAWN OUT -> " + receiver.getName() + " ]################################", false, PRINT_DEBUG);

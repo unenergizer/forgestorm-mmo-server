@@ -19,6 +19,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
     private static final boolean PRINT_DEBUG = false;
 
+    private Date date = new Date();
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Override
     public void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
         player.setName(resultSet.getString("name"));
@@ -82,9 +85,10 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
     @Override
     public PreparedStatement firstTimeSave(Player player, Connection connection) throws SQLException {
+        String characterCreateDate = simpleDateFormat.format(date);
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_player_characters " +
-                "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, hair_texture, hair_color, eye_color, skin_color) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+                "(user_id, name, class, gender, race, faction, health, facing_direction, world_name, world_x, world_y, hair_texture, hair_color, eye_color, skin_color, create_date) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 
         preparedStatement.setInt(1, player.getClientHandler().getAuthenticatedUser().getDatabaseUserId());
         preparedStatement.setString(2, player.getName());
@@ -101,6 +105,8 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(13, player.getAppearance().getHairColor());
         preparedStatement.setInt(14, player.getAppearance().getEyeColor());
         preparedStatement.setInt(15, player.getAppearance().getSkinColor());
+        preparedStatement.setInt(15, player.getAppearance().getSkinColor());
+        preparedStatement.setString(16, characterCreateDate);
 
         println(PRINT_DEBUG);
         println(getClass(), "==[ FIRST TIME SAVE ]====================================", false, PRINT_DEBUG);
@@ -168,8 +174,6 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public void softDelete(Player player) {
         String query = "UPDATE game_player_characters SET is_deleted=?, delete_date=? WHERE character_id=?";
 
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String characterDeleteDate = simpleDateFormat.format(date);
 
         try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
@@ -197,8 +201,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                     int databaseId = generatedKeys.getInt(1);
                     player.setDatabaseId(databaseId);
                     println(getClass(), "Player Database ID: " + databaseId);
-                }
-                else {
+                } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }

@@ -15,6 +15,8 @@ import static com.forgestorm.server.util.Log.println;
 
 public class EventBus {
 
+    private static final boolean PRINT_DEBUG = true;
+
     @AllArgsConstructor
     private class PacketListenerData {
         private PacketListener packetListener;
@@ -42,7 +44,7 @@ public class EventBus {
 
     public void determineCanceling() {
         List<Class<? extends PacketListener>> allPacketListenerClasses = new ArrayList<>();
-        packetListenerMap.values().forEach(packetListenerData ->  allPacketListenerClasses.add(packetListenerData.packetListener.getClass()));
+        packetListenerMap.values().forEach(packetListenerData -> allPacketListenerClasses.add(packetListenerData.packetListener.getClass()));
         for (PacketListenerData packetListenerData : packetListenerMap.values()) {
             if (packetListenerData instanceof PacketInCancelable) {
 
@@ -67,6 +69,7 @@ public class EventBus {
 
     public void decodeListenerOnNetworkThread(byte opcode, ClientHandler clientHandler) {
         PacketListenerData packetListenerData = getPacketListenerData(opcode);
+        println(getClass(), "PACKET IN: " + packetListenerData.packetListener, false, PRINT_DEBUG);
         if (packetListenerData == null) return;
         PacketData packetData = packetListenerData.packetListener.decodePacket(clientHandler);
         packetData.setOpcode(opcode);

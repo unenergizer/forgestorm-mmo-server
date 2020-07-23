@@ -1,6 +1,6 @@
 package com.forgestorm.server.network.game.packet.out;
 
-import com.forgestorm.server.game.rpg.Attributes;
+import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.shared.Opcodes;
@@ -11,23 +11,33 @@ public class EntityAttributesUpdatePacketOut extends AbstractServerOutPacket {
 
     private static final boolean PRINT_DEBUG = false;
 
-    private final MovingEntity movingEntity;
+    private final String entityName;
+    private final short serverEntityId;
+    private final EntityType entityType;
+    private final int armor;
+    private final int damage;
 
     public EntityAttributesUpdatePacketOut(final Player receiver, final MovingEntity movingEntity) {
         super(Opcodes.ATTRIBUTES_UPDATE, receiver.getClientHandler());
-        this.movingEntity = movingEntity;
+
+        this.entityName = movingEntity.getName();
+        this.serverEntityId = movingEntity.getServerEntityId();
+        this.entityType = detectEntityType(movingEntity);
+        this.armor = movingEntity.getAttributes().getArmor();
+        this.damage = movingEntity.getAttributes().getDamage();
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        Attributes attributes = movingEntity.getAttributes();
-        write.writeShort(movingEntity.getServerEntityId());
-        write.writeByte(getEntityType(movingEntity).getEntityTypeByte());
-        write.writeInt(attributes.getArmor());
-        write.writeInt(attributes.getDamage());
+        write.writeShort(serverEntityId);
+        write.writeByte(entityType.getEntityTypeByte());
+        write.writeInt(armor);
+        write.writeInt(damage);
 
-        println(getClass(), "Receiver: " + movingEntity.getName() + ", Type: " + movingEntity.getEntityType(), false, PRINT_DEBUG);
-        println(getClass(), "Armor: " + attributes.getArmor(), false, PRINT_DEBUG);
-        println(getClass(), "Damage: " + attributes.getDamage(), false, PRINT_DEBUG);
+        println(getClass(), "EntityName: " + entityName, false, PRINT_DEBUG);
+        println(getClass(), "EntityId: " + serverEntityId, false, PRINT_DEBUG);
+        println(getClass(), "EntityType: " + entityType, false, PRINT_DEBUG);
+        println(getClass(), "Armor: " + armor, false, PRINT_DEBUG);
+        println(getClass(), "Damage: " + damage, false, PRINT_DEBUG);
     }
 }

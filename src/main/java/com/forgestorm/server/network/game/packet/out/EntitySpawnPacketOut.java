@@ -21,6 +21,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
     @Override
     protected void createPacket(GameOutputStream write) {
+        // TODO: Remove object reference from createPacket method
         if (entityToSpawn instanceof MovingEntity) {
             spawnMovingEntity(write);
         } else if (entityToSpawn instanceof StationaryEntity) {
@@ -35,7 +36,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
         write.writeShort(entityToSpawn.getServerEntityId());
 
-        write.writeByte(getEntityType(entityToSpawn).getEntityTypeByte());
+        write.writeByte(detectEntityType(entityToSpawn).getEntityTypeByte());
         write.writeString(entityToSpawn.getName());
 
         MovingEntity movingEntity = (MovingEntity) entityToSpawn;
@@ -139,6 +140,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
         println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
         println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
+        println(getClass(), "MaxHP: " + movingEntity.getMaxHealth(), false, PRINT_DEBUG);
+        println(getClass(), "CurrentHp: " + movingEntity.getCurrentHealth(), false, PRINT_DEBUG);
 
         println(getClass(), "MonsterBody: " + appearance.getMonsterBodyTexture(), false, PRINT_DEBUG);
         println(getClass(), "Hair: " + appearance.getHairTexture(), false, PRINT_DEBUG);

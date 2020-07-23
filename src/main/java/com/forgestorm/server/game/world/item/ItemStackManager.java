@@ -34,7 +34,7 @@ public class ItemStackManager {
         return makeItemStack(itemStack.itemId, itemStack.getAmount());
     }
 
-    public int numberOfItems() {
+    public int getNumberOfItems() {
         return itemStacks.length;
     }
 }

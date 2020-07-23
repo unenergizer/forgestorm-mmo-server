@@ -20,6 +20,7 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
     @Override
     protected void createPacket(GameOutputStream write) {
 
+        // TODO: Remove object reference from createPacket method
         Map<Byte, Player> loadedPlayerList = clientHandler.getLoadedPlayers();
 
         write.writeByte((byte) loadedPlayerList.size()); // Tell client how many times to loop

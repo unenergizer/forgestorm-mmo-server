@@ -2,7 +2,6 @@ package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Entity;
-import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.*;
@@ -93,12 +92,12 @@ public class PlayerController {
                     new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
                 }
 
-                // Send joined player to all online players
-                if (playerWhoJoined.getEntityType() == EntityType.PLAYER) {
-                    new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
-                    new EntityAttributesUpdatePacketOut(playerWhoJoined, packetReceiver).sendPacket();
-                }
+                // Send all players to the player who joined (including themselves)
+                new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
             }
+
+            // Send the player attributes about themselves
+            new EntityAttributesUpdatePacketOut(playerWhoJoined, playerWhoJoined).sendPacket();
 
             // Tell the player about all the mobs currently on the map.
             gameMap.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));

@@ -19,11 +19,28 @@ public class AbilityUpdateTask implements AbstractTask {
     @Override
     public void tick(long ticksPassed) {
         for (GameMap gameMap : ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
-            tickGameMapCombat(gameMap, ticksPassed);
+            tickGameMapCombat(gameMap);
+            checkDeath(gameMap);
         }
     }
 
-    private void tickGameMapCombat(GameMap gameMap, long numberOfTicksPassed) {
+    private void checkDeath(GameMap gameMap) {
+        // TODO: ? This code is kinda redundent and death should probably be seperated out in some way
+        Collection<AiEntity> aiEntityList = gameMap.getAiEntityController().getEntities();
+        List<Player> playerList = gameMap.getPlayerController().getPlayerList();
+        for (AiEntity aiEntity : aiEntityList) {
+            if (aiEntity.getCurrentHealth() <= 0) {
+                processEntityDeath(gameMap, aiEntity);
+            }
+        }
+        for (Player player : playerList) {
+            if (player.getCurrentHealth() <= 0) {
+                processEntityDeath(gameMap, player);
+            }
+        }
+    }
+
+    private void tickGameMapCombat(GameMap gameMap) {
         Collection<AiEntity> aiEntityList = gameMap.getAiEntityController().getEntities();
         List<Player> playerList = gameMap.getPlayerController().getPlayerList();
 
@@ -51,7 +68,10 @@ public class AbilityUpdateTask implements AbstractTask {
 
         // Update Player
         for (Player playerAttacker : playerList) {
-            if (playerAttacker.getTargetEntity() == null) continue;
+            if (playerAttacker.getTargetEntity() == null) {
+
+                continue;
+            }
 
             MovingEntity targetEntity = playerAttacker.getTargetEntity();
 
@@ -120,6 +140,17 @@ public class AbilityUpdateTask implements AbstractTask {
         } else {
             AiEntity deadAiEntity = (AiEntity) deadEntity;
             deadAiEntity.killAiEntity(killerEntity);
+        }
+    }
+
+    private void processEntityDeath(GameMap gameMap, MovingEntity deadEntity) {
+        gameMap.getAiEntityController().releaseEntityTargets(deadEntity);
+        deadEntity.setTargetEntity(null);
+        deadEntity.setInCombat(false);
+
+        if (deadEntity instanceof Player) {
+            Player deadPlayer = (Player) deadEntity;
+            deadPlayer.killPlayer();
         }
     }
 }

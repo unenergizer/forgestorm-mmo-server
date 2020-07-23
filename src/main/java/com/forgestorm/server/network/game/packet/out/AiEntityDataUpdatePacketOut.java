@@ -8,29 +8,34 @@ public class AiEntityDataUpdatePacketOut extends AbstractServerOutPacket {
     public static final byte ALIGNMENT_INDEX = 0x01;
     public static final byte BANK_KEEPER_INDEX = 0x02;
 
-    private final AiEntity aiEntity;
+    private final short serverEntityId;
+    private final boolean isBankKeeper;
     private final byte dataBits;
+    private byte entityAlignmentByte;
 
     public AiEntityDataUpdatePacketOut(final Player packetReceiver, final AiEntity aiEntity, final byte dataBits) {
         super(Opcodes.AI_ENTITY_UPDATE_OUT, packetReceiver.getClientHandler());
-        this.aiEntity = aiEntity;
+
+        this.serverEntityId = aiEntity.getServerEntityId();
+        this.isBankKeeper = aiEntity.isBankKeeper();
         this.dataBits = dataBits;
+
+        EntityType entityType = aiEntity.getEntityType();
+        if (entityType == EntityType.NPC) {
+            this.entityAlignmentByte = ((NPC) aiEntity).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte();
+        } else if (entityType == EntityType.MONSTER) {
+            this.entityAlignmentByte = ((Monster) aiEntity).getAlignment().getEntityAlignmentByte();
+        }
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        Player packetReceiver = clientHandler.getPlayer();
-
-        write.writeShort(aiEntity.getServerEntityId());
+        write.writeShort(serverEntityId);
         write.writeByte(dataBits);
         if ((dataBits & ALIGNMENT_INDEX) != 0) {
-            if (aiEntity.getEntityType() == EntityType.NPC) {
-                write.writeByte(((NPC) aiEntity).getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
-            } else if (aiEntity.getEntityType() == EntityType.MONSTER) {
-                write.writeByte(((Monster) aiEntity).getAlignment().getEntityAlignmentByte());
-            }
+            write.writeByte(entityAlignmentByte);
         } else if ((dataBits & BANK_KEEPER_INDEX) != 0) {
-            write.writeBoolean(aiEntity.isBankKeeper());
+            write.writeBoolean(isBankKeeper);
         }
     }
 }

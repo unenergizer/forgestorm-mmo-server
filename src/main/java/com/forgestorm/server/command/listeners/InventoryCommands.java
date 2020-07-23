@@ -5,6 +5,7 @@ import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.IncompleteCommand;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
 
 public class InventoryCommands {
@@ -32,6 +33,17 @@ public class InventoryCommands {
 
         for (byte i = 0; i < InventoryConstants.BAG_SIZE; i++) {
             player.getPlayerBag().removeItemStack(i, true);
+        }
+    }
+
+    @Command(base = "giveall")
+    public void onGiveAll(CommandSource commandSource) {
+
+        ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
+        for (int item = 0; item < itemStackManager.getNumberOfItems(); item++) {
+            int finalItem = item;
+            ServerMain.getInstance().getGameManager().forAllPlayers(player ->
+                    player.give(itemStackManager.makeItemStack(finalItem, 1), true));
         }
     }
 
@@ -78,7 +90,7 @@ public class InventoryCommands {
 
             itemId = Integer.parseInt(argument);
 
-            int maxItems = ServerMain.getInstance().getItemStackManager().numberOfItems() - 1;
+            int maxItems = ServerMain.getInstance().getItemStackManager().getNumberOfItems() - 1;
             if (itemId < 0) {
                 commandSource.sendMessage("The itemId number cannot be below zero.");
                 return -1;
