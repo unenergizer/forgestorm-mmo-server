@@ -44,6 +44,7 @@ public class NetworkManager {
             eventBus.registerListener(new AdminEditorEntityPacketIn());
             eventBus.registerListener(new InspectPlayerPacketIn());
             eventBus.registerListener(new ProfileRequestPacketIn());
+            eventBus.registerListener(new NPCDialoguePacketIn());
         });
 
         outStreamManager = new OutputStreamManager();
