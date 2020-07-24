@@ -2,6 +2,7 @@ package com.forgestorm.server.database.sql;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.rpg.EntityAlignment;
+import com.forgestorm.server.game.world.entity.FirstInteraction;
 import com.forgestorm.server.game.world.entity.Monster;
 import com.forgestorm.server.game.world.maps.Location;
 
@@ -23,6 +24,7 @@ public class GameWorldMonsterSQL {
         short regionStartY = resultSet.getShort("region_start_y");
         short regionEndX = resultSet.getShort("region_end_x");
         short regionEndY = resultSet.getShort("region_end_y");
+        String firstInteract = resultSet.getString("first_interact");
         int health = resultSet.getInt("health");
         int damage = resultSet.getInt("damage");
         int expDrop = resultSet.getInt("exp_drop");
@@ -41,6 +43,9 @@ public class GameWorldMonsterSQL {
         monster.setCurrentMapLocation(location);
         monster.setFutureMapLocation(location);
         monster.setRegionLocations(regionStartX, regionStartY, regionEndX, regionEndY);
+        if (firstInteract != null) {
+            monster.setFirstInteraction(FirstInteraction.valueOf(firstInteract));
+        }
         monster.setCurrentHealth(health);
         monster.setMaxHealth(health);
         monster.getAttributes().setDamage(damage);

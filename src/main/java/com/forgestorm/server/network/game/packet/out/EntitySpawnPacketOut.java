@@ -60,6 +60,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeShort(monster.getDefaultSpawnLocation().getX());
                     write.writeShort(monster.getDefaultSpawnLocation().getY());
                 }
+
+                write.writeByte(FirstInteraction.getByte(monster.getFirstInteraction()));
                 write.writeShort(monster.getShopId());
 
                 write.writeByte(monster.getAlignment().getEntityAlignmentByte());
@@ -84,6 +86,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeShort(npc.getDefaultSpawnLocation().getY());
                 }
 
+                write.writeByte(FirstInteraction.getByte(npc.getFirstInteraction()));
                 write.writeShort((npc).getShopId());
                 write.writeBoolean((npc).isBankKeeper());
 

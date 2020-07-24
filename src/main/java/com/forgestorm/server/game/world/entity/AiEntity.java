@@ -34,6 +34,8 @@ public class AiEntity extends MovingEntity {
     private short regionEndX;
     private short regionEndY;
 
+    private FirstInteraction firstInteraction = FirstInteraction.ATTACK;
+
     public void setMovementInfo(float probabilityStill, float probabilityWalkStart) {
         randomRegionMoveGenerator = new RandomRegionMoveGenerator(this, probabilityStill, probabilityWalkStart);
     }

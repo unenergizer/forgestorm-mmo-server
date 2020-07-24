@@ -1,6 +1,7 @@
 package com.forgestorm.server.database.sql;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.world.entity.FirstInteraction;
 import com.forgestorm.server.game.world.entity.NPC;
 import com.forgestorm.server.game.world.maps.Location;
 
@@ -22,6 +23,7 @@ public class GameWorldNpcSQL {
         short regionStartY = resultSet.getShort("region_start_y");
         short regionEndX = resultSet.getShort("region_end_x");
         short regionEndY = resultSet.getShort("region_end_y");
+        String firstInteract = resultSet.getString("first_interact");
         int health = resultSet.getInt("health");
         int damage = resultSet.getInt("damage");
         int expDrop = resultSet.getInt("exp_drop");
@@ -51,6 +53,9 @@ public class GameWorldNpcSQL {
         npc.setCurrentMapLocation(location);
         npc.setFutureMapLocation(location);
         npc.setRegionLocations(regionStartX, regionStartY, regionEndX, regionEndY);
+        if (firstInteract != null) {
+            npc.setFirstInteraction(FirstInteraction.valueOf(firstInteract));
+        }
         npc.setCurrentHealth(health);
         npc.setMaxHealth(health);
         npc.getAttributes().setDamage(damage);
