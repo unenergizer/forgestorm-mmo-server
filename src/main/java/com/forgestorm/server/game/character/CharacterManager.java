@@ -14,6 +14,7 @@ import com.forgestorm.server.network.game.PlayerSessionData;
 import com.forgestorm.server.network.game.packet.out.CharacterMenuLoadPacketOut;
 import com.forgestorm.server.network.game.packet.out.InitClientPrivilegePacketOut;
 import com.forgestorm.server.network.game.packet.out.InitScreenPacketOut;
+import com.forgestorm.server.network.game.packet.out.PingPacketOut;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import com.forgestorm.server.util.color.EyeColorList;
 import com.forgestorm.server.util.color.HairColorList;
@@ -157,6 +158,7 @@ public class CharacterManager {
         ClientHandler clientHandler = playerSessionData.getClientHandler();
 
         ServerMain.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
+        new PingPacketOut(clientHandler).sendPacket();
 
         // Tell the client its privileges
         new InitClientPrivilegePacketOut(clientHandler).sendPacket();
