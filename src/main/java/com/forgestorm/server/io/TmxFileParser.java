@@ -35,7 +35,7 @@ public class TmxFileParser {
     public static GameMap parseGameMap(String fileName) {
         Document document = null;
 
-        println(TmxFileParser.class, "PATH: " + fileName);
+        println(TmxFileParser.class, "PATH: " + fileName, false, PRINT_DEBUG);
 
         InputStream inputStream = TmxFileParser.class.getResourceAsStream(FilePaths.MAPS.getFilePath() + fileName);
 
