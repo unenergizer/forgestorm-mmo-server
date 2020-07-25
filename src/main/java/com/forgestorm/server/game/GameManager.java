@@ -6,6 +6,7 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.entity.PlayerProcessor;
 import com.forgestorm.server.game.world.maps.GameMap;
 import com.forgestorm.server.game.world.maps.GameMapProcessor;
+import com.forgestorm.server.game.world.task.AbstractTask;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 
@@ -13,18 +14,20 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @Getter
-public class GameManager {
+public class GameManager implements AbstractTask, ManagerStart {
 
     private final AbilityManager abilityManager = new AbilityManager(this);
     private final PlayerProcessor playerProcessor = new PlayerProcessor(this);
     private final GameMapProcessor gameMapProcessor = new GameMapProcessor();
 
+    @Override
     public void start() {
         gameMapProcessor.loadAllMaps();
         gameMapProcessor.getEntitiesFromDatabase();
     }
 
-    void tickWorld(long ticksPassed) {
+    @Override
+    public void tick(long ticksPassed) {
         // WARNING: Maintain tick order!
         abilityManager.tick(ticksPassed);
         gameMapProcessor.spawnEntities();

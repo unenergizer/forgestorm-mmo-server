@@ -1,5 +1,6 @@
 package com.forgestorm.server.database;
 
+import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.io.DatabaseSettingsLoader;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -11,12 +12,13 @@ import java.sql.SQLException;
 import static com.forgestorm.server.util.Log.println;
 
 @SuppressWarnings("SpellCheckingInspection")
-public class DatabaseManager {
+public class DatabaseManager implements ManagerStart {
 
     @Getter
     private HikariDataSource hikariDataSource;
     private DatabaseSettingsLoader.DatabaseSettings databaseSettings;
 
+    @Override
     public void start() {
         openDatabase(new DatabaseSettingsLoader().loadNetworkSettings());
     }

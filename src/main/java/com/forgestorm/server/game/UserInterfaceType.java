@@ -1,5 +1,6 @@
 package com.forgestorm.server.game;
 
+@SuppressWarnings("unused")
 public enum UserInterfaceType {
     LOGIN,
     CHARACTER_SELECT,

@@ -1,5 +1,6 @@
 package com.forgestorm.server.network;
 
+import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.io.NetworkSettingsLoader;
 import com.forgestorm.server.network.game.GameServerConnection;
 import com.forgestorm.server.network.game.packet.in.*;
@@ -11,13 +12,14 @@ import lombok.Getter;
 import static com.forgestorm.server.util.Log.println;
 
 @Getter
-public class NetworkManager {
+public class NetworkManager implements ManagerStart {
 
     private final AuthenticationManager authenticationManager = new AuthenticationManager();
     private OutputStreamManager outStreamManager;
     private LoginServerConnection loginServerConnection;
     private GameServerConnection gameServerConnection;
 
+    @Override
     public void start() {
         Log.println(getClass(), "Initializing network...");
         NetworkSettingsLoader.NetworkSettings networkSettings = new NetworkSettingsLoader().loadNetworkSettings();

@@ -1,6 +1,7 @@
 package com.forgestorm.server.game.world.item;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.io.DropTableLoader;
 
 import java.util.List;
@@ -8,12 +9,13 @@ import java.util.Random;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class DropTableManager {
+public class DropTableManager implements ManagerStart {
 
     private DropTableLoader.DropTable[] dropTables;
 
     private Random random = new Random();
 
+    @Override
     public void start() {
         DropTableLoader dropTableLoader = new DropTableLoader();
         List<DropTableLoader.DropTable> loadedDropTables = dropTableLoader.loadDropTables();

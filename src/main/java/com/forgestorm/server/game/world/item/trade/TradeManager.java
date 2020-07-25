@@ -8,6 +8,7 @@ import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.item.inventory.PlayerBag;
+import com.forgestorm.server.game.world.task.AbstractTask;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.packet.out.PlayerTradePacketOut;
 
@@ -16,7 +17,7 @@ import java.util.*;
 import static com.forgestorm.server.util.Log.println;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-public class TradeManager {
+public class TradeManager implements AbstractTask {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -339,10 +340,11 @@ public class TradeManager {
     /**
      * Ticks the trade time out time.
      *
-     * @param numberOfTicksPassed The number of ticks passed in the {@link GameLoop}
+     * @param ticksPassed The number of ticks passed in the {@link GameLoop}
      */
-    public void tickTime(float numberOfTicksPassed) {
-        if (numberOfTicksPassed % 20 == 0) {
+    @Override
+    public void tick(long ticksPassed) {
+        if (ticksPassed % 20 == 0) {
 
             Iterator<TradeData> iterator = tradeDataMap.values().iterator();
             while (iterator.hasNext()) {

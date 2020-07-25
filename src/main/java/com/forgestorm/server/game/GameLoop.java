@@ -71,9 +71,9 @@ public class GameLoop extends Thread {
             entityRehealTask.tick(numberOfTicksPassed);
             processMining.tick(numberOfTicksPassed);
             aiEntityRespawnTimerTask.tick(numberOfTicksPassed);
-            serverMain.getGameManager().tickWorld(numberOfTicksPassed);
+            serverMain.getGameManager().tick(numberOfTicksPassed);
             serverMain.getNetworkManager().getOutStreamManager().sendPackets();
-            serverMain.getTradeManager().tickTime(numberOfTicksPassed);
+            serverMain.getTradeManager().tick(numberOfTicksPassed);
             // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);

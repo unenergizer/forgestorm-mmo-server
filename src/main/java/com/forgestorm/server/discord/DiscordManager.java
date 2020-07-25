@@ -1,5 +1,7 @@
 package com.forgestorm.server.discord;
 
+import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ManagerStart;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,19 +15,19 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import javax.security.auth.login.LoginException;
 import java.util.List;
 
-public class DiscordManager {
+public class DiscordManager implements ManagerStart {
 
-    private static final boolean USE_DISCORD_LOGGING = true;
     private static final String BOT_TOKEN = "NDgwMTc0NzE1OTgyNDQ2NjM4.XUa7uQ.ZhBHLlMFh1AQW9ELkXOrEKCsDAc";
     private static final String CONSOLE_CHANNEL = "607537864275656724";
 
     private JDA jdaEvent;
     private boolean isReady = false;
 
+    @Override
     public void start() {
 
         // TODO: Put option in config and/or use commands to start/stop discord output
-        if (!USE_DISCORD_LOGGING) return;
+        if (ServerMain.ideRun) return;
 
         try {
             JDA jda = JDABuilder.createDefault(BOT_TOKEN)
@@ -55,7 +57,7 @@ public class DiscordManager {
      */
     public void sendDiscordMessage(String message) {
         if (!isReady) return;
-        if (!USE_DISCORD_LOGGING) return;
+        if (ServerMain.ideRun) return;
         sendDiscordMessage(jdaEvent.getTextChannelById(CONSOLE_CHANNEL), message);
     }
 
