@@ -141,6 +141,7 @@ public class CharacterManager {
 
     public void characterLogin(ClientHandler clientHandler, byte characterId) {
         if (clientHandler.getPlayer().isLoggedInGameWorld()) return;
+        println(getClass(), "Sending " + clientHandler.getAuthenticatedUser().getXfAccountName() + " into the game world.");
         clientHandler.setCurrentPlayerId(characterId);
         ServerMain.getInstance().getGameManager().getPlayerProcessor().queuePlayerEnterGameWorld(clientHandler);
     }
@@ -179,7 +180,7 @@ public class CharacterManager {
     }
 
     public void sendToCharacterScreen(ClientHandler clientHandler) {
-        println(getClass(), "Sending client to the character screen.");
+        println(getClass(), "Sending " + clientHandler.getAuthenticatedUser().getXfAccountName() + " to the character screen.");
 
         // Used when logging out of a character and going to the character screen.
         clientHandler.getLoadedPlayers().clear();
