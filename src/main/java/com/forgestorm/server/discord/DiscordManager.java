@@ -15,7 +15,7 @@ import java.util.List;
 
 public class DiscordManager {
 
-    private static final boolean USE_DISCORD_LOGGING = false;
+    private static final boolean USE_DISCORD_LOGGING = true;
     private static final String BOT_TOKEN = "NDgwMTc0NzE1OTgyNDQ2NjM4.XUa7uQ.ZhBHLlMFh1AQW9ELkXOrEKCsDAc";
     private static final String CONSOLE_CHANNEL = "607537864275656724";
 
