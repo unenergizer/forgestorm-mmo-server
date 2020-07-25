@@ -40,6 +40,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         // Basic data
         short entityID = clientHandler.readShort();
         String name = null;
+        FirstInteraction firstInteraction = null;
 
         String faction = null;
         EntityAlignment entityAlignment = null;
@@ -75,6 +76,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         switch (entityType) {
             case NPC:
                 name = clientHandler.readString();
+                firstInteraction = FirstInteraction.getFirstInteraction(clientHandler.readByte());
                 faction = clientHandler.readString();
                 health = clientHandler.readInt();
                 damage = clientHandler.readInt();
@@ -98,6 +100,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 break;
             case MONSTER:
                 name = clientHandler.readString();
+                firstInteraction = FirstInteraction.getFirstInteraction(clientHandler.readByte());
                 entityAlignment = EntityAlignment.getEntityAlignment(clientHandler.readByte());
                 health = clientHandler.readInt();
                 damage = clientHandler.readInt();
@@ -127,6 +130,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         println(getClass(), "EntityType: " + entityType, false, PRINT_DEBUG);
         println(getClass(), "EntityID: " + entityID, false, PRINT_DEBUG);
         println(getClass(), "Name: " + name, false, PRINT_DEBUG);
+        println(getClass(), "FirstInteraction: " + firstInteraction, false, PRINT_DEBUG);
         if (faction != null) println(getClass(), "Faction: " + faction, false, PRINT_DEBUG);
         if (entityAlignment != null) println(getClass(), "Alignment: " + entityAlignment, false, PRINT_DEBUG);
         println(getClass(), "Health: " + health, false, PRINT_DEBUG);
@@ -166,6 +170,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 delete,
                 entityID,
                 name,
+                firstInteraction,
                 faction,
                 entityAlignment,
                 health,
@@ -250,6 +255,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             case NPC:
                 NPC npc = (NPC) entity;
                 npc.setName(packetData.name);
+                npc.setFirstInteraction(packetData.firstInteraction);
                 npc.setFaction(ServerMain.getInstance().getFactionManager().getFactionByName(packetData.faction));
                 npc.setCurrentHealth(packetData.health);
                 npc.setMaxHealth(packetData.health);
@@ -284,6 +290,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
             case MONSTER:
                 Monster monster = (Monster) entity;
                 monster.setName(packetData.name);
+                monster.setFirstInteraction(packetData.firstInteraction);
                 monster.setAlignment(packetData.entityAlignment);
                 monster.setCurrentHealth(packetData.health);
                 monster.setMaxHealth(packetData.health);
@@ -394,6 +401,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         // Basic data
         private short entityID;
         private String name;
+        private FirstInteraction firstInteraction;
         private String faction;
         private EntityAlignment entityAlignment;
         private int health;

@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.abilities;
 
+import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
@@ -9,11 +10,12 @@ import com.forgestorm.server.util.RandomUtil;
 
 import java.util.Map;
 
-public class AbilityManager {
+public class AbilityManager implements ManagerStart {
 
     private Map<Short, Ability> combatAbilities;
     private Ability genericAiEntityAbility;
 
+    @Override
     public void start() {
         combatAbilities = new AbilityLoader().loadCombatAbilities();
         genericAiEntityAbility = new Ability();

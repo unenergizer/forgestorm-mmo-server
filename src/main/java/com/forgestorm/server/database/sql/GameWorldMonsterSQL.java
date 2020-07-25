@@ -60,57 +60,59 @@ public class GameWorldMonsterSQL {
 
     private PreparedStatement databaseSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_monster" +
-                " SET name=?, world_name=?, world_x=?, world_y=?, " +
+                " SET name=?, first_interact=?, world_name=?, world_x=?, world_y=?, " +
                 " region_start_x=?, region_end_x=?, region_start_y=?, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?," +
                 " alignment=?, monster_body_texture=? WHERE monster_id=?");
 
         preparedStatement.setString(1, monster.getName());
-        preparedStatement.setString(2, monster.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(3, monster.getCurrentMapLocation().getX());
-        preparedStatement.setShort(4, monster.getCurrentMapLocation().getY());
-        preparedStatement.setShort(5, monster.getRegionStartX());
-        preparedStatement.setShort(6, monster.getRegionEndX());
-        preparedStatement.setShort(7, monster.getRegionStartY());
-        preparedStatement.setShort(8, monster.getRegionEndY());
-        preparedStatement.setInt(9, monster.getMaxHealth());
-        preparedStatement.setInt(10, monster.getAttributes().getDamage());
-        preparedStatement.setInt(11, monster.getExpDrop());
-        preparedStatement.setInt(12, monster.getDropTable());
-        preparedStatement.setFloat(13, monster.getMoveSpeed());
-        preparedStatement.setFloat(14, monster.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(15, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setShort(16, monster.getShopId());
-        preparedStatement.setString(17, monster.getAlignment().toString());
-        preparedStatement.setByte(18, monster.getAppearance().getMonsterBodyTexture());
-        preparedStatement.setInt(19, monster.getDatabaseId());
+        preparedStatement.setString(2, monster.getFirstInteraction().toString());
+        preparedStatement.setString(3, monster.getCurrentMapLocation().getMapName());
+        preparedStatement.setShort(4, monster.getCurrentMapLocation().getX());
+        preparedStatement.setShort(5, monster.getCurrentMapLocation().getY());
+        preparedStatement.setShort(6, monster.getRegionStartX());
+        preparedStatement.setShort(7, monster.getRegionEndX());
+        preparedStatement.setShort(8, monster.getRegionStartY());
+        preparedStatement.setShort(9, monster.getRegionEndY());
+        preparedStatement.setInt(10, monster.getMaxHealth());
+        preparedStatement.setInt(11, monster.getAttributes().getDamage());
+        preparedStatement.setInt(12, monster.getExpDrop());
+        preparedStatement.setInt(13, monster.getDropTable());
+        preparedStatement.setFloat(14, monster.getMoveSpeed());
+        preparedStatement.setFloat(15, monster.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(16, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setShort(17, monster.getShopId());
+        preparedStatement.setString(18, monster.getAlignment().toString());
+        preparedStatement.setByte(19, monster.getAppearance().getMonsterBodyTexture());
+        preparedStatement.setInt(20, monster.getDatabaseId());
 
         return preparedStatement;
     }
 
     private PreparedStatement firstTimeSave(Monster monster, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_monster " +
-                "(name, world_name, world_x, world_y, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, alignment, monster_body_texture) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(name, first_interact, world_name, world_x, world_y, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, alignment, monster_body_texture) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, monster.getName());
-        preparedStatement.setString(2, monster.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(3, monster.getCurrentMapLocation().getX());
-        preparedStatement.setShort(4, monster.getCurrentMapLocation().getY());
-        preparedStatement.setShort(5, monster.getRegionStartX());
-        preparedStatement.setShort(6, monster.getRegionEndX());
-        preparedStatement.setShort(7, monster.getRegionStartY());
-        preparedStatement.setShort(8, monster.getRegionEndY());
-        preparedStatement.setInt(9, monster.getMaxHealth());
-        preparedStatement.setInt(10, monster.getAttributes().getDamage());
-        preparedStatement.setInt(11, monster.getExpDrop());
-        preparedStatement.setInt(12, monster.getDropTable());
-        preparedStatement.setFloat(13, monster.getMoveSpeed());
-        preparedStatement.setFloat(14, monster.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(15, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setInt(16, monster.getShopId());
-        preparedStatement.setString(17, monster.getAlignment().toString());
-        preparedStatement.setByte(18, monster.getAppearance().getMonsterBodyTexture());
+        preparedStatement.setString(2, monster.getFirstInteraction().toString());
+        preparedStatement.setString(3, monster.getCurrentMapLocation().getMapName());
+        preparedStatement.setShort(4, monster.getCurrentMapLocation().getX());
+        preparedStatement.setShort(5, monster.getCurrentMapLocation().getY());
+        preparedStatement.setShort(6, monster.getRegionStartX());
+        preparedStatement.setShort(7, monster.getRegionEndX());
+        preparedStatement.setShort(8, monster.getRegionStartY());
+        preparedStatement.setShort(9, monster.getRegionEndY());
+        preparedStatement.setInt(10, monster.getMaxHealth());
+        preparedStatement.setInt(11, monster.getAttributes().getDamage());
+        preparedStatement.setInt(12, monster.getExpDrop());
+        preparedStatement.setInt(13, monster.getDropTable());
+        preparedStatement.setFloat(14, monster.getMoveSpeed());
+        preparedStatement.setFloat(15, monster.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(16, monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setInt(17, monster.getShopId());
+        preparedStatement.setString(18, monster.getAlignment().toString());
+        preparedStatement.setByte(19, monster.getAppearance().getMonsterBodyTexture());
 
         return preparedStatement;
     }
