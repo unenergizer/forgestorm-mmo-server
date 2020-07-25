@@ -47,9 +47,6 @@ public class Player extends MovingEntity {
 
     private Warp warp;
 
-    private long pingOutTime = 0;
-    private long lastPingTime = 0;
-
     private int tradeUUID = -1;
 
     private AiEntity currentShoppingEntity;

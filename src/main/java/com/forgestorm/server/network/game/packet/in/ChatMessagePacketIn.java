@@ -92,6 +92,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
                     // All other messages
                     new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
                 }
+                println(getClass(), "[" + packetData.chatChannelType + "] " + packetData.getClientHandler().getPlayer().getName() + ": " + packetData.text);
             });
         }
     }

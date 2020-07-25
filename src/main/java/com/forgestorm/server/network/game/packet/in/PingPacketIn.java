@@ -1,6 +1,6 @@
 package com.forgestorm.server.network.game.packet.in;
 
-import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.network.game.packet.out.PingPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
@@ -19,10 +19,11 @@ public class PingPacketIn implements PacketListener<PingPacketIn.PingPacket> {
 
     @Override
     public void onEvent(PingPacket packetData) {
-        Player player = packetData.getClientHandler().getPlayer();
-
-        long timeTaken = packetData.packetReceivedTime - player.getPingOutTime();
-        player.setLastPingTime(timeTaken);
+        ClientHandler clientHandler = packetData.getClientHandler();
+        long ping = packetData.packetReceivedTime - clientHandler.getPingSendTime();
+        clientHandler.setClientPing(ping);
+//        println(getClass(), "Account: " + clientHandler.getAuthenticatedUser().getXfAccountName() + ", Ping: " + ping);
+        new PingPacketOut(clientHandler).sendPacket();
     }
 
     @AllArgsConstructor

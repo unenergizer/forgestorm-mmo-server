@@ -11,7 +11,7 @@ import static com.forgestorm.server.util.Log.println;
 
 public class OutputStreamManager {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
     private static final int MAX_BUFFER_SIZE = 500;
 
     private final Map<ClientHandler, Queue<AbstractServerOutPacket>> outputContexts = new HashMap<>();

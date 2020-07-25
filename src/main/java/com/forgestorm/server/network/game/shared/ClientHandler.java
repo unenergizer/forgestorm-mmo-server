@@ -49,11 +49,14 @@ public class ClientHandler {
      */
     private CharacterSaveProgress characterSaveProgress = new CharacterSaveProgress(this);
 
-    @Getter
     private final Map<Byte, Player> loadedPlayers = new HashMap<>();
 
-    @Getter
     private Byte currentPlayerId = 0;
+
+    @Setter
+    private long clientPing = 0;
+    @Setter
+    private volatile long pingSendTime = 0;
 
     public void loadAllPlayers(List<CharacterDataOut> characterDataOutList) {
         for (byte i = 0; i < characterDataOutList.size(); i++) {

@@ -15,7 +15,7 @@ import static com.forgestorm.server.util.Log.println;
 
 public class EventBus {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @AllArgsConstructor
     private class PacketListenerData {

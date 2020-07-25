@@ -69,7 +69,7 @@ public class PlayerProcessor {
         player.setLoggedInGameWorld(true);
 
         new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
-//        new PingPacketOut(player).sendPacket();
+        new PingPacketOut(player.getClientHandler()).sendPacket();
         new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
 
         // Add player to World
