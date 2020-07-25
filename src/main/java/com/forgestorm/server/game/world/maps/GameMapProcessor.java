@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameMapProcessor {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
