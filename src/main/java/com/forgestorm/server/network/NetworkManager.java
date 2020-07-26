@@ -47,6 +47,7 @@ public class NetworkManager implements ManagerStart {
             eventBus.registerListener(new InspectPlayerPacketIn());
             eventBus.registerListener(new ProfileRequestPacketIn());
             eventBus.registerListener(new NPCDialoguePacketIn());
+            eventBus.registerListener(new WorldBuilderPacketIn());
         });
 
         outStreamManager = new OutputStreamManager();
