@@ -16,6 +16,7 @@ import com.forgestorm.server.game.world.item.trade.TradeManager;
 import com.forgestorm.server.io.ResourcePathLoader;
 import com.forgestorm.server.network.NetworkManager;
 import com.forgestorm.server.profile.XenforoProfileManager;
+import com.forgestorm.server.scripting.ScriptManager;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;
@@ -54,6 +55,7 @@ public class ServerMain {
     private final GameManager gameManager = new GameManager();
     private final CharacterManager characterManager = new CharacterManager();
     private final XenforoProfileManager xenforoProfileManager = new XenforoProfileManager();
+    private final ScriptManager scriptManager = new ScriptManager();
 
     private ServerMain() {
     }

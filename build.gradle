@@ -42,4 +42,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
+    // Server side scripting
+    compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
 }

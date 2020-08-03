@@ -23,7 +23,11 @@ public enum FilePaths {
     COMBAT_ABILITIES("abilities/CombatAbilities.yaml"),
 
     // Maps
-    MAPS("maps/");
+    MAPS("maps/"),
+
+    // Scripts
+    SCRIPTS("scripts/"),
+    SCRIPT_MAPPING("scripts/script_mapping.yaml");
 
     private String filePath;
 
