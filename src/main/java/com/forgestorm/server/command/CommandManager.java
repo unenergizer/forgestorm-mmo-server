@@ -1,7 +1,9 @@
 package com.forgestorm.server.command;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.listeners.*;
 import com.forgestorm.server.game.ManagerStart;
+import com.forgestorm.server.game.world.entity.Player;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;
@@ -16,9 +18,9 @@ public class CommandManager implements ManagerStart {
     public void start() {
         println(getClass(), "Registering commands...");
         commandProcessor.addListener(new EntityCommands());
-        commandProcessor.addListener(new InventoryCommands());
-        commandProcessor.addListener(new PlayerCommands());
-        commandProcessor.addListener(new ServerCommands());
+        commandProcessor.addListener(new InventoryCommands(this));
+        commandProcessor.addListener(new PlayerCommands(this));
+        commandProcessor.addListener(new ServerCommands(this));
         commandProcessor.addListener(new MapCommands());
         commandProcessor.addListener(new MessageCommands());
 
@@ -27,5 +29,16 @@ public class CommandManager implements ManagerStart {
 
     public void exit() {
         consoleCommandManager.stop();
+    }
+
+    public Player getPlayer(CommandSource commandSource, String playerName) {
+        Player player = ServerMain.getInstance().getGameManager().findPlayer(playerName);
+
+        if (player == null) {
+            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
+            return null;
+        }
+
+        return player;
     }
 }

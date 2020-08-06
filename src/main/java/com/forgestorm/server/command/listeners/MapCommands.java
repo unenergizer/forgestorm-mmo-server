@@ -3,7 +3,7 @@ package com.forgestorm.server.command.listeners;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.IncompleteCommand;
+import com.forgestorm.server.command.CommandString;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.maps.GameMap;
 import com.forgestorm.server.game.world.maps.GameMapProcessor;
@@ -13,7 +13,7 @@ import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 public class MapCommands {
 
     @Command(base = "create", argLenReq = 3)
-    @IncompleteCommand(missing = "create <mapName> <width> <height>")
+    @CommandString(missing = "create <mapName> <width> <height>")
     public void createWorld(CommandSource commandSource, String[] args) {
         GameMapProcessor gameMapProcessor = ServerMain.getInstance().getGameManager().getGameMapProcessor();
         final int minSize = 10;

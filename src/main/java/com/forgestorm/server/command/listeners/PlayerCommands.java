@@ -2,8 +2,9 @@ package com.forgestorm.server.command.listeners;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
+import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.IncompleteCommand;
+import com.forgestorm.server.command.CommandString;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
@@ -13,11 +14,15 @@ import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.Warp;
 import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityUpdatePacketOut;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class PlayerCommands {
 
+    private final CommandManager commandManager;
+    
     @Command(base = "heal", argLenReq = 1)
-    @IncompleteCommand(missing = "heal <packetReceiver>")
+    @CommandString(missing = "heal <playerName>")
     public void healPlayer(CommandSource commandSource, String[] args) {
 
         short playerId = 0;
@@ -37,7 +42,7 @@ public class PlayerCommands {
                 return;
             }
         } else {
-            player = getPlayer(commandSource, args[0]);
+            player = commandManager.getPlayer(commandSource, args[0]);
             if (player == null) return;
         }
 
@@ -50,17 +55,17 @@ public class PlayerCommands {
     }
 
     @Command(base = "teleport", argLenReq = 1)
-    @IncompleteCommand(missing = "teleport <playerName>")
+    @CommandString(missing = "teleport <playerName>")
     public void teleportToPlayer(CommandSource commandSource, String[] args) {
         Player player = commandSource.getPlayer();
-        Player teleportToPlayer = getPlayer(commandSource, args[0]);
+        Player teleportToPlayer = commandManager.getPlayer(commandSource, args[0]);
 
         if (teleportToPlayer == null) return;
         player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentMapLocation()), MoveDirection.SOUTH));
     }
 
     @Command(base = "teleport", argLenReq = 4)
-    @IncompleteCommand(missing = "teleport <playerName> <mapName> <x> <y>")
+    @CommandString(missing = "teleport <playerName> <mapName> <x> <y>")
     public void teleportPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         String mapName = args[1];
@@ -89,7 +94,7 @@ public class PlayerCommands {
             return;
         }
 
-        Player player = getPlayer(commandSource, playerName);
+        Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
         player.setWarp(new Warp(new Location(mapName, x, y), MoveDirection.SOUTH));
@@ -97,10 +102,10 @@ public class PlayerCommands {
     }
 
     @Command(base = "kick", argLenReq = 1)
-    @IncompleteCommand(missing = "kick <playerName>")
+    @CommandString(missing = "kick <playerName>")
     public void kickPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = getPlayer(commandSource, playerName);
+        Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
         ServerMain.getInstance().getGameManager().kickPlayer(player);
@@ -109,20 +114,20 @@ public class PlayerCommands {
     }
 
     @Command(base = "kill", argLenReq = 1)
-    @IncompleteCommand(missing = "kick <playerName>")
+    @CommandString(missing = "kill <playerName>")
     public void killPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = getPlayer(commandSource, playerName);
+        Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
         player.killPlayer();
     }
 
     @Command(base = "info", argLenReq = 1)
-    @IncompleteCommand(missing = "info <playerName>")
+    @CommandString(missing = "info <playerName>")
     public void getPlayerInfo(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = getPlayer(commandSource, playerName);
+        Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
         AuthenticatedUser authenticatedUser = player.getClientHandler().getAuthenticatedUser();
@@ -137,10 +142,10 @@ public class PlayerCommands {
     }
 
     @Command(base = "speed", argLenReq = 2)
-    @IncompleteCommand(missing = "info <playerName> <speed>")
+    @CommandString(missing = "info <playerName> <speed>")
     public void setPlayerSpeed(CommandSource commandSource, String[] args) {
         String playerName = args[0];
-        Player player = getPlayer(commandSource, playerName);
+        Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
         float oldMoveSpeed = player.getMoveSpeed();
@@ -162,16 +167,5 @@ public class PlayerCommands {
         } catch (NumberFormatException e) {
             commandSource.sendMessage(MessageText.SERVER + "Second argument must be a float.");
         }
-    }
-
-    private Player getPlayer(CommandSource commandSource, String playerName) {
-        Player player = ServerMain.getInstance().getGameManager().findPlayer(playerName);
-
-        if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
-            return null;
-        }
-
-        return player;
     }
 }

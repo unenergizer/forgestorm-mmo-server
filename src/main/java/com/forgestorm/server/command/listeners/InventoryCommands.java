@@ -2,32 +2,28 @@ package com.forgestorm.server.command.listeners;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
+import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.IncompleteCommand;
+import com.forgestorm.server.command.CommandString;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class InventoryCommands {
 
+    private final CommandManager commandManager;
+    
     @Command(base = "clearinv", argLenReq = 1)
-    @IncompleteCommand(missing = "clearinv <playerId>")
+    @CommandString(missing = "clearinv <playerName>")
     public void onClearItems(CommandSource commandSource, String[] args) {
 
-        short playerId;
-        try {
-
-            playerId = Short.parseShort(args[0]);
-
-        } catch (NumberFormatException e) {
-            commandSource.sendMessage("Could not parse playerId");
-            return;
-        }
-
-        Player player = ServerMain.getInstance().getGameManager().findPlayer(playerId);
+        String playerName = args[0];
+        Player player = commandManager.getPlayer(commandSource, playerName);
 
         if (player == null) {
-            commandSource.sendMessage("Could not find player for Id: " + playerId);
+            commandSource.sendMessage("Could not find player : " + playerName);
             return;
         }
 
@@ -37,6 +33,7 @@ public class InventoryCommands {
     }
 
     @Command(base = "giveall")
+    @CommandString(missing = "giveall")
     public void onGiveAll(CommandSource commandSource) {
 
         ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
@@ -48,7 +45,7 @@ public class InventoryCommands {
     }
 
     @Command(base = "give", argLenReq = 1)
-    @IncompleteCommand(missing = "give <itemId>")
+    @CommandString(missing = "give <itemId>")
     public void onGiveItem(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);
@@ -60,7 +57,7 @@ public class InventoryCommands {
     }
 
     @Command(base = "give", argLenReq = 2)
-    @IncompleteCommand(missing = "give <itemId> <amount>")
+    @CommandString(missing = "give <itemId> <amount>")
     public void onGiveItems(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);

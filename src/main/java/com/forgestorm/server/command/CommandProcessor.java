@@ -32,6 +32,22 @@ public class CommandProcessor {
         private CommandPermStatus permission;
     }
 
+    public void sendCommandList(CommandSource commandSource) {
+        commandSource.sendMessage("[YELLOW][Command List] --------------------------------");
+        sendCommandList(commandSource, commandArgLimitedListeners);
+        sendCommandList(commandSource, commandArgEndlessListeners);
+    }
+
+    private void sendCommandList(CommandSource commandSource, Map<String, Map<Integer, CommandInfo>> commandInfoMap) {
+        for (Map<Integer, CommandInfo> hashMap : commandInfoMap.values()) {
+            for (CommandInfo commandInfo : hashMap.values()) {
+                if (checkPermission(commandSource, commandInfo)) {
+                    commandSource.sendMessage("[YELLOW]/" + commandInfo.incompleteMsg);
+                }
+            }
+        }
+    }
+
     void addListener(Object listener) {
         for (Method method : listener.getClass().getMethods()) {
             Command[] cmdAnnotations = method.getAnnotationsByType(Command.class);
@@ -58,7 +74,7 @@ public class CommandProcessor {
             }
 
             String incompleteMsg = "";
-            IncompleteCommand[] incompleteCms = method.getAnnotationsByType(IncompleteCommand.class);
+            CommandString[] incompleteCms = method.getAnnotationsByType(CommandString.class);
             if (incompleteCms.length == 1) incompleteMsg = incompleteCms[0].missing();
 
             CommandPermStatus permission = CommandPermStatus.ADMIN;
@@ -129,7 +145,7 @@ public class CommandProcessor {
             commandInfoMap = commandArgEndlessListeners.get(command.toLowerCase());
             if (commandInfoMap != null) {
                 incompleteCommands = Stream.concat(Arrays.stream(incompleteCommands),
-                              Arrays.stream(getCommandSuggestions(commandInfoMap))).toArray(String[]::new);
+                        Arrays.stream(getCommandSuggestions(commandInfoMap))).toArray(String[]::new);
             }
 
             if (incompleteCommands.length == 0) {

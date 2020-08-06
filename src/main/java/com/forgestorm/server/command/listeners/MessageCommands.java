@@ -6,7 +6,7 @@ import com.forgestorm.server.game.world.entity.Player;
 public class MessageCommands {
 
     @Command(base = "msg")
-    @IncompleteCommand(missing =  "msg <Message...>")
+    @CommandString(missing =  "msg <message...>")
     @EndlessArguments
     @CommandPermission(status = CommandPermStatus.ALL)
     public void msg(CommandSource commandSource, String[] args) {
