@@ -23,11 +23,11 @@ public class CommandProcessor {
     private final Map<String, Map<Integer, CommandInfo>> commandArgEndlessListeners = new HashMap<>();
 
     @AllArgsConstructor
-    private class CommandInfo {
+    private static class CommandInfo {
         private Object listener;
         private Method method;
         private int reqArgs;
-        private String incompleteMsg;
+        private String expectedArguments;
         boolean endlessArguments;
         private CommandPermStatus permission;
     }
@@ -38,11 +38,14 @@ public class CommandProcessor {
         sendCommandList(commandSource, commandArgEndlessListeners);
     }
 
-    private void sendCommandList(CommandSource commandSource, Map<String, Map<Integer, CommandInfo>> commandInfoMap) {
-        for (Map<Integer, CommandInfo> hashMap : commandInfoMap.values()) {
-            for (CommandInfo commandInfo : hashMap.values()) {
+    private void sendCommandList(CommandSource commandSource, Map<String, Map<Integer, CommandInfo>> commandArgListeners) {
+        for (Map.Entry<String, Map<Integer, CommandInfo>> entrySet: commandArgListeners.entrySet()) {
+            String commandBase = entrySet.getKey();
+            Map<Integer, CommandInfo> commandInfoMap = entrySet.getValue();
+
+            for (CommandInfo commandInfo : commandInfoMap.values()) {
                 if (checkPermission(commandSource, commandInfo)) {
-                    commandSource.sendMessage("[YELLOW]/" + commandInfo.incompleteMsg);
+                    commandSource.sendMessage("[YELLOW]/" + commandBase + " " + commandInfo.expectedArguments);
                 }
             }
         }
@@ -74,7 +77,7 @@ public class CommandProcessor {
             }
 
             String incompleteMsg = "";
-            CommandString[] incompleteCms = method.getAnnotationsByType(CommandString.class);
+            CommandArguments[] incompleteCms = method.getAnnotationsByType(CommandArguments.class);
             if (incompleteCms.length == 1) incompleteMsg = incompleteCms[0].missing();
 
             CommandPermStatus permission = CommandPermStatus.ADMIN;
@@ -173,18 +176,15 @@ public class CommandProcessor {
         } else if (commandInfo.permission == CommandPermStatus.MOD) {
             return player.getClientHandler().getAuthenticatedUser().isModerator() ||
                     player.getClientHandler().getAuthenticatedUser().isAdmin();
-        } else if (commandInfo.permission == CommandPermStatus.ALL) {
-            return true;
-        }
-        return false;
+        } else return commandInfo.permission == CommandPermStatus.ALL;
     }
 
     private String[] getCommandSuggestions(Map<Integer, CommandInfo> commandInfoMap) {
         String[] incompleteCommands = new String[commandInfoMap.size()];
         int count = 0;
         for (CommandInfo commandInfoSuggestion : commandInfoMap.values()) {
-            if (commandInfoSuggestion.incompleteMsg.isEmpty()) continue;
-            incompleteCommands[count++] = commandInfoSuggestion.incompleteMsg;
+            if (commandInfoSuggestion.expectedArguments.isEmpty()) continue;
+            incompleteCommands[count++] = commandInfoSuggestion.expectedArguments;
         }
         return incompleteCommands;
     }
@@ -207,7 +207,7 @@ public class CommandProcessor {
     }
 
     @AllArgsConstructor
-    private class PublishInfo {
+    private static class PublishInfo {
         private CommandSource commandSource;
         private String[] arguments;
         private CommandInfo commandInfo;

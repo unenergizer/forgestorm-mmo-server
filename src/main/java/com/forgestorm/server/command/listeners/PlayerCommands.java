@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.CommandString;
+import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
@@ -22,7 +22,7 @@ public class PlayerCommands {
     private final CommandManager commandManager;
     
     @Command(base = "heal", argLenReq = 1)
-    @CommandString(missing = "heal <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void healPlayer(CommandSource commandSource, String[] args) {
 
         short playerId = 0;
@@ -55,7 +55,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "teleport", argLenReq = 1)
-    @CommandString(missing = "teleport <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void teleportToPlayer(CommandSource commandSource, String[] args) {
         Player player = commandSource.getPlayer();
         Player teleportToPlayer = commandManager.getPlayer(commandSource, args[0]);
@@ -65,7 +65,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "teleport", argLenReq = 4)
-    @CommandString(missing = "teleport <playerName> <mapName> <x> <y>")
+    @CommandArguments(missing = "<playerName> <mapName> <x> <y>")
     public void teleportPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         String mapName = args[1];
@@ -102,7 +102,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "kick", argLenReq = 1)
-    @CommandString(missing = "kick <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void kickPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -114,7 +114,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "kill", argLenReq = 1)
-    @CommandString(missing = "kill <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void killPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -124,7 +124,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "info", argLenReq = 1)
-    @CommandString(missing = "info <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void getPlayerInfo(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -142,7 +142,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "speed", argLenReq = 2)
-    @CommandString(missing = "info <playerName> <speed>")
+    @CommandArguments(missing = "<playerName> <speed>")
     public void setPlayerSpeed(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);

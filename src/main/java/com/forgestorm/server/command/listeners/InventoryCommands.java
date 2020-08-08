@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.CommandString;
+import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
@@ -16,7 +16,7 @@ public class InventoryCommands {
     private final CommandManager commandManager;
     
     @Command(base = "clearinv", argLenReq = 1)
-    @CommandString(missing = "clearinv <playerName>")
+    @CommandArguments(missing = "<playerName>")
     public void onClearItems(CommandSource commandSource, String[] args) {
 
         String playerName = args[0];
@@ -33,7 +33,6 @@ public class InventoryCommands {
     }
 
     @Command(base = "giveall")
-    @CommandString(missing = "giveall")
     public void onGiveAll(CommandSource commandSource) {
 
         ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
@@ -45,7 +44,7 @@ public class InventoryCommands {
     }
 
     @Command(base = "give", argLenReq = 1)
-    @CommandString(missing = "give <itemId>")
+    @CommandArguments(missing = "<itemId>")
     public void onGiveItem(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);
@@ -57,7 +56,7 @@ public class InventoryCommands {
     }
 
     @Command(base = "give", argLenReq = 2)
-    @CommandString(missing = "give <itemId> <amount>")
+    @CommandArguments(missing = "<itemId> <amount>")
     public void onGiveItems(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);

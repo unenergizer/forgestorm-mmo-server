@@ -100,6 +100,8 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
     private boolean attemptCommand(TextMessage packetData) {
         if (!packetData.text.startsWith("/")) return false;
 
+        println(getClass(), packetData.getClientHandler().getPlayer().getName() + ": " + packetData.text);
+
         String[] content = packetData.text.split("\\s+");
 
         // Strip the "/" off

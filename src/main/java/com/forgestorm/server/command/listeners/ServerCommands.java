@@ -17,31 +17,26 @@ public class ServerCommands {
     private final CommandManager commandManager;
 
     @Command(base = "commands")
-    @CommandString(missing = "commands")
     public void getCommandList(CommandSource commandSource) {
         commandManager.getCommandProcessor().sendCommandList(commandSource);
     }
 
     @Command(base = "tps")
-    @CommandString(missing = "tps")
     public void getTps(CommandSource commandSource) {
         commandSource.sendMessage("TPS: " + ServerMain.getInstance().getGameLoop().getCurrentTPS());
     }
 
     @Command(base = "stop")
-    @CommandString(missing = "stop")
     public void onStop(CommandSource commandSource) {
         ServerMain.getInstance().exitServer();
     }
 
     @Command(base = "online")
-    @CommandString(missing = "online")
     public void accountsOnline(CommandSource commandSource) {
         commandSource.sendMessage("Accounts Online: " + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
     }
 
     @Command(base = "time")
-    @CommandString(missing = "time")
     public void getServerTime(CommandSource commandSource) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -49,7 +44,6 @@ public class ServerCommands {
     }
 
     @Command(base = "uptime")
-    @CommandString(missing = "uptime")
     public void getServerUpTime(CommandSource commandSource) {
 
         long upTime = System.currentTimeMillis() - ServerMain.SERVER_START_TIME;
@@ -68,7 +62,7 @@ public class ServerCommands {
     }
 
     @Command(base = "say")
-    @CommandString(missing = "say <message...>")
+    @CommandArguments(missing = "<message...>")
     @EndlessArguments
     public void serverSay(CommandSource commandSource, String[] args) {
         ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
