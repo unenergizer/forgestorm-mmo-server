@@ -119,24 +119,24 @@ public class CommandProcessor {
         if (commandInfoMap == null) {
             commandInfoMap = commandArgEndlessListeners.get(command.toLowerCase());
             if (commandInfoMap == null) {
-                return new CommandState(CommandState.CommandType.NOT_FOUND);
+                return new CommandState(command, CommandState.CommandType.NOT_FOUND);
             }
 
             for (Map.Entry<Integer, CommandInfo> commandInfo : commandInfoMap.entrySet()) {
                 if (args.length <= commandInfo.getKey()) continue;
                 if (!checkPermission(commandSource, commandInfo.getValue()))
-                    return new CommandState(CommandState.CommandType.INVALID_PERMISSION);
+                    return new CommandState(command, CommandState.CommandType.INVALID_PERMISSION);
                 publishedCommands.add(new PublishInfo(commandSource, args, commandInfo.getValue()));
-                return new CommandState(CommandState.CommandType.FOUND);
+                return new CommandState(command, CommandState.CommandType.FOUND);
             }
 
             String[] incompleteCommands = getCommandSuggestions(commandInfoMap);
             if (incompleteCommands.length == 0) {
-                return new CommandState(CommandState.CommandType.NOT_FOUND);
+                return new CommandState(command, CommandState.CommandType.NOT_FOUND);
             } else if (incompleteCommands.length == 1) {
-                return new CommandState(CommandState.CommandType.SINGE_INCOMPLETE, incompleteCommands[0]);
+                return new CommandState(command, CommandState.CommandType.SINGE_INCOMPLETE, incompleteCommands[0]);
             } else {
-                return new CommandState(CommandState.CommandType.MULTIPLE_INCOMPLETE, incompleteCommands);
+                return new CommandState(command, CommandState.CommandType.MULTIPLE_INCOMPLETE, incompleteCommands);
             }
         }
 
@@ -152,19 +152,19 @@ public class CommandProcessor {
             }
 
             if (incompleteCommands.length == 0) {
-                return new CommandState(CommandState.CommandType.NOT_FOUND);
+                return new CommandState(command, CommandState.CommandType.NOT_FOUND);
             } else if (incompleteCommands.length == 1) {
-                return new CommandState(CommandState.CommandType.SINGE_INCOMPLETE, incompleteCommands[0]);
+                return new CommandState(command, CommandState.CommandType.SINGE_INCOMPLETE, incompleteCommands[0]);
             } else {
-                return new CommandState(CommandState.CommandType.MULTIPLE_INCOMPLETE, incompleteCommands);
+                return new CommandState(command, CommandState.CommandType.MULTIPLE_INCOMPLETE, incompleteCommands);
             }
         }
 
         if (!checkPermission(commandSource, commandInfo))
-            return new CommandState(CommandState.CommandType.INVALID_PERMISSION);
+            return new CommandState(command, CommandState.CommandType.INVALID_PERMISSION);
 
         publishedCommands.add(new PublishInfo(commandSource, args, commandInfo));
-        return new CommandState(CommandState.CommandType.FOUND);
+        return new CommandState(command, CommandState.CommandType.FOUND);
     }
 
     private boolean checkPermission(CommandSource commandSource, CommandInfo commandInfo) {

@@ -18,6 +18,7 @@ import static com.forgestorm.server.util.Log.println;
 public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.TextMessage> {
 
     private static final boolean PRINT_DEBUG = false;
+    private static final String COMMAND_ERROR = "[RED][Command Error] ";
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -117,23 +118,19 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         }
 
         Player player = packetData.getClientHandler().getPlayer();
-        String playerName = " [" + player.getName() + "] ";
         CommandState.CommandType commandType = commandState.getCommandType();
+        String commandBase = commandState.getCommandBase();
 
         if (commandType == CommandState.CommandType.NOT_FOUND) {
-            new ChatMessagePacketOut(player, packetData.chatChannelType, MessageText.ERROR + "Unknown Command").sendPacket();
-            println(getClass(), playerName + "Unknown Command");
-
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[WHITE]Unknown Command...").sendPacket();
         } else if (commandType == CommandState.CommandType.SINGE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, packetData.chatChannelType, MessageText.ERROR + "[Command] -> " + commandState.getIncompleteMessage()).sendPacket();
-            println(getClass(), playerName + " [Command] -> " + commandState.getIncompleteMessage());
-
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, " [YELLOW] 1. /" + commandBase + " " + commandState.getIncompleteMessage()).sendPacket();
         } else if (commandType == CommandState.CommandType.MULTIPLE_INCOMPLETE) {
-            new ChatMessagePacketOut(player, packetData.chatChannelType, "[YELLOW]Suggested Alternatives:").sendPacket();
-            println(getClass(), playerName + " Suggested Alternatives:");
-            for (String incompleteMsg : commandState.getMultipleIncompleteMessages()) {
-                new ChatMessagePacketOut(player, packetData.chatChannelType, "[YELLOW] - [Command] -> " + incompleteMsg).sendPacket();
-                println(getClass(), playerName + " - [Command] -> " + incompleteMsg);
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
+            for (int i = 0; i < commandState.getMultipleIncompleteMessages().length; i++) {
+                String incompleteMsg = commandState.getMultipleIncompleteMessages()[i];
+                new ChatMessagePacketOut(player, packetData.chatChannelType, " [YELLOW] " + (i + 1) + ". /" + commandBase + " " + incompleteMsg).sendPacket();
             }
         } else if (commandType == CommandState.CommandType.INVALID_PERMISSION) {
             return false;
