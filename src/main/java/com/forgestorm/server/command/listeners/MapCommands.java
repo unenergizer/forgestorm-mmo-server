@@ -42,10 +42,12 @@ public class MapCommands {
             }
         }
 
-        GameMap gameMap = new GameMap(mapName, width, height, tiles); //teleport <playerName> <mapName> <x> <y>
-        gameMapProcessor.loadMap(gameMap);
-        gameMapProcessor.loadEntities(gameMap);
-        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[GREEN]Map " + mapName + " was successfully created. Use the following command to warp to the map").sendPacket();
-        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[YELLOW] /teleport " + commandSource.getPlayer().getName() + " " + mapName + " 0 0").sendPacket();
+        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED] THIS NEEDS TO BE REDONE! PLEASE LOOK IT UP AND FIX... ").sendPacket();
+
+//        GameMap gameMap = new GameMap(mapName, width, height, tiles); //teleport <playerName> <mapName> <x> <y>
+//        gameMapProcessor.loadMap(gameMap);
+//        gameMapProcessor.loadEntities(gameMap);
+//        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[GREEN]Map " + mapName + " was successfully created. Use the following command to warp to the map").sendPacket();
+//        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[YELLOW] /teleport " + commandSource.getPlayer().getName() + " " + mapName + " 0 0").sendPacket();
     }
 }

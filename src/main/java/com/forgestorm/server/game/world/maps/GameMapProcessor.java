@@ -6,8 +6,8 @@ import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.FilePaths;
+import com.forgestorm.server.io.JsonMapParser;
 import com.forgestorm.server.io.ResourceList;
-import com.forgestorm.server.io.TmxFileParser;
 import lombok.Getter;
 
 import java.io.File;
@@ -18,7 +18,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameMapProcessor {
 
-    private static final boolean PRINT_DEBUG = false;
+    private static final String EXTENSION_TYPE = ".json";
+    private static final boolean PRINT_DEBUG = true;
 
     @Getter
     private final Map<String, GameMap> gameMaps = new HashMap<>();
@@ -62,6 +63,8 @@ public class GameMapProcessor {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
 
+        println(getClass(), warp.getLocation().getMapName(), true);
+
         gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
         gameMaps.get(warp.getLocation().getMapName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
@@ -75,29 +78,29 @@ public class GameMapProcessor {
         } else {
             mapCount = loadJarVersion();
         }
-        println(getClass(), "Tmx Maps Loaded: " + mapCount);
+        println(getClass(), "Game Maps Loaded: " + mapCount);
 
-        fixWarpHeights();
+//        fixWarpHeights(); // TODO - FIX ME
     }
 
     private int loadIdeVersion() {
-        File[] files = new File("src/main/resources/" + FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(".tmx"));
+        File[] files = new File("src/main/resources/" + FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
         checkNotNull(files, "No game maps were loaded.");
 
         for (File file : files) {
-            loadMap(TmxFileParser.parseGameMap(file.getName()));
+            loadMap(JsonMapParser.load(file.getName()));
         }
 
         return files.length;
     }
 
     private int loadJarVersion() {
-        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.MAPS.getFilePath(), ".tmx");
+        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.MAPS.getFilePath(), EXTENSION_TYPE);
         checkNotNull(files, "No game maps were loaded.");
 
         for (String fileName : files) {
             String[] temp = fileName.split("/"); // Removes the path
-            loadMap(TmxFileParser.parseGameMap(temp[temp.length - 1]));
+            loadMap(JsonMapParser.load(temp[temp.length - 1]));
         }
 
         return files.size();
@@ -203,20 +206,6 @@ public class GameMapProcessor {
             }
         }
         return continueLoop;
-    }
-
-    private void fixWarpHeights() {
-        for (GameMap gameMap : gameMaps.values()) {
-            println(getClass(), "Fixing warps for: " + gameMap.getMapName(), false, PRINT_DEBUG);
-            for (short i = 0; i < gameMap.getMapWidth(); i++) {
-                for (short j = 0; j < gameMap.getMapHeight(); j++) {
-                    if (gameMap.isOutOfBounds(i, j)) continue;
-                    Warp warp = gameMap.getMap()[i][j].getWarp();
-                    if (warp == null) continue;
-                    warp.getLocation().setY((short) (gameMaps.get(warp.getLocation().getMapName()).getMapHeight() - warp.getLocation().getY() - 1));
-                }
-            }
-        }
     }
 
     public GameMap getGameMap(String mapName) throws RuntimeException {

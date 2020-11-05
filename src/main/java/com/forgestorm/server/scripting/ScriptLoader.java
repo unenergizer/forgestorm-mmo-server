@@ -2,7 +2,6 @@ package com.forgestorm.server.scripting;
 
 
 import com.forgestorm.server.io.FilePaths;
-import com.forgestorm.server.io.TmxFileParser;
 
 import java.io.*;
 
@@ -16,7 +15,7 @@ public class ScriptLoader {
 
         println(getClass(), "====== START LOADING NPC SCRIPTS ======", false, PRINT_DEBUG);
 
-        InputStream inputStream = TmxFileParser.class.getResourceAsStream(FilePaths.SCRIPTS.getFilePath() + fileName);
+        InputStream inputStream = ScriptLoader.class.getResourceAsStream(FilePaths.SCRIPTS.getFilePath() + fileName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder stringBuilder = new StringBuilder();
         try {

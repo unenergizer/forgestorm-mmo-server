@@ -41,6 +41,7 @@ dependencies {
     compile 'com.google.guava:guava:29.0-jre'
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
+    compile "com.badlogicgames.gdx:gdx-backend-headless:1.9.9"
 
     // Server side scripting
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'

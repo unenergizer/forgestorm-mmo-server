@@ -4,6 +4,8 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.maps.GameMap;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.Tile;
+import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 
 import java.util.*;
 
@@ -40,14 +42,14 @@ public class PathFinding {
                 short worldX = (short) (bottomX + i);
                 short worldY = (short) (bottomY + j);
 
-                Tile worldTile = null;
+                TileImage worldTile = null;
                 if (!gameMap.isOutOfBounds(worldX, worldY)) {
                     worldTile = gameMap.getTileByLocation(new Location(gameMap.getMapName(), worldX, worldY));
                 }
 
                 if (worldTile == null) {
                     grid[i][j] = null;
-                } else if (!worldTile.isTraversable()) {
+                } else if (!worldTile.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) {
                     grid[i][j] = null;
                 } else {
                     grid[i][j] = new MoveNode(worldX, worldY, i, j);

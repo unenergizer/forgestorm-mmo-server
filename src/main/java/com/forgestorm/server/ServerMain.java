@@ -13,6 +13,7 @@ import com.forgestorm.server.game.rpg.skills.SkillNodeManager;
 import com.forgestorm.server.game.world.item.DropTableManager;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.trade.TradeManager;
+import com.forgestorm.server.game.world.maps.building.WorldBuilder;
 import com.forgestorm.server.io.ResourcePathLoader;
 import com.forgestorm.server.network.NetworkManager;
 import com.forgestorm.server.profile.XenforoProfileManager;
@@ -51,6 +52,7 @@ public class ServerMain {
     private final AbilityManager abilityManager = new AbilityManager();
 
     // System
+    private final WorldBuilder worldBuilder = new WorldBuilder();
     private final TradeManager tradeManager = new TradeManager();
     private final GameManager gameManager = new GameManager();
     private final CharacterManager characterManager = new CharacterManager();
@@ -82,6 +84,7 @@ public class ServerMain {
         println(getClass(), "Starting Server!");
 
         // Boot io loaders
+        worldBuilder.start();
         itemStackManager.start();
         dropTableManager.start();
         skillNodeManager.start();

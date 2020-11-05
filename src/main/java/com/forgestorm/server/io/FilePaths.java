@@ -24,6 +24,7 @@ public enum FilePaths {
 
     // Maps
     MAPS("maps/"),
+    TILES("graphics/TileProperties.yaml"),
 
     // Scripts
     SCRIPTS("scripts/"),

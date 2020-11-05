@@ -1,13 +1,28 @@
 package com.forgestorm.server.game.world.maps.building;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 @SuppressWarnings("unused")
+@Getter
+@AllArgsConstructor
 public enum LayerDefinition {
 
-    ROOF,
-    WALL,
-    WALL_DECORATION,
-    GROUND,
-    GROUND_DECORATION;
+//    // public enum TileLayers.java
+//    OVERHEAD,
+//    DECORATION,
+//    WALLS,
+//    GROUND,
+//    BACKGROUND
+
+    ROOF("overhead"),
+    WALL("walls"),
+    WALL_DECORATION("walls"),
+    GROUND("decoration"),
+    GROUND_DECORATION("decoration"),
+    BACKGROUND("background");
+
+    private String layerName;
 
     public static LayerDefinition getLayerDefinition(byte entityTypeByte) {
         for (LayerDefinition entityType : LayerDefinition.values()) {
