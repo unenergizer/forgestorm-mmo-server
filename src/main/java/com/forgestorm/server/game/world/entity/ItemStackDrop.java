@@ -39,6 +39,6 @@ public class ItemStackDrop extends Entity {
 
 
     public void removeItemStackDrop() {
-        getCurrentMapLocation().getGameMap().getItemStackDropEntityController().queueEntityDespawn(this);
+        getCurrentWorldLocation().getGameWorld().getItemStackDropEntityController().queueEntityDespawn(this);
     }
 }

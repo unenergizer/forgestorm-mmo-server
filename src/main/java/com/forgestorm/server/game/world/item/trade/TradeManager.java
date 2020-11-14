@@ -431,7 +431,7 @@ public class TradeManager implements AbstractTask {
      */
     private boolean checkMapSanity(Player tradeStarter, Player targetPlayer) {
         // Make sure the player is on the same map as the other one
-        if (!tradeStarter.getMapName().equals(targetPlayer.getMapName())) {
+        if (!tradeStarter.getWorldName().equals(targetPlayer.getWorldName())) {
             new ChatMessagePacketOut(targetPlayer, ChatChannelType.TRADE, MessageText.SERVER + "Trade canceled because a player left the map.").sendPacket();
             new ChatMessagePacketOut(tradeStarter, ChatChannelType.TRADE, MessageText.SERVER + "Trade canceled because a player left the map.").sendPacket();
             new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();
@@ -442,7 +442,7 @@ public class TradeManager implements AbstractTask {
         }
 
         // Make sure the player is within the correct distance
-        if (!tradeStarter.getCurrentMapLocation().isWithinDistance(targetPlayer.getCurrentMapLocation(), MAX_TRADE_DISTANCE)) {
+        if (!tradeStarter.getCurrentWorldLocation().isWithinDistance(targetPlayer.getCurrentWorldLocation(), MAX_TRADE_DISTANCE)) {
             new ChatMessagePacketOut(targetPlayer, ChatChannelType.TRADE, MessageText.SERVER + "Trade canceled because both players are too far apart.").sendPacket();
             new ChatMessagePacketOut(tradeStarter, ChatChannelType.TRADE, MessageText.SERVER + "Trade canceled because both players are too far apart.").sendPacket();
             new PlayerTradePacketOut(tradeStarter, new TradePacketInfoOut(TradeStatusOpcode.TRADE_CANCELED)).sendPacket();

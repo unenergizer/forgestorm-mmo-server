@@ -23,8 +23,8 @@ public enum FilePaths {
     COMBAT_ABILITIES("abilities/CombatAbilities.yaml"),
 
     // Maps
-    MAPS("maps/"),
-    MAPS_IMPL("maps/imp"),
+    WORLDS("maps/"),
+    WORLDS_IMPL("maps/imp"),
     TILE_PROPERTIES("graphics/TileProperties.yaml"),
 
     // Scripts

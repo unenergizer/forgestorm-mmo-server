@@ -28,7 +28,7 @@ public class NPCDialoguePacketIn implements PacketListener<NPCDialoguePacketIn.N
 
         Player player = packetData.getClientHandler().getPlayer();
 
-         NPC npc = (NPC) player.getGameMap().getAiEntityController().getEntity(packetData.entityId);
+         NPC npc = (NPC) player.getGameWorld().getAiEntityController().getEntity(packetData.entityId);
 
         System.out.println("Talking to NPC: " + npc);
 

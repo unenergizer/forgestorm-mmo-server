@@ -32,7 +32,7 @@ public class GameWorldItemStackDropSQL {
         itemStackDrop.setSpawnedFromMonster(false);
         itemStackDrop.setEntityType(EntityType.ITEM_STACK);
         itemStackDrop.setName(itemStack.getName());
-        itemStackDrop.setCurrentMapLocation(location);
+        itemStackDrop.setCurrentWorldLocation(location);
         itemStackDrop.setItemStack(itemStack);
         itemStackDrop.setRespawnTimeMin(respawnTimeMin);
         itemStackDrop.setRespawnTimeMax(respawnTimeMax);
@@ -47,9 +47,9 @@ public class GameWorldItemStackDropSQL {
                 " itemstack_id=?, amount=?, respawn_time_min=?, respawn_time_max=? " +
                 " WHERE drop_id=?");
 
-        preparedStatement.setString(1, itemStackDrop.getCurrentMapLocation().getWorldName());
-        preparedStatement.setInt(2, itemStackDrop.getCurrentMapLocation().getX());
-        preparedStatement.setInt(3, itemStackDrop.getCurrentMapLocation().getY());
+        preparedStatement.setString(1, itemStackDrop.getCurrentWorldLocation().getWorldName());
+        preparedStatement.setInt(2, itemStackDrop.getCurrentWorldLocation().getX());
+        preparedStatement.setInt(3, itemStackDrop.getCurrentWorldLocation().getY());
         preparedStatement.setInt(4, itemStackDrop.getItemStack().getItemId());
         preparedStatement.setInt(5, itemStackDrop.getItemStack().getAmount());
         preparedStatement.setInt(6, itemStackDrop.getRespawnTimeMin());
@@ -64,9 +64,9 @@ public class GameWorldItemStackDropSQL {
                 "(world_name, world_x, world_y, itemstack_id, amount, respawn_time_min, respawn_time_max) " +
                 "VALUES(?, ?, ?, ?, ?, ?, ?)");
 
-        preparedStatement.setString(1, itemStackDrop.getCurrentMapLocation().getWorldName());
-        preparedStatement.setInt(2, itemStackDrop.getCurrentMapLocation().getX());
-        preparedStatement.setInt(3, itemStackDrop.getCurrentMapLocation().getY());
+        preparedStatement.setString(1, itemStackDrop.getCurrentWorldLocation().getWorldName());
+        preparedStatement.setInt(2, itemStackDrop.getCurrentWorldLocation().getX());
+        preparedStatement.setInt(3, itemStackDrop.getCurrentWorldLocation().getY());
         preparedStatement.setInt(4, itemStackDrop.getItemStack().getItemId());
         preparedStatement.setInt(5, itemStackDrop.getItemStack().getAmount());
         preparedStatement.setInt(6, itemStackDrop.getRespawnTimeMin());
@@ -120,7 +120,7 @@ public class GameWorldItemStackDropSQL {
             }
 
             // Now reload and spawn the entity
-            ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadItemStackDrop(itemStackDrop.getGameWorld());
         }
     }
 

@@ -28,7 +28,7 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
         MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
         // TODO: REMOVE SHORT CAST!!
-        Location location = new Location(player.getMapName(), (short) packetData.x, (short) packetData.y);
+        Location location = new Location(player.getWorldName(), (short) packetData.x, (short) packetData.y);
 
         if (!movementUpdateTask.preMovementChecks(player, location)) return;
 

@@ -28,8 +28,8 @@ public class Location {
         this.y = location.y;
     }
 
-    public GameWorld getGameMap() {
-        return ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMap(worldName);
+    public GameWorld getGameWorld() {
+        return ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameWorld(worldName);
     }
 
     public Location add(Location location) {
@@ -51,7 +51,7 @@ public class Location {
     }
 
     public boolean isWithinDistance(Entity entity, int distance) {
-        return isWithinDistance(entity.getCurrentMapLocation(), distance);
+        return isWithinDistance(entity.getCurrentWorldLocation(), distance);
     }
 
     public boolean isWithinDistance(Location otherLocation, int distance) {

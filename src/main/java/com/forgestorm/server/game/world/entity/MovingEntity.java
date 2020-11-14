@@ -27,7 +27,7 @@ public class MovingEntity extends Entity {
     /**
      * The exact tile location of the entity on the tile grid.
      */
-    private Location futureMapLocation;
+    private Location futureWorldLocation;
 
     /**
      * The direction the entity is facing. Is not always the same direction
@@ -93,23 +93,23 @@ public class MovingEntity extends Entity {
         return abilitiesToCooldown.containsKey(ability.getAbilityId());
     }
 
-    public void gameMapRegister(Warp warp) {
-        setCurrentMapLocation(new Location(warp.getLocation()));
-        setFutureMapLocation(new Location(warp.getLocation()));
+    public void gameWorldRegister(Warp warp) {
+        setCurrentWorldLocation(new Location(warp.getLocation()));
+        setFutureWorldLocation(new Location(warp.getLocation()));
         setRealX(warp.getLocation().getX() * GameConstants.TILE_SIZE);
         setRealY(warp.getLocation().getY() * GameConstants.TILE_SIZE);
         walkTime = 0f;
         setFacingDirection(warp.getFacingDirection());
     }
 
-    void gameMapDeregister() {
+    void gameWorldDeregister() {
         setWalkTime(0f);
     }
 
     public void heal(int amount) {
         // Ensuring not to exceed the maximum health.
         final int realAmount = amount + currentHealth > maxHealth ? maxHealth - currentHealth : amount;
-        getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+        getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
                 new EntityHealPacketOut(anyPlayer, this, realAmount).sendPacket());
         currentHealth += realAmount;
     }
@@ -128,7 +128,7 @@ public class MovingEntity extends Entity {
 
 
         int finalDamage = damage;
-        getGameMap().getPlayerController().forAllPlayers(player ->
+        getGameWorld().getPlayerController().forAllPlayers(player ->
                 new EntityDamagePacketOut(player, this, currentHealth, finalDamage).sendPacket());
         if (this instanceof Player) {
             new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
@@ -139,7 +139,7 @@ public class MovingEntity extends Entity {
     }
 
     public boolean isEntityMoving() {
-        return getCurrentMapLocation().getX() != getFutureMapLocation().getX() || getCurrentMapLocation().getY() != getFutureMapLocation().getY();
+        return getCurrentWorldLocation().getX() != getFutureWorldLocation().getX() || getCurrentWorldLocation().getY() != getFutureWorldLocation().getY();
     }
 
     public void clearCombatTargets() {

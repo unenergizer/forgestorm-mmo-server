@@ -82,8 +82,8 @@ public class Player extends MovingEntity {
     }
 
     @Override
-    public void gameMapDeregister() {
-        super.gameMapDeregister();
+    public void gameWorldDeregister() {
+        super.gameWorldDeregister();
         getLatestMoveRequests().clear();
     }
 
@@ -93,9 +93,9 @@ public class Player extends MovingEntity {
 
         clearCombatTargets();
 
-        // Check to see if the player needs to change maps!
-        if (!getGameMap().isGraveYardMap()) {
-            println(getClass(), "Warping player to graveyard map!");
+        // Check to see if the player needs to change worlds!
+        if (!getGameWorld().isGraveYardWorld()) {
+            println(getClass(), "Warping player to graveyard world!");
 
             // Warp player to graveyard
             setWarp(new Warp(teleportLocation, facingDirection));
@@ -104,13 +104,13 @@ public class Player extends MovingEntity {
 
             // Teleport packetReceiver
             getLatestMoveRequests().clear();
-            gameMapRegister(new Warp(teleportLocation, facingDirection));
+            gameWorldRegister(new Warp(teleportLocation, facingDirection));
 
-            // Send all players in map the teleport packet
-            getGameMap().getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, this, teleportLocation, facingDirection).sendPacket());
+            // Send all players in world the teleport packet
+            getGameWorld().getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, this, teleportLocation, facingDirection).sendPacket());
 
-            // Send other players info about the reheal (if they are still on the same map)
-            getGameMap().getPlayerController().forAllPlayers(player -> new EntityHealPacketOut(player, this, getMaxHealth() - getCurrentHealth()).sendPacket());
+            // Send other players info about the reheal (if they are still on the same world)
+            getGameWorld().getPlayerController().forAllPlayers(player -> new EntityHealPacketOut(player, this, getMaxHealth() - getCurrentHealth()).sendPacket());
         }
 
         // Reheal Player

@@ -35,11 +35,11 @@ public class AbilityRequestPacketIn implements PacketListener<AbilityRequestPack
         switch (packetData.entityType) {
             case CLIENT_PLAYER:
             case PLAYER:
-                movingEntity = attacker.getGameMap().getPlayerController().findPlayer(packetData.targetId);
+                movingEntity = attacker.getGameWorld().getPlayerController().findPlayer(packetData.targetId);
                 break;
             case NPC:
             case MONSTER:
-                movingEntity = (MovingEntity) attacker.getGameMap().getAiEntityController().getEntity(packetData.targetId);
+                movingEntity = (MovingEntity) attacker.getGameWorld().getAiEntityController().getEntity(packetData.targetId);
                 break;
         }
 

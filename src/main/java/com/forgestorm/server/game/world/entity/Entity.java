@@ -13,19 +13,19 @@ public class Entity {
     private Short serverEntityId;
     private EntityType entityType;
     private String name = "";
-    private Location currentMapLocation;
+    private Location currentWorldLocation;
     private Appearance appearance;
 
-    public String getMapName() {
-        return currentMapLocation.getWorldName();
+    public String getWorldName() {
+        return currentWorldLocation.getWorldName();
     }
 
-    public GameWorld getGameMap() {
-        return currentMapLocation.getGameMap();
+    public GameWorld getGameWorld() {
+        return currentWorldLocation.getGameWorld();
     }
 
     @Override
     public String toString() {
-        return "[" + name + "] -> { DatabaseID=" + databaseId + ", ServerEntityID=" + serverEntityId + ", EntityType=" + entityType.toString() + ", Location=" + currentMapLocation.toString() + " }";
+        return "[" + name + "] -> { DatabaseID=" + databaseId + ", ServerEntityID=" + serverEntityId + ", EntityType=" + entityType.toString() + ", Location=" + currentWorldLocation.toString() + " }";
     }
 }

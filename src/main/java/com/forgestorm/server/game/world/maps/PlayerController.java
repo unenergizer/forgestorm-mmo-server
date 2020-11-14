@@ -26,7 +26,7 @@ public class PlayerController {
     private final Queue<Player> playerQuitQueue = new ConcurrentLinkedQueue<>();
 
     @Getter
-    private QueuedIdGenerator queuedIdGenerator;
+    private final QueuedIdGenerator queuedIdGenerator;
 
     PlayerController(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
@@ -34,7 +34,7 @@ public class PlayerController {
     }
 
     public void tickPlayerQuit() {
-        // Quitting the game map
+        // Quitting the game world
         Iterator<Player> quitIterator = playerQuitQueue.iterator();
         int quitsProcessed = 0;
         while (quitIterator.hasNext() && quitsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
@@ -43,7 +43,7 @@ public class PlayerController {
             player.setTargetEntity(null);
             gameWorld.getAiEntityController().releaseEntityTargets(player);
             playerList.remove(player);
-            player.gameMapDeregister();
+            player.gameWorldDeregister();
             quitsProcessed++;
         }
 
@@ -61,7 +61,7 @@ public class PlayerController {
     }
 
     public void tickPlayerJoin() {
-        // Joining the game map
+        // Joining the game world
         Iterator<QueueData> joinIterator = playerJoinQueue.iterator();
         int joinsProcessed = 0;
         while (joinIterator.hasNext() && joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS) {
@@ -71,9 +71,9 @@ public class PlayerController {
                 println(getClass(), "Not enough space reserved to spawn player: " + player, true);
                 return;
             }
-            player.gameMapRegister(queueData.getWarp());
+            player.gameWorldRegister(queueData.getWarp());
             playerList.add(player);
-            new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getWorldName()).sendPacket();
+            new InitializeWorldPacketOut(player, queueData.getWarp().getLocation().getWorldName()).sendPacket();
             println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
             joinsProcessed++;
         }
@@ -99,7 +99,7 @@ public class PlayerController {
             // Send the player attributes about themselves
             new EntityAttributesUpdatePacketOut(playerWhoJoined, playerWhoJoined).sendPacket();
 
-            // Tell the player about all the mobs currently on the map.
+            // Tell the player about all the mobs currently on the world.
             gameWorld.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
             gameWorld.getAiEntityController().getEntities().forEach(aiEntity -> {
                 // Sending additional information for the AI entity.

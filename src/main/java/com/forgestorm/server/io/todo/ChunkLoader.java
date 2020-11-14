@@ -25,38 +25,38 @@ import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.MapChunkDataWrapper, ChunkLoader.MapChunkParameter> {
+public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkDataWrapper, ChunkLoader.WorldChunkParameter> {
 
-    static class MapChunkParameter extends AssetLoaderParameters<MapChunkDataWrapper> {
+    static class WorldChunkParameter extends AssetLoaderParameters<WorldChunkDataWrapper> {
     }
 
     private static final boolean PRINT_DEBUG = false;
     private static final String EXTENSION_TYPE = ".json";
-    private MapChunkDataWrapper mapChunkDataWrapper = null;
+    private WorldChunkDataWrapper worldChunkDataWrapper = null;
 
     ChunkLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, MapChunkParameter parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, WorldChunkParameter parameter) {
         println(getClass(), "Is Directory: " + file.isDirectory(), false, PRINT_DEBUG);
         println(getClass(), "Directory List Size: " + file.list().length, false, PRINT_DEBUG);
         println(getClass(), "Directory Name: " + file.name(), false, PRINT_DEBUG);
 
-        mapChunkDataWrapper = null;
-        mapChunkDataWrapper = new MapChunkDataWrapper();
+        worldChunkDataWrapper = null;
+        worldChunkDataWrapper = new WorldChunkDataWrapper();
 
-        mapChunkDataWrapper.setWorldChunk(load(file));
+        worldChunkDataWrapper.setWorldChunk(load(file));
     }
 
     @Override
-    public MapChunkDataWrapper loadSync(AssetManager manager, String fileName, FileHandle file, MapChunkParameter parameter) {
-        return mapChunkDataWrapper;
+    public WorldChunkDataWrapper loadSync(AssetManager manager, String fileName, FileHandle file, WorldChunkParameter parameter) {
+        return worldChunkDataWrapper;
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, MapChunkParameter parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, WorldChunkParameter parameter) {
         return null;
     }
 
@@ -113,7 +113,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.MapChunkDat
 
     @Setter
     @Getter
-    public class MapChunkDataWrapper {
+    public class WorldChunkDataWrapper {
         private WorldChunk worldChunk;
     }
 }

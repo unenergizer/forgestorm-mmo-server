@@ -49,7 +49,7 @@ public class PlayerCommands {
         commandSource.sendMessage("Healed player " + player.getName());
 
         final Player sendPlayer = player;
-        player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+        player.getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
                 new EntityHealPacketOut(anyPlayer, sendPlayer, sendPlayer.getMaxHealth() - sendPlayer.getCurrentHealth()).sendPacket());
         player.setCurrentHealth(player.getMaxHealth());
     }
@@ -61,7 +61,7 @@ public class PlayerCommands {
         Player teleportToPlayer = commandManager.getPlayer(commandSource, args[0]);
 
         if (teleportToPlayer == null) return;
-        player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentMapLocation()), MoveDirection.SOUTH));
+        player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentWorldLocation()), MoveDirection.SOUTH));
     }
 
     @Command(base = "teleport", argLenReq = 4)
@@ -84,7 +84,7 @@ public class PlayerCommands {
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
         Location location = new Location(mapName, x, y);
 
-        if (!gameWorldProcessor.doesGameMapExist(mapName)) {
+        if (!gameWorldProcessor.doesGameWorldExist(mapName)) {
             commandSource.sendMessage("The map <" + mapName + "> does not exist. Check spelling.");
             return;
         }
@@ -161,7 +161,7 @@ public class PlayerCommands {
             player.setMoveSpeed(moveSpeed);
             commandSource.sendMessage(MessageText.SERVER + playerName + " move speed set to " + player.getMoveSpeed() + " from " + oldMoveSpeed + ".");
 
-            player.getGameMap().getPlayerController().forAllPlayers(anyPlayer ->
+            player.getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
                     new EntityUpdatePacketOut(anyPlayer, player, moveSpeed).sendPacket());
 
         } catch (NumberFormatException e) {

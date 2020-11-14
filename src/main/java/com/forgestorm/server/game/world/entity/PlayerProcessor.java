@@ -71,15 +71,15 @@ public class PlayerProcessor {
         new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
 
         // Add player to World
-        if (player.getGameMap() == null) {
-            // If the game map returns null here, we are trying to
+        if (player.getGameWorld() == null) {
+            // If the game world returns null here, we are trying to
             // add the player to a world that no longer exists.
             // Instead let's send them to the default spawn.
-            player.setCurrentMapLocation(PlayerConstants.RESPAWN_LOCATION);
-            player.setFutureMapLocation(PlayerConstants.RESPAWN_LOCATION);
-            new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.ERROR + "The map you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
+            player.setCurrentWorldLocation(PlayerConstants.RESPAWN_LOCATION);
+            player.setFutureWorldLocation(PlayerConstants.RESPAWN_LOCATION);
+            new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.ERROR + "The world you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
         }
-        player.getGameMap().getPlayerController().addPlayer(player, new Warp(player.getCurrentMapLocation(), player.getFacingDirection()));
+        player.getGameWorld().getPlayerController().addPlayer(player, new Warp(player.getCurrentWorldLocation(), player.getFacingDirection()));
 
         // Send player bag ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBag().getInventorySlotArray()) {
@@ -110,8 +110,8 @@ public class PlayerProcessor {
         }
 
         // Send other players join message
-        for (GameWorld mapSearch : gameManager.getGameWorldProcessor().getGameMaps().values()) {
-            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
+        for (GameWorld worldSearch : gameManager.getGameWorldProcessor().getGameWorlds().values()) {
+            for (Player playerSearch : worldSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
             }
@@ -148,14 +148,14 @@ public class PlayerProcessor {
     private void playerWorldQuit(Player player) {
         player.setLoggedInGameWorld(false);
 
-        for (GameWorld mapSearch : gameManager.getGameWorldProcessor().getGameMaps().values()) {
-            for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
+        for (GameWorld worldSearch : gameManager.getGameWorldProcessor().getGameWorlds().values()) {
+            for (Player playerSearch : worldSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
             }
         }
 
-        GameWorld gameWorld = player.getGameMap();
+        GameWorld gameWorld = player.getGameWorld();
         gameWorld.getPlayerController().removePlayer(player);
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player quit server.");
     }

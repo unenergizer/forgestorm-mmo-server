@@ -221,11 +221,11 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
 
         if (packetData.entityID != -1) {
             if (packetData.entityType == EntityType.NPC) {
-                entity = (NPC) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+                entity = (NPC) packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
             } else if (packetData.entityType == EntityType.MONSTER) {
-                entity = (Monster) packetData.getClientHandler().getPlayer().getGameMap().getAiEntityController().getEntity(packetData.entityID);
+                entity = (Monster) packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
             } else if (packetData.entityType == EntityType.ITEM_STACK) {
-                entity = (ItemStackDrop) packetData.getClientHandler().getPlayer().getGameMap().getItemStackDropEntityController().getEntity(packetData.entityID);
+                entity = (ItemStackDrop) packetData.getClientHandler().getPlayer().getGameWorld().getItemStackDropEntityController().getEntity(packetData.entityID);
             }
         } else {
             if (packetData.entityType == EntityType.NPC) {
@@ -269,7 +269,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 npc.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
                 npc.setMovementInfo(packetData.probStop, packetData.probWalk);
                 npc.setDefaultSpawnLocation(spawnLocation);
-                npc.gameMapRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
+                npc.gameWorldRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
 
                 // Appearance
                 appearance.setHairTexture(packetData.hairTexture);
@@ -304,7 +304,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 monster.setRegionLocations(0, 0, 96, 54); // TODO: Get from client
                 monster.setMovementInfo(packetData.probStop, packetData.probWalk);
                 monster.setDefaultSpawnLocation(spawnLocation);
-                monster.gameMapRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
+                monster.gameWorldRegister(new Warp(spawnLocation, MoveDirection.SOUTH));
 
                 // Appearance
                 appearance.setMonsterBodyTexture(packetData.monsterBodyTexture);
@@ -317,7 +317,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 break;
             case ITEM_STACK:
                 ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
-                itemStackDrop.setCurrentMapLocation(spawnLocation);
+                itemStackDrop.setCurrentWorldLocation(spawnLocation);
                 ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(packetData.itemStackId, packetData.amount);
                 itemStackDrop.setItemStack(itemStack);
                 itemStackDrop.setSpawnedForAll(true);
@@ -348,7 +348,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
                 new GameWorldItemStackDropSQL().saveSQL(itemStackDrop);
                 itemStackDrop.removeItemStackDrop();
-                ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
+                ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadItemStackDrop(itemStackDrop.getGameWorld());
             }
         } else if (packetData.save) {
             // Saving new entity
@@ -381,9 +381,9 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         } else {
             if (packetData.spawn) {
                 if (entity instanceof AiEntity) {
-                    player.getGameMap().getAiEntityController().queueEntitySpawn((AiEntity) entity);
+                    player.getGameWorld().getAiEntityController().queueEntitySpawn((AiEntity) entity);
                 } else if (entity instanceof ItemStackDrop) {
-                    player.getGameMap().getItemStackDropEntityController().queueEntitySpawn((ItemStackDrop) entity);
+                    player.getGameWorld().getItemStackDropEntityController().queueEntitySpawn((ItemStackDrop) entity);
                 }
             }
         }

@@ -29,8 +29,8 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         player.setCurrentHealth(resultSet.getInt("health"));
         player.setFacingDirection(MoveDirection.valueOf(resultSet.getString("facing_direction")));
         Location loginLocation = new Location(resultSet.getString("world_name"), resultSet.getShort("world_x"), resultSet.getShort("world_y"));
-        player.setCurrentMapLocation(new Location(loginLocation));
-        player.setFutureMapLocation(new Location(loginLocation));
+        player.setCurrentWorldLocation(new Location(loginLocation));
+        player.setFutureWorldLocation(new Location(loginLocation));
 
         byte hairTexture = resultSet.getByte("hair_texture");
         int hairColor = resultSet.getInt("hair_color");
@@ -62,9 +62,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setInt(2, player.getFaction());
         preparedStatement.setInt(3, player.getCurrentHealth());
         preparedStatement.setString(4, player.getFacingDirection().toString());
-        preparedStatement.setString(5, player.getMapName());
-        preparedStatement.setInt(6, player.getFutureMapLocation().getX());
-        preparedStatement.setInt(7, player.getFutureMapLocation().getY());
+        preparedStatement.setString(5, player.getWorldName());
+        preparedStatement.setInt(6, player.getFutureWorldLocation().getX());
+        preparedStatement.setInt(7, player.getFutureWorldLocation().getY());
         preparedStatement.setInt(8, player.getAppearance().getHairTexture());
         preparedStatement.setInt(9, player.getAppearance().getHairColor());
         preparedStatement.setInt(10, player.getAppearance().getEyeColor());
@@ -98,9 +98,9 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setByte(6, player.getFaction());
         preparedStatement.setInt(7, player.getCurrentHealth());
         preparedStatement.setString(8, player.getFacingDirection().toString());
-        preparedStatement.setString(9, player.getCurrentMapLocation().getWorldName());
-        preparedStatement.setInt(10, player.getCurrentMapLocation().getX());
-        preparedStatement.setInt(11, player.getCurrentMapLocation().getY());
+        preparedStatement.setString(9, player.getCurrentWorldLocation().getWorldName());
+        preparedStatement.setInt(10, player.getCurrentWorldLocation().getX());
+        preparedStatement.setInt(11, player.getCurrentWorldLocation().getY());
         preparedStatement.setByte(12, player.getAppearance().getHairTexture());
         preparedStatement.setInt(13, player.getAppearance().getHairColor());
         preparedStatement.setInt(14, player.getAppearance().getEyeColor());

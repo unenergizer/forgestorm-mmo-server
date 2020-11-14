@@ -63,16 +63,16 @@ public class MovementUpdateTask implements AbstractTask {
 
     private void continueFromMoveNodes(AiEntity aiEntity) {
         MoveNode moveNode = aiEntity.getMoveNodes().remove();
-        Location currentLocation = aiEntity.getCurrentMapLocation();
+        Location currentLocation = aiEntity.getCurrentWorldLocation();
 
         performAiEntityMove(aiEntity, currentLocation.getMoveDirectionFromLocation(
-                new Location(aiEntity.getMapName(), moveNode.getWorldX(), moveNode.getWorldY())));
+                new Location(aiEntity.getWorldName(), moveNode.getWorldX(), moveNode.getWorldY())));
     }
 
     private void mapTargets() {
         targetsLocations.clear();
         ServerMain.getInstance().getGameManager().forAllAiEntitiesFiltered(aiEntity -> {
-                    Location location = aiEntity.getFutureMapLocation();
+                    Location location = aiEntity.getFutureWorldLocation();
                     MovementTargetInfo movementTargetInfo = new MovementTargetInfo(aiEntity, location);
                     if (targetsLocations.containsKey(aiEntity.getTargetEntity())) {
                         targetsLocations.get(aiEntity.getTargetEntity()).add(movementTargetInfo);
@@ -85,7 +85,7 @@ public class MovementUpdateTask implements AbstractTask {
                 aiEntity -> aiEntity.getTargetEntity() != null);
 
         targetsLocations.forEach((target, trackers) ->
-                trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureMapLocation()) >= 2));
+                trackers.removeIf(tracker -> tracker.location.getDistanceAway(target.getFutureWorldLocation()) >= 2));
 
     }
 
@@ -148,11 +148,11 @@ public class MovementUpdateTask implements AbstractTask {
     private void moveEntity(MovingEntity movingEntity) {
         float delta = 1.0f / 20.0f; // TODO: Might want to get the actual delta (error incurred ter tick)
 
-        int currentX = movingEntity.getCurrentMapLocation().getX();
-        int currentY = movingEntity.getCurrentMapLocation().getY();
+        int currentX = movingEntity.getCurrentWorldLocation().getX();
+        int currentY = movingEntity.getCurrentWorldLocation().getY();
 
-        int futureX = movingEntity.getFutureMapLocation().getX();
-        int futureY = movingEntity.getFutureMapLocation().getY();
+        int futureX = movingEntity.getFutureWorldLocation().getX();
+        int futureY = movingEntity.getFutureWorldLocation().getY();
 
         float frameMove = movingEntity.getMoveSpeed() / GameConstants.TICKS_PER_SECOND;
 
@@ -169,15 +169,15 @@ public class MovementUpdateTask implements AbstractTask {
     private void finishMove(MovingEntity movingEntity) {
         println(getClass(), "EntityId: " + movingEntity.getServerEntityId() + " has finished it's move", false, PRINT_DEBUG);
 
-        movingEntity.getCurrentMapLocation().set(movingEntity.getFutureMapLocation());
-        movingEntity.setRealX(movingEntity.getFutureMapLocation().getX() * GameConstants.TILE_SIZE);
-        movingEntity.setRealY(movingEntity.getFutureMapLocation().getY() * GameConstants.TILE_SIZE);
+        movingEntity.getCurrentWorldLocation().set(movingEntity.getFutureWorldLocation());
+        movingEntity.setRealX(movingEntity.getFutureWorldLocation().getX() * GameConstants.TILE_SIZE);
+        movingEntity.setRealY(movingEntity.getFutureWorldLocation().getY() * GameConstants.TILE_SIZE);
 
         initEntityTargeting(movingEntity);
     }
 
     public void initEntityTargeting(MovingEntity movingEntity) {
-        GameWorld gameWorld = movingEntity.getGameMap();
+        GameWorld gameWorld = movingEntity.getGameWorld();
 
         if (movingEntity instanceof Player) {
             /*
@@ -208,8 +208,8 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private void findEntityTarget(AiEntity attackerEntity, MovingEntity targetEntity) {
-        Location attackerLocation = attackerEntity.getCurrentMapLocation();
-        Location targetLocation = targetEntity.getCurrentMapLocation();
+        Location attackerLocation = attackerEntity.getCurrentWorldLocation();
+        Location targetLocation = targetEntity.getCurrentWorldLocation();
 
         // The attacker has no assigned target.
         if (attackerEntity.getTargetEntity() == null) {
@@ -282,9 +282,9 @@ public class MovementUpdateTask implements AbstractTask {
         if (aiEntity.isEntityMoving()) return;
         if (!aiEntity.getMoveNodes().isEmpty()) return;
 
-        GameWorld gameWorld = aiEntity.getGameMap();
-        Location currentLocation = aiEntity.getCurrentMapLocation();
-        Location targetLocation = targetEntity.getCurrentMapLocation();
+        GameWorld gameWorld = aiEntity.getGameWorld();
+        Location currentLocation = aiEntity.getCurrentWorldLocation();
+        Location targetLocation = targetEntity.getCurrentWorldLocation();
 
         List<MovementTargetInfo> otherTargetLocations = targetsLocations.get(targetEntity);
         if (otherTargetLocations == null) otherTargetLocations = new ArrayList<>();
@@ -437,11 +437,11 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private boolean attemptAStar(List<MovementTargetInfo> otherTargetLocations, Location location, AiEntity tracker) {
-        if (!location.getGameMap().isMovable(location)) return false;
+        if (!location.getGameWorld().isMovable(location)) return false;
         if (containsMovement(otherTargetLocations, location, tracker)) return false;
-        Queue<MoveNode> nodes = pathFinding.findPath(tracker.getGameMap(),
-                tracker.getCurrentMapLocation().getX(),
-                tracker.getCurrentMapLocation().getY(),
+        Queue<MoveNode> nodes = pathFinding.findPath(tracker.getGameWorld(),
+                tracker.getCurrentWorldLocation().getX(),
+                tracker.getCurrentWorldLocation().getY(),
                 location.getX(),
                 location.getY());
         if (nodes == null) return false;
@@ -469,8 +469,8 @@ public class MovementUpdateTask implements AbstractTask {
         List<MoveDirection> directions = new LinkedList<>(Arrays.asList(MoveDirection.EAST, MoveDirection.NORTH, MoveDirection.SOUTH, MoveDirection.WEST));
         directions.removeIf(direction -> direction == excludeDirection);
         MoveDirection attemptDirection = directions.get(RandomUtil.getNewRandom(0, 2));
-        GameWorld gameWorld = aiEntity.getGameMap();
-        if (gameWorld.isMovable(aiEntity.getCurrentMapLocation().add(gameWorld.getLocation(attemptDirection)))) {
+        GameWorld gameWorld = aiEntity.getGameWorld();
+        if (gameWorld.isMovable(aiEntity.getCurrentWorldLocation().add(gameWorld.getLocation(attemptDirection)))) {
             performAiEntityMove(aiEntity, attemptDirection);
         }
     }
@@ -487,7 +487,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         // Makes sure they are not trying to move to where they already are located.
         if (!playerIsMoving) {
-            if (attemptLocation.equals(player.getCurrentMapLocation())) {
+            if (attemptLocation.equals(player.getCurrentWorldLocation())) {
                 println(getClass(), "A player tried to request a movement to the tile they are already on.", true);
                 return false;
             }
@@ -495,7 +495,7 @@ public class MovementUpdateTask implements AbstractTask {
 
             if (moveQueueEmpty) {
                 // We compare the incoming request up against where they will be in the future.
-                if (attemptLocation.equals(player.getFutureMapLocation())) {
+                if (attemptLocation.equals(player.getFutureWorldLocation())) {
                     println(getClass(), "The player tried to request movement to where their future move already is.", true);
                     return false;
                 }
@@ -516,19 +516,19 @@ public class MovementUpdateTask implements AbstractTask {
         // 3. The player is moving and the movement is is not empty -> the tile beside them is where they will be at the end of their queue
 
         if (!playerIsMoving) {
-            if (!player.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
+            if (!player.getCurrentWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
+                new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                 return false;
             }
         } else {
             if (moveQueueEmpty) {
-                if (!player.getFutureMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
+                if (!player.getFutureWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
+                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             } else {
                 if (!player.getLatestMoveRequests().getLast().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOut(player, player.getFutureMapLocation()).sendPacket();
+                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             }
@@ -537,7 +537,7 @@ public class MovementUpdateTask implements AbstractTask {
         if (player.getWarp() != null) return false; // Stop player moving during warp start
 
         // Prevents the player from moving places they are not allowed to go.
-        if (!player.getGameMap().isMovable(attemptLocation)) return false;
+        if (!player.getGameWorld().isMovable(attemptLocation)) return false;
 
         if (player.isEntityMoving()) {
             player.addFutureMoveToQueue(attemptLocation);
@@ -558,13 +558,13 @@ public class MovementUpdateTask implements AbstractTask {
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
-        if (player.getGameMap().locationHasWarp(attemptLocation)) {
-            player.setWarp(player.getGameMap().getWarpFromLocation(attemptLocation));
+        if (player.getGameWorld().locationHasWarp(attemptLocation)) {
+            player.setWarp(player.getGameWorld().getWarpFromLocation(attemptLocation));
         }
 
         StationaryEntity stationaryEntity = ServerMain.getInstance().getGameLoop().getProcessMining().getMiningNode(player);
         if (stationaryEntity != null) {
-            if (!stationaryEntity.getCurrentMapLocation().isWithinDistance(attemptLocation, (short) 1)) {
+            if (!stationaryEntity.getCurrentWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
                 ServerMain.getInstance().getGameLoop().getProcessMining().removePlayer(player);
             }
         }
@@ -576,9 +576,9 @@ public class MovementUpdateTask implements AbstractTask {
         }
 
 
-        player.setFutureMapLocation(new Location(attemptLocation));
+        player.setFutureWorldLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
-        player.setFacingDirection(player.getCurrentMapLocation().getMoveDirectionFromLocation(player.getFutureMapLocation()));
+        player.setFacingDirection(player.getCurrentWorldLocation().getMoveDirectionFromLocation(player.getFutureWorldLocation()));
 
         ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
@@ -592,21 +592,21 @@ public class MovementUpdateTask implements AbstractTask {
             println(getClass(), "The Entity is already moving!");
         }
 
-        Location futureLocation = new Location(aiEntity.getCurrentMapLocation()).add(aiEntity.getGameMap().getLocation(moveDirection));
+        Location futureLocation = new Location(aiEntity.getCurrentWorldLocation()).add(aiEntity.getGameWorld().getLocation(moveDirection));
 
         // Stopping entity from moving/chasing outside the region
         if (!aiEntity.isAiEntityInRegion(futureLocation)) return;
 
-        aiEntity.setFutureMapLocation(futureLocation);
+        aiEntity.setFutureWorldLocation(futureLocation);
         aiEntity.setWalkTime(0f);
         aiEntity.setFacingDirection(moveDirection);
 
         updateFutureLocation(aiEntity, futureLocation);
 
-        println(getClass(), "CurrentLocation: " + aiEntity.getCurrentMapLocation(), false, PRINT_DEBUG);
-        println(getClass(), "FutureLocation: " + aiEntity.getFutureMapLocation(), false, PRINT_DEBUG);
+        println(getClass(), "CurrentLocation: " + aiEntity.getCurrentWorldLocation(), false, PRINT_DEBUG);
+        println(getClass(), "FutureLocation: " + aiEntity.getFutureWorldLocation(), false, PRINT_DEBUG);
 
-        aiEntity.getGameMap().getPlayerController().getPlayerList().forEach(player ->
-                new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureMapLocation()).sendPacket());
+        aiEntity.getGameWorld().getPlayerController().getPlayerList().forEach(player ->
+                new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureWorldLocation()).sendPacket());
     }
 }

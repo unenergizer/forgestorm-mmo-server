@@ -93,8 +93,8 @@ public class CharacterManager {
         player.setFaction((byte) 0); // TODO: Fill in from client
         player.setCurrentHealth(PlayerConstants.BASE_HP);
         player.setFacingDirection(PlayerConstants.SPAWN_FACING_DIRECTION);
-        player.setCurrentMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
-        player.setFutureMapLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
+        player.setCurrentWorldLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
+        player.setFutureWorldLocation(new Location(PlayerConstants.START_SPAWN_LOCATION));
 
         player.setCharacterClass(CharacterClasses.FIGHTER);
         player.setCharacterGender(CharacterGenders.MALE);

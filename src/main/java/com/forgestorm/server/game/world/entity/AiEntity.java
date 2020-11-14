@@ -52,7 +52,7 @@ public class AiEntity extends MovingEntity {
     }
 
     public void killAiEntity(MovingEntity killerEntity) {
-        getGameMap().getAiEntityController().queueEntityDespawn(this);
+        getGameWorld().getAiEntityController().queueEntityDespawn(this);
 
         clearCombatTargets();
 
@@ -76,13 +76,13 @@ public class AiEntity extends MovingEntity {
         if (this.getDropTable() != null) {
             ItemStack[] itemStacks = ServerMain.getInstance().getDropTableManager().getItemStack(this.getDropTable(), 1);
 
-            ItemStackDropEntityController itemStackDropEntityController = getGameMap().getItemStackDropEntityController();
+            ItemStackDropEntityController itemStackDropEntityController = getGameWorld().getItemStackDropEntityController();
 
             for (ItemStack itemStack : itemStacks) {
                 if (itemStack == null) continue;
                 itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
                         itemStack,
-                        this.getCurrentMapLocation(),
+                        this.getCurrentWorldLocation(),
                         (Player) killerEntity
                 ));
             }
@@ -90,6 +90,6 @@ public class AiEntity extends MovingEntity {
     }
 
     public void removeAiEntity() {
-        getGameMap().getAiEntityController().removeEntity(this);
+        getGameWorld().getAiEntityController().removeEntity(this);
     }
 }

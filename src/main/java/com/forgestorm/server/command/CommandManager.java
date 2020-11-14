@@ -21,7 +21,7 @@ public class CommandManager implements ManagerStart {
         commandProcessor.addListener(new InventoryCommands(this));
         commandProcessor.addListener(new PlayerCommands(this));
         commandProcessor.addListener(new ServerCommands(this));
-        commandProcessor.addListener(new MapCommands());
+        commandProcessor.addListener(new WorldCommands());
         commandProcessor.addListener(new MessageCommands());
 
         consoleCommandManager.start();

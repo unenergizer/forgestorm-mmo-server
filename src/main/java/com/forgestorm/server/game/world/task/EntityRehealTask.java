@@ -20,7 +20,7 @@ public class EntityRehealTask implements AbstractTask {
 
             println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
-            for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values()) {
+            for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameWorlds().values()) {
                 // Reheal players
                 for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                     if (player.isInCombat()) continue; // Don't reheal entities in active.

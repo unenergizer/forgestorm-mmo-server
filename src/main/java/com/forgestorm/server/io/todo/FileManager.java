@@ -275,11 +275,11 @@ public class FileManager {
     }
 
     public void loadGameWorldData() {
-        String filePath = FilePaths.MAPS_IMPL.getFilePath();
+        String filePath = FilePaths.WORLDS_IMPL.getFilePath();
 
         // check if already loaded
         if (isFileLoaded(filePath)) {
-            println(getClass(), "GameMapData already loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData already loaded: " + filePath, true, PRINT_DEBUG);
             return;
         }
 
@@ -289,62 +289,62 @@ public class FileManager {
             assetManager.load(filePath, GameWorldLoader.GameWorldDataWrapper.class);
             assetManager.finishLoading();
         } else {
-            println(getClass(), "GameMapData doesn't exist: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData doesn't exist: " + filePath, true, PRINT_DEBUG);
         }
     }
 
     public GameWorldLoader.GameWorldDataWrapper getGameWorldData() {
-        String filePath = FilePaths.MAPS_IMPL.getFilePath();
+        String filePath = FilePaths.WORLDS_IMPL.getFilePath();
         GameWorldLoader.GameWorldDataWrapper data = null;
 
         if (assetManager.isLoaded(filePath)) {
             data = assetManager.get(filePath, GameWorldLoader.GameWorldDataWrapper.class);
         } else {
-            println(getClass(), "GameMapData not loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData not loaded: " + filePath, true, PRINT_DEBUG);
         }
 
         return data;
     }
 
-    public void loadMapChunkData(String worldName, short chunkX, short chunkY, boolean forceFinishLoading) {
-        String filePath = FilePaths.MAPS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
+    public void loadWorldChunkData(String worldName, short chunkX, short chunkY, boolean forceFinishLoading) {
+        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
 
         // check if already loaded
         if (isFileLoaded(filePath)) {
-            println(getClass(), "MapChunkData already loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData already loaded: " + filePath, true, PRINT_DEBUG);
             return;
         }
 
         // load asset
         if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(ChunkLoader.MapChunkDataWrapper.class, new ChunkLoader(filePathResolver));
-            assetManager.load(filePath, ChunkLoader.MapChunkDataWrapper.class);
+            assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(filePathResolver));
+            assetManager.load(filePath, ChunkLoader.WorldChunkDataWrapper.class);
             if (forceFinishLoading) assetManager.finishLoading();
         } else {
-            println(getClass(), "MapChunkData doesn't exist: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData doesn't exist: " + filePath, true, PRINT_DEBUG);
         }
     }
 
-    public ChunkLoader.MapChunkDataWrapper getMapChunkData(String worldName, short chunkX, short chunkY) {
-        String filePath = FilePaths.MAPS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
-        ChunkLoader.MapChunkDataWrapper data = null;
+    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String worldName, short chunkX, short chunkY) {
+        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
+        ChunkLoader.WorldChunkDataWrapper data = null;
 
         if (assetManager.isLoaded(filePath)) {
-            data = assetManager.get(filePath, ChunkLoader.MapChunkDataWrapper.class);
+            data = assetManager.get(filePath, ChunkLoader.WorldChunkDataWrapper.class);
         } else {
-            println(getClass(), "MapChunkData not loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData not loaded: " + filePath, true, PRINT_DEBUG);
         }
 
         return data;
     }
 
-    public void unloadMapChunkData(String worldName, short chunkX, short chunkY) {
-        String filePath = FilePaths.MAPS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
+    public void unloadWorldChunkData(String worldName, short chunkX, short chunkY) {
+        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
         assetManager.unload(filePath);
         if (assetManager.isLoaded(filePath)) {
-            println(getClass(), "MapChunkData was not unloaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData was not unloaded: " + filePath, true, PRINT_DEBUG);
         } else {
-            println(getClass(), "MapChunkData was unloaded successfully! FilePath: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData was unloaded successfully! FilePath: " + filePath, true, PRINT_DEBUG);
         }
     }
 

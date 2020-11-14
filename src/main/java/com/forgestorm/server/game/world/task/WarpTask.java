@@ -19,11 +19,11 @@ public class WarpTask implements AbstractTask {
 
     private void warpPlayer(Player player) {
         Log.println(getClass(), "===[ WARP ]========================", false, PRINT_DEBUG);
-        Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getWorldName(), false, PRINT_DEBUG);
-        Log.println(getClass(), "CLx: " + player.getCurrentMapLocation().getX(), false, PRINT_DEBUG);
-        Log.println(getClass(), "CLy: " + player.getCurrentMapLocation().getY(), false, PRINT_DEBUG);
-        Log.println(getClass(), "FLx: " + player.getFutureMapLocation().getX(), false, PRINT_DEBUG);
-        Log.println(getClass(), "FLy: " + player.getFutureMapLocation().getY(), false, PRINT_DEBUG);
+        Log.println(getClass(), "GameWorld: " + player.getCurrentWorldLocation().getWorldName(), false, PRINT_DEBUG);
+        Log.println(getClass(), "CLx: " + player.getCurrentWorldLocation().getX(), false, PRINT_DEBUG);
+        Log.println(getClass(), "CLy: " + player.getCurrentWorldLocation().getY(), false, PRINT_DEBUG);
+        Log.println(getClass(), "FLx: " + player.getFutureWorldLocation().getX(), false, PRINT_DEBUG);
+        Log.println(getClass(), "FLy: " + player.getFutureWorldLocation().getY(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRx: " + player.getRealX(), false, PRINT_DEBUG);
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
 
@@ -33,6 +33,6 @@ public class WarpTask implements AbstractTask {
         }
 
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player warping.");
-        ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameMap(player);
+        ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameWorld(player);
     }
 }

@@ -43,13 +43,13 @@ public class AiEntityRespawnTimerTask implements AbstractTask {
                     AiEntity aiEntity = timer.aiEntity;
 
                     // Spawn to original location
-                    aiEntity.gameMapRegister(new Warp(aiEntity.getDefaultSpawnLocation(), MoveDirection.SOUTH));
+                    aiEntity.gameWorldRegister(new Warp(aiEntity.getDefaultSpawnLocation(), MoveDirection.SOUTH));
 
                     // Reset health
                     aiEntity.setCurrentHealth(aiEntity.getMaxHealth());
 
                     // Finally, do the respawn!
-                    aiEntity.getCurrentMapLocation().getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
+                    aiEntity.getCurrentWorldLocation().getGameWorld().getAiEntityController().queueEntitySpawn(aiEntity);
 
                     iterator.remove();
                     println(getClass(), "Respawning Entity: " + aiEntity.getName() + " " + aiEntity.getServerEntityId(), false, PRINT_DEBUG);

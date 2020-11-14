@@ -6,7 +6,7 @@ import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.FilePaths;
-import com.forgestorm.server.io.JsonMapParser;
+import com.forgestorm.server.io.JsonWorldParser;
 import com.forgestorm.server.io.ResourceList;
 import lombok.Getter;
 
@@ -22,11 +22,11 @@ public class GameWorldProcessor {
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
-    private final Map<String, GameWorld> gameMaps = new HashMap<>();
+    private final Map<String, GameWorld> gameWorlds = new HashMap<>();
 
     /**
      * These queues are needed because entities need to be queued to spawn before
-     * the map object is created.
+     * the world object is created.
      */
     private final Queue<AiEntity> aiEntitySpawnQueue = new LinkedList<>();
     private final Queue<StationaryEntity> stationaryEntitySpawnQueue = new LinkedList<>();
@@ -47,79 +47,80 @@ public class GameWorldProcessor {
     public void spawnEntities() {
         AiEntity aiEntity;
         while ((aiEntity = aiEntitySpawnQueue.poll()) != null) {
-            aiEntity.getGameMap().getAiEntityController().queueEntitySpawn(aiEntity);
+            aiEntity.getGameWorld().getAiEntityController().queueEntitySpawn(aiEntity);
         }
         StationaryEntity stationaryEntity;
         while ((stationaryEntity = stationaryEntitySpawnQueue.poll()) != null) {
-            stationaryEntity.getGameMap().getStationaryEntityController().queueEntitySpawn(stationaryEntity);
+            stationaryEntity.getGameWorld().getStationaryEntityController().queueEntitySpawn(stationaryEntity);
         }
         ItemStackDrop itemStackDrop;
         while ((itemStackDrop = ItemStackDropSpawnQueue.poll()) != null) {
-            itemStackDrop.getGameMap().getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
+            itemStackDrop.getGameWorld().getItemStackDropEntityController().queueEntitySpawn(itemStackDrop);
         }
     }
 
-    public void playerSwitchGameMap(Player player) {
-        String currentMapName = player.getMapName();
+    public void playerSwitchGameWorld(Player player) {
+        String currentWorldName = player.getWorldName();
         Warp warp = player.getWarp();
 
         println(getClass(), warp.getLocation().getWorldName(), true);
 
-        gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
-        gameMaps.get(warp.getLocation().getWorldName()).getPlayerController().addPlayer(player, warp);
+        gameWorlds.get(currentWorldName).getPlayerController().removePlayer(player);
+        gameWorlds.get(warp.getLocation().getWorldName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
     }
 
-    public void loadAllMaps() {
+    public void loadAllWorlds() {
         // TEST CHUNK LOADER AND GAME WORLD LOADER
         ServerMain.getInstance().getFileManager().loadGameWorldData();
-        ServerMain.getInstance().getFileManager().loadMapChunkData("game_start", (short) 0, (short) 0, true);
+        ServerMain.getInstance().getFileManager().loadWorldChunkData("game_start", (short) 0, (short) 0, true);
 
         println(getClass(),"GameWorlds: " + ServerMain.getInstance().getFileManager().getGameWorldData().getGameWorlds().size());
-        println(getClass(),"Does Chunk Exist: " + ServerMain.getInstance().getFileManager().getMapChunkData("game_start", (short) 0, (short) 0).toString());
+        println(getClass(),"Does Chunk Exist: " + ServerMain.getInstance().getFileManager().getWorldChunkData("game_start", (short) 0, (short) 0).toString());
 
-        int mapCount;
+        int worldCount;
 
         if (ServerMain.ideRun) {
-            mapCount = loadIdeVersion();
+            worldCount = loadIdeVersion();
         } else {
-            mapCount = loadJarVersion();
+            worldCount = loadJarVersion();
         }
-        println(getClass(), "Game Maps Loaded: " + mapCount);
+        println(getClass(), "Game Worlds Loaded: " + worldCount);
 
 //        fixWarpHeights(); // TODO - FIX ME
     }
 
     private int loadIdeVersion() {
-        File[] files = new File("src/main/resources/" + FilePaths.MAPS.getFilePath()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
-        checkNotNull(files, "No game maps were loaded.");
+        File[] files = new File("src/main/resources/" + FilePaths.WORLDS.getFilePath()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
+        checkNotNull(files, "No game worlds were loaded.");
 
         for (File file : files) {
-            loadMap(JsonMapParser.load(file.getName()));
+            loadWorld(JsonWorldParser.load(file.getName()));
         }
 
         return files.length;
     }
 
     private int loadJarVersion() {
-        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.MAPS.getFilePath(), EXTENSION_TYPE);
-        checkNotNull(files, "No game maps were loaded.");
+        // TODO: Come back and fix this to make sure we are working correctly on jar files...
+        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.WORLDS.getFilePath(), EXTENSION_TYPE);
+        checkNotNull(files, "No game worlds were loaded.");
 
         for (String fileName : files) {
             String[] temp = fileName.split("/"); // Removes the path
-            loadMap(JsonMapParser.load(temp[temp.length - 1]));
+            loadWorld(JsonWorldParser.load(temp[temp.length - 1]));
         }
 
         return files.size();
     }
 
-    public void loadMap(GameWorld gameWorld) {
-        gameMaps.put(gameWorld.getWorldName(), gameWorld);
+    public void loadWorld(GameWorld gameWorld) {
+        gameWorlds.put(gameWorld.getWorldName(), gameWorld);
     }
 
     public void getEntitiesFromDatabase() {
         println(getClass(), "Loading entities from database has started...");
-        for (GameWorld gameWorld : gameMaps.values()) {
+        for (GameWorld gameWorld : gameWorlds.values()) {
             loadEntities(gameWorld);
         }
         println(getClass(), "Loading entities from database finished!");
@@ -130,7 +131,7 @@ public class GameWorldProcessor {
         int monsterSize = loadMonster(gameWorld);
         int itemStackDropSize = loadItemStackDrop(gameWorld);
         int entityTotal = npcSize + monsterSize + itemStackDropSize;
-        println(getClass(), "Map: " + gameWorld.getWorldName() +
+        println(getClass(), "World: " + gameWorld.getWorldName() +
                 ", NPCs Total: " + npcSize +
                 ", Monsters Total: " + monsterSize +
                 ", ItemStackDrop Total: " + itemStackDropSize +
@@ -215,17 +216,17 @@ public class GameWorldProcessor {
         return continueLoop;
     }
 
-    public GameWorld getGameMap(String mapName) throws RuntimeException {
-        checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
-        return gameMaps.get(mapName);
+    public GameWorld getGameWorld(String worldName) throws RuntimeException {
+        checkNotNull(gameWorlds.get(worldName), "Tried to get the world " + worldName + ", but it doesn't exist or was not loaded.");
+        return gameWorlds.get(worldName);
     }
 
-    public boolean doesGameMapExist(String mapName) {
-        return gameMaps.containsKey(mapName);
+    public boolean doesGameWorldExist(String worldName) {
+        return gameWorlds.containsKey(worldName);
     }
 
     public boolean doesLocationExist(Location location) {
-        if (!doesGameMapExist(location.getWorldName())) return false;
-        return !gameMaps.get(location.getWorldName()).isOutOfBounds(location.getX(), location.getY());
+        if (!doesGameWorldExist(location.getWorldName())) return false;
+        return !gameWorlds.get(location.getWorldName()).isOutOfBounds(location.getX(), location.getY());
     }
 }

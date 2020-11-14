@@ -54,7 +54,7 @@ public class Reputation {
     }
 
     private void updateEntitiesForFaction(byte faction) {
-        player.getGameMap().getAiEntityController().getEntities()
+        player.getGameWorld().getAiEntityController().getEntities()
                 .stream()
                 .filter(aiEntity -> aiEntity.getEntityType() == EntityType.NPC && ((NPC) aiEntity).getFaction() == faction)
                 .forEach(aiEntity -> new AiEntityDataUpdatePacketOut(player, aiEntity, AiEntityDataUpdatePacketOut.ALIGNMENT_INDEX).sendPacket());

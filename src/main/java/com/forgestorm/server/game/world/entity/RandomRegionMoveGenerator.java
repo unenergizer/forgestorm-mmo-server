@@ -71,11 +71,11 @@ public class RandomRegionMoveGenerator {
     private MoveDirection getMoveDirection() {
         MoveDirection moveDirection;
 
-        GameWorld gameWorld = aiEntity.getGameMap();
+        GameWorld gameWorld = aiEntity.getGameWorld();
 
         // Generates a number between 0-3
         MoveDirection possibleMoveDirection = MoveDirection.getDirection((byte) new Random().nextInt(4));
-        Location attemptLocation = new Location(gameWorld.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentMapLocation());
+        Location attemptLocation = new Location(gameWorld.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentWorldLocation());
 
         if (!gameWorld.isMovable(attemptLocation)) {
             moveDirection = MoveDirection.NONE;

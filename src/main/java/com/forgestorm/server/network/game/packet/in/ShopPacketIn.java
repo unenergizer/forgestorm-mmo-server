@@ -48,14 +48,14 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            if (player.getGameMap().getAiEntityController().doesNotContainKey(packetData.entityId)) {
+            if (player.getGameWorld().getAiEntityController().doesNotContainKey(packetData.entityId)) {
                 println(getClass(), "Entity does not exist, can not start shopping.", false, PRINT_DEBUG);
                 return false;
             }
         }
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
-            AiEntity aiEntity = (AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId);
+            AiEntity aiEntity = (AiEntity) player.getGameWorld().getAiEntityController().getEntity(packetData.entityId);
             if (aiEntity.getShopId() == -1) {
                 println(getClass(), "Shop value is -1 (shop does not exist for this entity)", false, PRINT_DEBUG);
                 return false;
@@ -79,7 +79,7 @@ public class ShopPacketIn implements PacketListener<ShopPacketIn.ShopPacket>, Pa
 
         if (packetData.shopOpcode == ShopOpcodes.START_SHOPPING) {
             println(getClass(), "Setting player shop entity.", false, PRINT_DEBUG);
-            player.setCurrentShoppingEntity((AiEntity) player.getGameMap().getAiEntityController().getEntity(packetData.entityId));
+            player.setCurrentShoppingEntity((AiEntity) player.getGameWorld().getAiEntityController().getEntity(packetData.entityId));
         } else if (packetData.shopOpcode == ShopOpcodes.BUY) {
             println(getClass(), "Player is buying an item.", false, PRINT_DEBUG);
             ServerMain.getInstance().getEntityShopManager()

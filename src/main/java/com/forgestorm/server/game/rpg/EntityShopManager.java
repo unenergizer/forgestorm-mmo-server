@@ -20,7 +20,7 @@ public class EntityShopManager {
         List<InventorySlot> goldSlots = player.getAllGoldSlots();
 
         // Make sure the player can only buy items within a certain distance.
-        if (!player.getCurrentShoppingEntity().getFutureMapLocation().isWithinDistance(player, GameConstants.MAX_SHOP_DISTANCE)) {
+        if (!player.getCurrentShoppingEntity().getFutureWorldLocation().isWithinDistance(player, GameConstants.MAX_SHOP_DISTANCE)) {
             player.setCurrentShoppingEntity(null);
             return;
         }

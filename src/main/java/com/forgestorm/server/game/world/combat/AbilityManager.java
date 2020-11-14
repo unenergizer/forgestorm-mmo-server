@@ -17,7 +17,7 @@ public class AbilityManager {
 
     public void tick(long ticksPassed) {
         if (ticksPassed % GameConstants.TICKS_PER_SECOND == 0) {
-            for (GameWorld gameWorld : gameManager.getGameWorldProcessor().getGameMaps().values()) {
+            for (GameWorld gameWorld : gameManager.getGameWorldProcessor().getGameWorlds().values()) {
                 for (AiEntity aiEntity : gameWorld.getAiEntityController().getEntities()) {
                     processEntity(aiEntity);
                 }

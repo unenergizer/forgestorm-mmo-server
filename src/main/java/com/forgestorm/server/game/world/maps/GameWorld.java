@@ -55,7 +55,7 @@ public class GameWorld {
 
     public boolean isTraversable(Location location) {
         if (isOutOfBounds(location)) return false;
-        GameWorld gameWorld = location.getGameMap();
+        GameWorld gameWorld = location.getGameWorld();
         for (TileImage[] layer : gameWorld.getLayers().values()) {
             TileImage tileImage = layer[location.getX() + location.getY() * gameWorld.getWidthInChunks()];
             if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) return false;
@@ -67,7 +67,7 @@ public class GameWorld {
     private boolean isOutOfBounds(Location location) {
         int x = location.getX();
         int y = location.getY();
-        return x < 0 || x >= location.getGameMap().getWidthInChunks() || y < 0 || y >= location.getGameMap().getHeightInChunks();
+        return x < 0 || x >= location.getGameWorld().getWidthInChunks() || y < 0 || y >= location.getGameWorld().getHeightInChunks();
     }
 
     public boolean isOutOfBounds(int x, int y) {
@@ -84,8 +84,8 @@ public class GameWorld {
 
     public TileImage getTileByLocation(Location location) {
 //        checkArgument(!isOutOfBounds(location));
-//        return location.getGameMap().getMap()[location.getX()][location.getY()];
-        return location.getGameMap().getLayers().get(0)[location.getX() + location.getY() * location.getGameMap().getWidthInChunks()];
+//        return location.getGameWorld().getWorld()[location.getX()][location.getY()];
+        return location.getGameWorld().getLayers().get(0)[location.getX() + location.getY() * location.getGameWorld().getWidthInChunks()];
     }
 
     public Location getLocation(MoveDirection direction) {
@@ -94,10 +94,10 @@ public class GameWorld {
         if (direction == MoveDirection.WEST) return new Location(worldName, -1, 0);
         if (direction == MoveDirection.EAST) return new Location(worldName, 1, 0);
         if (direction == MoveDirection.NONE) return new Location(worldName, 0, 0);
-        throw new RuntimeException("Tried to get a location, but direction could not be determined. MapName: " + worldName + ", MoveDirection: " + direction);
+        throw new RuntimeException("Tried to get a location, but direction could not be determined. WorldName: " + worldName + ", MoveDirection: " + direction);
     }
 
-    public boolean isGraveYardMap() {
+    public boolean isGraveYardWorld() {
         return worldName.equals(PlayerConstants.RESPAWN_LOCATION.getWorldName());
     }
 }

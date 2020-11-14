@@ -50,7 +50,7 @@ public class ProcessMining implements AbstractTask {
 
     private void growBack() {
 
-        ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values().forEach(map ->
+        ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameWorlds().values().forEach(map ->
                 map.getStationaryEntityController().getEntities()
                         .stream()
                         .filter(stationaryEntity -> stationaryEntity.getStationaryType() == StationaryTypes.ORE)
@@ -89,13 +89,13 @@ public class ProcessMining implements AbstractTask {
             ItemStack[] itemStacks = serverMain.getDropTableManager().getItemStack(skillNodeData.getDropTableId(), 1);
 
             if (player.getPlayerBag().isInventoryFull()) {
-                ItemStackDropEntityController itemStackDropEntityController = player.getGameMap().getItemStackDropEntityController();
+                ItemStackDropEntityController itemStackDropEntityController = player.getGameWorld().getItemStackDropEntityController();
 
                 for (ItemStack itemStack : itemStacks) {
                     if (itemStack == null) continue;
                     itemStackDropEntityController.queueEntitySpawn(itemStackDropEntityController.makeItemStackDrop(
                             itemStack,
-                            player.getCurrentMapLocation(),
+                            player.getCurrentWorldLocation(),
                             player
                     ));
                 }
@@ -121,7 +121,7 @@ public class ProcessMining implements AbstractTask {
         Appearance appearance = entity.getAppearance();
         appearance.setMonsterBodyTexture(appearanceID);
 
-        entity.getGameMap().getPlayerController()
+        entity.getGameWorld().getPlayerController()
                 .forAllPlayers(player -> new EntityAppearancePacketOut(player, entity).sendPacket());
 
     }

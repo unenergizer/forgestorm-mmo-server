@@ -22,7 +22,7 @@ public class GameManager implements AbstractTask, ManagerStart {
 
     @Override
     public void start() {
-        gameWorldProcessor.loadAllMaps();
+        gameWorldProcessor.loadAllWorlds();
         gameWorldProcessor.getEntitiesFromDatabase();
     }
 
@@ -31,43 +31,43 @@ public class GameManager implements AbstractTask, ManagerStart {
         // WARNING: Maintain tick order!
         abilityManager.tick(ticksPassed);
         gameWorldProcessor.spawnEntities();
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerQuit());
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerJoin());
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getStationaryEntityController().tick());
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getAiEntityController().tick());
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getItemStackDropEntityController().tick());
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerQuit());
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerJoin());
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerShuffle(ticksPassed));
         playerProcessor.processPlayerQuit();
         playerProcessor.processPlayerJoinGameWorld();
     }
 
     public void sendToAllButPlayer(Player player, Consumer<ClientHandler> callback) {
-        player.getGameMap().getPlayerController().getPlayerList().forEach(playerOnMap -> {
-            if (player.equals(playerOnMap)) return;
-            callback.accept(playerOnMap.getClientHandler());
+        player.getGameWorld().getPlayerController().getPlayerList().forEach(playerInWorld -> {
+            if (player.equals(playerInWorld)) return;
+            callback.accept(playerInWorld.getClientHandler());
         });
     }
 
     public void sendToAll(Player player, Consumer<ClientHandler> callback) {
-        player.getGameMap().getPlayerController().getPlayerList().forEach(playerOnMap -> {
-            callback.accept(playerOnMap.getClientHandler());
+        player.getGameWorld().getPlayerController().getPlayerList().forEach(playerInWorld -> {
+            callback.accept(playerInWorld.getClientHandler());
         });
     }
 
     public void forAllPlayers(Consumer<Player> callback) {
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().getPlayerList().forEach(callback));
     }
 
     public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
     public void forAllAiEntitiesFiltered(Consumer<AiEntity> callback, Predicate<AiEntity> predicate) {
-        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
     }
 
     public Player findPlayer(short playerId) {
-        for (GameWorld gameWorld : gameWorldProcessor.getGameMaps().values()) {
+        for (GameWorld gameWorld : gameWorldProcessor.getGameWorlds().values()) {
             for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 if (player.getServerEntityId() == playerId) {
                     return player;
@@ -78,7 +78,7 @@ public class GameManager implements AbstractTask, ManagerStart {
     }
 
     public Player findPlayer(String username) {
-        for (GameWorld gameWorld : gameWorldProcessor.getGameMaps().values()) {
+        for (GameWorld gameWorld : gameWorldProcessor.getGameWorlds().values()) {
             for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 if (player.getName().toLowerCase().equals(username.toLowerCase())) {
                     return player;
@@ -98,7 +98,7 @@ public class GameManager implements AbstractTask, ManagerStart {
 
     public void exit() {
         // Kick all players
-        for (GameWorld gameWorld : getGameWorldProcessor().getGameMaps().values()) {
+        for (GameWorld gameWorld : getGameWorldProcessor().getGameWorlds().values()) {
             for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 kickPlayer(player);
             }

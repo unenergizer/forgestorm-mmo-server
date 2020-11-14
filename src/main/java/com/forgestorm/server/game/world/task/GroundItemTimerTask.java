@@ -30,12 +30,12 @@ public class GroundItemTimerTask implements AbstractTask {
                 itemTimerIterator.remove();
             } else {
                 if (groundItemTimer.timePassed == TIME_TO_DESPAWN) {
-                    groundItemTimer.itemStackDrop.getGameMap().getItemStackDropEntityController().queueEntityDespawn(groundItemTimer.itemStackDrop);
+                    groundItemTimer.itemStackDrop.getGameWorld().getItemStackDropEntityController().queueEntityDespawn(groundItemTimer.itemStackDrop);
                     itemTimerIterator.remove();
                 }
 
                 if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed == TIME_TO_SPAWN_TO_ALL) {
-                    for (Player player : groundItemTimer.itemStackDrop.getGameMap().getPlayerController().getPlayerList()) {
+                    for (Player player : groundItemTimer.itemStackDrop.getGameWorld().getPlayerController().getPlayerList()) {
                         if (player.equals(groundItemTimer.itemStackDrop.getDropOwner())) continue;
                         new EntitySpawnPacketOut(player, groundItemTimer.itemStackDrop).sendPacket();
                     }

@@ -43,8 +43,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
 
-        write.writeInt(movingEntity.getFutureMapLocation().getX());
-        write.writeInt(movingEntity.getFutureMapLocation().getY());
+        write.writeInt(movingEntity.getFutureWorldLocation().getX());
+        write.writeInt(movingEntity.getFutureWorldLocation().getY());
 
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
@@ -138,9 +138,9 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
         println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
-        println(getClass(), "MapName: " + movingEntity.getFutureMapLocation().getWorldName(), false, PRINT_DEBUG);
-        println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
-        println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
+        println(getClass(), "MapName: " + movingEntity.getFutureWorldLocation().getWorldName(), false, PRINT_DEBUG);
+        println(getClass(), "tileX: " + movingEntity.getFutureWorldLocation().getX(), false, PRINT_DEBUG);
+        println(getClass(), "tileY: " + movingEntity.getFutureWorldLocation().getY(), false, PRINT_DEBUG);
         println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
         println(getClass(), "move speed: " + movingEntity.getMoveSpeed(), false, PRINT_DEBUG);
         println(getClass(), "MaxHP: " + movingEntity.getMaxHealth(), false, PRINT_DEBUG);
@@ -164,8 +164,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeString(entityToSpawn.getName());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
-        write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
+        write.writeInt(entityToSpawn.getCurrentWorldLocation().getX());
+        write.writeInt(entityToSpawn.getCurrentWorldLocation().getY());
         write.writeByte(entityToSpawn.getAppearance().getMonsterBodyTexture());
     }
 
@@ -174,8 +174,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(itemStackDrop.getServerEntityId());
         write.writeByte(itemStackDrop.getEntityType().getEntityTypeByte());
         write.writeString(itemStackDrop.getName());
-        write.writeInt(itemStackDrop.getCurrentMapLocation().getX());
-        write.writeInt(itemStackDrop.getCurrentMapLocation().getY());
+        write.writeInt(itemStackDrop.getCurrentWorldLocation().getX());
+        write.writeInt(itemStackDrop.getCurrentWorldLocation().getY());
 
         if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
             write.writeBoolean(itemStackDrop.isSpawnedFromMonster());

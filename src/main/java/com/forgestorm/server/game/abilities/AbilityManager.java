@@ -60,8 +60,8 @@ public class AbilityManager implements ManagerStart {
     }
 
     private void performMeleeAbility(Ability ability, MovingEntity casterEntity, MovingEntity targetEntity) {
-        Location casterLocation = casterEntity.getFutureMapLocation();
-        Location targetLocation = targetEntity.getFutureMapLocation();
+        Location casterLocation = casterEntity.getFutureWorldLocation();
+        Location targetLocation = targetEntity.getFutureWorldLocation();
 
         // TODO: If they have distance specifications then check against those instead! (The default check should be based on distance of weapon used if melee)
         if (!casterLocation.isWithinDistance(targetLocation, (short) 1)) return;
@@ -77,8 +77,8 @@ public class AbilityManager implements ManagerStart {
     }
 
     private void performRangeAbility(Ability ability, MovingEntity casterEntity, MovingEntity targetEntity) {
-        Location casterLocation = casterEntity.getFutureMapLocation();
-        Location targetLocation = targetEntity.getFutureMapLocation();
+        Location casterLocation = casterEntity.getFutureWorldLocation();
+        Location targetLocation = targetEntity.getFutureWorldLocation();
 
         int distanceAway = casterLocation.getDistanceAway(targetLocation);
         if (distanceAway >= ability.getDistanceMin() && distanceAway <= ability.getDistanceMax()) {

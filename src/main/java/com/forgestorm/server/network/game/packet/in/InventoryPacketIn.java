@@ -136,13 +136,13 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         ItemStack itemStack = inventory.getInventorySlotArray()[packetData.slotIndex].getItemStack();
         inventory.removeItemStack(packetData.slotIndex, true);
 
-        GameWorld gameWorld = player.getGameMap();
+        GameWorld gameWorld = player.getGameWorld();
 
         ItemStackDropEntityController itemStackDropEntityController = gameWorld.getItemStackDropEntityController();
         itemStackDropEntityController.queueEntitySpawn(
                 itemStackDropEntityController.makeItemStackDrop(
                         itemStack,
-                        player.getCurrentMapLocation(),
+                        player.getCurrentWorldLocation(),
                         player
                 ));
     }

@@ -18,7 +18,7 @@ public class AbilityUpdateTask implements AbstractTask {
 
     @Override
     public void tick(long ticksPassed) {
-        for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values()) {
+        for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameWorlds().values()) {
             tickGameMapCombat(gameWorld);
             checkDeath(gameWorld);
         }

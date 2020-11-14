@@ -29,11 +29,11 @@ public class BankManagePacketIn implements PacketListener<BankManagePacketIn.Ban
         switch (packetData.bankAction) {
             case PLAYER_REQUEST_OPEN:
 
-                Location playerLocation = player.getFutureMapLocation();
+                Location playerLocation = player.getFutureWorldLocation();
 
-                for (AiEntity aiEntity : player.getGameMap().getAiEntityController().getEntities()) {
+                for (AiEntity aiEntity : player.getGameWorld().getAiEntityController().getEntities()) {
                     if (!aiEntity.isBankKeeper()) continue;
-                    if (playerLocation.isWithinDistance(aiEntity.getFutureMapLocation(), GameConstants.MAX_BANK_DISTANCE)) {
+                    if (playerLocation.isWithinDistance(aiEntity.getFutureWorldLocation(), GameConstants.MAX_BANK_DISTANCE)) {
 
                         player.setBankOpen(true);
                         new BankManagePacketOut(player, BankActions.SERVER_OPEN).sendPacket();

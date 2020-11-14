@@ -15,14 +15,14 @@ import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class JsonMapParser {
+public class JsonWorldParser {
 
     public static GameWorld load(String file) {
 
-        InputStream inputStream = JsonMapParser.class.getResourceAsStream(FilePaths.MAPS.getFilePath() + file);
+        InputStream inputStream = JsonWorldParser.class.getResourceAsStream(FilePaths.WORLDS.getFilePath() + file);
 
-        println(JsonMapParser.class, "File: " + file);
-        println(JsonMapParser.class, "InputStream: " + inputStream);
+        println(JsonWorldParser.class, "File: " + file);
+        println(JsonWorldParser.class, "InputStream: " + inputStream);
 
         JsonValue root = new JsonReader().parse(inputStream);
         String mapName = file.replace(".json", "");

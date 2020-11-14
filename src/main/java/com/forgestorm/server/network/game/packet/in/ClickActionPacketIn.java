@@ -34,7 +34,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         // TODO: Anti-Hack Check: Check that player is exitServer.
 
         Player player = packetData.getClientHandler().getPlayer();
-        GameWorld gameWorld = player.getGameMap();
+        GameWorld gameWorld = player.getGameWorld();
         EntityType entityType = packetData.getEntityType();
 
         switch (entityType) {
