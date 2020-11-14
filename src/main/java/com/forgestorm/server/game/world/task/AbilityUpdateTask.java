@@ -5,7 +5,7 @@ import com.forgestorm.server.game.abilities.WaitingAbility;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,31 +18,31 @@ public class AbilityUpdateTask implements AbstractTask {
 
     @Override
     public void tick(long ticksPassed) {
-        for (GameMap gameMap : ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
-            tickGameMapCombat(gameMap);
-            checkDeath(gameMap);
+        for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values()) {
+            tickGameMapCombat(gameWorld);
+            checkDeath(gameWorld);
         }
     }
 
-    private void checkDeath(GameMap gameMap) {
+    private void checkDeath(GameWorld gameWorld) {
         // TODO: ? This code is kinda redundent and death should probably be seperated out in some way
-        Collection<AiEntity> aiEntityList = gameMap.getAiEntityController().getEntities();
-        List<Player> playerList = gameMap.getPlayerController().getPlayerList();
+        Collection<AiEntity> aiEntityList = gameWorld.getAiEntityController().getEntities();
+        List<Player> playerList = gameWorld.getPlayerController().getPlayerList();
         for (AiEntity aiEntity : aiEntityList) {
             if (aiEntity.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, aiEntity);
+                processEntityDeath(gameWorld, aiEntity);
             }
         }
         for (Player player : playerList) {
             if (player.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, player);
+                processEntityDeath(gameWorld, player);
             }
         }
     }
 
-    private void tickGameMapCombat(GameMap gameMap) {
-        Collection<AiEntity> aiEntityList = gameMap.getAiEntityController().getEntities();
-        List<Player> playerList = gameMap.getPlayerController().getPlayerList();
+    private void tickGameMapCombat(GameWorld gameWorld) {
+        Collection<AiEntity> aiEntityList = gameWorld.getAiEntityController().getEntities();
+        List<Player> playerList = gameWorld.getPlayerController().getPlayerList();
 
         // Checks for every tick
         aiEntityList.forEach(this::updateCooldowns);
@@ -55,14 +55,14 @@ public class AbilityUpdateTask implements AbstractTask {
             MovingEntity targetEntity = aiEntity.getTargetEntity();
 
             if (aiEntity.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, targetEntity, aiEntity);
+                processEntityDeath(gameWorld, targetEntity, aiEntity);
             } else {
                 // Do AiEntity combat
                 ServerMain.getInstance().getAbilityManager().performAiEntityAbility(aiEntity, targetEntity);
             }
 
             if (targetEntity.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, aiEntity, targetEntity);
+                processEntityDeath(gameWorld, aiEntity, targetEntity);
             }
         }
 
@@ -76,7 +76,7 @@ public class AbilityUpdateTask implements AbstractTask {
             MovingEntity targetEntity = playerAttacker.getTargetEntity();
 
             if (playerAttacker.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, targetEntity, playerAttacker);
+                processEntityDeath(gameWorld, targetEntity, playerAttacker);
             } else {
                 // TODO: Does this need to happen for players? Currently happens in "AbilityRequestPacketIn"
                 // Do Ability combat
@@ -85,7 +85,7 @@ public class AbilityUpdateTask implements AbstractTask {
             }
 
             if (targetEntity.getCurrentHealth() <= 0) {
-                processEntityDeath(gameMap, playerAttacker, targetEntity);
+                processEntityDeath(gameWorld, playerAttacker, targetEntity);
             }
         }
     }
@@ -125,9 +125,9 @@ public class AbilityUpdateTask implements AbstractTask {
         movingEntity.setCombatIdleTime(movingEntity.getCombatIdleTime() + 1);
     }
 
-    private void processEntityDeath(GameMap gameMap, MovingEntity killerEntity, MovingEntity deadEntity) {
+    private void processEntityDeath(GameWorld gameWorld, MovingEntity killerEntity, MovingEntity deadEntity) {
         // Remove the deadEntity from all entities target!
-        gameMap.getAiEntityController().releaseEntityTargets(deadEntity);
+        gameWorld.getAiEntityController().releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
         deadEntity.setInCombat(false);
 
@@ -143,8 +143,8 @@ public class AbilityUpdateTask implements AbstractTask {
         }
     }
 
-    private void processEntityDeath(GameMap gameMap, MovingEntity deadEntity) {
-        gameMap.getAiEntityController().releaseEntityTargets(deadEntity);
+    private void processEntityDeath(GameWorld gameWorld, MovingEntity deadEntity) {
+        gameWorld.getAiEntityController().releaseEntityTargets(deadEntity);
         deadEntity.setTargetEntity(null);
         deadEntity.setInCombat(false);
 

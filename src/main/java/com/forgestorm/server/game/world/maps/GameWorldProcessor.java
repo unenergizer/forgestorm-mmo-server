@@ -16,13 +16,13 @@ import java.util.*;
 import static com.forgestorm.server.util.Log.println;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class GameMapProcessor {
+public class GameWorldProcessor {
 
     private static final String EXTENSION_TYPE = ".json";
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
-    private final Map<String, GameMap> gameMaps = new HashMap<>();
+    private final Map<String, GameWorld> gameMaps = new HashMap<>();
 
     /**
      * These queues are needed because entities need to be queued to spawn before
@@ -63,14 +63,21 @@ public class GameMapProcessor {
         String currentMapName = player.getMapName();
         Warp warp = player.getWarp();
 
-        println(getClass(), warp.getLocation().getMapName(), true);
+        println(getClass(), warp.getLocation().getWorldName(), true);
 
         gameMaps.get(currentMapName).getPlayerController().removePlayer(player);
-        gameMaps.get(warp.getLocation().getMapName()).getPlayerController().addPlayer(player, warp);
+        gameMaps.get(warp.getLocation().getWorldName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
     }
 
     public void loadAllMaps() {
+        // TEST CHUNK LOADER AND GAME WORLD LOADER
+        ServerMain.getInstance().getFileManager().loadGameWorldData();
+        ServerMain.getInstance().getFileManager().loadMapChunkData("game_start", (short) 0, (short) 0, true);
+
+        println(getClass(),"GameWorlds: " + ServerMain.getInstance().getFileManager().getGameWorldData().getGameWorlds().size());
+        println(getClass(),"Does Chunk Exist: " + ServerMain.getInstance().getFileManager().getMapChunkData("game_start", (short) 0, (short) 0).toString());
+
         int mapCount;
 
         if (ServerMain.ideRun) {
@@ -106,38 +113,38 @@ public class GameMapProcessor {
         return files.size();
     }
 
-    public void loadMap(GameMap gameMap) {
-        gameMaps.put(gameMap.getMapName(), gameMap);
+    public void loadMap(GameWorld gameWorld) {
+        gameMaps.put(gameWorld.getWorldName(), gameWorld);
     }
 
     public void getEntitiesFromDatabase() {
         println(getClass(), "Loading entities from database has started...");
-        for (GameMap gameMap : gameMaps.values()) {
-            loadEntities(gameMap);
+        for (GameWorld gameWorld : gameMaps.values()) {
+            loadEntities(gameWorld);
         }
         println(getClass(), "Loading entities from database finished!");
     }
 
-    public void loadEntities(GameMap gameMap) {
-        int npcSize = loadNPC(gameMap);
-        int monsterSize = loadMonster(gameMap);
-        int itemStackDropSize = loadItemStackDrop(gameMap);
+    public void loadEntities(GameWorld gameWorld) {
+        int npcSize = loadNPC(gameWorld);
+        int monsterSize = loadMonster(gameWorld);
+        int itemStackDropSize = loadItemStackDrop(gameWorld);
         int entityTotal = npcSize + monsterSize + itemStackDropSize;
-        println(getClass(), "Map: " + gameMap.getMapName() +
+        println(getClass(), "Map: " + gameWorld.getWorldName() +
                 ", NPCs Total: " + npcSize +
                 ", Monsters Total: " + monsterSize +
                 ", ItemStackDrop Total: " + itemStackDropSize +
                 ", Entity Total: " + entityTotal, false, PRINT_DEBUG);
     }
 
-    public int loadNPC(GameMap gameMap) {
+    public int loadNPC(GameWorld gameWorld) {
         GameWorldNpcSQL gameWorldNpcSQL = new GameWorldNpcSQL();
-        List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(gameMap.getMapName());
+        List<Integer> npcIdList = gameWorldNpcSQL.searchNPC(gameWorld.getWorldName());
 
         for (Integer i : npcIdList) {
 
             // Don't spawn the entity if it is already spawned.
-            if (alreadySpawnedCheck(i, gameMap, EntityType.NPC)) continue;
+            if (alreadySpawnedCheck(i, gameWorld, EntityType.NPC)) continue;
 
             NPC npc = new NPC();
             npc.setFacingDirection(MoveDirection.SOUTH);
@@ -153,14 +160,14 @@ public class GameMapProcessor {
         return npcIdList.size();
     }
 
-    public int loadMonster(GameMap gameMap) {
+    public int loadMonster(GameWorld gameWorld) {
         GameWorldMonsterSQL gameWorldMonsterSQL = new GameWorldMonsterSQL();
-        List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(gameMap.getMapName());
+        List<Integer> monsterIdList = gameWorldMonsterSQL.searchMonster(gameWorld.getWorldName());
 
         for (Integer i : monsterIdList) {
 
             // Don't spawn the entity if it is already spawned.
-            if (alreadySpawnedCheck(i, gameMap, EntityType.MONSTER)) continue;
+            if (alreadySpawnedCheck(i, gameWorld, EntityType.MONSTER)) continue;
 
             Monster monster = new Monster();
             monster.setFacingDirection(MoveDirection.SOUTH);
@@ -176,14 +183,14 @@ public class GameMapProcessor {
         return monsterIdList.size();
     }
 
-    public int loadItemStackDrop(GameMap gameMap) {
+    public int loadItemStackDrop(GameWorld gameWorld) {
         GameWorldItemStackDropSQL gameWorldItemStackDropSQL = new GameWorldItemStackDropSQL();
-        List<Integer> monsterIdList = gameWorldItemStackDropSQL.searchItemStackDrop(gameMap.getMapName());
+        List<Integer> monsterIdList = gameWorldItemStackDropSQL.searchItemStackDrop(gameWorld.getWorldName());
 
         for (Integer i : monsterIdList) {
 
             // Don't spawn the entity if it is already spawned.
-            if (alreadySpawnedCheck(i, gameMap, EntityType.MONSTER)) continue;
+            if (alreadySpawnedCheck(i, gameWorld, EntityType.MONSTER)) continue;
 
             ItemStackDrop itemStackDrop = new ItemStackDrop();
             itemStackDrop.setEntityType(EntityType.ITEM_STACK);
@@ -197,9 +204,9 @@ public class GameMapProcessor {
         return monsterIdList.size();
     }
 
-    private boolean alreadySpawnedCheck(int databaseId, GameMap gameMap, EntityType entityType) {
+    private boolean alreadySpawnedCheck(int databaseId, GameWorld gameWorld, EntityType entityType) {
         boolean continueLoop = false;
-        for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
+        for (AiEntity aiEntity : gameWorld.getAiEntityController().getEntities()) {
             if (aiEntity.getDatabaseId() == databaseId && aiEntity.getEntityType() == entityType) {
                 continueLoop = true;
                 break;
@@ -208,7 +215,7 @@ public class GameMapProcessor {
         return continueLoop;
     }
 
-    public GameMap getGameMap(String mapName) throws RuntimeException {
+    public GameWorld getGameMap(String mapName) throws RuntimeException {
         checkNotNull(gameMaps.get(mapName), "Tried to get the map " + mapName + ", but it doesn't exist or was not loaded.");
         return gameMaps.get(mapName);
     }
@@ -218,7 +225,7 @@ public class GameMapProcessor {
     }
 
     public boolean doesLocationExist(Location location) {
-        if (!doesGameMapExist(location.getMapName())) return false;
-        return !gameMaps.get(location.getMapName()).isOutOfBounds(location.getX(), location.getY());
+        if (!doesGameMapExist(location.getWorldName())) return false;
+        return !gameMaps.get(location.getWorldName()).isOutOfBounds(location.getX(), location.getY());
     }
 }

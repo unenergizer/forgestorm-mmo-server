@@ -10,8 +10,8 @@ import com.forgestorm.server.game.world.item.ItemStack;
 
 public class ItemStackDropEntityController extends EntityController<ItemStackDrop> {
 
-    ItemStackDropEntityController(GameMap gameMap) {
-        super(gameMap, GameConstants.MAX_GROUND_ITEMS);
+    ItemStackDropEntityController(GameWorld gameWorld) {
+        super(gameWorld, GameConstants.MAX_GROUND_ITEMS);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.forgestorm.server.network.login;
 
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.database.sql.XFUserAuthenticateSQL;
-import com.forgestorm.server.io.NetworkSettingsLoader;
+import com.forgestorm.server.io.todo.NetworkSettingsLoader;
 import com.forgestorm.server.network.NetworkManager;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +40,7 @@ public class LoginServerConnection {
         this.networkManager = networkManager;
     }
 
-    public void openServer(NetworkSettingsLoader.NetworkSettings networkSettings) {
+    public void openServer(NetworkSettingsLoader.NetworkSettingsData networkSettings) {
         try {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, null, null);

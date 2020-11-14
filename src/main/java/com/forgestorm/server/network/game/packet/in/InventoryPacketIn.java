@@ -6,7 +6,7 @@ import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackConsumerManager;
 import com.forgestorm.server.game.world.item.ItemStackType;
 import com.forgestorm.server.game.world.item.inventory.*;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.ItemStackDropEntityController;
 import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
 import com.forgestorm.server.network.game.shared.*;
@@ -136,9 +136,9 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
         ItemStack itemStack = inventory.getInventorySlotArray()[packetData.slotIndex].getItemStack();
         inventory.removeItemStack(packetData.slotIndex, true);
 
-        GameMap gameMap = player.getGameMap();
+        GameWorld gameWorld = player.getGameMap();
 
-        ItemStackDropEntityController itemStackDropEntityController = gameMap.getItemStackDropEntityController();
+        ItemStackDropEntityController itemStackDropEntityController = gameWorld.getItemStackDropEntityController();
         itemStackDropEntityController.queueEntitySpawn(
                 itemStackDropEntityController.makeItemStackDrop(
                         itemStack,

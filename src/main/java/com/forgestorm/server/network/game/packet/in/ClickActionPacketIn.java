@@ -6,7 +6,7 @@ import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackType;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.item.inventory.PlayerBag;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         // TODO: Anti-Hack Check: Check that player is exitServer.
 
         Player player = packetData.getClientHandler().getPlayer();
-        GameMap gameMap = player.getGameMap();
+        GameWorld gameWorld = player.getGameMap();
         EntityType entityType = packetData.getEntityType();
 
         switch (entityType) {
@@ -44,29 +44,29 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
                 break;
             case MONSTER:
             case NPC:
-                aiEntityClick(player, gameMap, packetData);
+                aiEntityClick(player, gameWorld, packetData);
                 break;
             case ITEM_STACK:
-                itemStackDropClick(player, gameMap, packetData);
+                itemStackDropClick(player, gameWorld, packetData);
                 break;
             case SKILL_NODE:
-                stationaryEntityClick(gameMap, packetData);
+                stationaryEntityClick(gameWorld, packetData);
                 break;
         }
     }
 
-    private void aiEntityClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (gameMap.getAiEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
+    private void aiEntityClick(Player player, GameWorld gameWorld, ClickActionPacket packetData) {
+        if (gameWorld.getAiEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
 
-        AiEntity aiEntity = (AiEntity) gameMap.getAiEntityController().getEntity(packetData.getEntityUUID());
+        AiEntity aiEntity = (AiEntity) gameWorld.getAiEntityController().getEntity(packetData.getEntityUUID());
 
         player.setTargetEntity(aiEntity);
         aiEntity.setTargetEntity(player);
     }
 
-    private void stationaryEntityClick(GameMap gameMap, ClickActionPacket packetData) {
-        if (gameMap.getStationaryEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
-        StationaryEntity clickedOnEntity = (StationaryEntity) gameMap.getStationaryEntityController().getEntity(packetData.getEntityUUID());
+    private void stationaryEntityClick(GameWorld gameWorld, ClickActionPacket packetData) {
+        if (gameWorld.getStationaryEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
+        StationaryEntity clickedOnEntity = (StationaryEntity) gameWorld.getStationaryEntityController().getEntity(packetData.getEntityUUID());
 
         // TODO: check if the place they're trying to gather from is empty
 
@@ -77,12 +77,12 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         }
     }
 
-    private void itemStackDropClick(Player player, GameMap gameMap, ClickActionPacket packetData) {
-        if (gameMap.getItemStackDropEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
+    private void itemStackDropClick(Player player, GameWorld gameWorld, ClickActionPacket packetData) {
+        if (gameWorld.getItemStackDropEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
 
         // Click received, lets pick up the item!
         println(getClass(), "Incoming ItemStack click!");
-        ItemStackDrop itemStackDrop = (ItemStackDrop) gameMap.getItemStackDropEntityController().getEntity(packetData.getEntityUUID());
+        ItemStackDrop itemStackDrop = (ItemStackDrop) gameWorld.getItemStackDropEntityController().getEntity(packetData.getEntityUUID());
         ItemStack itemStack = itemStackDrop.getItemStack();
         PlayerBag playerBag = player.getPlayerBag();
 
@@ -98,7 +98,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         }
 
         // Despawn the item
-        gameMap.getItemStackDropEntityController().queueEntityDespawn(itemStackDrop);
+        gameWorld.getItemStackDropEntityController().queueEntityDespawn(itemStackDrop);
 
         // Don't let others pick the item up.
         itemStackDrop.setPickedUp(true);

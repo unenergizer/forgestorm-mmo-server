@@ -88,9 +88,9 @@ public class GameWorldNpcSQL {
 
         preparedStatement.setString(1, npc.getName());
         preparedStatement.setString(2, npc.getFirstInteraction().toString());
-        preparedStatement.setString(3, npc.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(4, npc.getCurrentMapLocation().getX());
-        preparedStatement.setShort(5, npc.getCurrentMapLocation().getY());
+        preparedStatement.setString(3, npc.getCurrentMapLocation().getWorldName());
+        preparedStatement.setInt(4, npc.getCurrentMapLocation().getX());
+        preparedStatement.setInt(5, npc.getCurrentMapLocation().getY());
         preparedStatement.setShort(6, npc.getRegionStartX());
         preparedStatement.setShort(7, npc.getRegionEndX());
         preparedStatement.setShort(8, npc.getRegionStartY());
@@ -127,9 +127,9 @@ public class GameWorldNpcSQL {
 
         preparedStatement.setString(1, npc.getName());
         preparedStatement.setString(2, npc.getFirstInteraction().toString());
-        preparedStatement.setString(3, npc.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(4, npc.getCurrentMapLocation().getX());
-        preparedStatement.setShort(5, npc.getCurrentMapLocation().getY());
+        preparedStatement.setString(3, npc.getCurrentMapLocation().getWorldName());
+        preparedStatement.setInt(4, npc.getCurrentMapLocation().getX());
+        preparedStatement.setInt(5, npc.getCurrentMapLocation().getY());
         preparedStatement.setShort(6, npc.getRegionStartX());
         preparedStatement.setShort(7, npc.getRegionEndX());
         preparedStatement.setShort(8, npc.getRegionStartY());
@@ -203,7 +203,7 @@ public class GameWorldNpcSQL {
             }
 
             // Now reload and spawn the entity
-            ServerMain.getInstance().getGameManager().getGameMapProcessor().loadNPC(npc.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadNPC(npc.getGameMap());
         }
     }
 

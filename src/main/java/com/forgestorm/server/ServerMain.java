@@ -14,7 +14,7 @@ import com.forgestorm.server.game.world.item.DropTableManager;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.trade.TradeManager;
 import com.forgestorm.server.game.world.maps.building.WorldBuilder;
-import com.forgestorm.server.io.ResourcePathLoader;
+import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.NetworkManager;
 import com.forgestorm.server.profile.XenforoProfileManager;
 import com.forgestorm.server.scripting.ScriptManager;
@@ -29,35 +29,29 @@ public class ServerMain {
 
     public static final long SERVER_START_TIME = System.currentTimeMillis();
 
-    // Init first
-    private static ResourcePathLoader resourcePathLoader;
-
-    static {
-//        resourcePathLoader = new ResourcePathLoader();
-    }
-
     // Framework
-    private final DiscordManager discordManager = new DiscordManager();
-    private final GameLoop gameLoop = new GameLoop();
-    private final CommandManager commandManager = new CommandManager();
-    private final DatabaseManager databaseManager = new DatabaseManager();
-    private final NetworkManager networkManager = new NetworkManager();
+    private DiscordManager discordManager;
+    private GameLoop gameLoop;
+    private CommandManager commandManager;
+    private DatabaseManager databaseManager;
+    private NetworkManager networkManager;
 
     // Data Loaders
-    private final FactionManager factionManager = new FactionManager();
-    private final ItemStackManager itemStackManager = new ItemStackManager();
-    private final DropTableManager dropTableManager = new DropTableManager();
-    private final SkillNodeManager skillNodeManager = new SkillNodeManager();
-    private final EntityShopManager entityShopManager = new EntityShopManager();
-    private final AbilityManager abilityManager = new AbilityManager();
+    private FileManager fileManager;
+    private FactionManager factionManager;
+    private ItemStackManager itemStackManager;
+    private DropTableManager dropTableManager;
+    private SkillNodeManager skillNodeManager;
+    private EntityShopManager entityShopManager;
+    private AbilityManager abilityManager;
 
     // System
-    private final WorldBuilder worldBuilder = new WorldBuilder();
-    private final TradeManager tradeManager = new TradeManager();
-    private final GameManager gameManager = new GameManager();
-    private final CharacterManager characterManager = new CharacterManager();
-    private final XenforoProfileManager xenforoProfileManager = new XenforoProfileManager();
-    private final ScriptManager scriptManager = new ScriptManager();
+    private WorldBuilder worldBuilder;
+    private TradeManager tradeManager;
+    private GameManager gameManager;
+    private CharacterManager characterManager;
+    private XenforoProfileManager xenforoProfileManager;
+    private ScriptManager scriptManager;
 
     private ServerMain() {
     }
@@ -79,6 +73,32 @@ public class ServerMain {
     }
 
     private void startServer() {
+        // Framework
+        discordManager = new DiscordManager();
+        gameLoop = new GameLoop();
+        commandManager = new CommandManager();
+        databaseManager = new DatabaseManager();
+        networkManager = new NetworkManager();
+
+        // Data Loaders
+        fileManager = new FileManager();
+        factionManager = new FactionManager();
+        itemStackManager = new ItemStackManager();
+        dropTableManager = new DropTableManager();
+        skillNodeManager = new SkillNodeManager();
+        entityShopManager = new EntityShopManager();
+        abilityManager = new AbilityManager();
+
+        // System
+        worldBuilder = new WorldBuilder();
+        tradeManager = new TradeManager();
+        gameManager = new GameManager();
+        characterManager = new CharacterManager();
+        xenforoProfileManager = new XenforoProfileManager();
+        scriptManager = new ScriptManager();
+
+        /// STARTING....
+
         discordManager.start();
         println(true);
         println(getClass(), "Starting Server!");
@@ -107,6 +127,7 @@ public class ServerMain {
         commandManager.exit();
         networkManager.exit();
         databaseManager.exit();
+        fileManager.dispose();
 
         System.exit(0);
     }

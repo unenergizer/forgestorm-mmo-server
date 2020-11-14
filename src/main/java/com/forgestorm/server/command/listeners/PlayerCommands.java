@@ -8,7 +8,7 @@ import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.GameMapProcessor;
+import com.forgestorm.server.game.world.maps.GameWorldProcessor;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.Warp;
@@ -81,15 +81,15 @@ public class PlayerCommands {
             return;
         }
 
-        GameMapProcessor gameMapProcessor = ServerMain.getInstance().getGameManager().getGameMapProcessor();
+        GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
         Location location = new Location(mapName, x, y);
 
-        if (!gameMapProcessor.doesGameMapExist(mapName)) {
+        if (!gameWorldProcessor.doesGameMapExist(mapName)) {
             commandSource.sendMessage("The map <" + mapName + "> does not exist. Check spelling.");
             return;
         }
 
-        if (!gameMapProcessor.doesLocationExist(location)) {
+        if (!gameWorldProcessor.doesLocationExist(location)) {
             commandSource.sendMessage("These coordinates <" + x + "," + y + "> are not valid.");
             return;
         }

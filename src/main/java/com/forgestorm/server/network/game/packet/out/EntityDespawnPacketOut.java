@@ -19,7 +19,7 @@ public class EntityDespawnPacketOut extends AbstractServerOutPacket {
         entityType = despawnTarget.getEntityType().getEntityTypeByte();
         println(getClass(), "###[ DESPAWN OUT -> " + receiver.getName() + " ]################################", false, PRINT_DEBUG);
         println(getClass(), "EntityName: " + despawnTarget.getName(), false, PRINT_DEBUG);
-        println(getClass(), "MapName: " + despawnTarget.getCurrentMapLocation().getMapName(), false, PRINT_DEBUG);
+        println(getClass(), "MapName: " + despawnTarget.getCurrentMapLocation().getWorldName(), false, PRINT_DEBUG);
     }
 
     @Override

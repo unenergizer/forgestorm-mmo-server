@@ -1,5 +1,6 @@
 package com.forgestorm.server.network.game.shared;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.database.CharacterSaveProgress;
 import com.forgestorm.server.database.sql.GamePlayerInventorySQL;
@@ -113,11 +114,17 @@ public class ClientHandler {
             // This prevents an ArrayOutOfBoundsException.
             return noItem;
         }
-        ItemStack itemStack = playerEquipment[equipmentSlotTypes.getSlotIndex()].getItemStack();
-        if (itemStack == null) {
-            return noItem;
-        } else {
+        ItemStack tempItemStack = playerEquipment[equipmentSlotTypes.getSlotIndex()].getItemStack();
+        if (tempItemStack == null) return noItem;
+
+        // TODO: Joseph said he don't like this bullshit right here
+        // TODO: WE NEED TO STORE PLAYER ITEMS IN DATABASE BUT NOT AS BASE64 BULLSHIT. DO IT THE "RIGHT" WAY.
+        ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(tempItemStack.getItemId(), 0);
+
+        if (itemStack instanceof WearableItemStack) {
             return ((WearableItemStack) itemStack).getTextureId();
+        } else {
+            return noItem;
         }
     }
 

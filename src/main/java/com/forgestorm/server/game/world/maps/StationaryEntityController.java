@@ -5,8 +5,8 @@ import com.forgestorm.server.game.world.entity.StationaryEntity;
 
 public class StationaryEntityController extends EntityController<StationaryEntity> {
 
-    StationaryEntityController(GameMap gameMap) {
-        super(gameMap, GameConstants.MAX_STATIONARY_ENTITIES);
+    StationaryEntityController(GameWorld gameWorld) {
+        super(gameWorld, GameConstants.MAX_STATIONARY_ENTITIES);
     }
 
     @Override

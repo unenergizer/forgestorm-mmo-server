@@ -98,7 +98,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
         preparedStatement.setByte(6, player.getFaction());
         preparedStatement.setInt(7, player.getCurrentHealth());
         preparedStatement.setString(8, player.getFacingDirection().toString());
-        preparedStatement.setString(9, player.getCurrentMapLocation().getMapName());
+        preparedStatement.setString(9, player.getCurrentMapLocation().getWorldName());
         preparedStatement.setInt(10, player.getCurrentMapLocation().getX());
         preparedStatement.setInt(11, player.getCurrentMapLocation().getY());
         preparedStatement.setByte(12, player.getAppearance().getHairTexture());

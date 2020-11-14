@@ -1,7 +1,7 @@
 package com.forgestorm.server.game.world.item;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
-import com.forgestorm.server.io.ItemStackLoader;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ public class ItemStackManager implements ManagerStart {
 
     @Override
     public void start() {
-        ItemStackLoader itemStackLoader = new ItemStackLoader();
-        List<ItemStack> loadedItemStacks = itemStackLoader.loadItems();
+        ServerMain.getInstance().getFileManager().loadItemStackData();
+        List<ItemStack> loadedItemStacks = ServerMain.getInstance().getFileManager().getItemStackData().getItemStackList();
         itemStacks = new ItemStack[loadedItemStacks.size()];
         loadedItemStacks.toArray(itemStacks);
     }

@@ -1,5 +1,6 @@
 package com.forgestorm.server.database;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.io.DatabaseSettingsLoader;
 import com.zaxxer.hikari.HikariConfig;
@@ -16,14 +17,15 @@ public class DatabaseManager implements ManagerStart {
 
     @Getter
     private HikariDataSource hikariDataSource;
-    private DatabaseSettingsLoader.DatabaseSettings databaseSettings;
+    private DatabaseSettingsLoader.DatabaseSettingsData databaseSettings;
 
     @Override
     public void start() {
-        openDatabase(new DatabaseSettingsLoader().loadNetworkSettings());
+        ServerMain.getInstance().getFileManager().loadDatabaseSettingsData();
+        openDatabase(ServerMain.getInstance().getFileManager().getDatabaseSettingsData());
     }
 
-    private void openDatabase(DatabaseSettingsLoader.DatabaseSettings databaseSettings) {
+    private void openDatabase(DatabaseSettingsLoader.DatabaseSettingsData databaseSettings) {
         this.databaseSettings = databaseSettings;
 
         println(getClass(), "Initializing database...");

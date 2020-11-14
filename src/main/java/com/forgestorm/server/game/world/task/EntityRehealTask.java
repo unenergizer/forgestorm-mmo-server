@@ -3,7 +3,7 @@ package com.forgestorm.server.game.world.task;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
 
 import static com.forgestorm.server.util.Log.println;
@@ -20,24 +20,24 @@ public class EntityRehealTask implements AbstractTask {
 
             println(getClass(), "Healing entities!", false, DEBUG_PRINT);
 
-            for (GameMap gameMap : ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values()) {
+            for (GameWorld gameWorld : ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values()) {
                 // Reheal players
-                for (Player player : gameMap.getPlayerController().getPlayerList()) {
+                for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                     if (player.isInCombat()) continue; // Don't reheal entities in active.
                     if (player.getCurrentHealth() < player.getMaxHealth()) {
                         println(getClass(), "Healing player: " + player.getName(), false, DEBUG_PRINT);
                         player.setCurrentHealth(player.getCurrentHealth() + REHEAL_AMOUNT);
-                        gameMap.getPlayerController().forAllPlayers(anyPlayer ->
+                        gameWorld.getPlayerController().forAllPlayers(anyPlayer ->
                                 new EntityHealPacketOut(anyPlayer, player, REHEAL_AMOUNT).sendPacket());
                     }
                 }
 
                 // Reheal Entities
-                for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
+                for (AiEntity aiEntity : gameWorld.getAiEntityController().getEntities()) {
                     if (aiEntity.isInCombat()) continue; // Don't reheal entities in active.
                     if (aiEntity.getCurrentHealth() < aiEntity.getMaxHealth()) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() + REHEAL_AMOUNT);
-                        gameMap.getPlayerController().forAllPlayers(anyPlayer ->
+                        gameWorld.getPlayerController().forAllPlayers(anyPlayer ->
                                 new EntityHealPacketOut(anyPlayer, aiEntity, REHEAL_AMOUNT).sendPacket());
                     }
                 }

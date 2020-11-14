@@ -1,6 +1,6 @@
 package com.forgestorm.server.game.world.entity;
 
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +17,10 @@ public class Entity {
     private Appearance appearance;
 
     public String getMapName() {
-        return currentMapLocation.getMapName();
+        return currentMapLocation.getWorldName();
     }
 
-    public GameMap getGameMap() {
+    public GameWorld getGameMap() {
         return currentMapLocation.getGameMap();
     }
 

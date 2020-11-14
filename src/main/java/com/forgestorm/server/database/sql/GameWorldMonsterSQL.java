@@ -67,9 +67,9 @@ public class GameWorldMonsterSQL {
 
         preparedStatement.setString(1, monster.getName());
         preparedStatement.setString(2, monster.getFirstInteraction().toString());
-        preparedStatement.setString(3, monster.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(4, monster.getCurrentMapLocation().getX());
-        preparedStatement.setShort(5, monster.getCurrentMapLocation().getY());
+        preparedStatement.setString(3, monster.getCurrentMapLocation().getWorldName());
+        preparedStatement.setInt(4, monster.getCurrentMapLocation().getX());
+        preparedStatement.setInt(5, monster.getCurrentMapLocation().getY());
         preparedStatement.setShort(6, monster.getRegionStartX());
         preparedStatement.setShort(7, monster.getRegionEndX());
         preparedStatement.setShort(8, monster.getRegionStartY());
@@ -96,9 +96,9 @@ public class GameWorldMonsterSQL {
 
         preparedStatement.setString(1, monster.getName());
         preparedStatement.setString(2, monster.getFirstInteraction().toString());
-        preparedStatement.setString(3, monster.getCurrentMapLocation().getMapName());
-        preparedStatement.setShort(4, monster.getCurrentMapLocation().getX());
-        preparedStatement.setShort(5, monster.getCurrentMapLocation().getY());
+        preparedStatement.setString(3, monster.getCurrentMapLocation().getWorldName());
+        preparedStatement.setInt(4, monster.getCurrentMapLocation().getX());
+        preparedStatement.setInt(5, monster.getCurrentMapLocation().getY());
         preparedStatement.setShort(6, monster.getRegionStartX());
         preparedStatement.setShort(7, monster.getRegionEndX());
         preparedStatement.setShort(8, monster.getRegionStartY());
@@ -162,7 +162,7 @@ public class GameWorldMonsterSQL {
             }
 
             // Now reload and spawn the entity
-            ServerMain.getInstance().getGameManager().getGameMapProcessor().loadMonster(monster.getGameMap());
+            ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadMonster(monster.getGameMap());
         }
     }
 

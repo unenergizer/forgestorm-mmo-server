@@ -1,7 +1,8 @@
 package com.forgestorm.server.network;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
-import com.forgestorm.server.io.NetworkSettingsLoader;
+import com.forgestorm.server.io.todo.NetworkSettingsLoader;
 import com.forgestorm.server.network.game.GameServerConnection;
 import com.forgestorm.server.network.game.packet.in.*;
 import com.forgestorm.server.network.game.packet.out.OutputStreamManager;
@@ -22,7 +23,9 @@ public class NetworkManager implements ManagerStart {
     @Override
     public void start() {
         Log.println(getClass(), "Initializing network...");
-        NetworkSettingsLoader.NetworkSettings networkSettings = new NetworkSettingsLoader().loadNetworkSettings();
+
+        ServerMain.getInstance().getFileManager().loadNetworkSettingsData();
+        NetworkSettingsLoader.NetworkSettingsData networkSettings = ServerMain.getInstance().getFileManager().getNetworkSettingsData();
 
         loginServerConnection = new LoginServerConnection(this);
         loginServerConnection.openServer(networkSettings);

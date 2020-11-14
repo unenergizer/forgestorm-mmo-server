@@ -34,8 +34,8 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
 
         // World data
         String worldName = clientHandler.readString();
-        short worldX = clientHandler.readShort();
-        short worldY = clientHandler.readShort();
+        int worldX = clientHandler.readInt();
+        int worldY = clientHandler.readInt();
 
         // Basic data
         short entityID = clientHandler.readShort();
@@ -241,7 +241,8 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         }
 
         // World Data
-        Location spawnLocation = new Location(packetData.worldName, packetData.worldX, packetData.worldY);        // Setup appearance
+        // TODO: REMOVE SHORT CAST!
+        Location spawnLocation = new Location(packetData.worldName, (short) packetData.worldX, (short) packetData.worldY);        // Setup appearance
 
         // Appearance
         Appearance appearance = new Appearance(entity);
@@ -347,7 +348,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 ItemStackDrop itemStackDrop = (ItemStackDrop) entity;
                 new GameWorldItemStackDropSQL().saveSQL(itemStackDrop);
                 itemStackDrop.removeItemStackDrop();
-                ServerMain.getInstance().getGameManager().getGameMapProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
+                ServerMain.getInstance().getGameManager().getGameWorldProcessor().loadItemStackDrop(itemStackDrop.getGameMap());
             }
         } else if (packetData.save) {
             // Saving new entity
@@ -416,8 +417,8 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
 
         // World data
         private String worldName;
-        private short worldX;
-        private short worldY;
+        private int worldX;
+        private int worldY;
 
         // Appearance
         private byte monsterBodyTexture;

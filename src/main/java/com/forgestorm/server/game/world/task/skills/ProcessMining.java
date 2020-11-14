@@ -50,7 +50,7 @@ public class ProcessMining implements AbstractTask {
 
     private void growBack() {
 
-        ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMaps().values().forEach(map ->
+        ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMaps().values().forEach(map ->
                 map.getStationaryEntityController().getEntities()
                         .stream()
                         .filter(stationaryEntity -> stationaryEntity.getStationaryType() == StationaryTypes.ORE)

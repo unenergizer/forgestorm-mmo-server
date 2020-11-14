@@ -1,6 +1,6 @@
 package com.forgestorm.server.game.world.entity;
 
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import lombok.Getter;
@@ -71,13 +71,13 @@ public class RandomRegionMoveGenerator {
     private MoveDirection getMoveDirection() {
         MoveDirection moveDirection;
 
-        GameMap gameMap = aiEntity.getGameMap();
+        GameWorld gameWorld = aiEntity.getGameMap();
 
         // Generates a number between 0-3
         MoveDirection possibleMoveDirection = MoveDirection.getDirection((byte) new Random().nextInt(4));
-        Location attemptLocation = new Location(gameMap.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentMapLocation());
+        Location attemptLocation = new Location(gameWorld.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentMapLocation());
 
-        if (!gameMap.isMovable(attemptLocation)) {
+        if (!gameWorld.isMovable(attemptLocation)) {
             moveDirection = MoveDirection.NONE;
         } else {
             // Making sure the entity does not move outside the region.

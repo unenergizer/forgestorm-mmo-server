@@ -12,58 +12,58 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Setter
 public class Location {
 
-    private String mapName;
-    private short x;
-    private short y;
+    private String worldName;
+    private int x;
+    private int y;
 
-    public Location(String mapName, short x, short y) {
-        this.mapName = mapName;
+    public Location(String worldName, int x, int y) {
+        this.worldName = worldName;
         this.x = x;
         this.y = y;
     }
 
     public Location(Location location) {
-        this.mapName = location.mapName;
+        this.worldName = location.worldName;
         this.x = location.x;
         this.y = location.y;
     }
 
-    public GameMap getGameMap() {
-        return ServerMain.getInstance().getGameManager().getGameMapProcessor().getGameMap(mapName);
+    public GameWorld getGameMap() {
+        return ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameMap(worldName);
     }
 
     public Location add(Location location) {
-        checkArgument(location.getMapName().equals(mapName),
-                "Can't add locations. " + location.getMapName() + " doesn't equal " + mapName + ".");
-        return new Location(mapName, (short) (this.x + location.getX()), (short) (this.y + location.getY()));
+        checkArgument(location.getWorldName().equals(worldName),
+                "Can't add locations. " + location.getWorldName() + " doesn't equal " + worldName + ".");
+        return new Location(worldName, (this.x + location.getX()), (this.y + location.getY()));
     }
 
     public void set(Location location) {
-        this.mapName = location.mapName;
+        this.worldName = location.worldName;
         this.x = location.x;
         this.y = location.y;
     }
 
-    public Location add(short x, short y) {
-        this.x = (short) (this.x + x);
-        this.y = (short) (this.y + y);
+    public Location add(int x, int y) {
+        this.x = this.x + x;
+        this.y = this.y + y;
         return this;
     }
 
-    public boolean isWithinDistance(Entity entity, short distance) {
+    public boolean isWithinDistance(Entity entity, int distance) {
         return isWithinDistance(entity.getCurrentMapLocation(), distance);
     }
 
-    public boolean isWithinDistance(Location otherLocation, short distance) {
+    public boolean isWithinDistance(Location otherLocation, int distance) {
         return getDistanceAway(otherLocation) <= distance;
     }
 
-    public short getDistanceAway(Location otherLocation) {
+    public int getDistanceAway(Location otherLocation) {
         int diffX = otherLocation.getX() - x;
         int diffY = otherLocation.getY() - y;
 
-        double realDifference = Math.sqrt((double) (diffX * diffX + diffY * diffY));
-        return (short) Math.floor(realDifference);
+        double realDifference = Math.sqrt(diffX * diffX + diffY * diffY);
+        return (int) Math.floor(realDifference);
     }
 
     public MoveDirection getMoveDirectionFromLocation(Location targetLocation) {
@@ -85,7 +85,7 @@ public class Location {
         if (!(obj instanceof Location)) return false;
         Location otherLocation = (Location) obj;
 
-        if (!otherLocation.getMapName().equals(mapName)) return false;
+        if (!otherLocation.getWorldName().equals(worldName)) return false;
         if (otherLocation.getX() != x) return false;
         if (otherLocation.getY() != y) return false;
         return true;
@@ -93,6 +93,6 @@ public class Location {
 
     @Override
     public String toString() {
-        return "[" + mapName + "] -> [" + x + ", " + y + "]";
+        return "[" + worldName + "] -> [" + x + ", " + y + "]";
     }
 }

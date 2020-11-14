@@ -5,7 +5,7 @@ import com.forgestorm.server.game.GameManager;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 
 public class AbilityManager {
 
@@ -17,11 +17,11 @@ public class AbilityManager {
 
     public void tick(long ticksPassed) {
         if (ticksPassed % GameConstants.TICKS_PER_SECOND == 0) {
-            for (GameMap gameMap : gameManager.getGameMapProcessor().getGameMaps().values()) {
-                for (AiEntity aiEntity : gameMap.getAiEntityController().getEntities()) {
+            for (GameWorld gameWorld : gameManager.getGameWorldProcessor().getGameMaps().values()) {
+                for (AiEntity aiEntity : gameWorld.getAiEntityController().getEntities()) {
                     processEntity(aiEntity);
                 }
-                for (Player player : gameMap.getPlayerController().getPlayerList()) {
+                for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                     processEntity(player);
                 }
             }

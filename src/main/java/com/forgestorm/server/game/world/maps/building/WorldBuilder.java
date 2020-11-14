@@ -1,8 +1,8 @@
 package com.forgestorm.server.game.world.maps.building;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.io.TilePropertiesLoader;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,8 +20,7 @@ public class WorldBuilder implements ManagerStart {
 
     @Override
     public void start() {
-        // Load AbstractTileProperty.yaml
-        TilePropertiesLoader tilePropertiesLoader = new TilePropertiesLoader();
-        tileImageMap = tilePropertiesLoader.loadTileProperties();
+        ServerMain.getInstance().getFileManager().loadTilePropertiesData();
+        tileImageMap = ServerMain.getInstance().getFileManager().getTilePropertiesData().getWorldImageMap();
     }
 }

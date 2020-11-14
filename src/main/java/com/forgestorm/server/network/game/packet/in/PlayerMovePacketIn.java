@@ -12,8 +12,8 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
-        final short x = clientHandler.readShort();
-        final short y = clientHandler.readShort();
+        final int x = clientHandler.readInt();
+        final int y = clientHandler.readInt();
         return new MovePacket(x, y);
     }
 
@@ -27,7 +27,8 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
         Player player = packetData.getClientHandler().getPlayer();
 
         MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
-        Location location = new Location(player.getMapName(), packetData.x, packetData.y);
+        // TODO: REMOVE SHORT CAST!!
+        Location location = new Location(player.getMapName(), (short) packetData.x, (short) packetData.y);
 
         if (!movementUpdateTask.preMovementChecks(player, location)) return;
 
@@ -36,7 +37,7 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
     @AllArgsConstructor
     class MovePacket extends PacketData {
-        short x;
-        short y;
+        int x;
+        int y;
     }
 }

@@ -4,8 +4,8 @@ import com.forgestorm.server.game.world.combat.AbilityManager;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.entity.PlayerProcessor;
-import com.forgestorm.server.game.world.maps.GameMap;
-import com.forgestorm.server.game.world.maps.GameMapProcessor;
+import com.forgestorm.server.game.world.maps.GameWorld;
+import com.forgestorm.server.game.world.maps.GameWorldProcessor;
 import com.forgestorm.server.game.world.task.AbstractTask;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import lombok.Getter;
@@ -18,25 +18,25 @@ public class GameManager implements AbstractTask, ManagerStart {
 
     private final AbilityManager abilityManager = new AbilityManager(this);
     private final PlayerProcessor playerProcessor = new PlayerProcessor(this);
-    private final GameMapProcessor gameMapProcessor = new GameMapProcessor();
+    private final GameWorldProcessor gameWorldProcessor = new GameWorldProcessor();
 
     @Override
     public void start() {
-        gameMapProcessor.loadAllMaps();
-        gameMapProcessor.getEntitiesFromDatabase();
+        gameWorldProcessor.loadAllMaps();
+        gameWorldProcessor.getEntitiesFromDatabase();
     }
 
     @Override
     public void tick(long ticksPassed) {
         // WARNING: Maintain tick order!
         abilityManager.tick(ticksPassed);
-        gameMapProcessor.spawnEntities();
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerQuit());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerJoin());
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
+        gameWorldProcessor.spawnEntities();
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getStationaryEntityController().tick());
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().tick());
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getItemStackDropEntityController().tick());
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerQuit());
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerJoin());
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().tickPlayerShuffle(ticksPassed));
         playerProcessor.processPlayerQuit();
         playerProcessor.processPlayerJoinGameWorld();
     }
@@ -55,20 +55,20 @@ public class GameManager implements AbstractTask, ManagerStart {
     }
 
     public void forAllPlayers(Consumer<Player> callback) {
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().forEach(callback));
     }
 
     public void forAllPlayersFiltered(Consumer<Player> callback, Predicate<Player> predicate) {
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getPlayerController().getPlayerList().stream().filter(predicate).forEach(callback));
     }
 
     public void forAllAiEntitiesFiltered(Consumer<AiEntity> callback, Predicate<AiEntity> predicate) {
-        gameMapProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
+        gameWorldProcessor.getGameMaps().values().forEach(gameMap -> gameMap.getAiEntityController().getEntities().stream().filter(predicate).forEach(callback));
     }
 
     public Player findPlayer(short playerId) {
-        for (GameMap gameMap : gameMapProcessor.getGameMaps().values()) {
-            for (Player player : gameMap.getPlayerController().getPlayerList()) {
+        for (GameWorld gameWorld : gameWorldProcessor.getGameMaps().values()) {
+            for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 if (player.getServerEntityId() == playerId) {
                     return player;
                 }
@@ -78,8 +78,8 @@ public class GameManager implements AbstractTask, ManagerStart {
     }
 
     public Player findPlayer(String username) {
-        for (GameMap gameMap : gameMapProcessor.getGameMaps().values()) {
-            for (Player player : gameMap.getPlayerController().getPlayerList()) {
+        for (GameWorld gameWorld : gameWorldProcessor.getGameMaps().values()) {
+            for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 if (player.getName().toLowerCase().equals(username.toLowerCase())) {
                     return player;
                 }
@@ -98,8 +98,8 @@ public class GameManager implements AbstractTask, ManagerStart {
 
     public void exit() {
         // Kick all players
-        for (GameMap gameMap : getGameMapProcessor().getGameMaps().values()) {
-            for (Player player : gameMap.getPlayerController().getPlayerList()) {
+        for (GameWorld gameWorld : getGameWorldProcessor().getGameMaps().values()) {
+            for (Player player : gameWorld.getPlayerController().getPlayerList()) {
                 kickPlayer(player);
             }
         }

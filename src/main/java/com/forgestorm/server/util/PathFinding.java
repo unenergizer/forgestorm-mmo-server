@@ -1,9 +1,8 @@
 package com.forgestorm.server.util;
 
 import com.forgestorm.server.game.GameConstants;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 
@@ -11,13 +10,11 @@ import java.util.*;
 
 public class PathFinding {
 
-    private static final boolean PRINT_DEBUG = false;
-
     private final List<MoveNode> closedSet = new ArrayList<>();
     private final List<MoveNode> openSet = new ArrayList<>();
 
-    private final short ALGORITHM_RADIUS = GameConstants.QUIT_ATTACK_RADIUS;
-    private final short GRID_LENGTH = (ALGORITHM_RADIUS * 2) + 1;
+    private final int ALGORITHM_RADIUS = GameConstants.QUIT_ATTACK_RADIUS;
+    private final int GRID_LENGTH = (ALGORITHM_RADIUS * 2) + 1;
 
     private final MoveNode[][] grid = new MoveNode[GRID_LENGTH][GRID_LENGTH];
 
@@ -32,19 +29,19 @@ public class PathFinding {
         return current;
     }
 
-    private void initializeGrid(GameMap gameMap, short startX, short startY) {
+    private void initializeGrid(GameWorld gameWorld, int startX, int startY) {
 
-        short bottomX = (short) (startX - ALGORITHM_RADIUS);
-        short bottomY = (short) (startY - ALGORITHM_RADIUS);
+        int bottomX = startX - ALGORITHM_RADIUS;
+        int bottomY = startY - ALGORITHM_RADIUS;
 
-        for (short i = 0; i < GRID_LENGTH; i++) {
-            for (short j = 0; j < GRID_LENGTH; j++) {
-                short worldX = (short) (bottomX + i);
-                short worldY = (short) (bottomY + j);
+        for (int i = 0; i < GRID_LENGTH; i++) {
+            for (int j = 0; j < GRID_LENGTH; j++) {
+                int worldX = bottomX + i;
+                int worldY = bottomY + j;
 
                 TileImage worldTile = null;
-                if (!gameMap.isOutOfBounds(worldX, worldY)) {
-                    worldTile = gameMap.getTileByLocation(new Location(gameMap.getMapName(), worldX, worldY));
+                if (!gameWorld.isOutOfBounds(worldX, worldY)) {
+                    worldTile = gameWorld.getTileByLocation(new Location(gameWorld.getWorldName(), worldX, worldY));
                 }
 
                 if (worldTile == null) {
@@ -57,21 +54,21 @@ public class PathFinding {
             }
         }
 
-        for (short i = 0; i < GRID_LENGTH; i++) {
-            for (short j = 0; j < GRID_LENGTH; j++) {
+        for (int i = 0; i < GRID_LENGTH; i++) {
+            for (int j = 0; j < GRID_LENGTH; j++) {
                 if (grid[i][j] != null) {
-                    grid[i][j].setMapName(gameMap.getMapName());
+                    grid[i][j].setMapName(gameWorld.getWorldName());
                     grid[i][j].addNeighbors(GRID_LENGTH, grid);
                 }
             }
         }
     }
 
-    private boolean initialConditions(GameMap gameMap, short startX, short startY, short finalX, short finalY) {
+    private boolean initialConditions(GameWorld gameWorld, int startX, int startY, int finalX, int finalY) {
         if (startX == finalX && startY == finalY) return false;
 
-        if (!gameMap.isTraversable(new Location(gameMap.getMapName(), startX, startY))) return false;
-        if (!gameMap.isTraversable(new Location(gameMap.getMapName(), finalX, finalY))) return false;
+        if (!gameWorld.isTraversable(new Location(gameWorld.getWorldName(), startX, startY))) return false;
+        if (!gameWorld.isTraversable(new Location(gameWorld.getWorldName(), finalX, finalY))) return false;
 
         return Math.abs(finalX - startX) <= ALGORITHM_RADIUS && Math.abs(finalY - startY) <= ALGORITHM_RADIUS;
     }
@@ -97,10 +94,10 @@ public class PathFinding {
         }
     }
 
-    public Queue<MoveNode> findPath(GameMap gameMap, short startX, short startY, short finalX, short finalY) {
-        if (!initialConditions(gameMap, startX, startY, finalX, finalY)) return null;
+    public Queue<MoveNode> findPath(GameWorld gameWorld, int startX, int startY, int finalX, int finalY) {
+        if (!initialConditions(gameWorld, startX, startY, finalX, finalY)) return null;
 
-        initializeGrid(gameMap, startX, startY);
+        initializeGrid(gameWorld, startX, startY);
 
         // Start node
         openSet.add(grid[ALGORITHM_RADIUS][ALGORITHM_RADIUS]);

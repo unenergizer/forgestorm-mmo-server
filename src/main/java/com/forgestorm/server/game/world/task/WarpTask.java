@@ -19,7 +19,7 @@ public class WarpTask implements AbstractTask {
 
     private void warpPlayer(Player player) {
         Log.println(getClass(), "===[ WARP ]========================", false, PRINT_DEBUG);
-        Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getMapName(), false, PRINT_DEBUG);
+        Log.println(getClass(), "GameMap: " + player.getCurrentMapLocation().getWorldName(), false, PRINT_DEBUG);
         Log.println(getClass(), "CLx: " + player.getCurrentMapLocation().getX(), false, PRINT_DEBUG);
         Log.println(getClass(), "CLy: " + player.getCurrentMapLocation().getY(), false, PRINT_DEBUG);
         Log.println(getClass(), "FLx: " + player.getFutureMapLocation().getX(), false, PRINT_DEBUG);
@@ -33,6 +33,6 @@ public class WarpTask implements AbstractTask {
         }
 
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player warping.");
-        ServerMain.getInstance().getGameManager().getGameMapProcessor().playerSwitchGameMap(player);
+        ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameMap(player);
     }
 }

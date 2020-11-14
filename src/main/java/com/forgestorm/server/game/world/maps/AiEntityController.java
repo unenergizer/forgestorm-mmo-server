@@ -8,8 +8,8 @@ import com.forgestorm.server.game.world.task.MovementUpdateTask;
 
 public class AiEntityController extends EntityController<AiEntity> {
 
-    AiEntityController(GameMap gameMap) {
-        super(gameMap, GameConstants.MAX_AI_ENTITIES);
+    AiEntityController(GameWorld gameWorld) {
+        super(gameWorld, GameConstants.MAX_AI_ENTITIES);
     }
 
     public void releaseEntityTargets(MovingEntity targetToRemove) {

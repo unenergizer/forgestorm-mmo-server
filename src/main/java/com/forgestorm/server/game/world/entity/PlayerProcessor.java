@@ -10,12 +10,11 @@ import com.forgestorm.server.game.*;
 import com.forgestorm.server.game.world.item.inventory.InventoryActions;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.item.inventory.InventoryType;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Warp;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.packet.out.InitScreenPacketOut;
 import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
-import com.forgestorm.server.network.game.packet.out.PingPacketOut;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 
 import java.util.Queue;
@@ -111,7 +110,7 @@ public class PlayerProcessor {
         }
 
         // Send other players join message
-        for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
+        for (GameWorld mapSearch : gameManager.getGameWorldProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
@@ -149,15 +148,15 @@ public class PlayerProcessor {
     private void playerWorldQuit(Player player) {
         player.setLoggedInGameWorld(false);
 
-        for (GameMap mapSearch : gameManager.getGameMapProcessor().getGameMaps().values()) {
+        for (GameWorld mapSearch : gameManager.getGameWorldProcessor().getGameMaps().values()) {
             for (Player playerSearch : mapSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
                 new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
             }
         }
 
-        GameMap gameMap = player.getGameMap();
-        gameMap.getPlayerController().removePlayer(player);
+        GameWorld gameWorld = player.getGameMap();
+        gameWorld.getPlayerController().removePlayer(player);
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player quit server.");
     }
 }

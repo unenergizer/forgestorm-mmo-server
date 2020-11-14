@@ -5,8 +5,7 @@ import com.forgestorm.server.command.Command;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.game.ChatChannelType;
-import com.forgestorm.server.game.world.maps.GameMap;
-import com.forgestorm.server.game.world.maps.GameMapProcessor;
+import com.forgestorm.server.game.world.maps.GameWorldProcessor;
 import com.forgestorm.server.game.world.maps.Tile;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 
@@ -15,14 +14,14 @@ public class MapCommands {
     @Command(base = "create", argLenReq = 3)
     @CommandArguments(missing = "<mapName> <width> <height>")
     public void createWorld(CommandSource commandSource, String[] args) {
-        GameMapProcessor gameMapProcessor = ServerMain.getInstance().getGameManager().getGameMapProcessor();
+        GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
         final int minSize = 10;
         String mapName = args[0];
         int width = Integer.parseInt(args[1]);
         int height = Integer.parseInt(args[2]);
 
         // Check to make sure the map name doesn't already exist
-        if (gameMapProcessor.doesGameMapExist(mapName)) {
+        if (gameWorldProcessor.doesGameMapExist(mapName)) {
             new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED]Map name already been used. Try a different name").sendPacket();
             return;
         }

@@ -3,7 +3,7 @@ package com.forgestorm.server.io;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.game.world.maps.GameMap;
+import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.Warp;
@@ -17,7 +17,7 @@ import static com.forgestorm.server.util.Log.println;
 
 public class JsonMapParser {
 
-    public static GameMap load(String file) {
+    public static GameWorld load(String file) {
 
         InputStream inputStream = JsonMapParser.class.getResourceAsStream(FilePaths.MAPS.getFilePath() + file);
 
@@ -35,7 +35,7 @@ public class JsonMapParser {
 
         layers.put(0, layer);
 
-        GameMap gameMap = new GameMap(
+        GameWorld gameWorld = new GameWorld(
                 mapName,
                 mapWidth,
                 mapHeight,
@@ -48,10 +48,10 @@ public class JsonMapParser {
                     new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
                     MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
             );
-            gameMap.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+            gameWorld.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
         }
 
-        return gameMap;
+        return gameWorld;
     }
 
     private static TileImage[] readLayer(String layerName, JsonValue root, int mapWidth, int mapHeight) {

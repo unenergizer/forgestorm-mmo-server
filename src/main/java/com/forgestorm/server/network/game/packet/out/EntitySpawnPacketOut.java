@@ -43,8 +43,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
         checkArgument(movingEntity.getFacingDirection() != MoveDirection.NONE, "Server tried to send a NONE type face direction!");
 
-        write.writeShort(movingEntity.getFutureMapLocation().getX());
-        write.writeShort(movingEntity.getFutureMapLocation().getY());
+        write.writeInt(movingEntity.getFutureMapLocation().getX());
+        write.writeInt(movingEntity.getFutureMapLocation().getY());
 
         Appearance appearance = movingEntity.getAppearance();
         switch (entityToSpawn.getEntityType()) {
@@ -56,9 +56,9 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeInt(monster.getDropTable());
                     write.writeFloat(monster.getRandomRegionMoveGenerator().getProbabilityStill());
                     write.writeFloat(monster.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-                    write.writeString(monster.getDefaultSpawnLocation().getMapName());
-                    write.writeShort(monster.getDefaultSpawnLocation().getX());
-                    write.writeShort(monster.getDefaultSpawnLocation().getY());
+                    write.writeString(monster.getDefaultSpawnLocation().getWorldName());
+                    write.writeInt(monster.getDefaultSpawnLocation().getX());
+                    write.writeInt(monster.getDefaultSpawnLocation().getY());
                 }
 
                 write.writeByte(FirstInteraction.getByte(monster.getFirstInteraction()));
@@ -81,9 +81,9 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeInt(npc.getDropTable());
                     write.writeFloat(npc.getRandomRegionMoveGenerator().getProbabilityStill());
                     write.writeFloat(npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-                    write.writeString(npc.getDefaultSpawnLocation().getMapName());
-                    write.writeShort(npc.getDefaultSpawnLocation().getX());
-                    write.writeShort(npc.getDefaultSpawnLocation().getY());
+                    write.writeString(npc.getDefaultSpawnLocation().getWorldName());
+                    write.writeInt(npc.getDefaultSpawnLocation().getX());
+                    write.writeInt(npc.getDefaultSpawnLocation().getY());
                 }
 
                 write.writeByte(FirstInteraction.getByte(npc.getFirstInteraction()));
@@ -138,7 +138,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         println(getClass(), "entityType: " + (entityToSpawn.equals(packetReceiver) ? EntityType.CLIENT_PLAYER : entityToSpawn.getEntityType()), false, PRINT_DEBUG);
         println(getClass(), "entityId: " + movingEntity.getServerEntityId(), false, PRINT_DEBUG);
         println(getClass(), "entityName: " + movingEntity.getName(), false, PRINT_DEBUG);
-        println(getClass(), "MapName: " + movingEntity.getFutureMapLocation().getMapName(), false, PRINT_DEBUG);
+        println(getClass(), "MapName: " + movingEntity.getFutureMapLocation().getWorldName(), false, PRINT_DEBUG);
         println(getClass(), "tileX: " + movingEntity.getFutureMapLocation().getX(), false, PRINT_DEBUG);
         println(getClass(), "tileY: " + movingEntity.getFutureMapLocation().getY(), false, PRINT_DEBUG);
         println(getClass(), "directional Byte: " + movingEntity.getFacingDirection().getDirectionByte(), false, PRINT_DEBUG);
@@ -164,8 +164,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(entityToSpawn.getServerEntityId());
         write.writeByte(entityToSpawn.getEntityType().getEntityTypeByte());
         write.writeString(entityToSpawn.getName());
-        write.writeShort(entityToSpawn.getCurrentMapLocation().getX());
-        write.writeShort(entityToSpawn.getCurrentMapLocation().getY());
+        write.writeInt(entityToSpawn.getCurrentMapLocation().getX());
+        write.writeInt(entityToSpawn.getCurrentMapLocation().getY());
         write.writeByte(entityToSpawn.getAppearance().getMonsterBodyTexture());
     }
 
@@ -174,8 +174,8 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeShort(itemStackDrop.getServerEntityId());
         write.writeByte(itemStackDrop.getEntityType().getEntityTypeByte());
         write.writeString(itemStackDrop.getName());
-        write.writeShort(itemStackDrop.getCurrentMapLocation().getX());
-        write.writeShort(itemStackDrop.getCurrentMapLocation().getY());
+        write.writeInt(itemStackDrop.getCurrentMapLocation().getX());
+        write.writeInt(itemStackDrop.getCurrentMapLocation().getY());
 
         if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
             write.writeBoolean(itemStackDrop.isSpawnedFromMonster());

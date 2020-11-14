@@ -1,7 +1,7 @@
 package com.forgestorm.server.network.game;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.io.NetworkSettingsLoader;
+import com.forgestorm.server.io.todo.NetworkSettingsLoader;
 import com.forgestorm.server.network.AuthenticationManager;
 import com.forgestorm.server.network.NetworkManager;
 import com.forgestorm.server.network.game.packet.out.GameOutputStream;
@@ -53,9 +53,10 @@ public class GameServerConnection {
     /**
      * Opens a server on a given socket and registers event listeners.
      *
+     * @param networkSettings
      * @param registerListeners Listeners to listen to.
      */
-    public void openServer(NetworkSettingsLoader.NetworkSettings networkSettings, Consumer<EventBus> registerListeners) {
+    public void openServer(NetworkSettingsLoader.NetworkSettingsData networkSettings, Consumer<EventBus> registerListeners) {
 
         // Creates a socket to allow for communication between clients and the server.
         try {

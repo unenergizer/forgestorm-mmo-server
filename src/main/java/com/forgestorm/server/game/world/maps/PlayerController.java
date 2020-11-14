@@ -18,7 +18,7 @@ public class PlayerController {
 
     private static final boolean PRINT_DEBUG = false;
 
-    private final GameMap gameMap;
+    private final GameWorld gameWorld;
 
     @Getter
     private final List<Player> playerList = new ArrayList<>();
@@ -28,8 +28,8 @@ public class PlayerController {
     @Getter
     private QueuedIdGenerator queuedIdGenerator;
 
-    PlayerController(GameMap gameMap) {
-        this.gameMap = gameMap;
+    PlayerController(GameWorld gameWorld) {
+        this.gameWorld = gameWorld;
         queuedIdGenerator = new QueuedIdGenerator((short) 1000);
     }
 
@@ -41,7 +41,7 @@ public class PlayerController {
             Player player = quitIterator.next();
             println(getClass(), "<Player Quit> " + player, false, PRINT_DEBUG);
             player.setTargetEntity(null);
-            gameMap.getAiEntityController().releaseEntityTargets(player);
+            gameWorld.getAiEntityController().releaseEntityTargets(player);
             playerList.remove(player);
             player.gameMapDeregister();
             quitsProcessed++;
@@ -73,7 +73,7 @@ public class PlayerController {
             }
             player.gameMapRegister(queueData.getWarp());
             playerList.add(player);
-            new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getMapName()).sendPacket();
+            new InitializeMapPacketOut(player, queueData.getWarp().getLocation().getWorldName()).sendPacket();
             println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
             joinsProcessed++;
         }
@@ -100,8 +100,8 @@ public class PlayerController {
             new EntityAttributesUpdatePacketOut(playerWhoJoined, playerWhoJoined).sendPacket();
 
             // Tell the player about all the mobs currently on the map.
-            gameMap.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
-            gameMap.getAiEntityController().getEntities().forEach(aiEntity -> {
+            gameWorld.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
+            gameWorld.getAiEntityController().getEntities().forEach(aiEntity -> {
                 // Sending additional information for the AI entity.
                 if (aiEntity.isBankKeeper()) {
                     // TODO: we could toggle bank access to certain bank tellers depending
@@ -111,10 +111,10 @@ public class PlayerController {
                             AiEntityDataUpdatePacketOut.BANK_KEEPER_INDEX).sendPacket();
                 }
             });
-            gameMap.getStationaryEntityController().getEntities().forEach(stationaryEntity -> postPlayerSpawn(playerWhoJoined, stationaryEntity));
+            gameWorld.getStationaryEntityController().getEntities().forEach(stationaryEntity -> postPlayerSpawn(playerWhoJoined, stationaryEntity));
 
             // Spawn itemStack drops!
-            for (ItemStackDrop itemStackDrop : gameMap.getItemStackDropEntityController().getEntities()) {
+            for (ItemStackDrop itemStackDrop : gameWorld.getItemStackDropEntityController().getEntities()) {
                 if (itemStackDrop.isSpawnedForAll()) {
                     // Spawn items for joined players, only if the item has been spawned for all players.
                     postPlayerSpawn(playerWhoJoined, itemStackDrop);
