@@ -5,9 +5,7 @@ import com.forgestorm.server.database.sql.GameWorldItemStackDropSQL;
 import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.world.entity.*;
-import com.forgestorm.server.io.FilePaths;
-import com.forgestorm.server.io.JsonWorldParser;
-import com.forgestorm.server.io.ResourceList;
+import com.forgestorm.server.io.todo.FileManager;
 import lombok.Getter;
 
 import java.io.File;
@@ -18,7 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameWorldProcessor {
 
-    private static final String EXTENSION_TYPE = ".json";
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
@@ -63,58 +60,29 @@ public class GameWorldProcessor {
         String currentWorldName = player.getWorldName();
         Warp warp = player.getWarp();
 
-        println(getClass(), warp.getLocation().getWorldName(), true);
-
         gameWorlds.get(currentWorldName).getPlayerController().removePlayer(player);
         gameWorlds.get(warp.getLocation().getWorldName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
     }
 
     public void loadAllWorlds() {
-        // TEST CHUNK LOADER AND GAME WORLD LOADER
-        ServerMain.getInstance().getFileManager().loadGameWorldData();
-        ServerMain.getInstance().getFileManager().loadWorldChunkData("game_start", (short) 0, (short) 0, true);
+        final String EXTENSION_TYPE = ".json";
 
-        println(getClass(),"GameWorlds: " + ServerMain.getInstance().getFileManager().getGameWorldData().getGameWorlds().size());
-        println(getClass(),"Does Chunk Exist: " + ServerMain.getInstance().getFileManager().getWorldChunkData("game_start", (short) 0, (short) 0).toString());
-
-        int worldCount;
-
-        if (ServerMain.ideRun) {
-            worldCount = loadIdeVersion();
-        } else {
-            worldCount = loadJarVersion();
-        }
-        println(getClass(), "Game Worlds Loaded: " + worldCount);
-
-//        fixWarpHeights(); // TODO - FIX ME
-    }
-
-    private int loadIdeVersion() {
-        File[] files = new File("src/main/resources/" + FilePaths.WORLDS.getFilePath()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
-        checkNotNull(files, "No game worlds were loaded.");
+        FileManager fileManager = ServerMain.getInstance().getFileManager();
+        File[] files = new File(fileManager.getWorldDirectory()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
+        checkNotNull(files, "No game worlds were found.");
 
         for (File file : files) {
-            loadWorld(JsonWorldParser.load(file.getName()));
+            fileManager.loadGameWorldData(file);
+            GameWorld gameWorld = fileManager.getGameWorldData(file).getGameWorld();
+            loadWorld(gameWorld);
         }
 
-        return files.length;
-    }
-
-    private int loadJarVersion() {
-        // TODO: Come back and fix this to make sure we are working correctly on jar files...
-        Collection<String> files = ResourceList.getDirectoryResources(FilePaths.WORLDS.getFilePath(), EXTENSION_TYPE);
-        checkNotNull(files, "No game worlds were loaded.");
-
-        for (String fileName : files) {
-            String[] temp = fileName.split("/"); // Removes the path
-            loadWorld(JsonWorldParser.load(temp[temp.length - 1]));
-        }
-
-        return files.size();
+        println(getClass(), "Game Worlds Loaded: " + files.length);
     }
 
     public void loadWorld(GameWorld gameWorld) {
+        gameWorld.loadChunks();
         gameWorlds.put(gameWorld.getWorldName(), gameWorld);
     }
 
@@ -223,10 +191,5 @@ public class GameWorldProcessor {
 
     public boolean doesGameWorldExist(String worldName) {
         return gameWorlds.containsKey(worldName);
-    }
-
-    public boolean doesLocationExist(Location location) {
-        if (!doesGameWorldExist(location.getWorldName())) return false;
-        return !gameWorlds.get(location.getWorldName()).isOutOfBounds(location.getX(), location.getY());
     }
 }

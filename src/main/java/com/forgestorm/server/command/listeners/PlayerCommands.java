@@ -85,12 +85,12 @@ public class PlayerCommands {
         Location location = new Location(mapName, x, y);
 
         if (!gameWorldProcessor.doesGameWorldExist(mapName)) {
-            commandSource.sendMessage("The map <" + mapName + "> does not exist. Check spelling.");
+            commandSource.sendMessage("[RED]The map <" + mapName + "> does not exist. Check spelling.");
             return;
         }
 
-        if (!gameWorldProcessor.doesLocationExist(location)) {
-            commandSource.sendMessage("These coordinates <" + x + "," + y + "> are not valid.");
+        if (!location.getGameWorld().isTraversable(location)) {
+            commandSource.sendMessage("[RED]These coordinates <" + x + "," + y + "> are not valid. Tile has collision.");
             return;
         }
 
@@ -98,7 +98,7 @@ public class PlayerCommands {
         if (player == null) return;
 
         player.setWarp(new Warp(new Location(mapName, x, y), MoveDirection.SOUTH));
-        commandSource.sendMessage("Sending <" + playerName + "> to " + location.toString());
+        commandSource.sendMessage("[YELLOW]Sending <" + playerName + "> to " + location.toString());
     }
 
     @Command(base = "kick", argLenReq = 1)

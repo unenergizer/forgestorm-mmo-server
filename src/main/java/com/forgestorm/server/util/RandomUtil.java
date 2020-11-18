@@ -19,4 +19,8 @@ class RandomUtil {
         return (short) (RANDOM.nextInt((max - min) + 1) + min);
     }
 
+    public static float getNewRandom() {
+        return RANDOM.nextFloat();
+    }
+
 }

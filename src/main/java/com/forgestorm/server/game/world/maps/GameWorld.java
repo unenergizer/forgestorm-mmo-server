@@ -1,77 +1,94 @@
 package com.forgestorm.server.game.world.maps;
 
+import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
+import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.server.io.todo.ChunkLoader;
+import com.forgestorm.server.io.todo.FileManager;
+import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.forgestorm.server.util.Log.println;
+
 @Getter
 public class GameWorld {
 
+    private final String chunkPath;
     private final String worldName;
     private final int widthInChunks, heightInChunks;
+    private final Color backgroundColor;
 
     private final PlayerController playerController = new PlayerController(this);
     private final AiEntityController aiEntityController = new AiEntityController(this);
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
-    private Map<Integer, TileImage[]> layers;
 
-    private final Map<Integer, Warp> tileWarps = new HashMap<Integer, Warp>();
+    //    private Map<Integer, TileImage[]> layers;
+    private Map<Integer, WorldChunk> worldChunks = new HashMap<>();
 
-
-    // TODO: THIS IS THE NEW ONE. DOES NOT HAVE "Map<Integer, TileImage[]> layers" SOMETHING WILL PROBABLY BREAK HERE....
-    public GameWorld(String worldName, int widthInChunks, int heightInChunks) {
+    public GameWorld(String chunkPath, String worldName, int widthInChunks, int heightInChunks, Color backgroundColor) {
+        this.chunkPath = chunkPath.replace(".json", "/");
         this.worldName = worldName;
         this.widthInChunks = widthInChunks;
         this.heightInChunks = heightInChunks;
+        this.backgroundColor = backgroundColor;
     }
 
-    // TODO: THIS IS THE OLD ONE. SOMETHING WILL PROBABLY BREAK HERE....
-    public GameWorld(String worldName, int widthInChunks, int heightInChunks, Map<Integer, TileImage[]> layers) {
-        this.worldName = worldName;
-        this.widthInChunks = widthInChunks;
-        this.heightInChunks = heightInChunks;
-        this.layers = layers;
-    }
+    public void loadChunks() {
+        FileManager fileManager = ServerMain.getInstance().getFileManager();
 
-    public void addTileWarp(int x, int y, Warp warp) {
-        tileWarps.put((x << 16) | (y & 0xFFFF), warp);
-    }
-
-    public Warp getWarp(int x, int y) {
-        if (tileWarps.containsKey((x << 16) | (y & 0xFFFF))) {
-            return tileWarps.get((x << 16) | (y & 0xFFFF));
+        for (short chunkY = 0; chunkY < heightInChunks; chunkY++) {
+            for (short chunkX = 0; chunkX < widthInChunks; chunkX++) {
+                String chunkPath = this.chunkPath + chunkX + "." + chunkY + ".json";
+                fileManager.loadWorldChunkData(chunkPath, true);
+                ChunkLoader.WorldChunkDataWrapper wrapper = fileManager.getWorldChunkData(chunkPath);
+                if (wrapper == null) continue;
+                WorldChunk worldChunk = wrapper.getWorldChunk();
+                worldChunks.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
+            }
         }
-        return null;
+
     }
 
-    public boolean isMovable(Location location) {
-        return !isOutOfBounds(location) && isTraversable(location);
+    public Warp getWarp(int worldX, int worldY) {
+        WorldChunk worldChunk = findChunk(worldX, worldY);
+        if (worldChunk == null) return null;
+
+        short localX = (short) (worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
+        short localY = (short) (worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
+
+        return worldChunk.getWarp(localX, localY);
     }
 
     public boolean isTraversable(Location location) {
-        if (isOutOfBounds(location)) return false;
-        GameWorld gameWorld = location.getGameWorld();
-        for (TileImage[] layer : gameWorld.getLayers().values()) {
-            TileImage tileImage = layer[location.getX() + location.getY() * gameWorld.getWidthInChunks()];
-            if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) return false;
-        }
-
-        return true;
+        return isTraversable(location.getX(), location.getY());
     }
 
-    private boolean isOutOfBounds(Location location) {
-        int x = location.getX();
-        int y = location.getY();
-        return x < 0 || x >= location.getGameWorld().getWidthInChunks() || y < 0 || y >= location.getGameWorld().getHeightInChunks();
+    public boolean isTraversable(int worldX, int worldY) {
+        WorldChunk worldChunk = findChunk(worldX, worldY);
+        if (worldChunk == null) return false;
+
+        int localX = worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
+        int localY = worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
+
+        TileImage tileImage = worldChunk.getTileImage(LayerDefinition.COLLIDABLES, localX, localY);
+        if (tileImage == null) return true;
+        return tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK);
     }
 
-    public boolean isOutOfBounds(int x, int y) {
-        return x < 0 || x >= widthInChunks || y < 0 || y >= heightInChunks;
+    WorldChunk findChunk(int worldX, int worldY) {
+
+        // Convert world coordinates to chunk location
+        short chunkX = (short) Math.floor(worldX / (float) GameConstants.CHUNK_SIZE);
+        short chunkY = (short) Math.floor(worldY / (float) GameConstants.CHUNK_SIZE);
+
+        return worldChunks.get((chunkX << 16) | (chunkY & 0xFFFF));
     }
 
     public Warp getWarpFromLocation(Location location) {
@@ -80,12 +97,6 @@ public class GameWorld {
 
     public boolean locationHasWarp(Location location) {
         return getWarp(location.getX(), location.getY()) != null;
-    }
-
-    public TileImage getTileByLocation(Location location) {
-//        checkArgument(!isOutOfBounds(location));
-//        return location.getGameWorld().getWorld()[location.getX()][location.getY()];
-        return location.getGameWorld().getLayers().get(0)[location.getX() + location.getY() * location.getGameWorld().getWidthInChunks()];
     }
 
     public Location getLocation(MoveDirection direction) {

@@ -387,7 +387,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         RandomDirectionResult result = genNewRandomAttemptLocation(directionOptions, MoveDirection.NONE, gameWorld, currentLocation);
         for (int i = 0; i < 4; i++) {
-            if (gameWorld.isMovable(result.attemptLocation)) {
+            if (gameWorld.isTraversable(result.attemptLocation)) {
                 performAiEntityMove(aiEntity, result.moveDirection);
                 return;
             }
@@ -424,10 +424,10 @@ public class MovementUpdateTask implements AbstractTask {
             directionComparison = targetLocation.getX() < currentLocation.getX();
         }
 
-        if (directionComparison && gameWorld.isMovable(attemptLocation)) {
+        if (directionComparison && gameWorld.isTraversable(attemptLocation)) {
 
             if (!(attemptLocation.equals(targetLocation))) {
-                if (gameWorld.isMovable(attemptLocation)) performAiEntityMove(aiEntity, attemptDirection);
+                if (gameWorld.isTraversable(attemptLocation)) performAiEntityMove(aiEntity, attemptDirection);
             } else if (containsMovement(otherTargetLocations, currentLocation, aiEntity)) {
                 generateNewMoveAndExclude(otherTargetLocations, aiEntity, attemptDirection);
             }
@@ -437,7 +437,7 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private boolean attemptAStar(List<MovementTargetInfo> otherTargetLocations, Location location, AiEntity tracker) {
-        if (!location.getGameWorld().isMovable(location)) return false;
+        if (!location.getGameWorld().isTraversable(location)) return false;
         if (containsMovement(otherTargetLocations, location, tracker)) return false;
         Queue<MoveNode> nodes = pathFinding.findPath(tracker.getGameWorld(),
                 tracker.getCurrentWorldLocation().getX(),
@@ -470,7 +470,7 @@ public class MovementUpdateTask implements AbstractTask {
         directions.removeIf(direction -> direction == excludeDirection);
         MoveDirection attemptDirection = directions.get(RandomUtil.getNewRandom(0, 2));
         GameWorld gameWorld = aiEntity.getGameWorld();
-        if (gameWorld.isMovable(aiEntity.getCurrentWorldLocation().add(gameWorld.getLocation(attemptDirection)))) {
+        if (gameWorld.isTraversable(aiEntity.getCurrentWorldLocation().add(gameWorld.getLocation(attemptDirection)))) {
             performAiEntityMove(aiEntity, attemptDirection);
         }
     }
@@ -537,7 +537,7 @@ public class MovementUpdateTask implements AbstractTask {
         if (player.getWarp() != null) return false; // Stop player moving during warp start
 
         // Prevents the player from moving places they are not allowed to go.
-        if (!player.getGameWorld().isMovable(attemptLocation)) return false;
+        if (!player.getGameWorld().isTraversable(attemptLocation)) return false;
 
         if (player.isEntityMoving()) {
             player.addFutureMoveToQueue(attemptLocation);

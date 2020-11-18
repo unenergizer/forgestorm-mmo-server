@@ -77,7 +77,7 @@ public class RandomRegionMoveGenerator {
         MoveDirection possibleMoveDirection = MoveDirection.getDirection((byte) new Random().nextInt(4));
         Location attemptLocation = new Location(gameWorld.getLocation(possibleMoveDirection)).add(aiEntity.getCurrentWorldLocation());
 
-        if (!gameWorld.isMovable(attemptLocation)) {
+        if (!gameWorld.isTraversable(attemptLocation)) {
             moveDirection = MoveDirection.NONE;
         } else {
             // Making sure the entity does not move outside the region.

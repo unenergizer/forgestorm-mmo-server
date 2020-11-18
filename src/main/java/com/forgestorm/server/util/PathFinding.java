@@ -39,18 +39,14 @@ public class PathFinding {
                 int worldX = bottomX + i;
                 int worldY = bottomY + j;
 
-                TileImage worldTile = null;
-                if (!gameWorld.isOutOfBounds(worldX, worldY)) {
-                    worldTile = gameWorld.getTileByLocation(new Location(gameWorld.getWorldName(), worldX, worldY));
+                boolean isTraversable = gameWorld.isTraversable(new Location(gameWorld.getWorldName(), worldX, worldY));
+
+                if (isTraversable) {
+                    grid[i][j] = new MoveNode(worldX, worldY, i, j);
+                } else {
+                    grid[i][j] = null;
                 }
 
-                if (worldTile == null) {
-                    grid[i][j] = null;
-                } else if (!worldTile.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) {
-                    grid[i][j] = null;
-                } else {
-                    grid[i][j] = new MoveNode(worldX, worldY, i, j);
-                }
             }
         }
 

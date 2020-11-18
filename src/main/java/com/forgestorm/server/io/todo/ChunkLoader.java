@@ -23,14 +23,11 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.forgestorm.server.util.Log.println;
-
 public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkDataWrapper, ChunkLoader.WorldChunkParameter> {
 
     static class WorldChunkParameter extends AssetLoaderParameters<WorldChunkDataWrapper> {
     }
 
-    private static final boolean PRINT_DEBUG = false;
     private static final String EXTENSION_TYPE = ".json";
     private WorldChunkDataWrapper worldChunkDataWrapper = null;
 
@@ -40,14 +37,10 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
 
     @Override
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, WorldChunkParameter parameter) {
-        println(getClass(), "Is Directory: " + file.isDirectory(), false, PRINT_DEBUG);
-        println(getClass(), "Directory List Size: " + file.list().length, false, PRINT_DEBUG);
-        println(getClass(), "Directory Name: " + file.name(), false, PRINT_DEBUG);
-
         worldChunkDataWrapper = null;
         worldChunkDataWrapper = new WorldChunkDataWrapper();
-
-        worldChunkDataWrapper.setWorldChunk(load(file));
+        WorldChunk worldChunk = parseChunk(file);
+        worldChunkDataWrapper.setWorldChunk(worldChunk);
     }
 
     @Override
@@ -55,13 +48,13 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         return worldChunkDataWrapper;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, WorldChunkParameter parameter) {
         return null;
     }
 
-    private WorldChunk load(FileHandle fileHandle) {
-
+    private WorldChunk parseChunk(FileHandle fileHandle) {
         JsonValue root = new JsonReader().parse(fileHandle.reader());
 
         String chunkName = fileHandle.name().replace(EXTENSION_TYPE, "");
@@ -69,7 +62,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         short chunkX = Short.parseShort(parts[0]);
         short chunkY = Short.parseShort(parts[1]);
 
-        Map<LayerDefinition, TileImage[]> layers = new HashMap<LayerDefinition, TileImage[]>();
+        Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
 
         for (LayerDefinition layerDefinition : LayerDefinition.values()) {
             TileImage[] layer = readLayer(layerDefinition.getLayerName(), root);
@@ -80,12 +73,14 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         chunk.setLayers(layers);
 
         JsonValue warpsArray = root.get("warps");
-        for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
-            Warp warp = new Warp(
-                    new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
-                    MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
-            );
-            chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+        if (warpsArray != null) {
+            for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
+                Warp warp = new Warp(
+                        new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
+                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
+                );
+                chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+            }
         }
 
         return chunk;
@@ -111,6 +106,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         }
     }
 
+    @SuppressWarnings("InnerClassMayBeStatic")
     @Setter
     @Getter
     public class WorldChunkDataWrapper {

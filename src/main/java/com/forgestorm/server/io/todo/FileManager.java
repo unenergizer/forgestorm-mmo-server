@@ -9,6 +9,11 @@ import com.forgestorm.server.io.DatabaseSettingsLoader;
 import com.forgestorm.server.io.FilePaths;
 import lombok.Getter;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import static com.forgestorm.server.util.Log.println;
 
 public class FileManager {
@@ -16,8 +21,37 @@ public class FileManager {
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
+    private String worldDirectory;
+
+    @Getter
     private AssetManager assetManager = new AssetManager();
-    private CustomResolver filePathResolver = new CustomResolver();
+    private HeadlessFiles headlessFiles = new HeadlessFiles();
+    private InternalResolver internalResolver = new InternalResolver();
+    private ExternalResolver externalResolver = new ExternalResolver();
+
+    public FileManager() {
+        // Get the path of the jar file.
+        String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decodedPath = "";
+        try {
+            decodedPath = URLDecoder.decode(jarPath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        // Create the World Directory if it doesn't exist.
+        File worldDirectory = new File(decodedPath + "worldDirectory");
+        if (!worldDirectory.exists()) {
+            if (worldDirectory.mkdir()) {
+                // TODO: If directory empty, create a new blank world
+                println(getClass(), "We had to make the world directory, so no game worlds exist!", true);
+            } else {
+                throw new RuntimeException("Couldn't create the World Directory!");
+            }
+        }
+
+        this.worldDirectory = worldDirectory.getAbsolutePath();
+    }
 
     /**
      * Wrapper method to dispose of all assets. Free's system resources.
@@ -59,8 +93,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(ItemStackLoader.ItemStackData.class, new ItemStackLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(ItemStackLoader.ItemStackData.class, new ItemStackLoader(internalResolver));
             assetManager.load(filePath, ItemStackLoader.ItemStackData.class);
             assetManager.finishLoading();
         } else {
@@ -91,11 +125,10 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(FactionLoader.FactionDataWrapper.class, new FactionLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(FactionLoader.FactionDataWrapper.class, new FactionLoader(internalResolver));
             assetManager.load(filePath, FactionLoader.FactionDataWrapper.class);
             assetManager.finishLoading();
-            System.out.println("!GOOD LOADED!");
         } else {
             println(getClass(), "FactionData doesn't exist: " + filePath, true, PRINT_DEBUG);
         }
@@ -124,8 +157,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(AbilityLoader.AbilityDataWrapper.class, new AbilityLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(AbilityLoader.AbilityDataWrapper.class, new AbilityLoader(internalResolver));
             assetManager.load(filePath, AbilityLoader.AbilityDataWrapper.class);
             assetManager.finishLoading();
         } else {
@@ -188,8 +221,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(TilePropertiesLoader.TilePropertiesDataWrapper.class, new TilePropertiesLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(TilePropertiesLoader.TilePropertiesDataWrapper.class, new TilePropertiesLoader(internalResolver));
             assetManager.load(filePath, TilePropertiesLoader.TilePropertiesDataWrapper.class);
             assetManager.finishLoading();
         } else {
@@ -220,8 +253,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(NetworkSettingsLoader.NetworkSettingsData.class, new NetworkSettingsLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(NetworkSettingsLoader.NetworkSettingsData.class, new NetworkSettingsLoader(internalResolver));
             assetManager.load(filePath, NetworkSettingsLoader.NetworkSettingsData.class);
             assetManager.finishLoading();
         } else {
@@ -252,8 +285,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(DatabaseSettingsLoader.DatabaseSettingsData.class, new DatabaseSettingsLoader(filePathResolver));
+        if (internalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(DatabaseSettingsLoader.DatabaseSettingsData.class, new DatabaseSettingsLoader(internalResolver));
             assetManager.load(filePath, DatabaseSettingsLoader.DatabaseSettingsData.class);
             assetManager.finishLoading();
         } else {
@@ -274,41 +307,50 @@ public class FileManager {
         return data;
     }
 
-    public void loadGameWorldData() {
-        String filePath = FilePaths.WORLDS_IMPL.getFilePath();
+    public void loadGameWorldData(File gameWorldPath) {
+        String path = null;
+        try {
+            path = gameWorldPath.getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // check if already loaded
-        if (isFileLoaded(filePath)) {
-            println(getClass(), "GameWorldData already loaded: " + filePath, true, PRINT_DEBUG);
+        if (isFileLoaded(path)) {
+            println(getClass(), "GameWorldData already loaded: " + path, true, PRINT_DEBUG);
             return;
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(GameWorldLoader.GameWorldDataWrapper.class, new GameWorldLoader(filePathResolver));
-            assetManager.load(filePath, GameWorldLoader.GameWorldDataWrapper.class);
+        if (externalResolver.resolve(path).exists()) {
+            assetManager.setLoader(GameWorldLoader.GameWorldDataWrapper.class, new GameWorldLoader(externalResolver));
+            assetManager.load(path, GameWorldLoader.GameWorldDataWrapper.class);
             assetManager.finishLoading();
         } else {
-            println(getClass(), "GameWorldData doesn't exist: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData doesn't exist: " + path, true, PRINT_DEBUG);
         }
     }
 
-    public GameWorldLoader.GameWorldDataWrapper getGameWorldData() {
-        String filePath = FilePaths.WORLDS_IMPL.getFilePath();
+    public GameWorldLoader.GameWorldDataWrapper getGameWorldData(File filePath) {
         GameWorldLoader.GameWorldDataWrapper data = null;
 
-        if (assetManager.isLoaded(filePath)) {
-            data = assetManager.get(filePath, GameWorldLoader.GameWorldDataWrapper.class);
+        String path = null;
+        try {
+            path = filePath.getCanonicalPath().replace("\\", "/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (assetManager.isLoaded(path)) {
+            data = assetManager.get(path, GameWorldLoader.GameWorldDataWrapper.class);
         } else {
-            println(getClass(), "GameWorldData not loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData not loaded: " + path, true, PRINT_DEBUG);
         }
 
         return data;
     }
 
-    public void loadWorldChunkData(String worldName, short chunkX, short chunkY, boolean forceFinishLoading) {
-        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
-
+    public void loadWorldChunkData(String filePath, boolean forceFinishLoading) {
         // check if already loaded
         if (isFileLoaded(filePath)) {
             println(getClass(), "WorldChunkData already loaded: " + filePath, true, PRINT_DEBUG);
@@ -316,8 +358,8 @@ public class FileManager {
         }
 
         // load asset
-        if (filePathResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(filePathResolver));
+        if (externalResolver.resolve(filePath).exists()) {
+            assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(externalResolver));
             assetManager.load(filePath, ChunkLoader.WorldChunkDataWrapper.class);
             if (forceFinishLoading) assetManager.finishLoading();
         } else {
@@ -325,8 +367,7 @@ public class FileManager {
         }
     }
 
-    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String worldName, short chunkX, short chunkY) {
-        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
+    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String filePath) {
         ChunkLoader.WorldChunkDataWrapper data = null;
 
         if (assetManager.isLoaded(filePath)) {
@@ -338,21 +379,7 @@ public class FileManager {
         return data;
     }
 
-    public void unloadWorldChunkData(String worldName, short chunkX, short chunkY) {
-        String filePath = FilePaths.WORLDS_IMPL.getFilePath() + "/" + worldName + "/" + chunkX + "." + chunkY + ".json";
-        assetManager.unload(filePath);
-        if (assetManager.isLoaded(filePath)) {
-            println(getClass(), "WorldChunkData was not unloaded: " + filePath, true, PRINT_DEBUG);
-        } else {
-            println(getClass(), "WorldChunkData was unloaded successfully! FilePath: " + filePath, true, PRINT_DEBUG);
-        }
-    }
-
-    static class CustomResolver implements FileHandleResolver {
-
-        // TODO: DO THIS THE "RIGHT" WAY...
-
-        HeadlessFiles headlessFiles = new HeadlessFiles();
+    class InternalResolver implements FileHandleResolver {
 
         @Override
         public FileHandle resolve(String fileName) {
@@ -362,6 +389,13 @@ public class FileManager {
                 println(getClass(), "FileName: " + fileName);
                 return headlessFiles.internal(fileName.substring(1));
             }
+        }
+    }
+
+    class ExternalResolver implements FileHandleResolver {
+        @Override
+        public FileHandle resolve(String fileName) {
+            return headlessFiles.absolute(fileName);
         }
     }
 
