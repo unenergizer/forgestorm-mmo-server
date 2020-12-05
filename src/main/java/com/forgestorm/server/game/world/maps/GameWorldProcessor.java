@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameWorldProcessor {
 
+    private static final String EXTENSION_TYPE = ".json";
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
@@ -66,8 +67,6 @@ public class GameWorldProcessor {
     }
 
     public void loadAllWorlds() {
-        final String EXTENSION_TYPE = ".json";
-
         FileManager fileManager = ServerMain.getInstance().getFileManager();
         File[] files = new File(fileManager.getWorldDirectory()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
         checkNotNull(files, "No game worlds were found.");
@@ -78,7 +77,21 @@ public class GameWorldProcessor {
             loadWorld(gameWorld);
         }
 
-        println(getClass(), "Game Worlds Loaded: " + files.length);
+        if (files.length == 0) createDefaultGameWorld(fileManager);
+
+        println(getClass(), "Game Worlds Loaded: " + gameWorlds.size());
+        if (gameWorlds.size() == 0) throw new RuntimeException("No worlds loaded. Shutting down...");
+    }
+
+    private void createDefaultGameWorld(FileManager fileManager) {
+        println(getClass(), "No game worlds exist, creating one now.", true);
+        String worldName = "world";
+        File filePath = new File(fileManager.getWorldDirectory() + File.separator + worldName + EXTENSION_TYPE);
+        WorldCreator worldCreator = new WorldCreator();
+        worldCreator.createWorld(worldName, 1, 1);
+        fileManager.loadGameWorldData(filePath);
+        GameWorld gameWorld = fileManager.getGameWorldData(filePath).getGameWorld();
+        loadWorld(gameWorld);
     }
 
     public void loadWorld(GameWorld gameWorld) {
