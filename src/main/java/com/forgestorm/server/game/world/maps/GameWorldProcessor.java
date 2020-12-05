@@ -85,7 +85,7 @@ public class GameWorldProcessor {
 
     private void createDefaultGameWorld(FileManager fileManager) {
         println(getClass(), "No game worlds exist, creating one now.", true);
-        String worldName = "world";
+        String worldName = "game_start";
         File filePath = new File(fileManager.getWorldDirectory() + File.separator + worldName + EXTENSION_TYPE);
         WorldCreator worldCreator = new WorldCreator();
         worldCreator.createWorld(worldName, 1, 1);

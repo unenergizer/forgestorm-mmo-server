@@ -1,8 +1,12 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.GameWorld;
+import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -27,8 +31,15 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
 
     @Override
     public void onEvent(WorldBuilderPacket packetData) {
-        // TODO: Create manager that can send all map edits to the client
-        // TODO: Clients who join late won't get the edits...
+        // Set the tile in the world
+        GameWorld gameWorld = packetData.playerSender.getGameWorld();
+        WorldChunk worldChunk = gameWorld.findChunk(packetData.tileX, packetData.tileY);
+
+        TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(packetData.textureId);
+        int localX = packetData.tileX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
+        int localY = packetData.tileY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
+
+        worldChunk.setTileImage(packetData.layerDefinition, tileImage, localX, localY);
 
         // For now, just resend the building packet to all (but original playerSender)
         ServerMain.getInstance().getGameManager().sendToAllButPlayer(packetData.playerSender, clientHandler ->

@@ -2,8 +2,10 @@ package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Entity;
+import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,7 +33,7 @@ public class WorldChunk {
         this.chunkY = chunkY;
     }
 
-    void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
+    public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
         layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE] = tileImage;
     }
 
@@ -48,5 +50,40 @@ public class WorldChunk {
             return tileWarps.get((localX << 16) | (localY & 0xFFFF));
         }
         return null;
+    }
+
+    public void sendChunk(Player chunkRecipient) {
+        // First... we don't send chunks. We send layer "parts"
+        // The packet must remain under 200 bytes
+
+        for (Map.Entry<LayerDefinition, TileImage[]> layerMap : layers.entrySet()) {
+            LayerDefinition layerDefinition = layerMap.getKey();
+            TileImage[] tileImages = layerMap.getValue();
+
+            // Construct and send a section
+            byte layerSectionsSent = 0;
+            for (int t = 0; t < tileImages.length / GameConstants.MAX_TILE_SEND; t++) {
+                TileImage[] arraySend = new TileImage[GameConstants.MAX_TILE_SEND];
+
+                // Get the tiles to send
+                int j = 0;
+                for (int i = layerSectionsSent * GameConstants.MAX_TILE_SEND; i < (layerSectionsSent + 1) * GameConstants.MAX_TILE_SEND; i++) {
+                    arraySend[j] = tileImages[i];
+                    j++;
+                }
+
+                // Construct packet
+                new WorldChunkPartPacketOut(
+                        chunkRecipient,
+                        chunkX,
+                        chunkY,
+                        layerDefinition.getLayerDefinitionByte(),
+                        layerSectionsSent,
+                        arraySend
+                ).sendPacket();
+
+                layerSectionsSent++;
+            }
+        }
     }
 }

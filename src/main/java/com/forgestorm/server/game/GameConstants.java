@@ -7,6 +7,7 @@ public class GameConstants {
     // NOTE: THIS SHOULD PROBABLY ALWAYS BE BIGGER THAN
     // THE RADIUS ON THE CLIENT SIDE
     public static final int VISIBLE_CHUNK_RADIUS = 2;
+    public static final  int MAX_TILE_SEND = 4 * 4;
 
     public static final short HUMAN_MAX_HEADS = 79;
     public static final short HUMAN_MAX_BODIES = 59;
