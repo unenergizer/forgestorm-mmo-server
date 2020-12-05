@@ -1,12 +1,15 @@
 package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.game.GameConstants;
+import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorldChunk {
@@ -19,6 +22,9 @@ public class WorldChunk {
     private Map<LayerDefinition, TileImage[]> layers;
 
     private final Map<Integer, Warp> tileWarps = new HashMap<Integer, Warp>();
+
+    @Getter
+    private List<Entity> entities = new ArrayList<>();
 
     public WorldChunk(short chunkX, short chunkY) {
         this.chunkX = chunkX;

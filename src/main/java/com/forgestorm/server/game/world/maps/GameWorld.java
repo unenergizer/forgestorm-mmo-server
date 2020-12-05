@@ -3,6 +3,8 @@ package com.forgestorm.server.game.world.maps;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
+import com.forgestorm.server.game.world.entity.Entity;
+import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
@@ -11,10 +13,10 @@ import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import static com.forgestorm.server.util.Log.println;
 
 @Getter
 public class GameWorld {
@@ -30,7 +32,7 @@ public class GameWorld {
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
 
     //    private Map<Integer, TileImage[]> layers;
-    private Map<Integer, WorldChunk> worldChunks = new HashMap<>();
+    private Map<Integer, WorldChunk> worldChunkMap = new HashMap<>();
 
     public GameWorld(String chunkPath, String worldName, int widthInChunks, int heightInChunks, Color backgroundColor) {
         this.chunkPath = chunkPath.replace(".json", "/");
@@ -50,18 +52,55 @@ public class GameWorld {
                 ChunkLoader.WorldChunkDataWrapper wrapper = fileManager.getWorldChunkData(chunkPath);
                 if (wrapper == null) continue;
                 WorldChunk worldChunk = wrapper.getWorldChunk();
-                worldChunks.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
+                worldChunkMap.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
+            }
+        }
+    }
+
+    public void calculateVisibleEntities(Player player) {
+
+        // TODO: should we use future location?
+        int playerX = player.getFutureWorldLocation().getX();
+        int playerY = player.getFutureWorldLocation().getY();
+
+        int clientChunkX = (int) Math.floor(playerX / (float) GameConstants.CHUNK_SIZE);
+        int clientChunkY = (int) Math.floor(playerY / (float) GameConstants.CHUNK_SIZE);
+
+        // 1. Check if the NPC is removed. If so remove it from the list!
+        //for (Entity visibleEntity : player.getVisibleEntities()) {
+        // if (visibleEntity.isDead()) { player.getVisibleEntities().remove(visibleEntity);
+        // And send despawn information!
+        // }
+        // }
+
+        // 2. Collect all entities (within view range) into 1 singular list!
+        // Then check if that entity is not within the list and not dead/removed, ect...
+        // And spawn
+
+
+        List<Entity> allVisibleEntities = new ArrayList<>();
+        for (int chunkY = clientChunkY - GameConstants.VISIBLE_CHUNK_RADIUS; chunkY < clientChunkY + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkY++) {
+            for (int chunkX = clientChunkX - GameConstants.VISIBLE_CHUNK_RADIUS; chunkX < clientChunkX + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkX++) {
+                WorldChunk chunk = findChunk((short) chunkX, (short) chunkY);
+
+                if (chunk == null) continue;
+
+
+                // List<Entity> entities = chunk.getEntitiesInChunk();
+                // allVisibleEntities.addAll(entities);
+
             }
         }
 
+
     }
 
-    public Warp getWarp(int worldX, int worldY) {
-        WorldChunk worldChunk = findChunk(worldX, worldY);
+    public Warp getWarp(int entityX, int entityY) {
+        WorldChunk worldChunk = findChunk(entityX, entityY);
         if (worldChunk == null) return null;
 
-        short localX = (short) (worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
-        short localY = (short) (worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
+        short localX = (short) (entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
+        short localY = (short) (entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
 
         return worldChunk.getWarp(localX, localY);
     }
@@ -70,25 +109,29 @@ public class GameWorld {
         return isTraversable(location.getX(), location.getY());
     }
 
-    public boolean isTraversable(int worldX, int worldY) {
-        WorldChunk worldChunk = findChunk(worldX, worldY);
+    public boolean isTraversable(int entityX, int entityY) {
+        WorldChunk worldChunk = findChunk(entityX, entityY);
         if (worldChunk == null) return false;
 
-        int localX = worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
-        int localY = worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
+        int localX = entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
+        int localY = entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
         TileImage tileImage = worldChunk.getTileImage(LayerDefinition.COLLIDABLES, localX, localY);
         if (tileImage == null) return true;
         return tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK);
     }
 
-    WorldChunk findChunk(int worldX, int worldY) {
+    public WorldChunk findChunk(int entityX, int entityY) {
 
         // Convert world coordinates to chunk location
-        short chunkX = (short) Math.floor(worldX / (float) GameConstants.CHUNK_SIZE);
-        short chunkY = (short) Math.floor(worldY / (float) GameConstants.CHUNK_SIZE);
+        short chunkX = (short) Math.floor(entityX / (float) GameConstants.CHUNK_SIZE);
+        short chunkY = (short) Math.floor(entityY / (float) GameConstants.CHUNK_SIZE);
 
-        return worldChunks.get((chunkX << 16) | (chunkY & 0xFFFF));
+        return findChunk(chunkX, chunkY);
+    }
+
+    WorldChunk findChunk(short chunkX, short chunkY) {
+        return worldChunkMap.get((chunkX << 16) | (chunkY & 0xFFFF));
     }
 
     public Warp getWarpFromLocation(Location location) {

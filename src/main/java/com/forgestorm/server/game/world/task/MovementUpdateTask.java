@@ -12,6 +12,7 @@ import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
 import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
+import com.forgestorm.server.network.game.packet.out.WorldChunkPacketOut;
 import com.forgestorm.server.util.MoveNode;
 import com.forgestorm.server.util.PathFinding;
 import com.forgestorm.server.util.RandomUtil;
@@ -554,6 +555,11 @@ public class MovementUpdateTask implements AbstractTask {
      * @param player The entity ot add.
      */
     public void performPlayerMove(Player player, Location attemptLocation) {
+
+        // TODO: REMOVE AND REUSE CORRECTLY... JUST FOR TESTING CHUNKS...
+        if (true) {
+            new WorldChunkPacketOut(player, player.getWorldChunk()).sendPacket();
+        }
 
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");

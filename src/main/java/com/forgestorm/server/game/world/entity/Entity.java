@@ -2,6 +2,7 @@ package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
+import com.forgestorm.server.game.world.maps.WorldChunk;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,10 @@ public class Entity {
 
     public GameWorld getGameWorld() {
         return currentWorldLocation.getGameWorld();
+    }
+
+    public WorldChunk getWorldChunk() {
+        return getGameWorld().findChunk(currentWorldLocation.getX(), currentWorldLocation.getY());
     }
 
     @Override
