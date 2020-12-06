@@ -37,6 +37,7 @@ public class GameManager implements AbstractTask, ManagerStart {
         gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerQuit());
         gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerJoin());
         gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.getPlayerController().tickPlayerShuffle(ticksPassed));
+        gameWorldProcessor.getGameWorlds().values().forEach(gameWorld -> gameWorld.saveChunks(ticksPassed));
         playerProcessor.processPlayerQuit();
         playerProcessor.processPlayerJoinGameWorld();
     }

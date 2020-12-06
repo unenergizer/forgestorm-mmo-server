@@ -1,6 +1,10 @@
 package com.forgestorm.server.game.world.maps;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.entity.Entity;
@@ -10,13 +14,18 @@ import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.io.todo.ChunkLoader;
 import com.forgestorm.server.io.todo.FileManager;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
 
+import java.io.File;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.forgestorm.server.util.Log.println;
 
 @Getter
 public class GameWorld {
@@ -55,6 +64,48 @@ public class GameWorld {
                 worldChunkMap.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
             }
         }
+    }
+
+    public void saveChunks(long ticksPassed) {
+        if (ticksPassed % (GameConstants.MAP_SAVE_INTERVAL_IN_MINUTES) == 0) {
+            println(getClass(), "Saving chunks for GameWorld " + getWorldName() + ".");
+
+            for (WorldChunk worldChunk : worldChunkMap.values()) {
+                String chunkPath = this.chunkPath + worldChunk.getChunkX() + "." + worldChunk.getChunkY() + ".json";
+                File chunkFile = new File(chunkPath);
+
+                Json json = new Json();
+                StringWriter jsonText = new StringWriter();
+                JsonWriter writer = new JsonWriter(jsonText);
+                json.setOutputType(JsonWriter.OutputType.json);
+                json.setWriter(writer);
+                json.writeObjectStart();
+
+                for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
+                    LayerDefinition layerDefinition = entrySet.getKey();
+                    TileImage[] tileImages = entrySet.getValue();
+                    StringBuilder ids = new StringBuilder();
+                    for (TileImage tileImage : tileImages) {
+                        if (tileImage == null) {
+                            ids.append("0,");
+                        } else {
+                            ids.append(tileImage.toString());
+                        }
+                    }
+                    json.writeValue(layerDefinition.getLayerName(), ids.toString());
+                }
+                json.writeObjectEnd();
+
+                FileHandle fileHandle = new FileHandle(chunkFile);
+                fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
+            }
+
+            // Send world save message
+            // TODO: Filter players by staff status.
+            ServerMain.getInstance().getGameManager().forAllPlayers(player ->
+                    new ChatMessagePacketOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
+        }
+
     }
 
     public void calculateVisibleEntities(Player player) {

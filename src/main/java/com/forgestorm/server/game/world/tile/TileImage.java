@@ -50,4 +50,9 @@ public class TileImage {
             throw new RuntimeException("TilePropertiesMap already contains this property: " + customTileProperty.getTilePropertyType());
         tileProperties.put(customTileProperty.getTilePropertyType(), customTileProperty);
     }
+
+    @Override
+    public String toString() {
+        return imageId + ",";
+    }
 }
