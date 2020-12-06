@@ -66,46 +66,52 @@ public class GameWorld {
         }
     }
 
-    public void saveChunks(long ticksPassed) {
+    public void saveChunksOnTick(long ticksPassed) {
         if (ticksPassed % (GameConstants.MAP_SAVE_INTERVAL_IN_MINUTES) == 0) {
-            println(getClass(), "Saving chunks for GameWorld " + getWorldName() + ".");
-
-            for (WorldChunk worldChunk : worldChunkMap.values()) {
-                String chunkPath = this.chunkPath + worldChunk.getChunkX() + "." + worldChunk.getChunkY() + ".json";
-                File chunkFile = new File(chunkPath);
-
-                Json json = new Json();
-                StringWriter jsonText = new StringWriter();
-                JsonWriter writer = new JsonWriter(jsonText);
-                json.setOutputType(JsonWriter.OutputType.json);
-                json.setWriter(writer);
-                json.writeObjectStart();
-
-                for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
-                    LayerDefinition layerDefinition = entrySet.getKey();
-                    TileImage[] tileImages = entrySet.getValue();
-                    StringBuilder ids = new StringBuilder();
-                    for (TileImage tileImage : tileImages) {
-                        if (tileImage == null) {
-                            ids.append("0,");
-                        } else {
-                            ids.append(tileImage.toString());
-                        }
-                    }
-                    json.writeValue(layerDefinition.getLayerName(), ids.toString());
-                }
-                json.writeObjectEnd();
-
-                FileHandle fileHandle = new FileHandle(chunkFile);
-                fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
-            }
-
+            saveChunks(false);
             // Send world save message
             // TODO: Filter players by staff status.
             ServerMain.getInstance().getGameManager().forAllPlayers(player ->
                     new ChatMessagePacketOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
         }
+    }
 
+    public void saveChunks(boolean manualSave) {
+        if (manualSave) {
+            println(getClass(), "Player manually saving chunks for GameWorld " + getWorldName() + ".");
+        } else {
+            println(getClass(), "Saving chunks for GameWorld " + getWorldName() + ".");
+        }
+
+        for (WorldChunk worldChunk : worldChunkMap.values()) {
+            String chunkPath = this.chunkPath + worldChunk.getChunkX() + "." + worldChunk.getChunkY() + ".json";
+            File chunkFile = new File(chunkPath);
+
+            Json json = new Json();
+            StringWriter jsonText = new StringWriter();
+            JsonWriter writer = new JsonWriter(jsonText);
+            json.setOutputType(JsonWriter.OutputType.json);
+            json.setWriter(writer);
+            json.writeObjectStart();
+
+            for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
+                LayerDefinition layerDefinition = entrySet.getKey();
+                TileImage[] tileImages = entrySet.getValue();
+                StringBuilder ids = new StringBuilder();
+                for (TileImage tileImage : tileImages) {
+                    if (tileImage == null) {
+                        ids.append("0,");
+                    } else {
+                        ids.append(tileImage.toString());
+                    }
+                }
+                json.writeValue(layerDefinition.getLayerName(), ids.toString());
+            }
+            json.writeObjectEnd();
+
+            FileHandle fileHandle = new FileHandle(chunkFile);
+            fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
+        }
     }
 
     public void calculateVisibleEntities(Player player) {

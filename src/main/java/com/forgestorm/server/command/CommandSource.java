@@ -21,9 +21,17 @@ public class CommandSource {
 
     public void sendMessage(String message) {
         if (player == null) {
+            sendMessage(message, null);
+        } else {
+            sendMessage(message, ChatChannelType.GENERAL);
+        }
+    }
+
+    public void sendMessage(String message, ChatChannelType chatChannelType) {
+        if (player == null) {
             println(CommandSource.class, message);
         } else {
-            new ChatMessagePacketOut(player, ChatChannelType.GENERAL, message).sendPacket();
+            new ChatMessagePacketOut(player, chatChannelType, message).sendPacket();
         }
     }
 }

@@ -1,13 +1,10 @@
 package com.forgestorm.server.command.listeners;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.command.Command;
-import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.CommandArguments;
+import com.forgestorm.server.command.*;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.GameWorldProcessor;
-import com.forgestorm.server.game.world.maps.Tile;
 import com.forgestorm.server.game.world.maps.WorldCreator;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
@@ -18,6 +15,7 @@ public class WorldCommands {
 
     @Command(base = "create", argLenReq = 3)
     @CommandArguments(missing = "<worldName> <width> <height>")
+    @CommandPermission(status = CommandPermStatus.ADMIN)
     public void createWorld(CommandSource commandSource, String[] args) {
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
         String worldName = args[0];
@@ -40,5 +38,17 @@ public class WorldCommands {
         gameWorldProcessor.loadWorld(gameWorld);
 
         new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED] THIS NEEDS TO BE REDONE! PLEASE LOOK IT UP AND FIX... ").sendPacket();
+    }
+
+    @Command(base = "saveworld")
+    @CommandPermission(status = CommandPermStatus.ADMIN)
+    public void getTps(CommandSource commandSource) {
+        GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
+
+        for (GameWorld gameWorld : gameWorldProcessor.getGameWorlds().values()) {
+            gameWorld.saveChunks(true);
+        }
+
+        commandSource.sendMessage("[GREEN]All " + gameWorldProcessor.getGameWorlds().size() + " worlds have been saved.", ChatChannelType.STAFF);
     }
 }
