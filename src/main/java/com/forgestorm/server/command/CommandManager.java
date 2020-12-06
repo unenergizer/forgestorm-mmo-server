@@ -35,7 +35,7 @@ public class CommandManager implements ManagerStart {
         Player player = ServerMain.getInstance().getGameManager().findPlayer(playerName);
 
         if (player == null) {
-            commandSource.sendMessage("The player <" + playerName + "> could not be found. Check spelling.");
+            commandSource.sendMessage("[RED]The player [YELLOW]" + playerName + "[RED] could not be found. Check spelling.");
             return null;
         }
 

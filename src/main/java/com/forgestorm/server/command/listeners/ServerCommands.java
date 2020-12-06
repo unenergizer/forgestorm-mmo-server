@@ -24,7 +24,7 @@ public class ServerCommands {
 
     @Command(base = "tps")
     public void getTps(CommandSource commandSource) {
-        commandSource.sendMessage("[YELLOW]TPS: " + ServerMain.getInstance().getGameLoop().getCurrentTPS());
+        commandSource.sendMessage("[YELLOW]TPS" + MessageText.CHAT_FORMATTING + "[GREEN]" + ServerMain.getInstance().getGameLoop().getCurrentTPS());
     }
 
     @Command(base = "stop")
@@ -35,14 +35,14 @@ public class ServerCommands {
     @Command(base = "online")
     @CommandPermission(status = CommandPermStatus.ALL)
     public void accountsOnline(CommandSource commandSource) {
-        commandSource.sendMessage("[YELLOW]Accounts Online: " + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
+        commandSource.sendMessage("[YELLOW]Accounts Online" + MessageText.CHAT_FORMATTING + "[GREEN]" + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
     }
 
     @Command(base = "time")
     public void getServerTime(CommandSource commandSource) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        commandSource.sendMessage("[YELLOW]Server Time: " + dtf.format(now));
+        commandSource.sendMessage("[YELLOW]Server Time" + MessageText.CHAT_FORMATTING + "[GREEN]" + dtf.format(now));
     }
 
     @Command(base = "uptime")
@@ -61,7 +61,7 @@ public class ServerCommands {
 
         String time = String.format("[GREEN]%d [YELLOW]days, [GREEN]%d [YELLOW]hours, [GREEN]%d [YELLOW]minutes, [GREEN]%d [YELLOW]seconds", days, hours, minutes, seconds);
 
-        commandSource.sendMessage("[YELLOW]Server UpTime: " + time);
+        commandSource.sendMessage("[YELLOW]Server UpTime" + MessageText.CHAT_FORMATTING + time);
     }
 
     @Command(base = "say")
