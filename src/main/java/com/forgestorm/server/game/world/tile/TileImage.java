@@ -37,6 +37,7 @@ public class TileImage {
     }
 
     public boolean containsProperty(TilePropertyTypes tilePropertyType) {
+        if (tileProperties == null) return false;
         return tileProperties.containsKey(tilePropertyType);
     }
 

@@ -9,6 +9,7 @@ import com.forgestorm.server.game.world.item.inventory.BankActions;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
 import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
@@ -26,13 +27,13 @@ public class MovementUpdateTask implements AbstractTask {
     private final static boolean PRINT_DEBUG = false;
 
     @AllArgsConstructor
-    private class MovementTargetInfo {
+    private static class MovementTargetInfo {
         private AiEntity tracker;
         private Location location;
     }
 
     @AllArgsConstructor
-    private class RandomDirectionResult {
+    private static class RandomDirectionResult {
         private MoveDirection moveDirection;
         private Location attemptLocation;
     }
@@ -146,7 +147,8 @@ public class MovementUpdateTask implements AbstractTask {
     }
 
     private void moveEntity(MovingEntity movingEntity) {
-        float delta = 1.0f / 20.0f; // TODO: Might want to get the actual delta (error incurred ter tick)
+        // TODO: Might want to get the actual delta (error incurred ter tick)
+//        float delta = 1.0f / 20.0f;
 
         int currentX = movingEntity.getCurrentWorldLocation().getX();
         int currentY = movingEntity.getCurrentWorldLocation().getY();
@@ -447,7 +449,9 @@ public class MovementUpdateTask implements AbstractTask {
         if (nodes == null) return false;
         tracker.setMoveNodes(nodes);
         MoveNode moveNode = nodes.peek();
-        updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY()));
+        if (moveNode != null) {
+            updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY()));
+        }
         return true;
     }
 
@@ -556,9 +560,9 @@ public class MovementUpdateTask implements AbstractTask {
     public void performPlayerMove(Player player, Location attemptLocation) {
 
         // TODO: REMOVE AND REUSE CORRECTLY... JUST FOR TESTING CHUNKS...
-        if (true) {
-            player.getWorldChunk().sendChunk(player);
-        }
+//        if (true) {
+//            player.getWorldChunk().sendChunk(player);
+//        }
 
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
@@ -580,10 +584,20 @@ public class MovementUpdateTask implements AbstractTask {
             player.setBankOpen(false);
         }
 
-
         player.setFutureWorldLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentWorldLocation().getMoveDirectionFromLocation(player.getFutureWorldLocation()));
+
+        // Compare chunks
+        WorldChunk currentChunk = player.getCurrentWorldLocation().getLocationChunk();
+        WorldChunk futureChunk = player.getFutureWorldLocation().getLocationChunk();
+        if (!player.getGameWorld().isSameChunk(currentChunk, futureChunk)) {
+            println(getClass(), "Moving into new chunk!", true);
+
+            // The player is moving into a new chunk. Load chunks the player hasn't seen yet.
+            // TODO: Load chunks around the player. The one they are walking into should already be loaded...
+            futureChunk.sendChunk(player);
+        }
 
         ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
                 new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());

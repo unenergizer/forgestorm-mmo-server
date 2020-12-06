@@ -185,6 +185,10 @@ public class GameWorld {
         return worldChunkMap.get((chunkX << 16) | (chunkY & 0xFFFF));
     }
 
+    public boolean isSameChunk(WorldChunk chunk1, WorldChunk chunk2) {
+        return ((chunk1.getChunkX() << 16) | (chunk1.getChunkY() & 0xFFFF)) == ((chunk2.getChunkX() << 16) | (chunk2.getChunkY() & 0xFFFF));
+    }
+
     public Warp getWarpFromLocation(Location location) {
         return getWarp(location.getX(), location.getY());
     }

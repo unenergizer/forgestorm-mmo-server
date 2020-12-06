@@ -32,6 +32,10 @@ public class Location {
         return ServerMain.getInstance().getGameManager().getGameWorldProcessor().getGameWorld(worldName);
     }
 
+    public WorldChunk getLocationChunk() {
+        return getGameWorld().findChunk(x, y);
+    }
+
     public Location add(Location location) {
         checkArgument(location.getWorldName().equals(worldName),
                 "Can't add locations. " + location.getWorldName() + " doesn't equal " + worldName + ".");
