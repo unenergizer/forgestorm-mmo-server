@@ -6,6 +6,7 @@ import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
 import lombok.AllArgsConstructor;
@@ -23,13 +24,15 @@ public class InventoryCommands {
         Player player = commandManager.getPlayer(commandSource, playerName);
 
         if (player == null) {
-            commandSource.sendMessage("Could not find player : " + playerName);
+            commandSource.sendMessage("[RED]Could not find player : " + playerName);
             return;
         }
 
         for (byte i = 0; i < InventoryConstants.BAG_SIZE; i++) {
             player.getPlayerBag().removeItemStack(i, true);
         }
+
+        commandSource.sendMessage("[GREEN]" + playerName + "'s [YELLOW]inventory has been cleared!");
     }
 
     @Command(base = "giveall")
@@ -41,6 +44,8 @@ public class InventoryCommands {
             ServerMain.getInstance().getGameManager().forAllPlayers(player ->
                     player.give(itemStackManager.makeItemStack(finalItem, 1), true));
         }
+
+        commandSource.sendMessage("[RED]Everyone on the server has received all items...");
     }
 
     @Command(base = "give", argLenReq = 1)
@@ -49,10 +54,9 @@ public class InventoryCommands {
 
         int itemId = parseItemId(commandSource, args[0]);
         if (itemId < 0) return;
-
-        ServerMain.getInstance().getGameManager().forAllPlayers(player ->
-                player.give(ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 1), true));
-
+        ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 1);
+        ServerMain.getInstance().getGameManager().forAllPlayers(player -> player.give(itemStack, true));
+        commandSource.sendMessage("[RED]Everyone on the server has received a [YELLOW]" + itemStack.getName() +  "[RED]...");
     }
 
     @Command(base = "give", argLenReq = 2)
@@ -60,22 +64,24 @@ public class InventoryCommands {
     public void onGiveItems(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);
-
+        ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 0);
         try {
 
             int itemAmount = Integer.parseInt(args[1]);
 
             if (itemAmount < 1) {
-                commandSource.sendMessage("Item amount must be at least 1.");
+                commandSource.sendMessage("[RED]Item amount must be at least 1.");
                 return;
             }
 
-            ServerMain.getInstance().getGameManager().forAllPlayers(player ->
-                    player.give(ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, itemAmount), true));
+            itemStack.setAmount(itemAmount);
+            ServerMain.getInstance().getGameManager().forAllPlayers(player -> player.give(itemStack, true));
 
         } catch (NumberFormatException e) {
-            commandSource.sendMessage("Must provide an itemAmount as a number.");
+            commandSource.sendMessage("[RED]Must provide an itemAmount as a number.");
         }
+
+        commandSource.sendMessage("[RED]Everyone on the server has received [YELLOW]" + itemStack.getAmount() + " " + itemStack.getName() +  "'s[RED]...");
     }
 
     private int parseItemId(CommandSource commandSource, String argument) {
@@ -88,15 +94,15 @@ public class InventoryCommands {
 
             int maxItems = ServerMain.getInstance().getItemStackManager().getNumberOfItems() - 1;
             if (itemId < 0) {
-                commandSource.sendMessage("The itemId number cannot be below zero.");
+                commandSource.sendMessage("[RED]The itemId number cannot be below zero.");
                 return -1;
             } else if (itemId > maxItems) {
-                commandSource.sendMessage("The itemId number cannot be above " + maxItems + ".");
+                commandSource.sendMessage("[RED]The itemId number cannot be above [YELLOW]" + maxItems + "[RED].");
                 return -1;
             }
 
         } catch (NumberFormatException e) {
-            commandSource.sendMessage("Must provide an itemId as a number.");
+            commandSource.sendMessage("[RED]Must provide an itemId as a number.");
             return -1;
         }
 

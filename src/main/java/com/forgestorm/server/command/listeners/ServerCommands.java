@@ -17,13 +17,14 @@ public class ServerCommands {
     private final CommandManager commandManager;
 
     @Command(base = "commands")
+    @CommandPermission(status = CommandPermStatus.ALL)
     public void getCommandList(CommandSource commandSource) {
         commandManager.getCommandProcessor().sendCommandList(commandSource);
     }
 
     @Command(base = "tps")
     public void getTps(CommandSource commandSource) {
-        commandSource.sendMessage("TPS: " + ServerMain.getInstance().getGameLoop().getCurrentTPS());
+        commandSource.sendMessage("[YELLOW]TPS: " + ServerMain.getInstance().getGameLoop().getCurrentTPS());
     }
 
     @Command(base = "stop")
@@ -32,18 +33,20 @@ public class ServerCommands {
     }
 
     @Command(base = "online")
+    @CommandPermission(status = CommandPermStatus.ALL)
     public void accountsOnline(CommandSource commandSource) {
-        commandSource.sendMessage("Accounts Online: " + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
+        commandSource.sendMessage("[YELLOW]Accounts Online: " + ServerMain.getInstance().getNetworkManager().getOutStreamManager().clientsOnline());
     }
 
     @Command(base = "time")
     public void getServerTime(CommandSource commandSource) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        commandSource.sendMessage("Server Time: " + dtf.format(now));
+        commandSource.sendMessage("[YELLOW]Server Time: " + dtf.format(now));
     }
 
     @Command(base = "uptime")
+    @CommandPermission(status = CommandPermStatus.ALL)
     public void getServerUpTime(CommandSource commandSource) {
 
         long upTime = System.currentTimeMillis() - ServerMain.SERVER_START_TIME;
@@ -56,9 +59,9 @@ public class ServerCommands {
         upTime -= TimeUnit.MINUTES.toMillis(minutes);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(upTime);
 
-        String time = String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
+        String time = String.format("[GREEN]%d [YELLOW]days, [GREEN]%d [YELLOW]hours, [GREEN]%d [YELLOW]minutes, [GREEN]%d [YELLOW]seconds", days, hours, minutes, seconds);
 
-        commandSource.sendMessage("Server UpTime: " + time);
+        commandSource.sendMessage("[YELLOW]Server UpTime: " + time);
     }
 
     @Command(base = "say")

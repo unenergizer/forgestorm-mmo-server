@@ -13,7 +13,7 @@ public class EntityCommands {
     public void getEntityCount(CommandSource commandSource, String[] args) {
         if (args[0].equalsIgnoreCase("count")) {
             int aiEntities = commandSource.getPlayer().getGameWorld().getAiEntityController().getEntities().size();
-            new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "Count: " + aiEntities).sendPacket();
+            commandSource.sendMessage("[YELLOW]Count: [GREEN]" + aiEntities);
         }
     }
 }

@@ -38,7 +38,7 @@ public class PlayerCommands {
         if (findById) {
             player = ServerMain.getInstance().getGameManager().findPlayer(playerId);
             if (player == null) {
-                commandSource.sendMessage("Could not find a player for id: " + playerId);
+                commandSource.sendMessage("[RED]Could not find a player for id: " + playerId);
                 return;
             }
         } else {
@@ -46,7 +46,7 @@ public class PlayerCommands {
             if (player == null) return;
         }
 
-        commandSource.sendMessage("Healed player " + player.getName());
+        commandSource.sendMessage("[GREEN]Healed player " + player.getName());
 
         final Player sendPlayer = player;
         player.getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
@@ -61,7 +61,8 @@ public class PlayerCommands {
         Player teleportToPlayer = commandManager.getPlayer(commandSource, args[0]);
 
         if (teleportToPlayer == null) return;
-        player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentWorldLocation()), MoveDirection.SOUTH));
+        player.setWarp(new Warp(new Location(teleportToPlayer.getCurrentWorldLocation()), teleportToPlayer.getFacingDirection()));
+        commandSource.sendMessage("[GREEN]You have teleported to [YELLOW]" + teleportToPlayer.getName() + "[GREEN].");
     }
 
     @Command(base = "teleport", argLenReq = 4)
@@ -76,8 +77,8 @@ public class PlayerCommands {
             x = Short.parseShort(args[2]);
             y = Short.parseShort(args[3]);
         } catch (NumberFormatException e) {
-            commandSource.sendMessage("Command arguments must contain valid numbers.");
-            commandSource.sendMessage("Accepted Args: teleport <playerName> <mapName> <x> <y>");
+            commandSource.sendMessage("[RED]Command arguments must contain valid numbers.");
+            commandSource.sendMessage("[RED]Accepted Args: teleport <playerName> <mapName> <x> <y>");
             return;
         }
 
@@ -111,6 +112,7 @@ public class PlayerCommands {
         ServerMain.getInstance().getGameManager().kickPlayer(player);
         ServerMain.getInstance().getNetworkManager().getOutStreamManager().removeClient(player.getClientHandler());
         player.getClientHandler().closeConnection();
+        commandSource.sendMessage("[RED]" + player.getName() + " [YELLOW]has been kicked.");
     }
 
     @Command(base = "kill", argLenReq = 1)
@@ -121,6 +123,7 @@ public class PlayerCommands {
         if (player == null) return;
 
         player.killPlayer();
+        commandSource.sendMessage("[RED]" + player.getName() + " [YELLOW]has been killed.");
     }
 
     @Command(base = "info", argLenReq = 1)
@@ -133,12 +136,12 @@ public class PlayerCommands {
         AuthenticatedUser authenticatedUser = player.getClientHandler().getAuthenticatedUser();
 
         commandSource.sendMessage(" ");
-        commandSource.sendMessage("---- Player Information ----");
-        commandSource.sendMessage("Account Name: " + authenticatedUser.getXfAccountName());
-        commandSource.sendMessage("Database Id: " + player.getDatabaseId());
-        commandSource.sendMessage("XF Account Id: " + authenticatedUser.getDatabaseUserId());
-        commandSource.sendMessage("Admin: " + authenticatedUser.isAdmin());
-        commandSource.sendMessage("IP: " + authenticatedUser.getIp());
+        commandSource.sendMessage("[YELLOW]---- Player Information ----");
+        commandSource.sendMessage("[GREEN]Account Name" + MessageText.CHAT_FORMATTING + authenticatedUser.getXfAccountName());
+        commandSource.sendMessage("[GREEN]Database Id" + MessageText.CHAT_FORMATTING + player.getDatabaseId());
+        commandSource.sendMessage("[GREEN]XF Account Id" + MessageText.CHAT_FORMATTING + authenticatedUser.getDatabaseUserId());
+        commandSource.sendMessage("[GREEN]Admin" + MessageText.CHAT_FORMATTING + authenticatedUser.isAdmin());
+        commandSource.sendMessage("[GREEN]IP" + MessageText.CHAT_FORMATTING + authenticatedUser.getIp());
     }
 
     @Command(base = "speed", argLenReq = 2)
