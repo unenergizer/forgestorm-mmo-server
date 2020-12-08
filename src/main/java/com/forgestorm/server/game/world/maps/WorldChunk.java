@@ -5,6 +5,7 @@ import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +40,15 @@ public class WorldChunk {
 
     TileImage getTileImage(LayerDefinition layerDefinition, int localX, int localY) {
         return layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
+    }
+
+    public boolean isTraversable(int localX, int localY) {
+        for (TileImage[] tileImages : layers.values()) {
+            TileImage tileImage = tileImages[localX + localY * GameConstants.CHUNK_SIZE];
+            if (tileImage == null) continue;
+            if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) return false;
+        }
+        return true;
     }
 
     public void addTileWarp(short localX, short localY, Warp warp) {

@@ -11,7 +11,6 @@ import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.io.todo.ChunkLoader;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
@@ -173,9 +172,7 @@ public class GameWorld {
         int localX = entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
-        TileImage tileImage = worldChunk.getTileImage(LayerDefinition.COLLIDABLES, localX, localY);
-        if (tileImage == null) return true;
-        return tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK);
+        return worldChunk.isTraversable(localX, localY);
     }
 
     public WorldChunk findChunk(int entityX, int entityY) {
