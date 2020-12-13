@@ -1,12 +1,15 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
+import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +37,14 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         // Set the tile in the world
         GameWorld gameWorld = packetData.playerSender.getGameWorld();
         WorldChunk worldChunk = gameWorld.findChunk(packetData.tileX, packetData.tileY);
+
+        if (worldChunk == null) {
+            new ChatMessagePacketOut(
+                    packetData.playerSender,
+                    ChatChannelType.GENERAL,
+                    MessageText.ERROR + "You cannot place a tile here. Chunk does not exist.").sendPacket();
+            return;
+        }
 
         TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(packetData.textureId);
         int localX = packetData.tileX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
