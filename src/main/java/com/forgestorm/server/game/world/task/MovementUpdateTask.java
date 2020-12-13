@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.task;
 
+import com.badlogic.gdx.Game;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
@@ -591,6 +592,16 @@ public class MovementUpdateTask implements AbstractTask {
         // Compare chunks
         WorldChunk currentChunk = player.getCurrentWorldLocation().getLocationChunk();
         WorldChunk futureChunk = player.getFutureWorldLocation().getLocationChunk();
+
+        // Generate new chunk
+        if (futureChunk == null) {
+            Location futureLocation = player.getFutureWorldLocation();
+            short chunkX = (short) Math.floor(futureLocation.getX() / (float) GameConstants.CHUNK_SIZE);
+            short chunkY = (short) Math.floor(futureLocation.getY() / (float) GameConstants.CHUNK_SIZE);
+            player.getGameWorld().generateNewChunk(chunkX, chunkY);
+        }
+
+        // Send chunk
         if (!player.getGameWorld().isSameChunk(currentChunk, futureChunk)) {
             println(getClass(), "Moving into new chunk!", true);
 

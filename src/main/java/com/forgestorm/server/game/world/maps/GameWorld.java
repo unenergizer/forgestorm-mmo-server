@@ -60,7 +60,7 @@ public class GameWorld {
                 ChunkLoader.WorldChunkDataWrapper wrapper = fileManager.getWorldChunkData(chunkPath);
                 if (wrapper == null) continue;
                 WorldChunk worldChunk = wrapper.getWorldChunk();
-                worldChunkMap.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
+                addChunk(worldChunk, chunkX, chunkY);
             }
         }
     }
@@ -111,6 +111,16 @@ public class GameWorld {
             FileHandle fileHandle = new FileHandle(chunkFile);
             fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
         }
+    }
+
+    public void generateNewChunk(short chunkX, short chunkY) {
+        WorldChunk worldChunk = new WorldChunk(chunkX, chunkY);
+        addChunk(worldChunk, chunkX, chunkY);
+        println(getClass(), "Generated a new chunk at ChunkX: " + chunkX + ", ChunkY: " + chunkY, true);
+    }
+
+    public void addChunk(WorldChunk worldChunk, short chunkX, short chunkY) {
+        worldChunkMap.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
     }
 
     public void calculateVisibleEntities(Player player) {

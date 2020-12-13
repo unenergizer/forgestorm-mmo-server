@@ -8,7 +8,7 @@ import static com.forgestorm.server.util.Log.println;
 
 public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     private final short chunkX, chunkY;
     private final byte layerDefinitionByte;
