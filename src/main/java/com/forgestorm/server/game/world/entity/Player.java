@@ -53,6 +53,8 @@ public class Player extends MovingEntity {
 
     private byte faction;
 
+    private boolean bypassCollision = false;
+
     /**
      * The amount of time that has progressed since the player
      * has been out of active.

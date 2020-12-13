@@ -2,10 +2,11 @@ package com.forgestorm.server.command.listeners;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.Command;
+import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
-import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.database.AuthenticatedUser;
+import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.GameWorldProcessor;
@@ -20,7 +21,7 @@ import lombok.AllArgsConstructor;
 public class PlayerCommands {
 
     private final CommandManager commandManager;
-    
+
     @Command(base = "heal", argLenReq = 1)
     @CommandArguments(missing = "<playerName>")
     public void healPlayer(CommandSource commandSource, String[] args) {
@@ -169,6 +170,21 @@ public class PlayerCommands {
 
         } catch (NumberFormatException e) {
             commandSource.sendMessage(MessageText.SERVER + "Second argument must be a float.");
+        }
+    }
+
+    @Command(base = "collision")
+    public void toggleCollision(CommandSource commandSource) {
+        Player player = commandSource.getPlayer();
+        if (player == null) return;
+
+        boolean bypassCollision = !player.isBypassCollision();
+        player.setBypassCollision(bypassCollision);
+
+        if (bypassCollision) {
+            commandSource.sendMessage("[YELLOW]Collision was toggled [RED]OFF [YELLOW]for player [ORANGE]" + player.getName() + "[YELLOW].", ChatChannelType.STAFF);
+        } else {
+            commandSource.sendMessage("[YELLOW]Collision was toggled [GREEN]ON [YELLOW]for player [ORANGE]" + player.getName() + "[YELLOW].", ChatChannelType.STAFF);
         }
     }
 }

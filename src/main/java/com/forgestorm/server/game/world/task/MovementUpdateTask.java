@@ -541,7 +541,7 @@ public class MovementUpdateTask implements AbstractTask {
         if (player.getWarp() != null) return false; // Stop player moving during warp start
 
         // Prevents the player from moving places they are not allowed to go.
-        if (!player.getGameWorld().isTraversable(attemptLocation)) return false;
+        if (!player.getGameWorld().isTraversable(attemptLocation) && !player.isBypassCollision()) return false;
 
         if (player.isEntityMoving()) {
             player.addFutureMoveToQueue(attemptLocation);

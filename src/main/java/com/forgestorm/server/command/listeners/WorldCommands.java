@@ -40,7 +40,7 @@ public class WorldCommands {
     }
 
     @Command(base = "saveworld")
-    public void getTps(CommandSource commandSource) {
+    public void saveWorld(CommandSource commandSource) {
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
 
         for (GameWorld gameWorld : gameWorldProcessor.getGameWorlds().values()) {
