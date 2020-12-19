@@ -7,6 +7,7 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.server.network.game.packet.out.TileWarpPacketOut;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import com.forgestorm.server.util.RandomUtil;
 import lombok.Getter;
@@ -97,6 +98,7 @@ public class WorldChunk {
         // First... we don't send chunks. We send layer "parts"
         // The packet must remain under 200 bytes
 
+        // Send chunk layers
         for (Map.Entry<LayerDefinition, TileImage[]> layerMap : layers.entrySet()) {
             LayerDefinition layerDefinition = layerMap.getKey();
             TileImage[] tileImages = layerMap.getValue();
@@ -126,6 +128,12 @@ public class WorldChunk {
                 layerSectionsSent++;
             }
         }
+
+        // Send chunk warps
+//        for (Warp warp : tileWarps.values()) {
+//            // TODO: send the tile location of the warp... NOT the destination location...
+//            new TileWarpPacketOut(chunkRecipient, warp.getLocation().getX(), warp.getLocation().getY()).sendPacket();
+//        }
     }
 
     @Override

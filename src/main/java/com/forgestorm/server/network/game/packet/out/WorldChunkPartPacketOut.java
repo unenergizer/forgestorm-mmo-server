@@ -16,7 +16,7 @@ public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
     private final TileImage[] arraySend;
 
     public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, byte layerDefinitionByte, byte sectionsSent, TileImage[] arraySend) {
-        super(Opcodes.WORLD_CHUNK, player.getClientHandler());
+        super(Opcodes.WORLD_CHUNK_LAYER, player.getClientHandler());
         this.chunkX = chunkX;
         this.chunkY = chunkY;
         this.layerDefinitionByte = layerDefinitionByte;
