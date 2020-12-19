@@ -307,13 +307,13 @@ public class FileManager {
         return data;
     }
 
-    public void loadGameWorldData(File gameWorldPath) {
+    public String loadGameWorldData(File gameWorldPath) {
         String path = getCanonicalPath(gameWorldPath);
 
         // check if already loaded
         if (isFileLoaded(path)) {
             println(getClass(), "GameWorldData already loaded: " + path, true, PRINT_DEBUG);
-            return;
+            return null;
         }
 
         // load asset
@@ -324,10 +324,10 @@ public class FileManager {
         } else {
             println(getClass(), "GameWorldData doesn't exist: " + path, true, PRINT_DEBUG);
         }
+        return path;
     }
 
-    public GameWorldLoader.GameWorldDataWrapper getGameWorldData(File filePath) {
-        String path = getCanonicalPath(filePath);
+    public GameWorldLoader.GameWorldDataWrapper getGameWorldData(String path) {
         GameWorldLoader.GameWorldDataWrapper data = null;
 
         println(getClass(), "Path: " + path);
@@ -341,13 +341,13 @@ public class FileManager {
         return data;
     }
 
-    public void loadWorldChunkData(File chunkFile, boolean forceFinishLoading) {
+    public String loadWorldChunkData(File chunkFile, boolean forceFinishLoading) {
         String path = getCanonicalPath(chunkFile);
 
         // check if already loaded
         if (isFileLoaded(path)) {
             println(getClass(), "WorldChunkData already loaded: " + path, true, PRINT_DEBUG);
-            return;
+            return null;
         }
 
         // load asset
@@ -359,10 +359,10 @@ public class FileManager {
         } else {
             println(getClass(), "WorldChunkData doesn't exist: " + path, true, PRINT_DEBUG);
         }
+        return path;
     }
 
-    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(File chunkFile) {
-        String path = getCanonicalPath(chunkFile);
+    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String path) {
         ChunkLoader.WorldChunkDataWrapper data = null;
 
         if (assetManager.isLoaded(path)) {

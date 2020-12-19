@@ -32,8 +32,8 @@ public class WorldCommands {
         worldCreator.createWorld(worldName, width, height);
         FileManager fileManager = ServerMain.getInstance().getFileManager();
         File file = new File(fileManager.getWorldDirectory() + File.separator + worldName);
-        fileManager.loadGameWorldData(file);
-        GameWorld gameWorld = fileManager.getGameWorldData(file).getGameWorld();
+        String path = fileManager.loadGameWorldData(file);
+        GameWorld gameWorld = fileManager.getGameWorldData(path).getGameWorld();
         gameWorldProcessor.loadWorld(gameWorld);
 
         new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED] THIS NEEDS TO BE REDONE! PLEASE LOOK IT UP AND FIX... ").sendPacket();

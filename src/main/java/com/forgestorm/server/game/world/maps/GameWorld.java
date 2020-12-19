@@ -52,8 +52,8 @@ public class GameWorld {
         checkNotNull(chunkFiles, "No world chunks were found.");
 
         for (File file : chunkFiles) {
-            fileManager.loadWorldChunkData(file, true);
-            addChunk(fileManager.getWorldChunkData(file).getWorldChunk());
+            String path = fileManager.loadWorldChunkData(file, true);
+            addChunk(fileManager.getWorldChunkData(path.replace("\\", "/")).getWorldChunk());
         }
 
         println(getClass(), "Loaded " + worldChunkMap.size() + "/" + chunkFiles.length + " chunks for game world \"" + worldName + "\".");

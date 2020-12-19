@@ -72,9 +72,14 @@ public class GameWorldProcessor {
         checkNotNull(files, "No game worlds were found.");
 
         for (File file : files) {
-            fileManager.loadGameWorldData(file);
-            GameWorld gameWorld = fileManager.getGameWorldData(file).getGameWorld();
+            String path = fileManager.loadGameWorldData(file);
+            println(getClass(), "WORLD: " + file.getPath());
+            GameWorld gameWorld = fileManager.getGameWorldData(path.replace("\\", "/")).getGameWorld();
             loadWorld(gameWorld);
+        }
+
+        for (String s : fileManager.getAssetManager().getAssetNames()) {
+            println(getClass(), "ASSET: " + s);
         }
 
         if (files.length == 0) createDefaultGameWorld(fileManager);
@@ -89,8 +94,8 @@ public class GameWorldProcessor {
         File filePath = new File(fileManager.getWorldDirectory() + File.separator + worldName + GameConstants.MAP_FILE_EXTENSION_TYPE);
         WorldCreator worldCreator = new WorldCreator();
         worldCreator.createWorld(worldName, 1, 1);
-        fileManager.loadGameWorldData(filePath);
-        GameWorld gameWorld = fileManager.getGameWorldData(filePath).getGameWorld();
+        String path = fileManager.loadGameWorldData(filePath);
+        GameWorld gameWorld = fileManager.getGameWorldData(path).getGameWorld();
         loadWorld(gameWorld);
     }
 
