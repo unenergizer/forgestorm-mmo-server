@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.maps;
 
+import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
@@ -7,8 +8,8 @@ import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
+import com.forgestorm.server.util.RandomUtil;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +21,8 @@ public class WorldChunk {
     @Getter
     private final short chunkX, chunkY;
 
-    @Setter
     @Getter
-    private Map<LayerDefinition, TileImage[]> layers;
+    private Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
 
     private final Map<Integer, Warp> tileWarps = new HashMap<Integer, Warp>();
 
@@ -34,8 +34,25 @@ public class WorldChunk {
         this.chunkY = chunkY;
     }
 
+    public WorldChunk(short chunkX, short chunkY, boolean generateLandscape) {
+        this.chunkX = chunkX;
+        this.chunkY = chunkY;
+        if (generateLandscape) generateLandscape();
+    }
+
     public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
+        initTileLayer(layerDefinition);
         layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE] = tileImage;
+    }
+
+    public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int index) {
+        initTileLayer(layerDefinition);
+        layers.get(layerDefinition)[index] = tileImage;
+    }
+
+    private void initTileLayer(LayerDefinition layerDefinition) {
+        if (layers.containsKey(layerDefinition)) return;
+        layers.put(layerDefinition, new TileImage[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE]);
     }
 
     TileImage getTileImage(LayerDefinition layerDefinition, int localX, int localY) {
@@ -60,6 +77,20 @@ public class WorldChunk {
             return tileWarps.get((localX << 16) | (localY & 0xFFFF));
         }
         return null;
+    }
+
+    private void generateLandscape() {
+        for (int i = 0; i < GameConstants.CHUNK_SIZE; i++) {
+            for (int j = 0; j < GameConstants.CHUNK_SIZE; j++) {
+
+                int rand = RandomUtil.getNewRandom(0, 100);
+
+                if (rand <= 50) {
+                    TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(262);
+                    setTileImage(LayerDefinition.GROUND_DECORATION, tileImage, i, j);
+                }
+            }
+        }
     }
 
     public void sendChunk(Player chunkRecipient) {
@@ -95,5 +126,10 @@ public class WorldChunk {
                 layerSectionsSent++;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "[WorldChunk] ChunkX: " + chunkX + ", ChunkY: " + chunkY;
     }
 }

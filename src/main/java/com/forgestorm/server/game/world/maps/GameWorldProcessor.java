@@ -4,6 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.database.sql.GameWorldItemStackDropSQL;
 import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.todo.FileManager;
 import lombok.Getter;
@@ -16,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GameWorldProcessor {
 
-    private static final String EXTENSION_TYPE = ".json";
     private static final boolean PRINT_DEBUG = true;
 
     @Getter
@@ -68,7 +68,7 @@ public class GameWorldProcessor {
 
     public void loadAllWorlds() {
         FileManager fileManager = ServerMain.getInstance().getFileManager();
-        File[] files = new File(fileManager.getWorldDirectory()).listFiles((d, name) -> name.endsWith(EXTENSION_TYPE));
+        File[] files = new File(fileManager.getWorldDirectory()).listFiles((d, name) -> name.endsWith(GameConstants.MAP_FILE_EXTENSION_TYPE));
         checkNotNull(files, "No game worlds were found.");
 
         for (File file : files) {
@@ -86,7 +86,7 @@ public class GameWorldProcessor {
     private void createDefaultGameWorld(FileManager fileManager) {
         println(getClass(), "No game worlds exist, creating one now.", true);
         String worldName = "game_start";
-        File filePath = new File(fileManager.getWorldDirectory() + File.separator + worldName + EXTENSION_TYPE);
+        File filePath = new File(fileManager.getWorldDirectory() + File.separator + worldName + GameConstants.MAP_FILE_EXTENSION_TYPE);
         WorldCreator worldCreator = new WorldCreator();
         worldCreator.createWorld(worldName, 1, 1);
         fileManager.loadGameWorldData(filePath);

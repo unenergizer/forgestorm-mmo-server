@@ -1,6 +1,5 @@
 package com.forgestorm.server.game.world.task;
 
-import com.badlogic.gdx.Game;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
@@ -560,11 +559,6 @@ public class MovementUpdateTask implements AbstractTask {
      */
     public void performPlayerMove(Player player, Location attemptLocation) {
 
-        // TODO: REMOVE AND REUSE CORRECTLY... JUST FOR TESTING CHUNKS...
-//        if (true) {
-//            player.getWorldChunk().sendChunk(player);
-//        }
-
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
@@ -598,7 +592,7 @@ public class MovementUpdateTask implements AbstractTask {
             Location futureLocation = player.getFutureWorldLocation();
             short chunkX = (short) Math.floor(futureLocation.getX() / (float) GameConstants.CHUNK_SIZE);
             short chunkY = (short) Math.floor(futureLocation.getY() / (float) GameConstants.CHUNK_SIZE);
-            player.getGameWorld().generateNewChunk(chunkX, chunkY);
+            futureChunk = player.getGameWorld().generateNewChunk(chunkX, chunkY);
         }
 
         // Send chunk

@@ -20,14 +20,16 @@ import com.forgestorm.server.game.world.tile.TileImage;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import static com.forgestorm.server.util.Log.println;
 
 public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkDataWrapper, ChunkLoader.WorldChunkParameter> {
 
     static class WorldChunkParameter extends AssetLoaderParameters<WorldChunkDataWrapper> {
     }
 
+    private static final boolean PRINT_DEBUG = false;
     private static final String EXTENSION_TYPE = ".json";
     private WorldChunkDataWrapper worldChunkDataWrapper = null;
 
@@ -41,6 +43,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         worldChunkDataWrapper = new WorldChunkDataWrapper();
         WorldChunk worldChunk = parseChunk(file);
         worldChunkDataWrapper.setWorldChunk(worldChunk);
+        println(getClass(), "Loading chunk finished. " + worldChunk.toString(), false, PRINT_DEBUG);
     }
 
     @Override
@@ -61,16 +64,16 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         String[] parts = chunkName.split("\\.");
         short chunkX = Short.parseShort(parts[0]);
         short chunkY = Short.parseShort(parts[1]);
-
-        Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
+        WorldChunk chunk = new WorldChunk(chunkX, chunkY);
 
         for (LayerDefinition layerDefinition : LayerDefinition.values()) {
             TileImage[] layer = readLayer(layerDefinition.getLayerName(), root);
-            layers.put(layerDefinition, layer);
-        }
 
-        WorldChunk chunk = new WorldChunk(chunkX, chunkY);
-        chunk.setLayers(layers);
+            // Individually add each TileImage to the chunk (NPE FIX)
+            for (int i = 0; i < layer.length; i++) {
+                chunk.setTileImage(layerDefinition, layer[i], i);
+            }
+        }
 
         JsonValue warpsArray = root.get("warps");
         if (warpsArray != null) {

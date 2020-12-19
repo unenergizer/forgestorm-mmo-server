@@ -27,7 +27,7 @@ public class FileManager {
     private AssetManager assetManager = new AssetManager();
     private HeadlessFiles headlessFiles = new HeadlessFiles();
     private InternalResolver internalResolver = new InternalResolver();
-    private ExternalResolver externalResolver = new ExternalResolver();
+    private AbsoluteResolver absoluteResolver = new AbsoluteResolver();
 
     public FileManager() {
         // Get the path of the jar file.
@@ -308,12 +308,7 @@ public class FileManager {
     }
 
     public void loadGameWorldData(File gameWorldPath) {
-        String path = null;
-        try {
-            path = gameWorldPath.getCanonicalPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String path = getCanonicalPath(gameWorldPath);
 
         // check if already loaded
         if (isFileLoaded(path)) {
@@ -322,8 +317,8 @@ public class FileManager {
         }
 
         // load asset
-        if (externalResolver.resolve(path).exists()) {
-            assetManager.setLoader(GameWorldLoader.GameWorldDataWrapper.class, new GameWorldLoader(externalResolver));
+        if (absoluteResolver.resolve(path).exists()) {
+            assetManager.setLoader(GameWorldLoader.GameWorldDataWrapper.class, new GameWorldLoader(absoluteResolver));
             assetManager.load(path, GameWorldLoader.GameWorldDataWrapper.class);
             assetManager.finishLoading();
         } else {
@@ -332,14 +327,10 @@ public class FileManager {
     }
 
     public GameWorldLoader.GameWorldDataWrapper getGameWorldData(File filePath) {
+        String path = getCanonicalPath(filePath);
         GameWorldLoader.GameWorldDataWrapper data = null;
 
-        String path = null;
-        try {
-            path = filePath.getCanonicalPath().replace("\\", "/");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        println(getClass(), "Path: " + path);
 
         if (assetManager.isLoaded(path)) {
             data = assetManager.get(path, GameWorldLoader.GameWorldDataWrapper.class);
@@ -350,33 +341,48 @@ public class FileManager {
         return data;
     }
 
-    public void loadWorldChunkData(String filePath, boolean forceFinishLoading) {
+    public void loadWorldChunkData(File chunkFile, boolean forceFinishLoading) {
+        String path = getCanonicalPath(chunkFile);
+
         // check if already loaded
-        if (isFileLoaded(filePath)) {
-            println(getClass(), "WorldChunkData already loaded: " + filePath, true, PRINT_DEBUG);
+        if (isFileLoaded(path)) {
+            println(getClass(), "WorldChunkData already loaded: " + path, true, PRINT_DEBUG);
             return;
         }
 
         // load asset
-        if (externalResolver.resolve(filePath).exists()) {
-            assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(externalResolver));
-            assetManager.load(filePath, ChunkLoader.WorldChunkDataWrapper.class);
+        if (absoluteResolver.resolve(path).exists()) {
+            println(getClass(), "WorldChunkData path: " + path);
+            assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(absoluteResolver));
+            assetManager.load(path, ChunkLoader.WorldChunkDataWrapper.class);
             if (forceFinishLoading) assetManager.finishLoading();
         } else {
-            println(getClass(), "WorldChunkData doesn't exist: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData doesn't exist: " + path, true, PRINT_DEBUG);
         }
     }
 
-    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String filePath) {
+    public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(File chunkFile) {
+        String path = getCanonicalPath(chunkFile);
         ChunkLoader.WorldChunkDataWrapper data = null;
 
-        if (assetManager.isLoaded(filePath)) {
-            data = assetManager.get(filePath, ChunkLoader.WorldChunkDataWrapper.class);
+        if (assetManager.isLoaded(path)) {
+            println(getClass(), "Path: " + path);
+            data = assetManager.get(path, ChunkLoader.WorldChunkDataWrapper.class);
         } else {
-            println(getClass(), "WorldChunkData not loaded: " + filePath, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData not loaded: " + path, true, PRINT_DEBUG);
         }
 
         return data;
+    }
+
+    private String getCanonicalPath(File file) {
+        String path = null;
+        try {
+            path = file.getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return path;
     }
 
     class InternalResolver implements FileHandleResolver {
@@ -392,7 +398,7 @@ public class FileManager {
         }
     }
 
-    class ExternalResolver implements FileHandleResolver {
+    class AbsoluteResolver implements FileHandleResolver {
         @Override
         public FileHandle resolve(String fileName) {
             return headlessFiles.absolute(fileName);

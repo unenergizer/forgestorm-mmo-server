@@ -49,15 +49,13 @@ public class GameWorldLoader extends AsynchronousAssetLoader<GameWorldLoader.Gam
         JsonValue root = new JsonReader().parse(fileHandle.reader());
 
         String worldName = fileHandle.name().replace(".json", "");
-        int widthInChunks = root.get("widthInChunks").asInt();
-        int heightInChunks = root.get("heightInChunks").asInt();
         float backgroundRed = root.get("backgroundRed").asFloat();
         float backgroundGreen = root.get("backgroundGreen").asFloat();
         float backgroundBlue = root.get("backgroundBlue").asFloat();
         float backgroundAlpha = root.get("backgroundAlpha").asFloat();
         Color backgroundColor = new Color(backgroundRed, backgroundGreen, backgroundBlue, backgroundAlpha);
 
-        return new GameWorld(fileHandle.path(), worldName, widthInChunks, heightInChunks, backgroundColor);
+        return new GameWorld(fileHandle.path(), worldName, backgroundColor);
     }
 
     @SuppressWarnings("InnerClassMayBeStatic")

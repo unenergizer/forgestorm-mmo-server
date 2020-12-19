@@ -11,7 +11,6 @@ import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.io.todo.ChunkLoader;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
@@ -25,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Getter
 public class GameWorld {
 
     private final String chunkPath;
     private final String worldName;
-    private final int widthInChunks, heightInChunks;
     private final Color backgroundColor;
 
     private final PlayerController playerController = new PlayerController(this);
@@ -39,30 +38,25 @@ public class GameWorld {
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
 
-    //    private Map<Integer, TileImage[]> layers;
     private Map<Integer, WorldChunk> worldChunkMap = new HashMap<>();
 
-    public GameWorld(String chunkPath, String worldName, int widthInChunks, int heightInChunks, Color backgroundColor) {
+    public GameWorld(String chunkPath, String worldName, Color backgroundColor) {
         this.chunkPath = chunkPath.replace(".json", "/");
         this.worldName = worldName;
-        this.widthInChunks = widthInChunks;
-        this.heightInChunks = heightInChunks;
         this.backgroundColor = backgroundColor;
     }
 
     public void loadChunks() {
         FileManager fileManager = ServerMain.getInstance().getFileManager();
+        File[] chunkFiles = new File(chunkPath).listFiles((d, name) -> name.endsWith(GameConstants.MAP_FILE_EXTENSION_TYPE));
+        checkNotNull(chunkFiles, "No world chunks were found.");
 
-        for (short chunkY = 0; chunkY < heightInChunks; chunkY++) {
-            for (short chunkX = 0; chunkX < widthInChunks; chunkX++) {
-                String chunkPath = this.chunkPath + chunkX + "." + chunkY + ".json";
-                fileManager.loadWorldChunkData(chunkPath, true);
-                ChunkLoader.WorldChunkDataWrapper wrapper = fileManager.getWorldChunkData(chunkPath);
-                if (wrapper == null) continue;
-                WorldChunk worldChunk = wrapper.getWorldChunk();
-                addChunk(worldChunk, chunkX, chunkY);
-            }
+        for (File file : chunkFiles) {
+            fileManager.loadWorldChunkData(file, true);
+            addChunk(fileManager.getWorldChunkData(file).getWorldChunk());
         }
+
+        println(getClass(), "Loaded " + worldChunkMap.size() + "/" + chunkFiles.length + " chunks for game world \"" + worldName + "\".");
     }
 
     public void saveChunksOnTick(long ticksPassed) {
@@ -113,14 +107,15 @@ public class GameWorld {
         }
     }
 
-    public void generateNewChunk(short chunkX, short chunkY) {
-        WorldChunk worldChunk = new WorldChunk(chunkX, chunkY);
-        addChunk(worldChunk, chunkX, chunkY);
+    public WorldChunk generateNewChunk(short chunkX, short chunkY) {
+        WorldChunk worldChunk = new WorldChunk(chunkX, chunkY, true);
+        addChunk(worldChunk);
         println(getClass(), "Generated a new chunk at ChunkX: " + chunkX + ", ChunkY: " + chunkY, true);
+        return worldChunk;
     }
 
-    public void addChunk(WorldChunk worldChunk, short chunkX, short chunkY) {
-        worldChunkMap.put((chunkX << 16) | (chunkY & 0xFFFF), worldChunk);
+    public void addChunk(WorldChunk worldChunk) {
+        worldChunkMap.put((worldChunk.getChunkX() << 16) | (worldChunk.getChunkY() & 0xFFFF), worldChunk);
     }
 
     public void calculateVisibleEntities(Player player) {
@@ -177,7 +172,7 @@ public class GameWorld {
 
     public boolean isTraversable(int entityX, int entityY) {
         WorldChunk worldChunk = findChunk(entityX, entityY);
-        if (worldChunk == null) return false;
+        if (worldChunk == null) return true;
 
         int localX = entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
@@ -199,6 +194,8 @@ public class GameWorld {
     }
 
     public boolean isSameChunk(WorldChunk chunk1, WorldChunk chunk2) {
+        if (chunk1 == null) println(getClass(), "Chunk 1 null");
+        if (chunk2 == null) println(getClass(), "Chunk 2 null");
         return ((chunk1.getChunkX() << 16) | (chunk1.getChunkY() & 0xFFFF)) == ((chunk2.getChunkX() << 16) | (chunk2.getChunkY() & 0xFFFF));
     }
 

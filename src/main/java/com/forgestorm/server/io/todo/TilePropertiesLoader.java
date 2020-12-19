@@ -28,7 +28,7 @@ public class TilePropertiesLoader extends SynchronousAssetLoader<TilePropertiesL
     static class TilePropertiesParameter extends AssetLoaderParameters<TilePropertiesDataWrapper> {
     }
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     TilePropertiesLoader(FileHandleResolver resolver) {
         super(resolver);
