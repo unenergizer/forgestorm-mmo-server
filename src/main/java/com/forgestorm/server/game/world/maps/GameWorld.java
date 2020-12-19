@@ -196,6 +196,7 @@ public class GameWorld {
     public boolean isSameChunk(WorldChunk chunk1, WorldChunk chunk2) {
         if (chunk1 == null) println(getClass(), "Chunk 1 null");
         if (chunk2 == null) println(getClass(), "Chunk 2 null");
+        if (chunk1 == null || chunk2 == null) return false;
         return ((chunk1.getChunkX() << 16) | (chunk1.getChunkY() & 0xFFFF)) == ((chunk2.getChunkX() << 16) | (chunk2.getChunkY() & 0xFFFF));
     }
 
