@@ -53,7 +53,7 @@ public class GameWorld {
 
         for (File file : chunkFiles) {
             String path = fileManager.loadWorldChunkData(file, true);
-            addChunk(fileManager.getWorldChunkData(path.replace("\\", "/")).getWorldChunk());
+            addChunk(fileManager.getWorldChunkData(path).getWorldChunk());
         }
 
         println(getClass(), "Loaded " + worldChunkMap.size() + "/" + chunkFiles.length + " chunks for game world \"" + worldName + "\".");

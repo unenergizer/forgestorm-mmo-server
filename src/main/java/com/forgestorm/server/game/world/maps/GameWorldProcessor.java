@@ -73,13 +73,8 @@ public class GameWorldProcessor {
 
         for (File file : files) {
             String path = fileManager.loadGameWorldData(file);
-            println(getClass(), "WORLD: " + file.getPath());
-            GameWorld gameWorld = fileManager.getGameWorldData(path.replace("\\", "/")).getGameWorld();
+            GameWorld gameWorld = fileManager.getGameWorldData(path).getGameWorld();
             loadWorld(gameWorld);
-        }
-
-        for (String s : fileManager.getAssetManager().getAssetNames()) {
-            println(getClass(), "ASSET: " + s);
         }
 
         if (files.length == 0) createDefaultGameWorld(fileManager);

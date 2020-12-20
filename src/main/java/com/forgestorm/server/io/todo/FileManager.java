@@ -330,12 +330,13 @@ public class FileManager {
     public GameWorldLoader.GameWorldDataWrapper getGameWorldData(String path) {
         GameWorldLoader.GameWorldDataWrapper data = null;
 
-        println(getClass(), "Path: " + path);
+        // Fixes problems with loading files from an "absolute path"...
+        String pathFixed = path.replace("\\", "/");
 
-        if (assetManager.isLoaded(path)) {
-            data = assetManager.get(path, GameWorldLoader.GameWorldDataWrapper.class);
+        if (assetManager.isLoaded(pathFixed)) {
+            data = assetManager.get(pathFixed, GameWorldLoader.GameWorldDataWrapper.class);
         } else {
-            println(getClass(), "GameWorldData not loaded: " + path, true, PRINT_DEBUG);
+            println(getClass(), "GameWorldData not loaded: " + pathFixed, true, PRINT_DEBUG);
         }
 
         return data;
@@ -352,7 +353,6 @@ public class FileManager {
 
         // load asset
         if (absoluteResolver.resolve(path).exists()) {
-            println(getClass(), "WorldChunkData path: " + path);
             assetManager.setLoader(ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(absoluteResolver));
             assetManager.load(path, ChunkLoader.WorldChunkDataWrapper.class);
             if (forceFinishLoading) assetManager.finishLoading();
@@ -365,11 +365,13 @@ public class FileManager {
     public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String path) {
         ChunkLoader.WorldChunkDataWrapper data = null;
 
-        if (assetManager.isLoaded(path)) {
-            println(getClass(), "Path: " + path);
-            data = assetManager.get(path, ChunkLoader.WorldChunkDataWrapper.class);
+        // Fixes problems with loading files from an "absolute path"...
+        String pathFixed = path.replace("\\", "/");
+
+        if (assetManager.isLoaded(pathFixed)) {
+            data = assetManager.get(pathFixed, ChunkLoader.WorldChunkDataWrapper.class);
         } else {
-            println(getClass(), "WorldChunkData not loaded: " + path, true, PRINT_DEBUG);
+            println(getClass(), "WorldChunkData not loaded: " + pathFixed, true, PRINT_DEBUG);
         }
 
         return data;
