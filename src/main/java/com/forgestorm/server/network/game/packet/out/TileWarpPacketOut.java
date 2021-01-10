@@ -1,21 +1,36 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.network.game.shared.Opcodes;
 
 public class TileWarpPacketOut extends AbstractServerOutPacket {
 
-    private final int x, y;
+    private final boolean clearWarps;
+    private final int chunkLocation;
+    private final String worldName;
+    private final int toX, toY;
+    private final MoveDirection facingDirection;
 
-    public TileWarpPacketOut(final Player player, int x, int y) {
+    public TileWarpPacketOut(final Player player, boolean clearWarps, int chunkLocation, String worldName, int toX, int toY, MoveDirection facingDirection) {
         super(Opcodes.WORLD_CHUNK_WARP, player.getClientHandler());
-        this.x = x;
-        this.y = y;
+        this.clearWarps = clearWarps;
+        this.chunkLocation = chunkLocation;
+        this.worldName = worldName;
+        this.toX = toX;
+        this.toY = toY;
+        this.facingDirection = facingDirection;
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
-        write.writeInt(x);
-        write.writeInt(y);
+        write.writeBoolean(clearWarps);
+
+        write.writeInt(chunkLocation);
+
+        write.writeString(worldName);
+        write.writeInt(toX);
+        write.writeInt(toY);
+        write.writeByte(facingDirection.getDirectionByte());
     }
 }

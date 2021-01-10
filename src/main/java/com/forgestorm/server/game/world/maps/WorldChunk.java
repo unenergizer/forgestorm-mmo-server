@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.forgestorm.server.util.Log.println;
+
 public class WorldChunk {
 
     @Getter
@@ -130,10 +132,22 @@ public class WorldChunk {
         }
 
         // Send chunk warps
-//        for (Warp warp : tileWarps.values()) {
-//            // TODO: send the tile location of the warp... NOT the destination location...
-//            new TileWarpPacketOut(chunkRecipient, warp.getLocation().getX(), warp.getLocation().getY()).sendPacket();
-//        }
+        boolean clearWarps = true;
+        for (Map.Entry<Integer, Warp> entry : tileWarps.entrySet()) {
+            int chunkLocation = entry.getKey();
+            Warp warp = entry.getValue();
+
+            new TileWarpPacketOut(chunkRecipient,
+                    clearWarps,
+                    chunkLocation,
+                    warp.getLocation().getWorldName(),
+                    warp.getLocation().getX(),
+                    warp.getLocation().getY(),
+                    warp.getFacingDirection()).sendPacket();
+
+            // Reset only once per chunk send
+            clearWarps = false;
+        }
     }
 
     @Override
