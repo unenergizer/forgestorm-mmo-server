@@ -131,10 +131,18 @@ public class MovingEntity extends Entity {
         getGameWorld().getPlayerController().forAllPlayers(player ->
                 new EntityDamagePacketOut(player, this, currentHealth, finalDamage).sendPacket());
         if (this instanceof Player) {
-            new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
+            if (damage <= 0) {
+                new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " tried to hit you but missed.").sendPacket();
+            } else {
+                new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
+            }
         }
         if (attackerEntity instanceof Player) {
-            new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You hit " + getName() + " for " + damage + ".").sendPacket();
+            if (damage <= 0) {
+                new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You tried to hit " + getName() + " but missed.").sendPacket();
+            } else {
+                new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You hit " + getName() + " for " + damage + ".").sendPacket();
+            }
         }
     }
 
