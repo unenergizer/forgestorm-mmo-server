@@ -94,12 +94,12 @@ public class MovingEntity extends Entity {
     }
 
     public void gameWorldRegister(Warp warp) {
-        setCurrentWorldLocation(new Location(warp.getLocation()));
-        setFutureWorldLocation(new Location(warp.getLocation()));
-        setRealX(warp.getLocation().getX() * GameConstants.TILE_SIZE);
-        setRealY(warp.getLocation().getY() * GameConstants.TILE_SIZE);
+        setCurrentWorldLocation(new Location(warp.getWarpDestination()));
+        setFutureWorldLocation(new Location(warp.getWarpDestination()));
+        setRealX(warp.getWarpDestination().getX() * GameConstants.TILE_SIZE);
+        setRealY(warp.getWarpDestination().getY() * GameConstants.TILE_SIZE);
         walkTime = 0f;
-        setFacingDirection(warp.getFacingDirection());
+        setFacingDirection(warp.getDirectionToFace());
     }
 
     void gameWorldDeregister() {

@@ -28,19 +28,19 @@ public class MovementUpdateTask implements AbstractTask {
 
     @AllArgsConstructor
     private static class MovementTargetInfo {
-        private AiEntity tracker;
+        private final AiEntity tracker;
         private Location location;
     }
 
     @AllArgsConstructor
     private static class RandomDirectionResult {
-        private MoveDirection moveDirection;
-        private Location attemptLocation;
+        private final MoveDirection moveDirection;
+        private final Location attemptLocation;
     }
 
     private final PathFinding pathFinding = new PathFinding();
 
-    private Map<MovingEntity, List<MovementTargetInfo>> targetsLocations = new HashMap<>();
+    private final Map<MovingEntity, List<MovementTargetInfo>> targetsLocations = new HashMap<>();
 
     @Override
     public void tick(long ticksPassed) {
@@ -597,7 +597,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         // Send chunk
         if (!player.getGameWorld().isSameChunk(currentChunk, futureChunk)) {
-            println(getClass(), "Moving into new chunk!", true);
+            println(getClass(), "Moving into new chunk! Chunk XY: " + futureChunk.getChunkX() + " / " + futureChunk.getChunkY(), true);
 
             // The player is moving into a new chunk. Load chunks the player hasn't seen yet.
             // TODO: Load chunks around the player. The one they are walking into should already be loaded...

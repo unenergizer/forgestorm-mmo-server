@@ -17,20 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.forgestorm.server.util.Log.println;
-
 public class WorldChunk {
 
     @Getter
     private final short chunkX, chunkY;
 
     @Getter
-    private Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
+    private final Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
 
-    private final Map<Integer, Warp> tileWarps = new HashMap<Integer, Warp>();
+    private final Map<WarpLocation, Warp> tileWarps = new HashMap<>();
 
     @Getter
-    private List<Entity> entities = new ArrayList<>();
+    private final List<Entity> entities = new ArrayList<>();
 
     public WorldChunk(short chunkX, short chunkY) {
         this.chunkX = chunkX;
@@ -58,10 +56,6 @@ public class WorldChunk {
         layers.put(layerDefinition, new TileImage[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE]);
     }
 
-    TileImage getTileImage(LayerDefinition layerDefinition, int localX, int localY) {
-        return layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
-    }
-
     public boolean isTraversable(int localX, int localY) {
         for (TileImage[] tileImages : layers.values()) {
             TileImage tileImage = tileImages[localX + localY * GameConstants.CHUNK_SIZE];
@@ -72,12 +66,13 @@ public class WorldChunk {
     }
 
     public void addTileWarp(short localX, short localY, Warp warp) {
-        tileWarps.put((localX << 16) | (localY & 0xFFFF), warp);
+        tileWarps.put(new WarpLocation(localX, localY), warp);
     }
 
     Warp getWarp(short localX, short localY) {
-        if (tileWarps.containsKey((localX << 16) | (localY & 0xFFFF))) {
-            return tileWarps.get((localX << 16) | (localY & 0xFFFF));
+        for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
+            WarpLocation warpLocation = entry.getKey();
+            if (warpLocation.getFromX() == localX && warpLocation.getFromY() == localY) return entry.getValue();
         }
         return null;
     }
@@ -133,17 +128,17 @@ public class WorldChunk {
 
         // Send chunk warps
         boolean clearWarps = true;
-        for (Map.Entry<Integer, Warp> entry : tileWarps.entrySet()) {
-            int chunkLocation = entry.getKey();
+        for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
+            WarpLocation warpLocation = entry.getKey();
             Warp warp = entry.getValue();
 
             new TileWarpPacketOut(chunkRecipient,
                     clearWarps,
-                    chunkLocation,
-                    warp.getLocation().getWorldName(),
-                    warp.getLocation().getX(),
-                    warp.getLocation().getY(),
-                    warp.getFacingDirection()).sendPacket();
+                    warpLocation,
+                    warp.getWarpDestination().getWorldName(),
+                    warp.getWarpDestination().getX(),
+                    warp.getWarpDestination().getY(),
+                    warp.getDirectionToFace()).sendPacket();
 
             // Reset only once per chunk send
             clearWarps = false;

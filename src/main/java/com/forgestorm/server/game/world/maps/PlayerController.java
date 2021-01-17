@@ -73,7 +73,7 @@ public class PlayerController {
             }
             player.gameWorldRegister(queueData.getWarp());
             playerList.add(player);
-            new InitializeWorldPacketOut(player, queueData.getWarp().getLocation().getWorldName()).sendPacket();
+            new InitializeWorldPacketOut(player, queueData.getWarp().getWarpDestination().getWorldName()).sendPacket();
             println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
             joinsProcessed++;
         }
@@ -158,7 +158,7 @@ public class PlayerController {
 
     @Getter
     @AllArgsConstructor
-    private class QueueData {
+    private static class QueueData {
         private final Player player;
         private final Warp warp;
     }

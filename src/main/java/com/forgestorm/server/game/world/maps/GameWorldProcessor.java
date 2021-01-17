@@ -62,7 +62,7 @@ public class GameWorldProcessor {
         Warp warp = player.getWarp();
 
         gameWorlds.get(currentWorldName).getPlayerController().removePlayer(player);
-        gameWorlds.get(warp.getLocation().getWorldName()).getPlayerController().addPlayer(player, warp);
+        gameWorlds.get(warp.getWarpDestination().getWorldName()).getPlayerController().addPlayer(player, warp);
         player.setWarp(null);
     }
 
