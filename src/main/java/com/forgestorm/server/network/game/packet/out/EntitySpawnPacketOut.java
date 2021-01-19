@@ -1,5 +1,6 @@
 package com.forgestorm.server.network.game.packet.out;
 
+import com.forgestorm.server.game.rpg.EntityAlignment;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.network.game.shared.Opcodes;
@@ -31,6 +32,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         }
     }
 
+    @SuppressWarnings("DanglingJavadoc")
     private void spawnMovingEntity(GameOutputStream write) {
         Player packetReceiver = clientHandler.getPlayer();
 
@@ -86,9 +88,20 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                     write.writeInt(npc.getDefaultSpawnLocation().getY());
                 }
 
-                write.writeByte(FirstInteraction.getByte(npc.getFirstInteraction()));
-                write.writeShort((npc).getShopId());
-                write.writeBoolean((npc).isBankKeeper());
+                /******************************************************************
+                 * IF THE NPC IS HOSTILE TOWARDS THE PLAYER, MAKE SURE TO SEND THEM
+                 * THE ATTACK INTERACTION. NO REASON TO OPEN PLAYER BANK OR ENTITY
+                 * STORE IF ENTITY HATES THE PLAYER.
+                 */
+                if (npc.getAlignmentByPlayer(packetReceiver) == EntityAlignment.HOSTILE) {
+                    write.writeByte(FirstInteraction.getByte(FirstInteraction.ATTACK));
+                    write.writeShort((short) -1);
+                    write.writeBoolean(false);
+                } else {
+                    write.writeByte(FirstInteraction.getByte(npc.getFirstInteraction()));
+                    write.writeShort((npc).getShopId());
+                    write.writeBoolean((npc).isBankKeeper());
+                }
 
                 write.writeByte(npc.getAlignmentByPlayer(packetReceiver).getEntityAlignmentByte());
                 write.writeByte(npc.getFaction());
