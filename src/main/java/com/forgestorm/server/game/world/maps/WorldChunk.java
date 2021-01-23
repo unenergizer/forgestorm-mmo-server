@@ -25,7 +25,8 @@ public class WorldChunk {
     @Getter
     private final Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
 
-    private final Map<WarpLocation, Warp> tileWarps = new HashMap<>();
+    @Getter
+    private final List<Warp> tileWarps = new ArrayList<>();
 
     @Getter
     private final List<Entity> entities = new ArrayList<>();
@@ -65,14 +66,13 @@ public class WorldChunk {
         return true;
     }
 
-    public void addTileWarp(short localX, short localY, Warp warp) {
-        tileWarps.put(new WarpLocation(localX, localY), warp);
+    public void addTileWarp(Warp warp) {
+        tileWarps.add(warp);
     }
 
     Warp getWarp(short localX, short localY) {
-        for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
-            WarpLocation warpLocation = entry.getKey();
-            if (warpLocation.getFromX() == localX && warpLocation.getFromY() == localY) return entry.getValue();
+        for (Warp warp : tileWarps) {
+            if (warp.getFromX() == localX && warp.getFromY() == localY) return warp;
         }
         return null;
     }
@@ -128,13 +128,11 @@ public class WorldChunk {
 
         // Send chunk warps
         boolean clearWarps = true;
-        for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
-            WarpLocation warpLocation = entry.getKey();
-            Warp warp = entry.getValue();
-
+        for (Warp warp : tileWarps) {
             new TileWarpPacketOut(chunkRecipient,
                     clearWarps,
-                    warpLocation,
+                    warp.getFromX(),
+                    warp.getFromY(),
                     warp.getWarpDestination().getWorldName(),
                     warp.getWarpDestination().getX(),
                     warp.getWarpDestination().getY(),

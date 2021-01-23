@@ -4,7 +4,9 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.inventory.BankActions;
+import com.forgestorm.server.game.world.maps.Warp;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
+import com.forgestorm.server.network.game.packet.out.MovingEntityTeleportPacketOut;
 import com.forgestorm.server.util.Log;
 
 public class WarpTask implements AbstractTask {
@@ -33,6 +35,19 @@ public class WarpTask implements AbstractTask {
         }
 
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Player warping.");
-        ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameWorld(player);
+
+        Warp warp = player.getWarp();
+        if (warp.getWarpDestination().getGameWorld().getWorldName().equals(player.getCurrentWorldLocation().getWorldName())) {
+            // Same world, just location switch
+            player.getLatestMoveRequests().clear();
+            player.gameWorldRegister(warp);
+            player.setWarp(null);
+
+            // Send all players in world the teleport packet
+            player.getGameWorld().getPlayerController().forAllPlayers(otherPlayer -> new MovingEntityTeleportPacketOut(otherPlayer, player, warp.getWarpDestination(), warp.getDirectionToFace()).sendPacket());
+        } else {
+            // World switch
+            ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameWorld(player);
+        }
     }
 }

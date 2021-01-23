@@ -80,9 +80,10 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
             for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
                 Warp warp = new Warp(
                         new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
-                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
+                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString()),
+                        jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort()
                 );
-                chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+                chunk.addTileWarp(warp);
             }
         }
 

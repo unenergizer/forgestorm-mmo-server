@@ -38,7 +38,7 @@ public class GameWorld {
     private final StationaryEntityController stationaryEntityController = new StationaryEntityController(this);
     private final ItemStackDropEntityController itemStackDropEntityController = new ItemStackDropEntityController(this);
 
-    private Map<Integer, WorldChunk> worldChunkMap = new HashMap<>();
+    private final Map<Integer, WorldChunk> worldChunkMap = new HashMap<>();
 
     public GameWorld(String chunkPath, String worldName, Color backgroundColor) {
         this.chunkPath = chunkPath.replace(".json", "/");
@@ -79,14 +79,14 @@ public class GameWorld {
         for (WorldChunk worldChunk : worldChunkMap.values()) {
             String chunkPath = this.chunkPath + worldChunk.getChunkX() + "." + worldChunk.getChunkY() + ".json";
             File chunkFile = new File(chunkPath);
-
             Json json = new Json();
             StringWriter jsonText = new StringWriter();
             JsonWriter writer = new JsonWriter(jsonText);
             json.setOutputType(JsonWriter.OutputType.json);
             json.setWriter(writer);
-            json.writeObjectStart();
 
+            // Save Layer
+            json.writeObjectStart("layers");
             for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
                 LayerDefinition layerDefinition = entrySet.getKey();
                 TileImage[] tileImages = entrySet.getValue();
@@ -101,6 +101,14 @@ public class GameWorld {
                 json.writeValue(layerDefinition.getLayerName(), ids.toString());
             }
             json.writeObjectEnd();
+
+            // Save Tile Warp
+            List<Warp> tileWarps = worldChunk.getTileWarps();
+            if (!tileWarps.isEmpty()) {
+                json.writeObjectStart("warps");
+                json.writeValue(tileWarps);
+                json.writeObjectEnd();
+            }
 
             FileHandle fileHandle = new FileHandle(chunkFile);
             fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
