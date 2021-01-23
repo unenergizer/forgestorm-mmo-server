@@ -34,10 +34,6 @@ public class GameWorldProcessor {
         aiEntitySpawnQueue.add(aiEntity);
     }
 
-    public void queueStationaryEntitySpawn(StationaryEntity stationaryEntity) {
-        stationaryEntitySpawnQueue.add(stationaryEntity);
-    }
-
     public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
         ItemStackDropSpawnQueue.add(itemStackDrop);
     }
@@ -58,6 +54,7 @@ public class GameWorldProcessor {
     }
 
     public void playerSwitchGameWorld(Player player) {
+        println(getClass(), "WARPING AND SWITCHING WORLD");
         String currentWorldName = player.getWorldName();
         Warp warp = player.getWarp();
 

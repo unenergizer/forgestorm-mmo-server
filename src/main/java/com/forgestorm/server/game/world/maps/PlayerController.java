@@ -80,6 +80,8 @@ public class PlayerController {
 
         // Sending packets to others
         for (joinsProcessed = 0; joinsProcessed <= GameConstants.PLAYERS_TO_PROCESS; joinsProcessed++) {
+
+
             if (playerJoinQueue.isEmpty()) break;
 
             // Tell everyone already online about the player and the player about everyone online.
