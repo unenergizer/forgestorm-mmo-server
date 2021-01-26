@@ -44,4 +44,12 @@ public class PlayerConstants {
      * Player Starting Damage
      */
     public static final int BASE_DAMAGE = 10;
+
+    /**
+     * PLAYER STARTING GEAR
+     */
+    public static final int STARTER_GEAR_SWORD_ID = 4;
+    public static final int STARTER_GEAR_CHEST_ID = 2;
+    public static final int STARTER_GEAR_PANTS_ID = 23;
+    public static final int STARTER_GEAR_SHOES_ID = 7;
 }

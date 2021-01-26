@@ -112,10 +112,10 @@ public class CharacterManager {
         ItemStackManager itemStackManager = ServerMain.getInstance().getItemStackManager();
 
         // Default Armor and Weapons
-        ItemStack sword = itemStackManager.makeItemStack(4, 1);
-        ItemStack chest = itemStackManager.makeItemStack(2, 1);
-        ItemStack pants = itemStackManager.makeItemStack(23, 1);
-        ItemStack shoes = itemStackManager.makeItemStack(7, 1);
+        ItemStack sword = itemStackManager.makeItemStack(PlayerConstants.STARTER_GEAR_SWORD_ID, 1);
+        ItemStack chest = itemStackManager.makeItemStack(PlayerConstants.STARTER_GEAR_CHEST_ID, 1);
+        ItemStack pants = itemStackManager.makeItemStack(PlayerConstants.STARTER_GEAR_PANTS_ID, 1);
+        ItemStack shoes = itemStackManager.makeItemStack(PlayerConstants.STARTER_GEAR_SHOES_ID, 1);
         player.getPlayerEquipment().setItemStack((byte) 10, sword, false);
         player.getPlayerEquipment().setItemStack((byte) 1, chest, false);
         player.getPlayerEquipment().setItemStack((byte) 2, pants, false);
