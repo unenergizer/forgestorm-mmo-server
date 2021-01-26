@@ -68,7 +68,8 @@ public class PlayerProcessor {
         player.setLoggedInGameWorld(true);
 
         new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
-        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.SERVER + "Welcome to RetroMMO!").sendPacket();
+        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE).sendPacket();
+        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE_2).sendPacket();
 
         // Add player to World
         if (player.getGameWorld() == null) {
