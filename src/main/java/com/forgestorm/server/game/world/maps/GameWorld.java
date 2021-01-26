@@ -86,7 +86,8 @@ public class GameWorld {
             json.setWriter(writer);
 
             // Save Layer
-            json.writeObjectStart("layers");
+//            json.writeObjectStart("layers");
+            json.writeObjectStart();
             for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
                 LayerDefinition layerDefinition = entrySet.getKey();
                 TileImage[] tileImages = entrySet.getValue();
@@ -103,12 +104,12 @@ public class GameWorld {
             json.writeObjectEnd();
 
             // Save Tile Warp
-            List<Warp> tileWarps = worldChunk.getTileWarps();
-            if (!tileWarps.isEmpty()) {
-                json.writeObjectStart("warps");
-                json.writeValue(tileWarps);
-                json.writeObjectEnd();
-            }
+//            List<Warp> tileWarps = worldChunk.getTileWarps();
+//            if (!tileWarps.isEmpty()) {
+//                json.writeObjectStart("warps");
+//                json.writeValue(tileWarps);
+//                json.writeObjectEnd();
+//            }
 
             FileHandle fileHandle = new FileHandle(chunkFile);
             fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
