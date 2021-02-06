@@ -11,9 +11,11 @@ import static com.forgestorm.server.util.Log.println;
 
 public class DropTableManager implements ManagerStart {
 
-    private DropTableLoader.DropTable[] dropTables;
+    private static final boolean PRINT_DEBUG = false;
 
-    private Random random = new Random();
+    private final Random random = new Random();
+
+    private DropTableLoader.DropTable[] dropTables;
 
     @Override
     public void start() {
@@ -34,7 +36,7 @@ public class DropTableManager implements ManagerStart {
         int[] itemStackIDs = dropTable.getItemStackIDs();
         float[] probabilities = dropTable.getProbabilities();
 
-        println(getClass(), "Number of items: " + itemStackIDs.length);
+        println(getClass(), "Number of items: " + itemStackIDs.length, false, PRINT_DEBUG);
 
         ItemStack[] itemStacks = new ItemStack[itemStackIDs.length];
 

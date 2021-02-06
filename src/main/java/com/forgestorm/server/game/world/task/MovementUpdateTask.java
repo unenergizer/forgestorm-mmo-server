@@ -398,7 +398,7 @@ public class MovementUpdateTask implements AbstractTask {
             }
         }
 
-        println(getClass(), "Setting target null??");
+        println(getClass(), "Setting target null??", false);
         aiEntity.setTargetEntity(null);
     }
 
@@ -597,7 +597,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         // Send chunk
         if (!player.getGameWorld().isSameChunk(currentChunk, futureChunk)) {
-            println(getClass(), "Moving into new chunk! Chunk XY: " + futureChunk.getChunkX() + " / " + futureChunk.getChunkY(), false);
+            println(getClass(), "Moving into new chunk! Chunk XY: " + futureChunk.getChunkX() + " / " + futureChunk.getChunkY(), false, PRINT_DEBUG);
 
             // The player is moving into a new chunk. Load chunks the player hasn't seen yet.
             // TODO: Load chunks around the player. The one they are walking into should already be loaded...
@@ -613,7 +613,7 @@ public class MovementUpdateTask implements AbstractTask {
 //        Preconditions.checkArgument(moveDirection != MoveDirection.NONE, "The requested move direction was NONE!");
         if (moveDirection == MoveDirection.NONE) return;
         if (aiEntity.isEntityMoving()) {
-            println(getClass(), "The Entity is already moving!");
+            println(getClass(), "The Entity is already moving!", true, PRINT_DEBUG);
         }
 
         Location futureLocation = new Location(aiEntity.getCurrentWorldLocation()).add(aiEntity.getGameWorld().getLocation(moveDirection));

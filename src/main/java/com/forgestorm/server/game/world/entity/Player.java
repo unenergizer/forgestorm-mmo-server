@@ -29,6 +29,8 @@ import static com.forgestorm.server.util.Log.println;
 @Setter
 public class Player extends MovingEntity {
 
+    private static final boolean PRINT_DEBUG = false;
+
     private final ClientHandler clientHandler;
 
     private boolean loggedInGameWorld = false;
@@ -97,12 +99,12 @@ public class Player extends MovingEntity {
 
         // Check to see if the player needs to change worlds!
         if (!getGameWorld().isGraveYardWorld()) {
-            println(getClass(), "Warping player to graveyard world!");
+            println(getClass(), "Warping " + getName() + " to graveyard world!", false, PRINT_DEBUG);
 
             // Warp player to graveyard
             setWarp(new Warp(teleportLocation, facingDirection));
         } else {
-            println(getClass(), "Teleporting player to graveyard!");
+            println(getClass(), "Teleporting " + getName() + " to graveyard!", false, PRINT_DEBUG);
 
             // Teleport packetReceiver
             getLatestMoveRequests().clear();
@@ -118,7 +120,7 @@ public class Player extends MovingEntity {
         // Reheal Player
         setCurrentHealth(getMaxHealth());
 
-        new ChatMessagePacketOut(this, ChatChannelType.COMBAT, "You died! Respawning you in graveyard!").sendPacket();
+        new ChatMessagePacketOut(this, ChatChannelType.COMBAT, "[RED]You died! Respawning you in graveyard!").sendPacket();
     }
 
     public List<InventorySlot> getAllGoldSlots() {
@@ -129,16 +131,10 @@ public class Player extends MovingEntity {
     }
 
     public void give(ItemStack itemStack, boolean sendPacket) {
-        InventorySlot slot = null;
+        InventorySlot slot = playerBag.findEmptySlot();
 
-        slot = playerBag.findEmptySlot();
-        if (slot == null) {
-            slot = playerHotBar.findEmptySlot();
-        }
-
-        if (slot == null) {
-            throw new RuntimeException("The inventory size should be checked before giving items.");
-        }
+        if (slot == null) slot = playerHotBar.findEmptySlot();
+        if (slot == null) throw new RuntimeException("The inventory size should be checked before giving items.");
 
         slot.setItemStack(itemStack);
         if (sendPacket) {

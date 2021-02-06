@@ -1,6 +1,7 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.rpg.StationaryTypes;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackType;
@@ -15,6 +16,8 @@ import static com.forgestorm.server.util.Log.println;
 
 @Opcode(getOpcode = Opcodes.CLICK_ACTION)
 public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.ClickActionPacket> {
+
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -70,10 +73,8 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
         // TODO: check if the place they're trying to gather from is empty
 
-        switch (clickedOnEntity.getStationaryType()) {
-            case ORE:
-                ServerMain.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
-                break;
+        if (clickedOnEntity.getStationaryType() == StationaryTypes.ORE) {
+            ServerMain.getInstance().getGameLoop().getProcessMining().addPlayerToMine(packetData.getClientHandler().getPlayer(), clickedOnEntity);
         }
     }
 
@@ -81,7 +82,7 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
         if (gameWorld.getItemStackDropEntityController().doesNotContainKey(packetData.getEntityUUID())) return;
 
         // Click received, lets pick up the item!
-        println(getClass(), "Incoming ItemStack click!");
+        println(getClass(), "Incoming ItemStack click!", false, PRINT_DEBUG);
         ItemStackDrop itemStackDrop = (ItemStackDrop) gameWorld.getItemStackDropEntityController().getEntity(packetData.getEntityUUID());
         ItemStack itemStack = itemStackDrop.getItemStack();
         PlayerBag playerBag = player.getPlayerBag();
@@ -123,21 +124,9 @@ public class ClickActionPacketIn implements PacketListener<ClickActionPacketIn.C
 
     }
 
-//    private void changeEntityAppearance(Entity entity, GameMap gameMap) {
-//        short appearanceID = entity.getAppearance().getTextureId(0);
-//
-//        if (appearanceID >= 3) appearanceID = 0;
-//        else appearanceID++;
-//
-//        entity.setAppearance(new Appearance(entity, (byte) 0, new short[]{appearanceID}));
-//
-//        gameMap.getPlayerController().forAllPlayers(player -> new EntityAppearancePacketOut(player, entity, EntityAppearancePacketOut.BODY_INDEX).sendPacket());
-//
-//    }
-
     @Getter
     @AllArgsConstructor
-    class ClickActionPacket extends PacketData {
+    static class ClickActionPacket extends PacketData {
         private final byte clickAction;
         private final EntityType entityType;
         private final short entityUUID;
