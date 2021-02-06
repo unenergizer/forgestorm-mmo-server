@@ -2,6 +2,8 @@ package com.forgestorm.server.network.login;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class LoginState {
 
@@ -9,6 +11,7 @@ public class LoginState {
     private Boolean loginSuccess;
     private LoginFailReason loginFailReason;
     private String username;
+    private List<Integer> secondaryGroupIds;
     private boolean isAdmin;
     private boolean isModerator;
 
@@ -18,10 +21,11 @@ public class LoginState {
         return this;
     }
 
-    public LoginState successState(int userId, String username, boolean isAdmin, boolean isModerator) {
+    public LoginState successState(int userId, String username, List<Integer> secondaryGroupIds, boolean isAdmin, boolean isModerator) {
         this.userId = userId;
         loginSuccess = true;
         this.username = username;
+        this.secondaryGroupIds = secondaryGroupIds;
         this.isAdmin = isAdmin;
         this.isModerator = isModerator;
         return this;

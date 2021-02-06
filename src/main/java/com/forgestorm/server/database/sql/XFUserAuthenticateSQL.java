@@ -8,12 +8,16 @@ import com.forgestorm.server.network.login.LoginState;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.forgestorm.server.util.Log.println;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class XFUserAuthenticateSQL {
 
-    private static final String GET_USER_ID = "SELECT user_id, username, is_moderator, is_admin, is_banned FROM xf_user WHERE username=?";
+    private static final String GET_USER_ID = "SELECT user_id, username, secondary_group_ids, is_moderator, is_admin, is_banned FROM xf_user WHERE username=?";
     private static final String GET_USER_HASH = "SELECT data FROM xf_user_authenticate WHERE user_id=?";
 
     private XFUserAuthenticateSQL() {
@@ -26,6 +30,7 @@ public class XFUserAuthenticateSQL {
         PreparedStatement getHashStatement = null;
         int databaseUserId;
         String databaseUsername;
+        String secondaryGroupIds;
         boolean isModerator;
         boolean isAdmin;
         boolean isBanned;
@@ -45,6 +50,7 @@ public class XFUserAuthenticateSQL {
 
                 databaseUserId = userIdResult.getInt("user_id");
                 databaseUsername = userIdResult.getString("username");
+                secondaryGroupIds = userIdResult.getString("secondary_group_ids");
                 isModerator = userIdResult.getBoolean("is_moderator");
                 isAdmin = userIdResult.getBoolean("is_admin");
                 isBanned = userIdResult.getBoolean("is_banned");
@@ -99,6 +105,31 @@ public class XFUserAuthenticateSQL {
                 e.printStackTrace();
             }
         }
-        return new LoginState().successState(databaseUserId, databaseUsername, isAdmin, isModerator);
+
+        // Convert the String of secondary group id's into an Interger list
+        String[] array = secondaryGroupIds.split(",", -1);
+        List<Integer> integerList = new ArrayList<>();
+
+        for (String s : array) {
+            integerList.add(Integer.parseInt(s));
+        }
+
+        return new LoginState().successState(
+                databaseUserId,
+                databaseUsername,
+                integerList,
+                isAdmin,
+                isModerator);
+    }
+
+    public static List<Integer> getIntegerList(Array array) {
+        if (array == null) return null;
+        try {
+            checkArgument(array.getBaseType() == Types.INTEGER);
+            return Arrays.asList((Integer[]) array.getArray());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
