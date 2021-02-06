@@ -67,12 +67,15 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             // TODO : Use StringBuilder
 
             ClientHandler messageSender = packetData.getClientHandler();
+            AuthenticatedUser authenticatedSender = messageSender.getAuthenticatedUser();
             StringBuilder stringBuilder = new StringBuilder();
 
-            if (messageSender.getAuthenticatedUser().isAdmin()) {
+            if (authenticatedSender.isAdmin()) {
                 stringBuilder.append(MessageText.ADMIN_COLOR);
-            } else if (messageSender.getAuthenticatedUser().isModerator()) {
+            } else if (authenticatedSender.isModerator()) {
                 stringBuilder.append(MessageText.MOD_COLOR);
+            } else if (authenticatedSender.isContentDeveloper()) {
+                stringBuilder.append(MessageText.CONTENT_DEVELOPER);
             } else {
                 stringBuilder.append(MessageText.PLAYER_COLOR);
             }
@@ -85,8 +88,8 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
             ServerMain.getInstance().getGameManager().forAllPlayers(onlinePlayer -> {
                 // If the message is a staff message, make sure we send it to the correct clients!
                 if (packetData.chatChannelType == ChatChannelType.STAFF) {
-                    AuthenticatedUser authenticatedUser = onlinePlayer.getClientHandler().getAuthenticatedUser();
-                    if (authenticatedUser.isAdmin() || authenticatedUser.isModerator()) {
+                    AuthenticatedUser authenticatedReceiver = onlinePlayer.getClientHandler().getAuthenticatedUser();
+                    if (authenticatedReceiver.isAdmin() || authenticatedReceiver.isModerator()) {
                         new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
                     }
                 } else {
