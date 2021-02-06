@@ -105,11 +105,15 @@ public class XFUserAuthenticateSQL {
         }
 
         // Convert the String of secondary group id's into an Byte list
-        String[] array = secondaryGroupIds.split(",", -1);
         List<Byte> byteList = new ArrayList<>();
 
-        for (String s : array) {
-            byteList.add(Byte.parseByte(s));
+        // Check to make sure the String is NOT empty, otherwise a NumberFormatException occurs
+        if (!secondaryGroupIds.isEmpty()) {
+            String[] array = secondaryGroupIds.split(",", -1);
+
+            for (String s : array) {
+                byteList.add(Byte.parseByte(s));
+            }
         }
 
         return new LoginState().successState(
