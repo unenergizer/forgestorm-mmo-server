@@ -27,13 +27,13 @@ public class TileWarpPacketIn implements PacketListener<TileWarpPacketIn.TileWar
     @Override
     public boolean sanitizePacket(TileWarpPacket packetData) {
         AuthenticatedUser authenticatedUser = packetData.getClientHandler().getAuthenticatedUser();
-        boolean isAdmin = authenticatedUser.isAdmin();
+        boolean isAllowed = authenticatedUser.isAdmin() || authenticatedUser.isContentDeveloper();
 
-        if (!isAdmin) {
+        if (!isAllowed) {
             println(getClass(), "Non admin player attempted to create a WARP! XF Account name: " + authenticatedUser.getXfAccountName(), true);
         }
 
-        return isAdmin;
+        return isAllowed;
     }
 
     @Override

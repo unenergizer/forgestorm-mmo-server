@@ -1,5 +1,6 @@
 package com.forgestorm.server.network.game.packet.out;
 
+import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.network.game.shared.Opcodes;
@@ -12,11 +13,13 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
     private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
     private final Player packetReceiver;
+    private final AuthenticatedUser authenticatedUser;
 
     public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player.getClientHandler());
-        packetReceiver = player;
         this.entityToSpawn = entityToSpawn;
+        packetReceiver = player;
+        authenticatedUser = packetReceiver.getClientHandler().getAuthenticatedUser();
     }
 
     @Override
@@ -33,7 +36,6 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
 
     @SuppressWarnings("DanglingJavadoc")
     private void spawnMovingEntity(GameOutputStream write) {
-        Player packetReceiver = clientHandler.getPlayer();
 
         write.writeShort(entityToSpawn.getServerEntityId());
 
@@ -51,7 +53,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         switch (entityToSpawn.getEntityType()) {
             case MONSTER:
                 Monster monster = (Monster) entityToSpawn;
-                if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+                if (authenticatedUser.isAdmin() || authenticatedUser.isContentDeveloper()) {
                     write.writeInt(movingEntity.getAttributes().getDamage());
                     write.writeInt(monster.getExpDrop());
                     write.writeInt(monster.getDropTable());
@@ -76,7 +78,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
                 break;
             case NPC:
                 NPC npc = (NPC) entityToSpawn;
-                if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+                if (authenticatedUser.isAdmin() || authenticatedUser.isContentDeveloper()) {
                     write.writeInt(npc.getAttributes().getDamage());
                     write.writeInt(npc.getExpDrop());
                     write.writeInt(npc.getDropTable());
@@ -183,7 +185,7 @@ public class EntitySpawnPacketOut extends AbstractServerOutPacket {
         write.writeInt(itemStackDrop.getCurrentWorldLocation().getX());
         write.writeInt(itemStackDrop.getCurrentWorldLocation().getY());
 
-        if (packetReceiver.getClientHandler().getAuthenticatedUser().isAdmin()) {
+        if (authenticatedUser.isAdmin() || authenticatedUser.isContentDeveloper()) {
             write.writeBoolean(itemStackDrop.isSpawnedFromMonster());
             write.writeInt(itemStackDrop.getItemStack().getItemId());
             write.writeInt(itemStackDrop.getItemStack().getAmount());

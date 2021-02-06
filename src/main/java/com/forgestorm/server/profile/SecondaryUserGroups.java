@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum SecondaryUserGroups {
-    CONTENT_DEVELOPER(5);
+    CONTENT_DEVELOPER((byte) 5);
 
-    private final int userGroupId;
+    private final byte userGroupId;
 }

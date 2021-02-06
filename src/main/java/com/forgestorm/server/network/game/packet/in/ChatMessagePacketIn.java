@@ -89,7 +89,7 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
                 // If the message is a staff message, make sure we send it to the correct clients!
                 if (packetData.chatChannelType == ChatChannelType.STAFF) {
                     AuthenticatedUser authenticatedReceiver = onlinePlayer.getClientHandler().getAuthenticatedUser();
-                    if (authenticatedReceiver.isAdmin() || authenticatedReceiver.isModerator()) {
+                    if (authenticatedReceiver.isAdmin() || authenticatedReceiver.isModerator() || authenticatedReceiver.isContentDeveloper()) {
                         new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
                     }
                 } else {

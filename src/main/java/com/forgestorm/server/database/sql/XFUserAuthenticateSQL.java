@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.forgestorm.server.util.Log.println;
-import static com.google.common.base.Preconditions.checkArgument;
 
 public class XFUserAuthenticateSQL {
 
@@ -106,30 +104,19 @@ public class XFUserAuthenticateSQL {
             }
         }
 
-        // Convert the String of secondary group id's into an Interger list
+        // Convert the String of secondary group id's into an Byte list
         String[] array = secondaryGroupIds.split(",", -1);
-        List<Integer> integerList = new ArrayList<>();
+        List<Byte> byteList = new ArrayList<>();
 
         for (String s : array) {
-            integerList.add(Integer.parseInt(s));
+            byteList.add(Byte.parseByte(s));
         }
 
         return new LoginState().successState(
                 databaseUserId,
                 databaseUsername,
-                integerList,
+                byteList,
                 isAdmin,
                 isModerator);
-    }
-
-    public static List<Integer> getIntegerList(Array array) {
-        if (array == null) return null;
-        try {
-            checkArgument(array.getBaseType() == Types.INTEGER);
-            return Arrays.asList((Integer[]) array.getArray());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

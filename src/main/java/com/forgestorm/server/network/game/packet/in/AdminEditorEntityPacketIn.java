@@ -205,13 +205,13 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
     @Override
     public boolean sanitizePacket(EntityEditorPacketIn packetData) {
         AuthenticatedUser authenticatedUser = packetData.getClientHandler().getAuthenticatedUser();
-        boolean isAdmin = authenticatedUser.isAdmin();
+        boolean isAllowed = authenticatedUser.isAdmin() || authenticatedUser.isContentDeveloper();
 
-        if (!isAdmin) {
+        if (!isAllowed) {
             println(getClass(), "Non admin player attempted to create a NPC! XF Account name: " + authenticatedUser.getXfAccountName(), true);
         }
 
-        return isAdmin;
+        return isAllowed;
     }
 
     @Override
