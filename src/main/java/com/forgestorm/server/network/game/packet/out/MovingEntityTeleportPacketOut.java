@@ -11,6 +11,8 @@ import static com.forgestorm.server.util.Log.println;
 
 public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
 
+    private static final boolean PRINT_DEBUG = false;
+
     private final short serverEntityId;
     private final EntityType entityType;
     private final String mapName;
@@ -38,6 +40,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
         write.writeInt(y);
         write.writeByte(facingDirection.getDirectionByte());
 
-        println(getClass(), "MapName: " + mapName + "X: " + x + ", Y: " + y + ", Facing: " + facingDirection);
+        println(getClass(), "MapName: " + mapName + "X: " + x + ", Y: " + y + ", Facing: " + facingDirection, false, PRINT_DEBUG
+        );
     }
 }
