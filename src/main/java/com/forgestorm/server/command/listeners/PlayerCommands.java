@@ -1,10 +1,7 @@
 package com.forgestorm.server.command.listeners;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.command.Command;
-import com.forgestorm.server.command.CommandArguments;
-import com.forgestorm.server.command.CommandManager;
-import com.forgestorm.server.command.CommandSource;
+import com.forgestorm.server.command.*;
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
@@ -57,6 +54,7 @@ public class PlayerCommands {
 
     @Command(base = "teleport", argLenReq = 1)
     @CommandArguments(missing = "<playerName>")
+    @CommandPermission(status = CommandPermStatus.MOD)
     public void teleportToPlayer(CommandSource commandSource, String[] args) {
         Player player = commandSource.getPlayer();
         Player teleportToPlayer = commandManager.getPlayer(commandSource, args[0]);
@@ -68,6 +66,7 @@ public class PlayerCommands {
 
     @Command(base = "teleport", argLenReq = 4)
     @CommandArguments(missing = "<playerName> <mapName> <x> <y>")
+    @CommandPermission(status = CommandPermStatus.MOD)
     public void teleportPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         String mapName = args[1];
@@ -105,6 +104,7 @@ public class PlayerCommands {
 
     @Command(base = "kick", argLenReq = 1)
     @CommandArguments(missing = "<playerName>")
+    @CommandPermission(status = CommandPermStatus.MOD)
     public void kickPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -118,6 +118,7 @@ public class PlayerCommands {
 
     @Command(base = "kill", argLenReq = 1)
     @CommandArguments(missing = "<playerName>")
+    @CommandPermission(status = CommandPermStatus.MOD)
     public void killPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -129,6 +130,7 @@ public class PlayerCommands {
 
     @Command(base = "info", argLenReq = 1)
     @CommandArguments(missing = "<playerName>")
+    @CommandPermission(status = CommandPermStatus.MOD)
     public void getPlayerInfo(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         Player player = commandManager.getPlayer(commandSource, playerName);
@@ -174,6 +176,7 @@ public class PlayerCommands {
     }
 
     @Command(base = "collision")
+    @CommandPermission(status = CommandPermStatus.CONTENT_DEVELOPER)
     public void toggleCollision(CommandSource commandSource) {
         Player player = commandSource.getPlayer();
         if (player == null) return;

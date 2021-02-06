@@ -15,6 +15,7 @@ public class WorldCommands {
 
     @Command(base = "create", argLenReq = 3)
     @CommandArguments(missing = "<worldName> <width> <height>")
+    @CommandPermission(status = CommandPermStatus.CONTENT_DEVELOPER)
     public void createWorld(CommandSource commandSource, String[] args) {
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
         String worldName = args[0];
@@ -40,6 +41,7 @@ public class WorldCommands {
     }
 
     @Command(base = "saveworld")
+    @CommandPermission(status = CommandPermStatus.CONTENT_DEVELOPER)
     public void saveWorld(CommandSource commandSource) {
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
 

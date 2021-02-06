@@ -1,6 +1,6 @@
 package com.forgestorm.server.command;
 
-import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.database.AuthenticatedUser;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
@@ -24,12 +24,12 @@ public class CommandProcessor {
 
     @AllArgsConstructor
     private static class CommandInfo {
-        private Object listener;
-        private Method method;
-        private int reqArgs;
-        private String expectedArguments;
+        private final Object listener;
+        private final Method method;
+        private final int reqArgs;
+        private final String expectedArguments;
         boolean endlessArguments;
-        private CommandPermStatus permission;
+        private final CommandPermStatus permission;
     }
 
     public void sendCommandList(CommandSource commandSource) {
@@ -39,7 +39,7 @@ public class CommandProcessor {
     }
 
     private void sendCommandList(CommandSource commandSource, Map<String, Map<Integer, CommandInfo>> commandArgListeners) {
-        for (Map.Entry<String, Map<Integer, CommandInfo>> entrySet: commandArgListeners.entrySet()) {
+        for (Map.Entry<String, Map<Integer, CommandInfo>> entrySet : commandArgListeners.entrySet()) {
             String commandBase = entrySet.getKey();
             Map<Integer, CommandInfo> commandInfoMap = entrySet.getValue();
 
@@ -170,12 +170,13 @@ public class CommandProcessor {
     private boolean checkPermission(CommandSource commandSource, CommandInfo commandInfo) {
         // Must be the console
         if (commandSource.getPlayer() == null) return true;
-        Player player = commandSource.getPlayer();
+        AuthenticatedUser player = commandSource.getPlayer().getClientHandler().getAuthenticatedUser();
         if (commandInfo.permission == CommandPermStatus.ADMIN) {
-            return player.getClientHandler().getAuthenticatedUser().isAdmin();
+            return player.isAdmin();
         } else if (commandInfo.permission == CommandPermStatus.MOD) {
-            return player.getClientHandler().getAuthenticatedUser().isModerator() ||
-                    player.getClientHandler().getAuthenticatedUser().isAdmin();
+            return player.isModerator() || player.isAdmin();
+        } else if (commandInfo.permission == CommandPermStatus.CONTENT_DEVELOPER) {
+            return player.isContentDeveloper() || player.isAdmin();
         } else return commandInfo.permission == CommandPermStatus.ALL;
     }
 
@@ -208,8 +209,8 @@ public class CommandProcessor {
 
     @AllArgsConstructor
     private static class PublishInfo {
-        private CommandSource commandSource;
-        private String[] arguments;
-        private CommandInfo commandInfo;
+        private final CommandSource commandSource;
+        private final String[] arguments;
+        private final CommandInfo commandInfo;
     }
 }
