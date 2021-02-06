@@ -20,16 +20,16 @@ import static com.forgestorm.server.util.Log.println;
 
 public class FileManager {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Getter
-    private String worldDirectory;
+    private final String worldDirectory;
 
     @Getter
-    private AssetManager assetManager = new AssetManager();
-    private HeadlessFiles headlessFiles = new HeadlessFiles();
-    private InternalResolver internalResolver = new InternalResolver();
-    private AbsoluteResolver absoluteResolver = new AbsoluteResolver();
+    private final AssetManager assetManager = new AssetManager();
+    private final HeadlessFiles headlessFiles = new HeadlessFiles();
+    private final InternalResolver internalResolver = new InternalResolver();
+    private final AbsoluteResolver absoluteResolver = new AbsoluteResolver();
 
     public FileManager() {
         // Get the path of the jar file.
@@ -238,7 +238,7 @@ public class FileManager {
             if (ServerMain.ideRun) {
                 return headlessFiles.internal("src/main/resources" + fileName);
             } else {
-                println(getClass(), "FileName: " + fileName);
+                println(getClass(), "FileName: " + fileName, false, PRINT_DEBUG);
                 return headlessFiles.internal(fileName.substring(1));
             }
         }
