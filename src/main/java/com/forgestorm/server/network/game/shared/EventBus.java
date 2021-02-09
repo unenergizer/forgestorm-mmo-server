@@ -1,5 +1,6 @@
 package com.forgestorm.server.network.game.shared;
 
+import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.AllowNullPlayer;
 import com.forgestorm.server.network.game.packet.in.PacketInCancelable;
 import lombok.AllArgsConstructor;
@@ -75,6 +76,10 @@ public class EventBus {
         packetData.setOpcode(opcode);
         packetData.setClientHandler(clientHandler);
         decodedPackets.add(packetData);
+
+        // Update idle time to not kick player
+        Player player = clientHandler.getPlayer();
+        if (player != null && opcode != 0) player.updatePlayerIdleTimestamp(opcode);
     }
 
     private PacketListenerData getPacketListenerData(byte opcode) {

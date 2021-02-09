@@ -67,8 +67,18 @@ public class Player extends MovingEntity {
 
     private Map<Short, WaitingAbility> queuedAbilities = new HashMap<>();
 
+    /**
+     * Used to determine how long a player has been AFK.
+     */
+    private long idleTimestamp = System.currentTimeMillis();
+
     public Player(final ClientHandler clientHandler) {
         this.clientHandler = clientHandler;
+    }
+
+    public void updatePlayerIdleTimestamp(byte opcode) {
+        println(getClass(), "UpdatedPlayerIdleTimestamp. Opcode received: " + opcode, false, PRINT_DEBUG);
+        this.idleTimestamp = System.currentTimeMillis();
     }
 
     /**

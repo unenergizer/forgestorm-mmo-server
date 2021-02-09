@@ -4,6 +4,7 @@ public class MessageText {
 
     public static final String SERVER = "[GREEN][Server][WHITE] ";
     public static final String ERROR = "[RED][Error][WHITE] ";
+    public static final String WARNING = "[RED][Warning][WHITE] ";
 
     public static final String ADMIN_COLOR = "[RED]";
     public static final String MOD_COLOR = "[PURPLE]";

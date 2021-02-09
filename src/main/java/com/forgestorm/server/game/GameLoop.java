@@ -24,6 +24,7 @@ public class GameLoop extends Thread {
     private final EntityRehealTask entityRehealTask = new EntityRehealTask();
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
     private final ProcessMining processMining = new ProcessMining();
+    private final CheckIdlePlayerTask checkIdlePlayerTask = new CheckIdlePlayerTask();
 
     /* UPDATES PER SECOND */
     private int currentTPS;
@@ -74,6 +75,7 @@ public class GameLoop extends Thread {
             serverMain.getGameManager().tick(numberOfTicksPassed);
             serverMain.getNetworkManager().getOutStreamManager().sendPackets();
             serverMain.getTradeManager().tick(numberOfTicksPassed);
+            checkIdlePlayerTask.tick(numberOfTicksPassed);
             // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);
