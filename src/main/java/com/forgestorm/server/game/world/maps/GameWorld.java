@@ -7,8 +7,6 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
-import com.forgestorm.server.game.world.entity.Entity;
-import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.io.todo.FileManager;
@@ -18,9 +16,7 @@ import lombok.Getter;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
@@ -70,13 +66,31 @@ public class GameWorld {
     }
 
     public void saveChunks(boolean manualSave) {
-        if (manualSave) {
-            println(getClass(), "Player manually saving chunks for GameWorld " + getWorldName() + ".");
-        } else {
+        // Check if saving actually needs to happen
+        if (!manualSave) {
+            boolean noNewEditsDetected = false;
+            for (WorldChunk worldChunk : worldChunkMap.values()) {
+                if (worldChunk.isChangedSinceLastSave()) {
+                    noNewEditsDetected = true;
+                    break;
+                }
+            }
+            if (!noNewEditsDetected) {
+                println(getClass(), "NOT SAVING CHUNKS, NO EDITS HAPPENED!");
+                return;
+            }
             println(getClass(), "Saving chunks for GameWorld " + getWorldName() + ".");
+        } else {
+            println(getClass(), "Player manually saving chunks for GameWorld " + getWorldName() + ".");
         }
 
         for (WorldChunk worldChunk : worldChunkMap.values()) {
+
+            // Check if chunk needs to save
+            if (!worldChunk.isChangedSinceLastSave()) continue;
+            worldChunk.setChangedSinceLastSave(false);
+
+            // Get chunk file
             String chunkPath = this.chunkPath + worldChunk.getChunkX() + "." + worldChunk.getChunkY() + ".json";
             File chunkFile = new File(chunkPath);
             Json json = new Json();
@@ -127,43 +141,40 @@ public class GameWorld {
         worldChunkMap.put((worldChunk.getChunkX() << 16) | (worldChunk.getChunkY() & 0xFFFF), worldChunk);
     }
 
-    public void calculateVisibleEntities(Player player) {
-
-        // TODO: should we use future location?
-        int playerX = player.getFutureWorldLocation().getX();
-        int playerY = player.getFutureWorldLocation().getY();
-
-        int clientChunkX = (int) Math.floor(playerX / (float) GameConstants.CHUNK_SIZE);
-        int clientChunkY = (int) Math.floor(playerY / (float) GameConstants.CHUNK_SIZE);
-
-        // 1. Check if the NPC is removed. If so remove it from the list!
-        //for (Entity visibleEntity : player.getVisibleEntities()) {
-        // if (visibleEntity.isDead()) { player.getVisibleEntities().remove(visibleEntity);
-        // And send despawn information!
-        // }
-        // }
-
-        // 2. Collect all entities (within view range) into 1 singular list!
-        // Then check if that entity is not within the list and not dead/removed, ect...
-        // And spawn
-
-
-        List<Entity> allVisibleEntities = new ArrayList<>();
-        for (int chunkY = clientChunkY - GameConstants.VISIBLE_CHUNK_RADIUS; chunkY < clientChunkY + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkY++) {
-            for (int chunkX = clientChunkX - GameConstants.VISIBLE_CHUNK_RADIUS; chunkX < clientChunkX + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkX++) {
-                WorldChunk chunk = findChunk((short) chunkX, (short) chunkY);
-
-                if (chunk == null) continue;
-
-
-                // List<Entity> entities = chunk.getEntitiesInChunk();
-                // allVisibleEntities.addAll(entities);
-
-            }
-        }
-
-
-    }
+//    public void calculateVisibleEntities(Player player) {
+//
+//        // TODO: should we use future location?
+//        int playerX = player.getFutureWorldLocation().getX();
+//        int playerY = player.getFutureWorldLocation().getY();
+//
+//        int clientChunkX = (int) Math.floor(playerX / (float) GameConstants.CHUNK_SIZE);
+//        int clientChunkY = (int) Math.floor(playerY / (float) GameConstants.CHUNK_SIZE);
+//
+//        // 1. Check if the NPC is removed. If so remove it from the list!
+//        //for (Entity visibleEntity : player.getVisibleEntities()) {
+//        // if (visibleEntity.isDead()) { player.getVisibleEntities().remove(visibleEntity);
+//        // And send despawn information!
+//        // }
+//        // }
+//
+//        // 2. Collect all entities (within view range) into 1 singular list!
+//        // Then check if that entity is not within the list and not dead/removed, ect...
+//        // And spawn
+//
+//        List<Entity> allVisibleEntities = new ArrayList<>();
+//        for (int chunkY = clientChunkY - GameConstants.VISIBLE_CHUNK_RADIUS; chunkY < clientChunkY + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkY++) {
+//            for (int chunkX = clientChunkX - GameConstants.VISIBLE_CHUNK_RADIUS; chunkX < clientChunkX + GameConstants.VISIBLE_CHUNK_RADIUS + 1; chunkX++) {
+//                WorldChunk chunk = findChunk((short) chunkX, (short) chunkY);
+//
+//                if (chunk == null) continue;
+//
+//
+//                // List<Entity> entities = chunk.getEntitiesInChunk();
+//                // allVisibleEntities.addAll(entities);
+//
+//            }
+//        }
+//    }
 
     public Warp getWarp(int entityX, int entityY) {
         WorldChunk worldChunk = findChunk(entityX, entityY);

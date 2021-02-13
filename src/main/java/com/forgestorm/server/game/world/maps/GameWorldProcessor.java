@@ -195,9 +195,10 @@ public class GameWorldProcessor {
     }
 
     public GameWorld getGameWorld(String worldName) throws RuntimeException {
-        checkNotNull(gameWorlds.get(worldName), "Tried to get the world " + worldName + ", but it doesn't exist or was not loaded.");
+        checkNotNull(gameWorlds.get(worldName), "Tried to get the world \"" + worldName + "\", but it doesn't exist or was not loaded.");
         return gameWorlds.get(worldName);
     }
+
 
     public boolean doesGameWorldExist(String worldName) {
         return gameWorlds.containsKey(worldName);

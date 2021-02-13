@@ -11,25 +11,23 @@ import com.forgestorm.server.network.game.packet.out.TileWarpPacketOut;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import com.forgestorm.server.util.RandomUtil;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class WorldChunk {
 
-    @Getter
     private final short chunkX, chunkY;
-
-    @Getter
     private final Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
-
-    @Getter
     private final List<Warp> tileWarps = new ArrayList<>();
-
-    @Getter
     private final List<Entity> entities = new ArrayList<>();
+
+    @Setter
+    private boolean changedSinceLastSave = false;
 
     public WorldChunk(short chunkX, short chunkY) {
         this.chunkX = chunkX;
@@ -45,6 +43,7 @@ public class WorldChunk {
     public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
         initTileLayer(layerDefinition);
         layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE] = tileImage;
+        changedSinceLastSave = true;
     }
 
     public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int index) {
