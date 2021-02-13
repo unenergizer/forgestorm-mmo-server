@@ -75,10 +75,7 @@ public class GameWorld {
                     break;
                 }
             }
-            if (!noNewEditsDetected) {
-                println(getClass(), "NOT SAVING CHUNKS, NO EDITS HAPPENED!");
-                return;
-            }
+            if (!noNewEditsDetected) return; // Not saving chunks, no edits happened...
             println(getClass(), "Saving chunks for GameWorld " + getWorldName() + ".");
         } else {
             println(getClass(), "Player manually saving chunks for GameWorld " + getWorldName() + ".");
