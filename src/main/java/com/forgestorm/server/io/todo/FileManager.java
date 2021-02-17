@@ -23,6 +23,8 @@ public class FileManager {
     private static final boolean PRINT_DEBUG = false;
 
     @Getter
+    private final String clientFilesDirectory;
+    @Getter
     private final String worldDirectory;
 
     @Getter
@@ -34,6 +36,7 @@ public class FileManager {
     public FileManager() {
         // Get the path of the jar file.
         String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        println(getClass(), jarPath);
         String decodedPath = "";
         try {
             decodedPath = URLDecoder.decode(jarPath, "UTF-8");
@@ -41,14 +44,24 @@ public class FileManager {
             e.printStackTrace();
         }
 
+        // Create the client files directory
+        File clientFilesDirectory = new File(decodedPath + "clientFiles");
+        if (!clientFilesDirectory.exists()) {
+            if (clientFilesDirectory.mkdir()) {
+                println(getClass(), "Created the ClientFilesOnly directory!", true);
+            } else {
+                throw new RuntimeException("Couldn't create the ClientFilesOnly directory!");
+            }
+        }
+        this.clientFilesDirectory = clientFilesDirectory.getAbsolutePath();
+
         // Create the World Directory if it doesn't exist.
-        File worldDirectory = new File(decodedPath + "worldDirectory");
+        File worldDirectory = new File(clientFilesDirectory + "/worldDirectory");
         if (!worldDirectory.exists()) {
             if (worldDirectory.mkdir()) {
-                // TODO: If directory empty, create a new blank world
-                println(getClass(), "We had to make the world directory, so no game worlds exist!", true);
+                println(getClass(), "The World directory didn't exist so one was created.", true);
             } else {
-                throw new RuntimeException("Couldn't create the World Directory!");
+                throw new RuntimeException("Couldn't create the World directory!");
             }
         }
 

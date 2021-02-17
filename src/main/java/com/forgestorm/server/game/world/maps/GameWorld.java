@@ -125,6 +125,9 @@ public class GameWorld {
             FileHandle fileHandle = new FileHandle(chunkFile);
             fileHandle.writeString(json.prettyPrint(json.getWriter().getWriter().toString()), false);
         }
+
+        // TODO INIT VERSION MAIN??
+        ServerMain.getInstance().getVersionMain().beginVersioning();
     }
 
     public WorldChunk generateNewChunk(short chunkX, short chunkY) {

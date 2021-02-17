@@ -71,4 +71,10 @@ public class ServerCommands {
         ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
                 new ChatMessagePacketOut(anyPlayer, ChatChannelType.GENERAL, MessageText.SERVER + String.join(" ", args)).sendPacket());
     }
+
+    @Command(base = "createVersion")
+    public void createNewVersion(CommandSource commandSource) {
+        ServerMain.getInstance().getVersionMain().beginVersioning();
+        commandSource.sendMessage("[YELLOW]Creating a new client files version.");
+    }
 }

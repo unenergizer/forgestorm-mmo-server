@@ -18,6 +18,7 @@ import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.NetworkManager;
 import com.forgestorm.server.profile.XenforoProfileManager;
 import com.forgestorm.server.scripting.ScriptManager;
+import com.forgestorm.server.versioning.VersionMain;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;
@@ -52,6 +53,9 @@ public class ServerMain {
     private CharacterManager characterManager;
     private XenforoProfileManager xenforoProfileManager;
     private ScriptManager scriptManager;
+
+    // Client Files Versioning
+    private VersionMain versionMain;
 
     private ServerMain() {
     }
@@ -116,6 +120,9 @@ public class ServerMain {
         commandManager.start();
         networkManager.start();
         gameLoop.start();
+
+        // Client files updater
+        versionMain = new VersionMain();
     }
 
     public void exitServer() {
