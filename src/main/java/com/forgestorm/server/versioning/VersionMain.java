@@ -8,11 +8,13 @@ import lombok.AllArgsConstructor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static com.forgestorm.server.util.Log.println;
 
@@ -22,6 +24,8 @@ public class VersionMain {
 
     public void beginVersioning() {
         new Thread(() -> {
+            updateCurrentRevisionNumber();
+
             List<SendFile> sendFileList = createSendFileList();
 
             // Now generate a new file list document
@@ -29,6 +33,32 @@ public class VersionMain {
 
             ftpUpload(fileListDocument, sendFileList);
         }, "VersioningMainUpdater").start();
+    }
+
+    private void updateCurrentRevisionNumber() {
+        // Check remote revision
+        int remoteRevisionNumber = -1;
+        try {
+            URL url = new URL("https://forgestorm.com/client_files/Revision.txt");
+            Scanner scanner = new Scanner(url.openStream());
+            remoteRevisionNumber = scanner.nextInt();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Increment revision build number
+        remoteRevisionNumber++;
+
+        File file = new File(ServerMain.getInstance().getFileManager().getClientFilesDirectory() + "/Revision.txt");
+        try {
+            FileWriter myWriter = new FileWriter(file);
+            myWriter.write(Integer.toString(remoteRevisionNumber));
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        println(getClass(), "Revision File Path: " + file.getAbsolutePath());
     }
 
     private List<SendFile> createSendFileList() {

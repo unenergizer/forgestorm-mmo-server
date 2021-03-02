@@ -45,4 +45,7 @@ dependencies {
 
     // Server side scripting
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
+
+    // FTP
+    compile group: 'commons-net', name: 'commons-net', version: '3.7.2'
 }
