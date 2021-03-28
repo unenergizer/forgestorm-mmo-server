@@ -8,9 +8,9 @@ public class WorldBuilderPacketOut extends AbstractServerOutPacket {
 
     private final LayerDefinition layerDefinition;
     private final int textureId;
-    private final short tileX, tileY;
+    private final int tileX, tileY;
 
-    public WorldBuilderPacketOut(final ClientHandler clientHandler, LayerDefinition layerDefinition, int textureId, short tileX, short tileY) {
+    public WorldBuilderPacketOut(final ClientHandler clientHandler, LayerDefinition layerDefinition, int textureId, int tileX, int tileY) {
         super(Opcodes.WORLD_BUILDER, clientHandler);
         this.layerDefinition = layerDefinition;
         this.textureId = textureId;
@@ -22,7 +22,7 @@ public class WorldBuilderPacketOut extends AbstractServerOutPacket {
     protected void createPacket(GameOutputStream write) {
         write.writeByte(layerDefinition.getLayerDefinitionByte());
         write.writeInt(textureId);
-        write.writeShort(tileX);
-        write.writeShort(tileY);
+        write.writeInt(tileX);
+        write.writeInt(tileY);
     }
 }

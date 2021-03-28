@@ -5,6 +5,7 @@ public enum BuildCategory {
     WALKABLE,
     WALL,
     ROOF,
+    WANG,
     UNDEFINED;
 
     @Override
