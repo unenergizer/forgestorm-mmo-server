@@ -42,6 +42,7 @@ public class VersionMain {
             URL url = new URL("https://forgestorm.com/client_files/Revision.txt");
             Scanner scanner = new Scanner(url.openStream());
             remoteRevisionNumber = scanner.nextInt();
+            scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
