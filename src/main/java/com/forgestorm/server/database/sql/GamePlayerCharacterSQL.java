@@ -19,8 +19,8 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
 
     private static final boolean PRINT_DEBUG = false;
 
-    private Date date = new Date();
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final Date date = new Date();
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void databaseLoad(Player player, ResultSet resultSet) throws SQLException {
@@ -127,7 +127,7 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
     public List<CharacterDataOut> searchCharacters(int databaseUserId) {
 
         List<CharacterDataOut> characterDataOuts = new ArrayList<>();
-        String query = "SELECT character_id, name, hair_texture, hair_color, eye_color, skin_color, is_deleted FROM game_player_characters WHERE user_id = ?";
+        String query = "SELECT character_id, name, facing_direction, world_name, world_x, world_y, hair_texture, hair_color, eye_color, skin_color, is_deleted FROM game_player_characters WHERE user_id = ?";
 
         try (Connection connection = ServerMain.getInstance().getDatabaseManager().getHikariDataSource().getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -138,6 +138,10 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
             while (resultSet.next()) {
                 int characterId = resultSet.getInt("character_id");
                 String name = resultSet.getString("name");
+                String facingDirection = resultSet.getString("facing_direction");
+                String worldName = resultSet.getString("world_name");
+                int worldX = resultSet.getInt("world_x");
+                int worldY = resultSet.getInt("world_y");
                 byte hairTexture = resultSet.getByte("hair_texture");
                 int hairColor = resultSet.getInt("hair_color");
                 int eyeColor = resultSet.getInt("eye_color");
@@ -147,6 +151,10 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 println(PRINT_DEBUG);
                 println(getClass(), "==[ CHARACTER SEARCH ]====================================", false, PRINT_DEBUG);
                 println(getClass(), "Name: " + name, false, PRINT_DEBUG);
+                println(getClass(), "FacingDirection: " + facingDirection, false, PRINT_DEBUG);
+                println(getClass(), "World Name: " + worldName, false, PRINT_DEBUG);
+                println(getClass(), "World X: " + worldX, false, PRINT_DEBUG);
+                println(getClass(), "World Y: " + worldY, false, PRINT_DEBUG);
                 println(getClass(), "HairTexture: " + hairTexture, false, PRINT_DEBUG);
                 println(getClass(), "HairColor: " + hairColor, false, PRINT_DEBUG);
                 println(getClass(), "EyeColor: " + eyeColor, false, PRINT_DEBUG);
@@ -157,6 +165,10 @@ public class GamePlayerCharacterSQL extends AbstractSingleSQL implements Abstrac
                 characterDataOuts.add(new CharacterDataOut(
                         characterId,
                         name,
+                        MoveDirection.valueOf(facingDirection),
+                        worldName,
+                        worldX,
+                        worldY,
                         hairTexture,
                         hairColor,
                         eyeColor,

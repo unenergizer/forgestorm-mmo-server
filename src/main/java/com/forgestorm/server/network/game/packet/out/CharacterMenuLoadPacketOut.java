@@ -2,6 +2,7 @@ package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import com.forgestorm.server.network.game.shared.Opcodes;
 
@@ -32,6 +33,13 @@ public class CharacterMenuLoadPacketOut extends AbstractServerOutPacket {
             write.writeString(player.getName());
             write.writeByte(index); // index of array (player will send back index to load and play character)
 
+            // Write Location data
+            Location location = player.getCurrentWorldLocation();
+            write.writeString(location.getWorldName());
+//            write.writeInt(location.getX());
+//            write.writeInt(location.getY());
+
+            // Write appearance
             Appearance appearance = player.getAppearance();
             write.writeByte(appearance.getHairTexture());
             write.writeByte(appearance.getHelmTexture());

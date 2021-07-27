@@ -11,6 +11,7 @@ import com.forgestorm.server.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.WearableItemStack;
 import com.forgestorm.server.game.world.item.inventory.EquipmentSlotTypes;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
+import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.network.game.packet.out.AbstractServerOutPacket;
 import com.forgestorm.server.network.game.packet.out.GameOutputStream;
 import com.forgestorm.server.util.Log;
@@ -81,6 +82,12 @@ public class ClientHandler {
 
             player.setName(characterDataOut.getName());
             player.setDatabaseId(characterDataOut.getCharacterId());
+
+            // Set the players location
+            Location location = new Location(characterDataOut.getWorldName(), characterDataOut.getWorldX(), characterDataOut.getWorldY());
+            player.setCurrentWorldLocation(location);
+            player.setFutureWorldLocation(location);
+            player.setFacingDirection(characterDataOut.getFacingDirection());
 
             // Here we access the players inventory via SQL. Load it in, and get the items the player is wearing.
             // We could do well here by optimizing this. This inventory is loaded twice.
