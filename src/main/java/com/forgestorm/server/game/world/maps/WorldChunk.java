@@ -18,8 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.forgestorm.server.util.Log.println;
+
 @Getter
 public class WorldChunk {
+
+    private static final boolean PRINT_DEBUG = false;
 
     private final short chunkX, chunkY;
     private final Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
@@ -123,6 +127,7 @@ public class WorldChunk {
 
                 layerSectionsSent++;
             }
+            println(getClass(), "Layer: " + layerDefinition.getLayerName() + ", Sections Sent: " + layerSectionsSent, false, PRINT_DEBUG);
         }
 
         // Send chunk warps
