@@ -12,7 +12,7 @@ import static com.forgestorm.server.util.Log.println;
 @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
 public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.MovePacket> {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
