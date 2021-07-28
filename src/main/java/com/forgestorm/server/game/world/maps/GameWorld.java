@@ -66,7 +66,7 @@ public class GameWorld {
             short chunkY = Short.parseShort(parts[1]);
 
             String path = fileManager.loadWorldChunkData(file, true, worldName);
-            findChunk(chunkX, chunkY).setChunkFromDisk(fileManager.getWorldChunkData(path).getWorldChunkFromDisk());
+            getChunk(chunkX, chunkY).setChunkFromDisk(fileManager.getWorldChunkData(path).getWorldChunkFromDisk());
         }
 
 
@@ -233,10 +233,10 @@ public class GameWorld {
         short chunkX = (short) Math.floor(entityX / (float) GameConstants.CHUNK_SIZE);
         short chunkY = (short) Math.floor(entityY / (float) GameConstants.CHUNK_SIZE);
 
-        return findChunk(chunkX, chunkY);
+        return getChunk(chunkX, chunkY);
     }
 
-    WorldChunk findChunk(short chunkX, short chunkY) {
+    public WorldChunk getChunk(short chunkX, short chunkY) {
         return worldChunkMap.get((chunkX << 16) | (chunkY & 0xFFFF));
     }
 

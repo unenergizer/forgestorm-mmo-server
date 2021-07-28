@@ -50,6 +50,14 @@ public class WorldChunk {
         initTileLayers();
     }
 
+    public WorldChunk(String worldName, short chunkX, short chunkY, boolean generateLandscape) {
+        this.worldName = worldName;
+        this.chunkX = chunkX;
+        this.chunkY = chunkY;
+        initTileLayers();
+        if (generateLandscape) generateLandscape();
+    }
+
     private void initTileLayers() {
 
         for (LayerDefinition layerDefinition : LayerDefinition.values()) {
@@ -69,13 +77,6 @@ public class WorldChunk {
 
             layers.put(layerDefinition, tiles);
         }
-    }
-
-    public WorldChunk(String worldName, short chunkX, short chunkY, boolean generateLandscape) {
-        this.worldName = worldName;
-        this.chunkX = chunkX;
-        this.chunkY = chunkY;
-        if (generateLandscape) generateLandscape();
     }
 
     public void setChunkFromDisk(WorldChunk chunkFromDisk) {

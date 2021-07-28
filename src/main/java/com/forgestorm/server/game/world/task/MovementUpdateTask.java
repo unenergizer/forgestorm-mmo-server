@@ -601,7 +601,17 @@ public class MovementUpdateTask implements AbstractTask {
 
             // The player is moving into a new chunk. Load chunks the player hasn't seen yet.
             // TODO: Load chunks around the player. The one they are walking into should already be loaded...
-            futureChunk.sendChunk(player);
+
+            Location futureLocation = player.getFutureWorldLocation();
+            short clientChunkX = (short) Math.floor(futureLocation.getX() / (float) GameConstants.CHUNK_SIZE);
+            short clientChunkY = (short) Math.floor(futureLocation.getY() / (float) GameConstants.CHUNK_SIZE);
+
+            for (int chunkY = clientChunkY - GameConstants.CHUNK_RADIUS; chunkY < clientChunkY + GameConstants.CHUNK_RADIUS + 1; chunkY++) {
+                for (int chunkX = clientChunkX - GameConstants.CHUNK_RADIUS; chunkX < clientChunkX + GameConstants.CHUNK_RADIUS + 1; chunkX++) {
+                    WorldChunk worldChunk = player.getGameWorld().getChunk((short) chunkX, (short) chunkY);
+                    if (worldChunk != null) worldChunk.sendChunk(player);
+                }
+            }
         }
 
         ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
