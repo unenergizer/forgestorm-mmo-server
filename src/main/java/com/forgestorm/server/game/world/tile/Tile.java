@@ -8,8 +8,6 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.forgestorm.server.util.Log.println;
-
 public class Tile {
 
     private final transient List<Integer> collisionParents = new ArrayList<>(0);
