@@ -1,7 +1,7 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.network.game.shared.Opcodes;
 
 import static com.forgestorm.server.util.Log.println;
@@ -13,9 +13,9 @@ public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
     private final short chunkX, chunkY;
     private final byte layerDefinitionByte;
     private final byte sectionsSent;
-    private final TileImage[] arraySend;
+    private final Tile[] arraySend;
 
-    public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, byte layerDefinitionByte, byte sectionsSent, TileImage[] arraySend) {
+    public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, byte layerDefinitionByte, byte sectionsSent, Tile[] arraySend) {
         super(Opcodes.WORLD_CHUNK_LAYER, player.getClientHandler());
         this.chunkX = chunkX;
         this.chunkY = chunkY;
@@ -36,11 +36,11 @@ public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
         write.writeByte(sectionsSent);
 
         // Write all tile images.
-        for (TileImage tileImage : arraySend) {
-            if (tileImage == null) {
+        for (Tile tile : arraySend) {
+            if (tile.getTileImage() == null) {
                 write.writeInt(0); // 0 represents a null TileImage
             } else {
-                write.writeInt(tileImage.getImageId());
+                write.writeInt(tile.getTileImage().getImageId());
             }
         }
     }

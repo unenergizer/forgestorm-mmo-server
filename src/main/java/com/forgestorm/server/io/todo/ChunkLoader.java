@@ -16,44 +16,53 @@ import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.Warp;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.server.game.world.maps.building.WorldBuilder;
+import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
-
 import static com.forgestorm.server.util.Log.println;
 
-public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkDataWrapper, ChunkLoader.WorldChunkParameter> {
+public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkDataWrapper, ChunkLoader.MapChunkParameter> {
 
-    static class WorldChunkParameter extends AssetLoaderParameters<WorldChunkDataWrapper> {
+    static class MapChunkParameter extends AssetLoaderParameters<WorldChunkDataWrapper> {
     }
 
     private static final boolean PRINT_DEBUG = false;
     private static final String EXTENSION_TYPE = ".json";
+
+    private final String worldName;
+
     private WorldChunkDataWrapper worldChunkDataWrapper = null;
 
-    ChunkLoader(FileHandleResolver resolver) {
+    ChunkLoader(FileHandleResolver resolver, String worldName) {
         super(resolver);
+        this.worldName = worldName;
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, WorldChunkParameter parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, MapChunkParameter parameter) {
+        println(getClass(), "File Location: " + file.path(), false, PRINT_DEBUG);
+        println(getClass(), "Is Directory: " + file.isDirectory(), false, PRINT_DEBUG);
+        println(getClass(), "Directory List Size: " + file.list().length, false, PRINT_DEBUG);
+        println(getClass(), "Directory Name: " + file.name(), false, PRINT_DEBUG);
+        println(PRINT_DEBUG);
+
         worldChunkDataWrapper = null;
         worldChunkDataWrapper = new WorldChunkDataWrapper();
         WorldChunk worldChunk = parseChunk(file);
         worldChunkDataWrapper.setWorldChunk(worldChunk);
-        println(getClass(), "Loading chunk finished. " + worldChunk.toString(), false, PRINT_DEBUG);
     }
 
     @Override
-    public WorldChunkDataWrapper loadSync(AssetManager manager, String fileName, FileHandle file, WorldChunkParameter parameter) {
+    public WorldChunkDataWrapper loadSync(AssetManager manager, String fileName, FileHandle file, MapChunkParameter parameter) {
         return worldChunkDataWrapper;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, WorldChunkParameter parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, MapChunkParameter parameter) {
         return null;
     }
 
@@ -64,56 +73,56 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         String[] parts = chunkName.split("\\.");
         short chunkX = Short.parseShort(parts[0]);
         short chunkY = Short.parseShort(parts[1]);
-        WorldChunk chunk = new WorldChunk(chunkX, chunkY);
+        WorldChunk chunk = new WorldChunk(worldName, chunkX, chunkY);
 
+        // Process Tile Layers
         for (LayerDefinition layerDefinition : LayerDefinition.values()) {
-            TileImage[] layer = readLayer(layerDefinition.getLayerName(), root);
-
-            // Individually add each TileImage to the chunk (NPE FIX)
-            for (int i = 0; i < layer.length; i++) {
-                chunk.setTileImage(layerDefinition, layer[i], i);
-            }
+            readLayer(layerDefinition, root, chunk);
         }
 
+        // Process Tile Warps
         JsonValue warpsArray = root.get("warps");
         if (warpsArray != null) {
             for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
                 Warp warp = new Warp(
                         new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
-                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString()),
-                        jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort()
+                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
                 );
-                chunk.addTileWarp(warp);
+                chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
             }
         }
 
         return chunk;
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private static TileImage[] readLayer(String layerName, JsonValue root) {
+    private static void readLayer(LayerDefinition layerDefinition, JsonValue root, WorldChunk chunk) {
 
-        if (root.has(layerName)) {
-            String layer = root.get(layerName).asString();
+        if (root.has(layerDefinition.getLayerName())) {
+            WorldBuilder worldBuilder = ServerMain.getInstance().getWorldBuilder();
+            String layer = root.get(layerDefinition.getLayerName()).asString();
             String[] imageIds = layer.split(",");
-            Map<Integer, TileImage> tileImages = ServerMain.getInstance().getFileManager().getTilePropertiesData().getWorldImageMap();
-            TileImage[] tiles = new TileImage[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
-            for (int y = 0; y < GameConstants.CHUNK_SIZE; y++) {
-                for (int x = 0; x < GameConstants.CHUNK_SIZE; x++) {
-                    TileImage tileImage = tileImages.get(Integer.parseInt(imageIds[x + y * GameConstants.CHUNK_SIZE]));
-                    tiles[x + y * GameConstants.CHUNK_SIZE] = tileImage;
+            for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+                for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
+
+                    println(ChunkLoader.class, "Processing Tile: " + layerDefinition + " - " + localX + "/" + localY, false, PRINT_DEBUG);
+                    // Get the TileImage
+                    int tileId = Integer.parseInt(imageIds[localX + localY * GameConstants.CHUNK_SIZE]);
+                    TileImage tileImage = worldBuilder.getTileImage(tileId);
+
+                    // Set the TileImage to the Tile
+                    if (tileImage != null) {
+                        println(ChunkLoader.class, " -- Setting TileImage: " + tileImage.getFileName(), false, PRINT_DEBUG);
+                        Tile tile = chunk.getTile(layerDefinition, localX, localY);
+                        tile.setTileImage(new TileImage(tileImage));
+                    }
                 }
             }
-            return tiles;
-        } else {
-            return new TileImage[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
         }
     }
 
-    @SuppressWarnings("InnerClassMayBeStatic")
     @Setter
     @Getter
-    public class WorldChunkDataWrapper {
+    public static class WorldChunkDataWrapper {
         private WorldChunk worldChunk;
     }
 }

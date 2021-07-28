@@ -8,7 +8,7 @@ import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
@@ -47,10 +47,28 @@ public class GameWorld {
         File[] chunkFiles = new File(chunkPath).listFiles((d, name) -> name.endsWith(GameConstants.MAP_FILE_EXTENSION_TYPE));
         checkNotNull(chunkFiles, "No world chunks were found.");
 
+        // Initialize all chunks first. This allows collision to be enabled properly.
         for (File file : chunkFiles) {
-            String path = fileManager.loadWorldChunkData(file, true);
-            addChunk(fileManager.getWorldChunkData(path).getWorldChunk());
+
+            String chunkName = file.getName().replace(".json", "");
+            String[] parts = chunkName.split("\\.");
+            short chunkX = Short.parseShort(parts[0]);
+            short chunkY = Short.parseShort(parts[1]);
+            addChunk(new WorldChunk(worldName, chunkX, chunkY));
         }
+
+        // Now process chunk TileImages (and AbstractTileProperties)
+        for (File file : chunkFiles) {
+
+            String chunkName = file.getName().replace(".json", "");
+            String[] parts = chunkName.split("\\.");
+            short chunkX = Short.parseShort(parts[0]);
+            short chunkY = Short.parseShort(parts[1]);
+
+            String path = fileManager.loadWorldChunkData(file, true, worldName);
+            findChunk(chunkX, chunkY).setChunkFromDisk(fileManager.getWorldChunkData(path).getWorldChunk());
+        }
+
 
         println(getClass(), "Loaded " + worldChunkMap.size() + "/" + chunkFiles.length + " chunks for game world \"" + worldName + "\".");
     }
@@ -97,17 +115,16 @@ public class GameWorld {
             json.setWriter(writer);
 
             // Save Layer
-//            json.writeObjectStart("layers");
             json.writeObjectStart();
-            for (Map.Entry<LayerDefinition, TileImage[]> entrySet : worldChunk.getLayers().entrySet()) {
+            for (Map.Entry<LayerDefinition, Tile[]> entrySet : worldChunk.getLayers().entrySet()) {
                 LayerDefinition layerDefinition = entrySet.getKey();
-                TileImage[] tileImages = entrySet.getValue();
+                Tile[] tiles = entrySet.getValue();
                 StringBuilder ids = new StringBuilder();
-                for (TileImage tileImage : tileImages) {
-                    if (tileImage == null) {
+                for (Tile tile : tiles) {
+                    if (tile.getTileImage() == null) {
                         ids.append("0,");
                     } else {
-                        ids.append(tileImage.toString());
+                        ids.append(tile.getTileImage().getImageId()).append(",");
                     }
                 }
                 json.writeValue(layerDefinition.getLayerName(), ids.toString());
@@ -131,7 +148,7 @@ public class GameWorld {
     }
 
     public WorldChunk generateNewChunk(short chunkX, short chunkY) {
-        WorldChunk worldChunk = new WorldChunk(chunkX, chunkY, true);
+        WorldChunk worldChunk = new WorldChunk(worldName, chunkX, chunkY, true);
         addChunk(worldChunk);
         println(getClass(), "Generated a new chunk at ChunkX: " + chunkX + ", ChunkY: " + chunkY, true);
         return worldChunk;
@@ -175,6 +192,16 @@ public class GameWorld {
 //            }
 //        }
 //    }
+
+    public Tile getTile(LayerDefinition layerDefinition, int worldX, int worldY) {
+        WorldChunk worldChunk = findChunk(worldX, worldY);
+        if (worldChunk == null) return null;
+
+        int localX = worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
+        int localY = worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
+
+        return worldChunk.getTile(layerDefinition, localX, localY);
+    }
 
     public Warp getWarp(int entityX, int entityY) {
         WorldChunk worldChunk = findChunk(entityX, entityY);

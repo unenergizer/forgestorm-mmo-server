@@ -8,7 +8,6 @@ import com.badlogic.gdx.assets.loaders.SynchronousAssetLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.tile.BuildCategory;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypeHelper;
@@ -43,7 +42,7 @@ public class TilePropertiesLoader extends SynchronousAssetLoader<TilePropertiesL
         Yaml yaml = new Yaml();
         Map<Integer, Map<String, Object>> root = yaml.load(file.read());
 
-        tilePropertiesDataWrapper.setWorldImageMap(new HashMap<Integer, TileImage>());
+        tilePropertiesDataWrapper.setWorldImageMap(new HashMap<>());
 
         for (Map.Entry<Integer, Map<String, Object>> entry : root.entrySet()) {
             Map<String, Object> itemNode = entry.getValue();
@@ -54,11 +53,11 @@ public class TilePropertiesLoader extends SynchronousAssetLoader<TilePropertiesL
             String name = (String) itemNode.get("fileName");
             println(getClass(), "FileName: " + name, false, PRINT_DEBUG);
 
-            BuildCategory buildCategory = BuildCategory.valueOf((String) itemNode.get("buildCategory"));
-            println(getClass(), "BuildCategory: " + buildCategory, false, PRINT_DEBUG);
+            LayerDefinition layerDefinition = LayerDefinition.valueOf((String) itemNode.get("layerDefinition"));
+            println(getClass(), "LayerDefinition: " + layerDefinition, false, PRINT_DEBUG);
 
             // Create the TileImage
-            TileImage tileImage = new TileImage(imageId, name, buildCategory);
+            TileImage tileImage = new TileImage(imageId, name, layerDefinition);
 
             // Load properties based on tile type
             Map<String, Object> mapOfTileProperties = (Map<String, Object>) itemNode.get("tileProperties");
@@ -79,14 +78,6 @@ public class TilePropertiesLoader extends SynchronousAssetLoader<TilePropertiesL
                         println(getClass(), "WARNING: Tile property " + tilePropertyType.name() + " was NOT setup! Create a entry for it!", true);
                     }
                 }
-            }
-
-            // Get layer definition
-            String tileLayerValue = (String) itemNode.get("layerDefinition");
-            if (tileLayerValue != null && !tileLayerValue.isEmpty()) {
-                LayerDefinition tileLayers = LayerDefinition.valueOf(tileLayerValue);
-                tileImage.setLayerDefinition(tileLayers);
-                println(getClass(), "TileLayer: " + tileLayers, false, PRINT_DEBUG);
             }
 
             println(PRINT_DEBUG);

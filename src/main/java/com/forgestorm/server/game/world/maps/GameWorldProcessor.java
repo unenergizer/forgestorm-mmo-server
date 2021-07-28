@@ -92,8 +92,8 @@ public class GameWorldProcessor {
     }
 
     public void loadWorld(GameWorld gameWorld) {
-        gameWorld.loadChunks();
         gameWorlds.put(gameWorld.getWorldName(), gameWorld);
+        gameWorld.loadChunks();
     }
 
     public void getEntitiesFromDatabase() {

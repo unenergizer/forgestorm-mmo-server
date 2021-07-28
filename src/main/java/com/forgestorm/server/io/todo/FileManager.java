@@ -9,6 +9,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.io.DatabaseSettingsLoader;
 import com.forgestorm.server.io.FilePaths;
+import com.forgestorm.server.io.TextureAtlasLoader;
+import com.forgestorm.server.io.atlas.TextureAtlas;
+import com.forgestorm.server.io.type.GameAtlas;
 import lombok.Getter;
 
 import java.io.File;
@@ -83,6 +86,14 @@ public class FileManager {
      */
     private boolean isFileLoaded(String filePath) {
         return assetManager.isLoaded(filePath);
+    }
+
+    public void loadAtlas(GameAtlas gameAtlas) {
+        abstractedLoad(gameAtlas.getFilePath(), true, false, TextureAtlas.class, new TextureAtlasLoader(internalResolver));
+    }
+
+    public TextureAtlas getAtlas(GameAtlas gameAtlas) {
+        return abstractGet(gameAtlas.getFilePath(), false, TextureAtlas.class);
     }
 
     public void loadItemStackData() {
@@ -173,8 +184,8 @@ public class FileManager {
         return abstractGet(path, true, GameWorldLoader.GameWorldDataWrapper.class);
     }
 
-    public String loadWorldChunkData(File chunkFile, boolean forceFinishLoading) {
-        return abstractedLoad(chunkFile, forceFinishLoading, true, ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(absoluteResolver));
+    public String loadWorldChunkData(File chunkFile, boolean forceFinishLoading, String worldName) {
+        return abstractedLoad(chunkFile, forceFinishLoading, true, ChunkLoader.WorldChunkDataWrapper.class, new ChunkLoader(absoluteResolver, worldName));
     }
 
     public ChunkLoader.WorldChunkDataWrapper getWorldChunkData(String path) {

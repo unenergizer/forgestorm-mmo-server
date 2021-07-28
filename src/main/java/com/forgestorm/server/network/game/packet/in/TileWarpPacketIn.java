@@ -44,7 +44,7 @@ public class TileWarpPacketIn implements PacketListener<TileWarpPacketIn.TileWar
         Location warpLocation = new Location(packetData.toWorldName, packetData.toX, packetData.toY);
         short localX = (short) (packetData.fromX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
         short localY = (short) (packetData.fromY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
-        worldChunk.addTileWarp(new Warp(warpLocation, packetData.facingDirection, localX, localY));
+        worldChunk.addTileWarp(localX, localY, new Warp(warpLocation, packetData.facingDirection, localX, localY));
 
         println(getClass(), "fromX: " + packetData.fromX, false, PRINT_DEBUG);
         println(getClass(), "fromY: " + packetData.fromY, false, PRINT_DEBUG);

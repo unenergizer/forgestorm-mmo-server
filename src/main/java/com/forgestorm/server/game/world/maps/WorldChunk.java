@@ -5,8 +5,8 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.TileWarpPacketOut;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import com.forgestorm.server.util.RandomUtil;
@@ -20,62 +20,125 @@ import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
 
-@Getter
 public class WorldChunk {
 
     private static final boolean PRINT_DEBUG = false;
 
+    @Getter
+    private final String worldName;
+
+    @Getter
     private final short chunkX, chunkY;
-    private final Map<LayerDefinition, TileImage[]> layers = new HashMap<>();
-    private final List<Warp> tileWarps = new ArrayList<>();
+
+    @Getter
+    private final Map<LayerDefinition, Tile[]> layers = new HashMap<>();
+
+    @Getter
+    private final Map<WarpLocation, Warp> tileWarps = new HashMap<>();
+
+    @Getter
     private final List<Entity> entities = new ArrayList<>();
 
+    @Getter
     @Setter
     private boolean changedSinceLastSave = false;
 
-    public WorldChunk(short chunkX, short chunkY) {
+    public WorldChunk(String worldName, short chunkX, short chunkY) {
+        this.worldName = worldName;
         this.chunkX = chunkX;
         this.chunkY = chunkY;
+        initTileLayers();
     }
 
-    public WorldChunk(short chunkX, short chunkY, boolean generateLandscape) {
+    private void initTileLayers() {
+
+        for (LayerDefinition layerDefinition : LayerDefinition.values()) {
+
+            Tile[] tiles = new Tile[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
+
+            // Initialize all tiles
+            for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+
+                    tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
+                            worldName,
+                            localX + chunkX * GameConstants.CHUNK_SIZE,
+                            localY + chunkY * GameConstants.CHUNK_SIZE);
+                }
+            }
+
+            layers.put(layerDefinition, tiles);
+        }
+    }
+
+    public WorldChunk(String worldName, short chunkX, short chunkY, boolean generateLandscape) {
+        this.worldName = worldName;
         this.chunkX = chunkX;
         this.chunkY = chunkY;
         if (generateLandscape) generateLandscape();
     }
 
+    public void setChunkFromDisk(WorldChunk chunkFromDisk) {
+        // Copy layers
+        for (Map.Entry<LayerDefinition, Tile[]> entry : chunkFromDisk.getLayers().entrySet()) {
+            LayerDefinition layerDefinition = entry.getKey();
+            Tile[] tiles = entry.getValue();
+
+            for (Tile tileFromDisk : tiles) {
+                if (tileFromDisk.getTileImage() == null) continue;
+                int localTileX = tileFromDisk.getWorldX() - GameConstants.CHUNK_SIZE * chunkX;
+                int localTileY = tileFromDisk.getWorldY() - GameConstants.CHUNK_SIZE * chunkY;
+                Tile localTile = getTile(layerDefinition, localTileX, localTileY);
+                localTile.setTileImage(tileFromDisk.getTileImage());
+            }
+        }
+
+        // Copy Warps
+        for (Map.Entry<WarpLocation, Warp> entry : chunkFromDisk.getTileWarps().entrySet()) {
+            WarpLocation warpLocation = entry.getKey();
+            Warp warp = entry.getValue();
+
+            addTileWarp(warpLocation, warp);
+        }
+    }
+
     public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
-        initTileLayer(layerDefinition);
-        layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE] = tileImage;
+        layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE].setTileImage(tileImage);
         changedSinceLastSave = true;
     }
 
-    public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int index) {
-        initTileLayer(layerDefinition);
-        layers.get(layerDefinition)[index] = tileImage;
-    }
-
-    private void initTileLayer(LayerDefinition layerDefinition) {
-        if (layers.containsKey(layerDefinition)) return;
-        layers.put(layerDefinition, new TileImage[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE]);
+    public Tile getTile(LayerDefinition layerDefinition, int localX, int localY) {
+        return layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
     }
 
     public boolean isTraversable(int localX, int localY) {
-        for (TileImage[] tileImages : layers.values()) {
-            TileImage tileImage = tileImages[localX + localY * GameConstants.CHUNK_SIZE];
-            if (tileImage == null) continue;
-            if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) return false;
-        }
-        return true;
+        // We only have collision on two layers. (Removed looping through all tiles)
+        if (!isTraversable(LayerDefinition.COLLIDABLES, localX, localY)) return false;
+        return isTraversable(LayerDefinition.GROUND_DECORATION, localX, localY);
     }
 
-    public void addTileWarp(Warp warp) {
-        tileWarps.add(warp);
+    private boolean isTraversable(LayerDefinition layerDefinition, int localX, int localY) {
+        Tile[] tiles = layers.get(layerDefinition);
+        Tile tile = tiles[localX + localY * GameConstants.CHUNK_SIZE];
+        if (tile == null) return true;
+        boolean b = !tile.hasCollision();
+//        println(getClass(), "isTraversable: " + b);
+        return b;
     }
 
-    Warp getWarp(short localX, short localY) {
-        for (Warp warp : tileWarps) {
-            if (warp.getFromX() == localX && warp.getFromY() == localY) return warp;
+    public void addTileWarp(int localX, int localY, Warp warp) {
+        addTileWarp(new WarpLocation(localX, localY), warp);
+    }
+
+    public void addTileWarp(WarpLocation warpLocation, Warp warp) {
+        tileWarps.put(warpLocation, warp);
+    }
+
+    Warp getWarp(int localX, int localY) {
+        for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
+            WarpLocation warpLocation = entry.getKey();
+            if (warpLocation.getFromX() == localX && warpLocation.getFromY() == localY)
+                return entry.getValue();
         }
         return null;
     }
@@ -88,7 +151,7 @@ public class WorldChunk {
 
                 if (rand <= 50) {
                     TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(262);
-                    setTileImage(LayerDefinition.GROUND_DECORATION, tileImage, i, j);
+                    setTileImage(LayerDefinition.COLLIDABLES, tileImage, i, j);
                 }
             }
         }
@@ -99,14 +162,14 @@ public class WorldChunk {
         // The packet must remain under 200 bytes
 
         // Send chunk layers
-        for (Map.Entry<LayerDefinition, TileImage[]> layerMap : layers.entrySet()) {
+        for (Map.Entry<LayerDefinition, Tile[]> layerMap : layers.entrySet()) {
             LayerDefinition layerDefinition = layerMap.getKey();
-            TileImage[] tileImages = layerMap.getValue();
+            Tile[] tileImages = layerMap.getValue();
 
             // Construct and send a section
             byte layerSectionsSent = 0;
             for (int t = 0; t < tileImages.length / GameConstants.MAX_TILE_SEND; t++) {
-                TileImage[] arraySend = new TileImage[GameConstants.MAX_TILE_SEND];
+                Tile[] arraySend = new Tile[GameConstants.MAX_TILE_SEND];
 
                 // Get the tiles to send
                 int j = 0;
@@ -132,7 +195,7 @@ public class WorldChunk {
 
         // Send chunk warps
         boolean clearWarps = true;
-        for (Warp warp : tileWarps) {
+        for (Warp warp : tileWarps.values()) {
             new TileWarpPacketOut(chunkRecipient,
                     clearWarps,
                     warp.getFromX(),

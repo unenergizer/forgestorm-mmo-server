@@ -14,8 +14,12 @@ import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
+import static com.forgestorm.server.util.Log.println;
+
 @Opcode(getOpcode = Opcodes.WORLD_BUILDER)
 public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn.WorldBuilderPacket> {
+
+    private static final boolean PRINT_DEBUG = false;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -23,6 +27,12 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         int textureId = clientHandler.readInt();
         int tileX = clientHandler.readInt();
         int tileY = clientHandler.readInt();
+
+        println(getClass(), "LayerDefinition: " + layerDefinition, false, PRINT_DEBUG);
+        println(getClass(), "textureId: " + textureId, false, PRINT_DEBUG);
+        println(getClass(), "tileX: " + tileX, false, PRINT_DEBUG);
+        println(getClass(), "tileY: " + tileY, false, PRINT_DEBUG);
+
         return new WorldBuilderPacket(clientHandler.getPlayer(), layerDefinition, textureId, tileX, tileY);
     }
 

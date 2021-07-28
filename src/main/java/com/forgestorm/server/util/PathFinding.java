@@ -2,9 +2,6 @@ package com.forgestorm.server.util;
 
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.maps.GameWorld;
-import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 
 import java.util.*;
 
@@ -39,7 +36,7 @@ public class PathFinding {
                 int worldX = bottomX + i;
                 int worldY = bottomY + j;
 
-                boolean isTraversable = gameWorld.isTraversable(new Location(gameWorld.getWorldName(), worldX, worldY));
+                boolean isTraversable = gameWorld.isTraversable(worldX, worldY);
 
                 if (isTraversable) {
                     grid[i][j] = new MoveNode(worldX, worldY, i, j);
@@ -63,8 +60,8 @@ public class PathFinding {
     private boolean initialConditions(GameWorld gameWorld, int startX, int startY, int finalX, int finalY) {
         if (startX == finalX && startY == finalY) return false;
 
-        if (!gameWorld.isTraversable(new Location(gameWorld.getWorldName(), startX, startY))) return false;
-        if (!gameWorld.isTraversable(new Location(gameWorld.getWorldName(), finalX, finalY))) return false;
+        if (!gameWorld.isTraversable(startX, startY)) return false;
+        if (!gameWorld.isTraversable(finalX, finalY)) return false;
 
         return Math.abs(finalX - startX) <= ALGORITHM_RADIUS && Math.abs(finalY - startY) <= ALGORITHM_RADIUS;
     }
