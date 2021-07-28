@@ -20,9 +20,10 @@ import static com.forgestorm.server.util.Log.println;
 
 public class VersionMain {
 
-    private static final boolean PRINT_DEBUG = true;
+    private static final boolean PRINT_DEBUG = false;
 
     public void beginVersioning() {
+        println(getClass(), "(1/3) Begin creating new version of content.");
         new Thread(() -> {
             updateCurrentRevisionNumber();
 
@@ -59,7 +60,7 @@ public class VersionMain {
             e.printStackTrace();
         }
 
-        println(getClass(), "Revision File Path: " + file.getAbsolutePath());
+        println(getClass(), "Revision File Path: " + file.getAbsolutePath(), false, PRINT_DEBUG);
     }
 
     private List<SendFile> createSendFileList() {
@@ -84,6 +85,7 @@ public class VersionMain {
     }
 
     private void ftpUpload(File fileListDocument, List<SendFile> sendFileList) {
+        println(getClass(), "(2/3) Uploading new content version to ftp. Do not shutdown server.");
         FTPUploader ftpUploader = new FTPUploader(PRINT_DEBUG);
         ftpUploader.connect();
 
@@ -97,6 +99,7 @@ public class VersionMain {
 
         // Finish uploading...
         ftpUploader.disconnect();
+        println(getClass(), "(3/3) Uploading finished. Content versioning complete.");
     }
 
     /**
