@@ -102,4 +102,9 @@ public class TileImage {
         println(getClass(), "TileImage:" + fileName + ", Height: " + height, false, PRINT_DEBUG);
         return height;
     }
+
+    @Override
+    public String toString() {
+        return "FileName: " + fileName + ", ImageID: " + imageId + ", Layer: " + layerDefinition + ", Properties: " + tileProperties.size();
+    }
 }

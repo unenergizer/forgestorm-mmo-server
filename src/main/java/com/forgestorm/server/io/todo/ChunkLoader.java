@@ -52,7 +52,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         worldChunkDataWrapper = null;
         worldChunkDataWrapper = new WorldChunkDataWrapper();
         WorldChunk worldChunk = parseChunk(file);
-        worldChunkDataWrapper.setWorldChunk(worldChunk);
+        worldChunkDataWrapper.setWorldChunkFromDisk(worldChunk);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
                     if (tileImage != null) {
                         println(ChunkLoader.class, " -- Setting TileImage: " + tileImage.getFileName(), false, PRINT_DEBUG);
                         Tile tile = chunk.getTile(layerDefinition, localX, localY);
-                        tile.setTileImage(new TileImage(tileImage));
+                        tile.setTileImage(tileImage);
                     }
                 }
             }
@@ -123,6 +123,6 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
     @Setter
     @Getter
     public static class WorldChunkDataWrapper {
-        private WorldChunk worldChunk;
+        private WorldChunk worldChunkFromDisk;
     }
 }

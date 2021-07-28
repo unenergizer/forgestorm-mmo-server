@@ -121,9 +121,7 @@ public class WorldChunk {
         Tile[] tiles = layers.get(layerDefinition);
         Tile tile = tiles[localX + localY * GameConstants.CHUNK_SIZE];
         if (tile == null) return true;
-        boolean b = !tile.hasCollision();
-//        println(getClass(), "isTraversable: " + b);
-        return b;
+        return !tile.hasCollision();
     }
 
     public void addTileWarp(int localX, int localY, Warp warp) {

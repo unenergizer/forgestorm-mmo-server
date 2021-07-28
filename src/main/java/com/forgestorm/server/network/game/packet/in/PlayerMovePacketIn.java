@@ -7,8 +7,12 @@ import com.forgestorm.server.game.world.task.MovementUpdateTask;
 import com.forgestorm.server.network.game.shared.*;
 import lombok.AllArgsConstructor;
 
+import static com.forgestorm.server.util.Log.println;
+
 @Opcode(getOpcode = Opcodes.MOVE_REQUEST)
 public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.MovePacket> {
+
+    private static final boolean PRINT_DEBUG = true;
 
     @Override
     public PacketData decodePacket(ClientHandler clientHandler) {
@@ -24,19 +28,23 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
 
     @Override
     public void onEvent(MovePacket packetData) {
+        println(getClass(), "- - //----------- PLAYER MOVE INCOMING -----------// - -", false, PRINT_DEBUG);
         Player player = packetData.getClientHandler().getPlayer();
 
         MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
-        // TODO: REMOVE SHORT CAST!!
-        Location location = new Location(player.getWorldName(), (short) packetData.x, (short) packetData.y);
+        Location location = new Location(player.getWorldName(), packetData.x, packetData.y);
 
-        if (!movementUpdateTask.preMovementChecks(player, location)) return;
+        if (!movementUpdateTask.preMovementChecks(player, location)) {
+            println(getClass(), "Player failed pre-movement checks.", false, PRINT_DEBUG);
+            return;
+        }
 
+        println(getClass(), "Moving player to " + location.toString(), false, PRINT_DEBUG);
         movementUpdateTask.performPlayerMove(player, location);
     }
 
     @AllArgsConstructor
-    class MovePacket extends PacketData {
+    static class MovePacket extends PacketData {
         int x;
         int y;
     }

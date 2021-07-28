@@ -66,7 +66,7 @@ public class GameWorld {
             short chunkY = Short.parseShort(parts[1]);
 
             String path = fileManager.loadWorldChunkData(file, true, worldName);
-            findChunk(chunkX, chunkY).setChunkFromDisk(fileManager.getWorldChunkData(path).getWorldChunk());
+            findChunk(chunkX, chunkY).setChunkFromDisk(fileManager.getWorldChunkData(path).getWorldChunkFromDisk());
         }
 
 

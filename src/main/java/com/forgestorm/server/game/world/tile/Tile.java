@@ -8,9 +8,11 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.forgestorm.server.util.Log.println;
+
 public class Tile {
 
-    private final transient List<TileImage> collisionParents = new ArrayList<>(0);
+    private final transient List<Integer> collisionParents = new ArrayList<>(0);
     private final LayerDefinition layerDefinition;
 
     @Getter
@@ -30,13 +32,13 @@ public class Tile {
     }
 
     public void setTileImage(TileImage tileImage) {
-        if (this.tileImage != null) removeTileImage();
+        removeTileImage();
 
         this.tileImage = tileImage;
         applyTileProperties();
     }
 
-    public void removeTileImage() {
+    private void removeTileImage() {
         removeTileProperties();
         tileImage = null;
     }
@@ -57,16 +59,18 @@ public class Tile {
         // DO COLLISION REMOVAL
         if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) {
             CollisionBlockProperty collisionBlockProperty = (CollisionBlockProperty) tileImage.getProperty(TilePropertyTypes.COLLISION_BLOCK);
-            collisionBlockProperty.removePropertyToWorld(tileImage, layerDefinition, worldName, worldX, worldY);
+            collisionBlockProperty.removePropertyFromWorld(tileImage, layerDefinition, worldName, worldX, worldY);
         }
     }
 
     public void addCollision(TileImage parent) {
-        collisionParents.add(parent);
+        if (collisionParents.contains(parent.getImageId())) return;
+        collisionParents.add(parent.getImageId());
     }
 
-    public void removeCollision(TileImage parent) {
-        collisionParents.remove(parent);
+    public boolean removeCollision(TileImage parent) {
+        // Do not remove cast to Integer
+        return collisionParents.remove((Integer) parent.getImageId());
     }
 
     public boolean hasCollision() {
