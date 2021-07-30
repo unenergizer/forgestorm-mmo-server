@@ -1,8 +1,13 @@
 package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
+import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.tile.properties.DoorProperty;
+import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.DoorInteractPacketOut;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,52 +16,81 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.forgestorm.server.util.Log.println;
-
 public class DoorManager {
 
-    private static final boolean PRINT_DEBUG = true;
-    private static final int MAX_TIME_DOOR_OPEN = 120;
+    private static final int MAX_TIME_DOOR_OPEN_MINUTES = 1; // Change door auto close time here
+    private static final int MAX_TIME_DOOR_OPEN = 20 * 60 * MAX_TIME_DOOR_OPEN_MINUTES;
 
     @Getter
     private final List<DoorInfo> doorOpenList = new ArrayList<>();
 
-    public void openDoor(Player player, GameWorld gameWorld, Tile tile) {
+    public void playerToggleDoor(Player player, DoorStatus doorStatus, int tileX, int tileY) {
+        GameWorld gameWorld = player.getGameWorld();
+        Location playerLocation = player.getCurrentWorldLocation();
 
-        // TODO: In the future check to see what the status of the door is. If it is locked etc..
+        Tile tile = gameWorld.getTile(LayerDefinition.COLLIDABLES, tileX, tileY);
+        TileImage tileImage = tile.getTileImage();
 
-        println(getClass(), "Door has been opened. Player: " + player.getName() + ", TileXY: " + tile.getWorldX() + "/" + tile.getWorldY());
-        sendDoorStatus(DoorStatus.OPEN, player, tile);
-        doorOpenList.add(new DoorInfo(player, gameWorld, tile));
+        if (tileImage == null) return;
+        if (!tileImage.containsProperty(TilePropertyTypes.DOOR)) return;
+        if (isTooFarAway(playerLocation, tileX, tileY)) return;
+
+        DoorProperty doorProperty = (DoorProperty) tileImage.getProperty(TilePropertyTypes.DOOR);
+        DoorStatus serverDoorStatus = doorProperty.getDoorStatus();
+
+        // If the door status are the same, then do not continue
+        if (serverDoorStatus == doorStatus) return;
+        doorProperty.setDoorStatus(doorStatus);
+
+        // Do door status specific operations
+        switch (doorStatus) {
+            case OPEN:
+                doorOpenList.add(new DoorInfo(gameWorld, tile));
+                break;
+            case CLOSED:
+                doorOpenList.removeIf(doorInfo -> doorInfo.tile == tile);
+                break;
+        }
+
+        // Send network packet
+        ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
+                new DoorInteractPacketOut(player, doorStatus, tile).sendPacket());
     }
 
-    public void closeDoor(Tile tile) {
-        doorOpenList.removeIf(doorInfo -> {
-            sendDoorStatus(DoorStatus.CLOSED, doorInfo.doorOpener, doorInfo.getTile());
-            return doorInfo.tile == tile;
-        });
+    private boolean isTooFarAway(Location playerClientLocation, int x1, int y1) {
+        int x2 = playerClientLocation.getX();
+        int y2 = playerClientLocation.getY();
+
+        double distance = Math.abs(x2 - x1) + Math.abs(y2 - y1);
+
+        return distance > GameConstants.MAX_INTERACT_DISTANCE;
     }
 
-    public void forceCloseDoor(Iterator<DoorInfo> iterator, DoorInfo doorInfo) {
-        println(getClass(), "Force close door. TileXY: " + doorInfo.tile.getWorldX() + "/" + doorInfo.tile.getWorldY());
-        sendDoorStatus(DoorStatus.CLOSED, doorInfo.doorOpener, doorInfo.getTile());
+    public void serverForceCloseDoor(Iterator<DoorInfo> iterator, DoorInfo doorInfo) {
+        DoorStatus forceCloseStatus = DoorStatus.CLOSED;
+        TileImage tileImage = doorInfo.getTile().getTileImage();
+        DoorProperty doorProperty = (DoorProperty) tileImage.getProperty(TilePropertyTypes.DOOR);
+
+        // If the door is already closed, no need to continue..
+        if (doorProperty.getDoorStatus() == forceCloseStatus) return;
+
+        // Set the force close status to the door
+        doorProperty.setDoorStatus(forceCloseStatus);
+
+        // Let the players know!
+        ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
+                new DoorInteractPacketOut(anyPlayer, forceCloseStatus, doorInfo.getTile()).sendPacket()
+        );
         iterator.remove();
     }
 
-    public void sendDoorStatus(DoorStatus doorStatus, Player player, Tile tile) {
-        switch (doorStatus) {
-            case OPEN:
-                ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                        new DoorInteractPacketOut(player, DoorStatus.OPEN, tile).sendPacket());
-                break;
-            case CLOSED:
-                ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
-                        new DoorInteractPacketOut(clientHandler.getPlayer(), DoorStatus.CLOSED, tile).sendPacket());
-                break;
-            default:
-                new DoorInteractPacketOut(player, DoorStatus.LOCKED, tile).sendPacket();
-                break;
-        }
+    public boolean isDoorwayTraversable(Tile tile) {
+        TileImage tileImage = tile.getTileImage();
+        if (tileImage == null) return true;
+        if (!tileImage.containsProperty(TilePropertyTypes.DOOR)) return true;
+
+        DoorProperty doorProperty = (DoorProperty) tileImage.getProperty(TilePropertyTypes.DOOR);
+        return doorProperty.getDoorStatus() == DoorStatus.OPEN;
     }
 
     public enum DoorStatus {
@@ -78,15 +112,13 @@ public class DoorManager {
 
     @Getter
     public static class DoorInfo {
-        private final Player doorOpener;
         private final GameWorld gameWorld;
         private final Tile tile;
 
         @Setter
         private int timeLeftTillAutoClose = MAX_TIME_DOOR_OPEN;
 
-        public DoorInfo(Player doorOpener, GameWorld gameWorld, Tile tile) {
-            this.doorOpener = doorOpener;
+        public DoorInfo(GameWorld gameWorld, Tile tile) {
             this.gameWorld = gameWorld;
             this.tile = tile;
         }

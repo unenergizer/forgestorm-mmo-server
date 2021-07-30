@@ -17,7 +17,7 @@ public class DoorTimerTask implements AbstractTask {
             int timeLeft = doorInfo.getTimeLeftTillAutoClose() - 1;
 
             if (timeLeft <= 0) {
-                doorManager.forceCloseDoor(iterator, doorInfo);
+                doorManager.serverForceCloseDoor(iterator, doorInfo);
             } else {
                 doorInfo.setTimeLeftTillAutoClose(timeLeft);
             }

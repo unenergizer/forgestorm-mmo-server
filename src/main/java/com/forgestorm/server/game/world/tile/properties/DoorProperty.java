@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.tile.properties;
 
+import com.forgestorm.server.game.world.maps.DoorManager;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,8 @@ import static com.forgestorm.server.util.Log.println;
 @Setter
 public class DoorProperty extends AbstractTileProperty {
 
+    // Must match the game-client
+    private transient DoorManager.DoorStatus doorStatus = DoorManager.DoorStatus.CLOSED;
     private Integer magicLockingLevel;
 
     public DoorProperty() {

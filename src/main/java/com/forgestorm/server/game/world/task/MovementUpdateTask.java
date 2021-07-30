@@ -10,7 +10,6 @@ import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
 import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
@@ -565,26 +564,12 @@ public class MovementUpdateTask implements AbstractTask {
             return;
         }
 
-        GameWorld gameWorld = player.getGameWorld();
-        Location currentLocation = player.getCurrentWorldLocation();
-
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
         // Warping to location
-        if (gameWorld.locationHasWarp(attemptLocation)) {
+        if (player.getGameWorld().locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameWorld().getWarpFromLocation(attemptLocation));
-        }
-
-        // Door control
-        boolean enteringDoor = gameWorld.isDoor(attemptLocation.getX(), attemptLocation.getY());
-        boolean leavingDoor = gameWorld.isDoor(currentLocation.getX(), currentLocation.getY());
-
-        if (enteringDoor) {
-            println(getClass(), "DOOR ENTER");
-            ServerMain.getInstance().getDoorManager().openDoor(player, gameWorld, gameWorld.getTile(LayerDefinition.COLLIDABLES, attemptLocation.getX(), attemptLocation.getY()));
-        } else if (leavingDoor) {
-            println(getClass(), "DOOR EXIT");
         }
 
         // Stationary Entity interactivity?
