@@ -25,6 +25,7 @@ public class GameLoop extends Thread {
     private final AiEntityRespawnTimerTask aiEntityRespawnTimerTask = new AiEntityRespawnTimerTask();
     private final ProcessMining processMining = new ProcessMining();
     private final CheckIdlePlayerTask checkIdlePlayerTask = new CheckIdlePlayerTask();
+    private final DoorTimerTask doorTimerTask = new DoorTimerTask();
 
     /* UPDATES PER SECOND */
     private int currentTPS;
@@ -76,6 +77,7 @@ public class GameLoop extends Thread {
             serverMain.getNetworkManager().getOutStreamManager().sendPackets();
             serverMain.getTradeManager().tick(numberOfTicksPassed);
             checkIdlePlayerTask.tick(numberOfTicksPassed);
+            doorTimerTask.tick(numberOfTicksPassed);
             // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);

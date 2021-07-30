@@ -10,6 +10,7 @@ import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.WorldChunk;
+import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
 import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
 import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
@@ -558,14 +559,35 @@ public class MovementUpdateTask implements AbstractTask {
      * @param player The entity ot add.
      */
     public void performPlayerMove(Player player, Location attemptLocation) {
+        //
+        if (!preMovementChecks(player, attemptLocation)) {
+            println(getClass(), "Player failed pre-movement checks.", false, PRINT_DEBUG);
+            return;
+        }
+
+        GameWorld gameWorld = player.getGameWorld();
+        Location currentLocation = player.getCurrentWorldLocation();
 
         // Canceling trade for the packetReceiver.
         ServerMain.getInstance().getTradeManager().ifTradeExistCancel(player, MessageText.SERVER + "Trade canceled. Players can not move when trading.");
 
-        if (player.getGameWorld().locationHasWarp(attemptLocation)) {
+        // Warping to location
+        if (gameWorld.locationHasWarp(attemptLocation)) {
             player.setWarp(player.getGameWorld().getWarpFromLocation(attemptLocation));
         }
 
+        // Door control
+        boolean enteringDoor = gameWorld.isDoor(attemptLocation.getX(), attemptLocation.getY());
+        boolean leavingDoor = gameWorld.isDoor(currentLocation.getX(), currentLocation.getY());
+
+        if (enteringDoor) {
+            println(getClass(), "DOOR ENTER");
+            ServerMain.getInstance().getDoorManager().openDoor(player, gameWorld, gameWorld.getTile(LayerDefinition.COLLIDABLES, attemptLocation.getX(), attemptLocation.getY()));
+        } else if (leavingDoor) {
+            println(getClass(), "DOOR EXIT");
+        }
+
+        // Stationary Entity interactivity?
         StationaryEntity stationaryEntity = ServerMain.getInstance().getGameLoop().getProcessMining().getMiningNode(player);
         if (stationaryEntity != null) {
             if (!stationaryEntity.getCurrentWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
@@ -579,6 +601,7 @@ public class MovementUpdateTask implements AbstractTask {
             player.setBankOpen(false);
         }
 
+        // Update future location
         player.setFutureWorldLocation(new Location(attemptLocation));
         player.setWalkTime(0f);
         player.setFacingDirection(player.getCurrentWorldLocation().getMoveDirectionFromLocation(player.getFutureWorldLocation()));
@@ -600,7 +623,8 @@ public class MovementUpdateTask implements AbstractTask {
             println(getClass(), "Moving into new chunk! Chunk XY: " + futureChunk.getChunkX() + " / " + futureChunk.getChunkY(), false, false);
 
             // The player is moving into a new chunk. Load chunks the player hasn't seen yet.
-            // TODO: Load chunks around the player. The one they are walking into should already be loaded...
+            // TODO: This loads chunks around the player...
+            //  However, we should only send the player new chunks they don't have loaded yet...
 
             Location futureLocation = player.getFutureWorldLocation();
             short clientChunkX = (short) Math.floor(futureLocation.getX() / (float) GameConstants.CHUNK_SIZE);

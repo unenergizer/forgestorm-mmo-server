@@ -9,6 +9,7 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
+import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
@@ -211,6 +212,13 @@ public class GameWorld {
         short localY = (short) (entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
 
         return worldChunk.getWarp(localX, localY);
+    }
+
+    public boolean isDoor(int entityX, int entityY) {
+        Tile tile = getTile(LayerDefinition.COLLIDABLES, entityX, entityY);
+        if (tile == null) return false;
+        if (tile.getTileImage() == null) return false;
+        return tile.getTileImage().containsProperty(TilePropertyTypes.DOOR);
     }
 
     public boolean isTraversable(Location location) {

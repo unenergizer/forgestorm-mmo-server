@@ -7,6 +7,7 @@ public class GameConstants {
     public static final int MAP_SAVE_INTERVAL_IN_MINUTES = TICKS_PER_SECOND * 60 * 5; // TPS * 60 Seconds * 5 Minutes
     public static final int TILE_SIZE = 16;
     public static final int CHUNK_SIZE = 16;
+
     // NOTE: THIS SHOULD PROBABLY ALWAYS BE BIGGER THAN
     // THE RADIUS ON THE CLIENT SIDE
     public static final int CHUNK_RADIUS = 2;

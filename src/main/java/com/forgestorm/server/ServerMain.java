@@ -13,6 +13,7 @@ import com.forgestorm.server.game.rpg.skills.SkillNodeManager;
 import com.forgestorm.server.game.world.item.DropTableManager;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.item.trade.TradeManager;
+import com.forgestorm.server.game.world.maps.DoorManager;
 import com.forgestorm.server.game.world.maps.building.WorldBuilder;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.NetworkManager;
@@ -47,6 +48,7 @@ public class ServerMain {
     private AbilityManager abilityManager;
 
     // System
+    private DoorManager doorManager;
     private WorldBuilder worldBuilder;
     private TradeManager tradeManager;
     private GameManager gameManager;
@@ -94,6 +96,7 @@ public class ServerMain {
         abilityManager = new AbilityManager();
 
         // System
+        doorManager = new DoorManager();
         worldBuilder = new WorldBuilder();
         tradeManager = new TradeManager();
         gameManager = new GameManager();

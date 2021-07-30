@@ -34,11 +34,6 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
         MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
         Location location = new Location(player.getWorldName(), packetData.x, packetData.y);
 
-        if (!movementUpdateTask.preMovementChecks(player, location)) {
-            println(getClass(), "Player failed pre-movement checks.", false, PRINT_DEBUG);
-            return;
-        }
-
         println(getClass(), "Moving player to " + location.toString(), false, PRINT_DEBUG);
         movementUpdateTask.performPlayerMove(player, location);
     }
