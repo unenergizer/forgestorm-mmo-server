@@ -4,6 +4,7 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.EntitySpawnPacketOut;
+import com.forgestorm.server.util.ServerTimeUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,8 +15,8 @@ import static com.forgestorm.server.util.Log.println;
 public class GroundItemTimerTask implements AbstractTask {
 
     private static final boolean PRINT_DEBUG = false;
-    private static final int TIME_TO_SPAWN_TO_ALL = GameConstants.TICKS_PER_SECOND * 60; // 1 min
-    private static final int TIME_TO_DESPAWN = GameConstants.TICKS_PER_SECOND * 60 * 3; // 3 min
+    private static final int TIME_TO_SPAWN_TO_ALL = ServerTimeUtil.getMinutes(1);
+    private static final int TIME_TO_DESPAWN = ServerTimeUtil.getMinutes(3);
 
     private final List<GroundItemTimer> groundItemTimers = new ArrayList<>();
 

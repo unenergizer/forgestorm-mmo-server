@@ -1,17 +1,19 @@
 package com.forgestorm.server.game;
 
+import com.forgestorm.server.util.ServerTimeUtil;
+
 public class GameConstants {
     public static final int TICKS_PER_SECOND = 20;
 
     public static final String MAP_FILE_EXTENSION_TYPE = ".json";
-    public static final int MAP_SAVE_INTERVAL_IN_MINUTES = TICKS_PER_SECOND * 60 * 5; // TPS * 60 Seconds * 5 Minutes
+    public static final int MAP_SAVE_INTERVAL_IN_MINUTES = ServerTimeUtil.getMinutes(5);
     public static final int TILE_SIZE = 16;
     public static final int CHUNK_SIZE = 16;
 
     // NOTE: THIS SHOULD PROBABLY ALWAYS BE BIGGER THAN
     // THE RADIUS ON THE CLIENT SIDE
     public static final int CHUNK_RADIUS = 2;
-    public static final  int MAX_TILE_SEND = 4 * 4;
+    public static final int MAX_TILE_SEND = 4 * 4;
 
     public static final short HUMAN_MAX_HEADS = 79;
     public static final short HUMAN_MAX_BODIES = 59;

@@ -4,13 +4,13 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
+import com.forgestorm.server.util.ServerTimeUtil;
 
 import java.util.concurrent.TimeUnit;
 
 public class CheckIdlePlayerTask {
 
-    private static final int IDLE_LOGOUT_TIME_MINUTES = 5;
-    private static final int IDLE_LOGOUT_TIME_SECONDS = IDLE_LOGOUT_TIME_MINUTES * 60;
+    private static final int IDLE_LOGOUT_TIME_SECONDS = ServerTimeUtil.getMinutes(5);
 
     public void tick(long numberOfTicksPassed) {
         long currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
