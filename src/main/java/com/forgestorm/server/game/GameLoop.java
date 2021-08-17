@@ -66,6 +66,7 @@ public class GameLoop extends Thread {
             serverMain.getCommandManager().getCommandProcessor().executeCommands();
             serverMain.getNetworkManager().getGameServerConnection().getEventBus().gameThreadPublish();
             playerMoveInventoryEvents.processInventoryEvents();
+            doorTimerTask.tick(numberOfTicksPassed);
             movementUpdateTask.tick(numberOfTicksPassed);
             warpTask.tick(numberOfTicksPassed);
             groundItemTimerTask.tick(numberOfTicksPassed);
@@ -77,7 +78,6 @@ public class GameLoop extends Thread {
             serverMain.getNetworkManager().getOutStreamManager().sendPackets();
             serverMain.getTradeManager().tick(numberOfTicksPassed);
             checkIdlePlayerTask.tick(numberOfTicksPassed);
-            doorTimerTask.tick(numberOfTicksPassed);
             // Update End
 
             sync(GameConstants.TICKS_PER_SECOND);

@@ -9,6 +9,7 @@ import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.DoorProperty;
 import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.DoorInteractPacketOut;
+import com.forgestorm.server.util.ServerTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +19,7 @@ import java.util.List;
 
 public class DoorManager {
 
-    private static final int MAX_TIME_DOOR_OPEN_MINUTES = 1; // Change door auto close time here
-    private static final int MAX_TIME_DOOR_OPEN = 20 * 60 * MAX_TIME_DOOR_OPEN_MINUTES;
+    private static final int MAX_TIME_DOOR_OPEN = ServerTimeUtil.getMinutes(1);
 
     @Getter
     private final List<DoorInfo> doorOpenList = new ArrayList<>();
