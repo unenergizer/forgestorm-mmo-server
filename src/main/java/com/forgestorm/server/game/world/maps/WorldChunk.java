@@ -149,7 +149,7 @@ public class WorldChunk {
 
                 int rand = RandomUtil.getNewRandom(0, 100);
 
-                if (rand <= 50) {
+                if (rand <= 20) {
                     TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(262);
                     setTileImage(LayerDefinition.COLLIDABLES, tileImage, i, j);
                 }
