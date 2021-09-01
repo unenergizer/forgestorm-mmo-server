@@ -18,7 +18,8 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
     public PacketData decodePacket(ClientHandler clientHandler) {
         final int x = clientHandler.readInt();
         final int y = clientHandler.readInt();
-        return new MovePacket(x, y);
+        final short worldZ = clientHandler.readShort();
+        return new MovePacket(x, y, worldZ);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
         Player player = packetData.getClientHandler().getPlayer();
 
         MovementUpdateTask movementUpdateTask = ServerMain.getInstance().getGameLoop().getMovementUpdateTask();
-        Location location = new Location(player.getWorldName(), packetData.x, packetData.y);
+        Location location = new Location(player.getWorldName(), packetData.x, packetData.y, packetData.worldZ);
 
         println(getClass(), "Moving player to " + location.toString(), false, PRINT_DEBUG);
         movementUpdateTask.performPlayerMove(player, location);
@@ -42,5 +43,6 @@ public class PlayerMovePacketIn implements PacketListener<PlayerMovePacketIn.Mov
     static class MovePacket extends PacketData {
         int x;
         int y;
+        short worldZ;
     }
 }

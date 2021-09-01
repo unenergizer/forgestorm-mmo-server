@@ -18,14 +18,15 @@ public class GameWorldItemStackDropSQL {
 
     private void databaseLoad(ItemStackDrop itemStackDrop, ResultSet resultSet) throws SQLException {
         String worldName = resultSet.getString("world_name");
-        short worldX = resultSet.getShort("world_x");
-        short worldY = resultSet.getShort("world_y");
+        int worldX = resultSet.getInt("world_x");
+        int worldY = resultSet.getInt("world_y");
+        short worldZ = resultSet.getShort("world_z");
         int itemStackId = resultSet.getInt("itemstack_id");
         int amount = resultSet.getInt("amount");
         int respawnTimeMin = resultSet.getInt("respawn_time_min");
         int respawnTimeMax = resultSet.getInt("respawn_time_min");
 
-        Location location = new Location(worldName, worldX, worldY);
+        Location location = new Location(worldName, worldX, worldY, worldZ);
         ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(itemStackId, amount);
 
         itemStackDrop.setSpawnedForAll(true);
@@ -43,34 +44,36 @@ public class GameWorldItemStackDropSQL {
 
     private PreparedStatement databaseSave(ItemStackDrop itemStackDrop, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_itemstack_drop" +
-                " SET world_name=?, world_x=?, world_y=?, " +
+                " SET world_name=?, world_x=?, world_y=?, world_z=?, " +
                 " itemstack_id=?, amount=?, respawn_time_min=?, respawn_time_max=? " +
                 " WHERE drop_id=?");
 
         preparedStatement.setString(1, itemStackDrop.getCurrentWorldLocation().getWorldName());
         preparedStatement.setInt(2, itemStackDrop.getCurrentWorldLocation().getX());
         preparedStatement.setInt(3, itemStackDrop.getCurrentWorldLocation().getY());
-        preparedStatement.setInt(4, itemStackDrop.getItemStack().getItemId());
-        preparedStatement.setInt(5, itemStackDrop.getItemStack().getAmount());
-        preparedStatement.setInt(6, itemStackDrop.getRespawnTimeMin());
-        preparedStatement.setInt(7, itemStackDrop.getRespawnTimeMax());
-        preparedStatement.setInt(8, itemStackDrop.getDatabaseId());
+        preparedStatement.setShort(4, itemStackDrop.getCurrentWorldLocation().getZ());
+        preparedStatement.setInt(5, itemStackDrop.getItemStack().getItemId());
+        preparedStatement.setInt(6, itemStackDrop.getItemStack().getAmount());
+        preparedStatement.setInt(7, itemStackDrop.getRespawnTimeMin());
+        preparedStatement.setInt(8, itemStackDrop.getRespawnTimeMax());
+        preparedStatement.setInt(9, itemStackDrop.getDatabaseId());
 
         return preparedStatement;
     }
 
     private PreparedStatement firstTimeSave(ItemStackDrop itemStackDrop, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_itemstack_drop " +
-                "(world_name, world_x, world_y, itemstack_id, amount, respawn_time_min, respawn_time_max) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?)");
+                "(world_name, world_x, world_y, world_z, itemstack_id, amount, respawn_time_min, respawn_time_max) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, itemStackDrop.getCurrentWorldLocation().getWorldName());
         preparedStatement.setInt(2, itemStackDrop.getCurrentWorldLocation().getX());
         preparedStatement.setInt(3, itemStackDrop.getCurrentWorldLocation().getY());
-        preparedStatement.setInt(4, itemStackDrop.getItemStack().getItemId());
-        preparedStatement.setInt(5, itemStackDrop.getItemStack().getAmount());
-        preparedStatement.setInt(6, itemStackDrop.getRespawnTimeMin());
-        preparedStatement.setInt(7, itemStackDrop.getRespawnTimeMax());
+        preparedStatement.setShort(4, itemStackDrop.getCurrentWorldLocation().getZ());
+        preparedStatement.setInt(5, itemStackDrop.getItemStack().getItemId());
+        preparedStatement.setInt(6, itemStackDrop.getItemStack().getAmount());
+        preparedStatement.setInt(7, itemStackDrop.getRespawnTimeMin());
+        preparedStatement.setInt(8, itemStackDrop.getRespawnTimeMax());
 
         return preparedStatement;
     }

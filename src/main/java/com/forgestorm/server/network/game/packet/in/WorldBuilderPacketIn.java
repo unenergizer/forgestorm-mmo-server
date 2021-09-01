@@ -5,6 +5,7 @@ import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
@@ -27,13 +28,15 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         int textureId = clientHandler.readInt();
         int tileX = clientHandler.readInt();
         int tileY = clientHandler.readInt();
+        short worldZ = clientHandler.readShort();
 
         println(getClass(), "LayerDefinition: " + layerDefinition, false, PRINT_DEBUG);
         println(getClass(), "textureId: " + textureId, false, PRINT_DEBUG);
         println(getClass(), "tileX: " + tileX, false, PRINT_DEBUG);
         println(getClass(), "tileY: " + tileY, false, PRINT_DEBUG);
+        println(getClass(), "worldZ: " + worldZ, false, PRINT_DEBUG);
 
-        return new WorldBuilderPacket(clientHandler.getPlayer(), layerDefinition, textureId, tileX, tileY);
+        return new WorldBuilderPacket(clientHandler.getPlayer(), layerDefinition, textureId, tileX, tileY, worldZ);
     }
 
     @Override
@@ -60,11 +63,11 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         int localX = packetData.tileX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = packetData.tileY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
-        worldChunk.setTileImage(packetData.layerDefinition, tileImage, localX, localY);
+        worldChunk.setTileImage(packetData.layerDefinition, tileImage, localX, localY, Floors.getFloor(packetData.worldZ));
 
         // For now, just resend the building packet to all (but original playerSender)
         ServerMain.getInstance().getGameManager().sendToAllButPlayer(packetData.playerSender, clientHandler ->
-                new WorldBuilderPacketOut(clientHandler, packetData.layerDefinition, packetData.textureId, packetData.tileX, packetData.tileY).sendPacket());
+                new WorldBuilderPacketOut(clientHandler, packetData.layerDefinition, packetData.textureId, packetData.tileX, packetData.tileY, packetData.worldZ).sendPacket());
     }
 
     @AllArgsConstructor
@@ -74,5 +77,6 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         private final int textureId;
         private final int tileX;
         private final int tileY;
+        private final short worldZ;
     }
 }

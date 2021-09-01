@@ -17,11 +17,13 @@ public class TileWarpPacketIn implements PacketListener<TileWarpPacketIn.TileWar
     public PacketData decodePacket(ClientHandler clientHandler) {
         int fromX = clientHandler.readInt();
         int fromY = clientHandler.readInt();
+        short fromZ = clientHandler.readShort();
         String toWorldName = clientHandler.readString();
         int toX = clientHandler.readInt();
         int toY = clientHandler.readInt();
+        short toZ = clientHandler.readShort();
         byte moveDirection = clientHandler.readByte();
-        return new TileWarpPacket(fromX, fromY, toWorldName, toX, toY, MoveDirection.getDirection(moveDirection));
+        return new TileWarpPacket(fromX, fromY, fromZ, toWorldName, toX, toY, toZ, MoveDirection.getDirection(moveDirection));
     }
 
     @Override
@@ -41,24 +43,28 @@ public class TileWarpPacketIn implements PacketListener<TileWarpPacketIn.TileWar
         GameWorld gameWorld = packetData.getClientHandler().getPlayer().getCurrentWorldLocation().getGameWorld();
         WorldChunk worldChunk = gameWorld.findChunk(packetData.fromX, packetData.fromY);
 
-        Location warpLocation = new Location(packetData.toWorldName, packetData.toX, packetData.toY);
+        Location warpLocation = new Location(packetData.toWorldName, packetData.toX, packetData.toY, packetData.toZ);
         short localX = (short) (packetData.fromX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
         short localY = (short) (packetData.fromY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
-        worldChunk.addTileWarp(localX, localY, new Warp(warpLocation, packetData.facingDirection, localX, localY));
+        worldChunk.addTileWarp(localX, localY, new Warp(warpLocation, packetData.facingDirection, localX, localY, packetData.fromZ));
 
         println(getClass(), "fromX: " + packetData.fromX, false, PRINT_DEBUG);
         println(getClass(), "fromY: " + packetData.fromY, false, PRINT_DEBUG);
+        println(getClass(), "fromZ: " + packetData.fromZ, false, PRINT_DEBUG);
         println(getClass(), "toWorldName: " + packetData.toWorldName, false, PRINT_DEBUG);
         println(getClass(), "toX: " + packetData.toX, false, PRINT_DEBUG);
         println(getClass(), "toY: " + packetData.toY, false, PRINT_DEBUG);
+        println(getClass(), "toZ: " + packetData.toZ, false, PRINT_DEBUG);
         println(getClass(), "MoveDirection: " + packetData.facingDirection, false, PRINT_DEBUG);
     }
 
     @AllArgsConstructor
     static class TileWarpPacket extends PacketData {
         private final int fromX, fromY;
+        private final short fromZ;
         private final String toWorldName;
         private final int toX, toY;
+        private final short toZ;
         private final MoveDirection facingDirection;
     }
 }

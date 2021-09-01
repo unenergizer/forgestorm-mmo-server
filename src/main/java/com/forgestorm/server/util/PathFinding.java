@@ -26,7 +26,7 @@ public class PathFinding {
         return current;
     }
 
-    private void initializeGrid(GameWorld gameWorld, int startX, int startY) {
+    private void initializeGrid(GameWorld gameWorld, int startX, int startY, short worldZ) {
 
         int bottomX = startX - ALGORITHM_RADIUS;
         int bottomY = startY - ALGORITHM_RADIUS;
@@ -36,7 +36,7 @@ public class PathFinding {
                 int worldX = bottomX + i;
                 int worldY = bottomY + j;
 
-                boolean isTraversable = gameWorld.isTraversable(worldX, worldY);
+                boolean isTraversable = gameWorld.isTraversable(worldX, worldY, worldZ);
 
                 if (isTraversable) {
                     grid[i][j] = new MoveNode(worldX, worldY, i, j);
@@ -57,11 +57,11 @@ public class PathFinding {
         }
     }
 
-    private boolean initialConditions(GameWorld gameWorld, int startX, int startY, int finalX, int finalY) {
+    private boolean initialConditions(GameWorld gameWorld, int startX, int startY, int finalX, int finalY, short worldZ) {
         if (startX == finalX && startY == finalY) return false;
 
-        if (!gameWorld.isTraversable(startX, startY)) return false;
-        if (!gameWorld.isTraversable(finalX, finalY)) return false;
+        if (!gameWorld.isTraversable(startX, startY, worldZ)) return false;
+        if (!gameWorld.isTraversable(finalX, finalY, worldZ)) return false;
 
         return Math.abs(finalX - startX) <= ALGORITHM_RADIUS && Math.abs(finalY - startY) <= ALGORITHM_RADIUS;
     }
@@ -87,10 +87,10 @@ public class PathFinding {
         }
     }
 
-    public Queue<MoveNode> findPath(GameWorld gameWorld, int startX, int startY, int finalX, int finalY) {
-        if (!initialConditions(gameWorld, startX, startY, finalX, finalY)) return null;
+    public Queue<MoveNode> findPath(GameWorld gameWorld, int startX, int startY, int finalX, int finalY, short worldZ) {
+        if (!initialConditions(gameWorld, startX, startY, finalX, finalY, worldZ)) return null;
 
-        initializeGrid(gameWorld, startX, startY);
+        initializeGrid(gameWorld, startX, startY, worldZ);
 
         // Start node
         openSet.add(grid[ALGORITHM_RADIUS][ALGORITHM_RADIUS]);

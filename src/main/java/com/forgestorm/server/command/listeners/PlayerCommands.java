@@ -64,26 +64,27 @@ public class PlayerCommands {
         commandSource.sendMessage("[GREEN]You have teleported to [YELLOW]" + teleportToPlayer.getName() + "[GREEN].");
     }
 
-    @Command(base = "teleport", argLenReq = 4)
-    @CommandArguments(missing = "<playerName> <mapName> <x> <y>")
+    @Command(base = "teleport", argLenReq = 5)
+    @CommandArguments(missing = "<playerName> <mapName> <x> <y> <z>")
     @CommandPermission(status = CommandPermStatus.MOD)
     public void teleportPlayer(CommandSource commandSource, String[] args) {
         String playerName = args[0];
         String mapName = args[1];
-        short x;
-        short y;
+        int x, y;
+        short z;
 
         try {
-            x = Short.parseShort(args[2]);
-            y = Short.parseShort(args[3]);
+            x = Integer.parseInt(args[2]);
+            y = Integer.parseInt(args[3]);
+            z = Short.parseShort(args[4]);
         } catch (NumberFormatException e) {
             commandSource.sendMessage("[RED]Command arguments must contain valid numbers.");
-            commandSource.sendMessage("[RED]Accepted Args: teleport <playerName> <mapName> <x> <y>");
+            commandSource.sendMessage("[RED]Accepted Args: teleport <playerName> <mapName> <x> <y> <z>");
             return;
         }
 
         GameWorldProcessor gameWorldProcessor = ServerMain.getInstance().getGameManager().getGameWorldProcessor();
-        Location location = new Location(mapName, x, y);
+        Location location = new Location(mapName, x, y, z);
 
         if (!gameWorldProcessor.doesGameWorldExist(mapName)) {
             commandSource.sendMessage("[RED]The map <" + mapName + "> does not exist. Check spelling.");
@@ -98,7 +99,7 @@ public class PlayerCommands {
         Player player = commandManager.getPlayer(commandSource, playerName);
         if (player == null) return;
 
-        player.setWarp(new Warp(new Location(mapName, x, y), MoveDirection.SOUTH));
+        player.setWarp(new Warp(new Location(mapName, x, y, z), MoveDirection.SOUTH));
         commandSource.sendMessage("[YELLOW]Sending <" + playerName + "> to " + location.toString());
     }
 

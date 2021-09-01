@@ -7,17 +7,20 @@ import com.forgestorm.server.network.game.shared.Opcodes;
 public class ClientMoveResyncPacketOut extends AbstractServerOutPacket {
 
     private final int syncX, syncY;
+    public final short syncZ;
 
     public ClientMoveResyncPacketOut(Player player, Location syncLocation) {
         super(Opcodes.CLIENT_MOVE_RESYNC, player.getClientHandler());
 
         syncX = syncLocation.getX();
         syncY = syncLocation.getY();
+        syncZ = syncLocation.getZ();
     }
 
     @Override
     protected void createPacket(GameOutputStream write) {
         write.writeInt(syncX);
         write.writeInt(syncY);
+        write.writeShort(syncZ);
     }
 }

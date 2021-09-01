@@ -18,6 +18,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
     private final String mapName;
     private final int x;
     private final int y;
+    private final short z;
     private final MoveDirection facingDirection;
 
     public MovingEntityTeleportPacketOut(final Player receiver, final MovingEntity teleportedEntity, final Location teleportLocation, final MoveDirection facingDirection) {
@@ -28,6 +29,7 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
         this.mapName = teleportLocation.getWorldName();
         this.x = teleportLocation.getX();
         this.y = teleportLocation.getY();
+        this.z = teleportLocation.getZ();
         this.facingDirection = facingDirection;
     }
 
@@ -38,9 +40,10 @@ public class MovingEntityTeleportPacketOut extends AbstractServerOutPacket {
         write.writeString(mapName);
         write.writeInt(x);
         write.writeInt(y);
+        write.writeShort(z);
         write.writeByte(facingDirection.getDirectionByte());
 
-        println(getClass(), "MapName: " + mapName + "X: " + x + ", Y: " + y + ", Facing: " + facingDirection, false, PRINT_DEBUG
+        println(getClass(), "MapName: " + mapName + "X: " + x + ", Y: " + y + ", Z: " + z + ", Facing: " + facingDirection, false, PRINT_DEBUG
         );
     }
 }

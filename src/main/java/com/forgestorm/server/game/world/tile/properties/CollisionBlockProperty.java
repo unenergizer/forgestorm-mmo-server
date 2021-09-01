@@ -40,16 +40,16 @@ public class CollisionBlockProperty extends AbstractTileProperty implements Worl
     }
 
     @Override
-    public void applyPropertyToWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY) {
-        processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, false);
+    public void applyPropertyToWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
+        processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, worldZ, false);
     }
 
     @Override
-    public void removePropertyFromWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY) {
-        processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, true);
+    public void removePropertyFromWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
+        processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, worldZ, true);
     }
 
-    private void processCollisionTiles(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, boolean useEraser) {
+    private void processCollisionTiles(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ, boolean useEraser) {
         int tilesWide = tileImage.getWidth() / GameConstants.TILE_SIZE;
         int tilesTall = tileImage.getHeight() / GameConstants.TILE_SIZE;
 
@@ -66,15 +66,15 @@ public class CollisionBlockProperty extends AbstractTileProperty implements Worl
                     int tileY = worldY + tilesTall - row - 1;
                     Tile tileParent = ServerMain.getInstance().getGameManager().getGameWorldProcessor()
                             .getGameWorld(worldName)
-                            .getTile(layerDefinition, tileX, tileY);
+                            .getTile(layerDefinition, tileX, tileY, worldZ);
 
                     if (tileParent == null) continue;
                     if (useEraser) {
                         tileParent.removeCollision(tileImage);
-                        println(getClass(), "Removing collision from " + tileX + "/" + tileY, false, PRINT_DEBUG);
+                        println(getClass(), "Removing collision from " + tileX + "/" + tileY + "/" + worldZ, false, PRINT_DEBUG);
                     } else {
                         tileParent.addCollision(tileImage);
-                        println(getClass(), "Setting collision to " + tileX + "/" + tileY, false, PRINT_DEBUG);
+                        println(getClass(), "Setting collision to " + tileX + "/" + tileY + "/" + worldZ, false, PRINT_DEBUG);
                     }
                 }
             }

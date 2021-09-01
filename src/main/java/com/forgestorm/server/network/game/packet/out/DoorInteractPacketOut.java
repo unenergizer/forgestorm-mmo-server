@@ -25,9 +25,11 @@ public class DoorInteractPacketOut extends AbstractServerOutPacket {
         write.writeByte(DoorManager.DoorStatus.getByte(doorStatus));
         write.writeInt(tile.getWorldX());
         write.writeInt(tile.getWorldY());
+        write.writeShort(tile.getWorldZ());
 
         println(getClass(), "DoorStatus: " + doorStatus, false, PRINT_DEBUG);
         println(getClass(), "TileX: " + tile.getWorldX(), false, PRINT_DEBUG);
         println(getClass(), "TileY: " + tile.getWorldY(), false, PRINT_DEBUG);
+        println(getClass(), "TileZ: " + tile.getWorldZ(), false, PRINT_DEBUG);
     }
 }

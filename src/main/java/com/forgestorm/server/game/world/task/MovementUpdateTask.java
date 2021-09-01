@@ -67,7 +67,7 @@ public class MovementUpdateTask implements AbstractTask {
         Location currentLocation = aiEntity.getCurrentWorldLocation();
 
         performAiEntityMove(aiEntity, currentLocation.getMoveDirectionFromLocation(
-                new Location(aiEntity.getWorldName(), moveNode.getWorldX(), moveNode.getWorldY())));
+                new Location(aiEntity.getWorldName(), moveNode.getWorldX(), moveNode.getWorldY(), currentLocation.getZ())));
     }
 
     private void mapTargets() {
@@ -445,12 +445,13 @@ public class MovementUpdateTask implements AbstractTask {
                 tracker.getCurrentWorldLocation().getX(),
                 tracker.getCurrentWorldLocation().getY(),
                 location.getX(),
-                location.getY());
+                location.getY(),
+                location.getZ());
         if (nodes == null) return false;
         tracker.setMoveNodes(nodes);
         MoveNode moveNode = nodes.peek();
         if (moveNode != null) {
-            updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY()));
+            updateFutureLocation(tracker, new Location(moveNode.getMapName(), moveNode.getWorldX(), moveNode.getWorldY(), location.getZ()));
         }
         return true;
     }

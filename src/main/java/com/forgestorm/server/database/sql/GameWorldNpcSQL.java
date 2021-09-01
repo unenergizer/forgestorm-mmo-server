@@ -17,12 +17,13 @@ public class GameWorldNpcSQL {
     private void databaseLoad(NPC npc, ResultSet resultSet) throws SQLException {
         String name = resultSet.getString("name");
         String worldName = resultSet.getString("world_name");
-        short worldX = resultSet.getShort("world_x");
-        short worldY = resultSet.getShort("world_y");
-        short regionStartX = resultSet.getShort("region_start_x");
-        short regionStartY = resultSet.getShort("region_start_y");
-        short regionEndX = resultSet.getShort("region_end_x");
-        short regionEndY = resultSet.getShort("region_end_y");
+        int worldX = resultSet.getInt("world_x");
+        int worldY = resultSet.getInt("world_y");
+        short worldZ = resultSet.getShort("world_z");
+        int regionStartX = resultSet.getInt("region_start_x");
+        int regionStartY = resultSet.getInt("region_start_y");
+        int regionEndX = resultSet.getInt("region_end_x");
+        int regionEndY = resultSet.getInt("region_end_y");
         String firstInteract = resultSet.getString("first_interact");
         int health = resultSet.getInt("health");
         int damage = resultSet.getInt("damage");
@@ -46,7 +47,7 @@ public class GameWorldNpcSQL {
         // TODO: byte scriptId = resultSet.getInt("script_id");
         int scriptId = 0;
 
-        Location location = new Location(worldName, worldX, worldY);
+        Location location = new Location(worldName, worldX, worldY, worldZ);
 
         npc.setName(name);
         npc.setDefaultSpawnLocation(location);
@@ -80,7 +81,7 @@ public class GameWorldNpcSQL {
 
     private PreparedStatement databaseSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("UPDATE game_world_npc" +
-                " SET name=?, first_interact=?, world_name=?, world_x=?, world_y=?," +
+                " SET name=?, first_interact=?, world_name=?, world_x=?, world_y=?, world_z=?," +
                 " region_start_x=?, region_end_x=?, region_start_y=?, region_end_y=?, " +
                 " health=?, damage=?, exp_drop=?, drop_table=?, walk_speed=?, prob_still=?, prob_walk=?, shop_id=?, is_bank_keeper=?, faction=?," +
                 " hair_texture=?, helm_texture=?, chest_texture=?, pants_texture=?, shoes_texture=?," +
@@ -91,30 +92,31 @@ public class GameWorldNpcSQL {
         preparedStatement.setString(3, npc.getCurrentWorldLocation().getWorldName());
         preparedStatement.setInt(4, npc.getCurrentWorldLocation().getX());
         preparedStatement.setInt(5, npc.getCurrentWorldLocation().getY());
-        preparedStatement.setShort(6, npc.getRegionStartX());
-        preparedStatement.setShort(7, npc.getRegionEndX());
-        preparedStatement.setShort(8, npc.getRegionStartY());
-        preparedStatement.setShort(9, npc.getRegionEndY());
-        preparedStatement.setInt(10, npc.getMaxHealth());
-        preparedStatement.setInt(11, npc.getAttributes().getDamage());
-        preparedStatement.setInt(12, npc.getExpDrop());
-        preparedStatement.setInt(13, npc.getDropTable());
-        preparedStatement.setFloat(14, npc.getMoveSpeed());
-        preparedStatement.setFloat(15, npc.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(16, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setShort(17, npc.getShopId());
-        preparedStatement.setBoolean(18, npc.isBankKeeper());
-        preparedStatement.setByte(19, npc.getFaction());
-        preparedStatement.setByte(20, npc.getAppearance().getHairTexture());
-        preparedStatement.setByte(21, npc.getAppearance().getHelmTexture());
-        preparedStatement.setByte(22, npc.getAppearance().getChestTexture());
-        preparedStatement.setByte(23, npc.getAppearance().getPantsTexture());
-        preparedStatement.setByte(24, npc.getAppearance().getShoesTexture());
-        preparedStatement.setInt(25, npc.getAppearance().getHairColor());
-        preparedStatement.setInt(26, npc.getAppearance().getEyeColor());
-        preparedStatement.setInt(27, npc.getAppearance().getSkinColor());
-        preparedStatement.setInt(28, npc.getAppearance().getGlovesColor());
-        preparedStatement.setInt(29, npc.getDatabaseId());
+        preparedStatement.setShort(6, npc.getCurrentWorldLocation().getZ());
+        preparedStatement.setInt(7, npc.getRegionStartX());
+        preparedStatement.setInt(8, npc.getRegionEndX());
+        preparedStatement.setInt(9, npc.getRegionStartY());
+        preparedStatement.setInt(10, npc.getRegionEndY());
+        preparedStatement.setInt(11, npc.getMaxHealth());
+        preparedStatement.setInt(12, npc.getAttributes().getDamage());
+        preparedStatement.setInt(13, npc.getExpDrop());
+        preparedStatement.setInt(14, npc.getDropTable());
+        preparedStatement.setFloat(15, npc.getMoveSpeed());
+        preparedStatement.setFloat(16, npc.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(17, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setShort(18, npc.getShopId());
+        preparedStatement.setBoolean(19, npc.isBankKeeper());
+        preparedStatement.setByte(20, npc.getFaction());
+        preparedStatement.setByte(21, npc.getAppearance().getHairTexture());
+        preparedStatement.setByte(22, npc.getAppearance().getHelmTexture());
+        preparedStatement.setByte(23, npc.getAppearance().getChestTexture());
+        preparedStatement.setByte(24, npc.getAppearance().getPantsTexture());
+        preparedStatement.setByte(25, npc.getAppearance().getShoesTexture());
+        preparedStatement.setInt(26, npc.getAppearance().getHairColor());
+        preparedStatement.setInt(27, npc.getAppearance().getEyeColor());
+        preparedStatement.setInt(28, npc.getAppearance().getSkinColor());
+        preparedStatement.setInt(29, npc.getAppearance().getGlovesColor());
+        preparedStatement.setInt(30, npc.getDatabaseId());
         // TODO: preparedStatement.setInt(29, npc.getScriptId());
 
         return preparedStatement;
@@ -122,37 +124,38 @@ public class GameWorldNpcSQL {
 
     private PreparedStatement firstTimeSave(NPC npc, Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO game_world_npc " +
-                "(name, first_interact, world_name, world_x, world_y, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, is_bank_keeper, faction, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                "(name, first_interact, world_name, world_x, world_y, world_z, region_start_x, region_end_x, region_start_y, region_end_y, health, damage, exp_drop, drop_table, walk_speed, prob_still, prob_walk, shop_id, is_bank_keeper, faction, hair_texture, helm_texture, chest_texture, pants_texture, shoes_texture, hair_color, eye_color, skin_color, gloves_color) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, npc.getName());
         preparedStatement.setString(2, npc.getFirstInteraction().toString());
         preparedStatement.setString(3, npc.getCurrentWorldLocation().getWorldName());
         preparedStatement.setInt(4, npc.getCurrentWorldLocation().getX());
         preparedStatement.setInt(5, npc.getCurrentWorldLocation().getY());
-        preparedStatement.setShort(6, npc.getRegionStartX());
-        preparedStatement.setShort(7, npc.getRegionEndX());
-        preparedStatement.setShort(8, npc.getRegionStartY());
-        preparedStatement.setShort(9, npc.getRegionEndY());
-        preparedStatement.setInt(10, npc.getMaxHealth());
-        preparedStatement.setInt(11, npc.getAttributes().getDamage());
-        preparedStatement.setInt(12, npc.getExpDrop());
-        preparedStatement.setInt(13, npc.getDropTable());
-        preparedStatement.setFloat(14, npc.getMoveSpeed());
-        preparedStatement.setFloat(15, npc.getRandomRegionMoveGenerator().getProbabilityStill());
-        preparedStatement.setFloat(16, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
-        preparedStatement.setInt(17, npc.getShopId());
-        preparedStatement.setBoolean(18, npc.isBankKeeper());
-        preparedStatement.setByte(19, npc.getFaction());
-        preparedStatement.setByte(20, npc.getAppearance().getHairTexture());
-        preparedStatement.setByte(21, npc.getAppearance().getHelmTexture());
-        preparedStatement.setByte(22, npc.getAppearance().getChestTexture());
-        preparedStatement.setByte(23, npc.getAppearance().getPantsTexture());
-        preparedStatement.setByte(24, npc.getAppearance().getShoesTexture());
-        preparedStatement.setInt(25, npc.getAppearance().getHairColor());
-        preparedStatement.setInt(26, npc.getAppearance().getEyeColor());
-        preparedStatement.setInt(27, npc.getAppearance().getSkinColor());
-        preparedStatement.setInt(28, npc.getAppearance().getGlovesColor());
+        preparedStatement.setShort(6, npc.getCurrentWorldLocation().getZ());
+        preparedStatement.setInt(7, npc.getRegionStartX());
+        preparedStatement.setInt(8, npc.getRegionEndX());
+        preparedStatement.setInt(9, npc.getRegionStartY());
+        preparedStatement.setInt(10, npc.getRegionEndY());
+        preparedStatement.setInt(11, npc.getMaxHealth());
+        preparedStatement.setInt(12, npc.getAttributes().getDamage());
+        preparedStatement.setInt(13, npc.getExpDrop());
+        preparedStatement.setInt(14, npc.getDropTable());
+        preparedStatement.setFloat(15, npc.getMoveSpeed());
+        preparedStatement.setFloat(16, npc.getRandomRegionMoveGenerator().getProbabilityStill());
+        preparedStatement.setFloat(17, npc.getRandomRegionMoveGenerator().getProbabilityWalkStart());
+        preparedStatement.setInt(18, npc.getShopId());
+        preparedStatement.setBoolean(19, npc.isBankKeeper());
+        preparedStatement.setByte(20, npc.getFaction());
+        preparedStatement.setByte(21, npc.getAppearance().getHairTexture());
+        preparedStatement.setByte(22, npc.getAppearance().getHelmTexture());
+        preparedStatement.setByte(23, npc.getAppearance().getChestTexture());
+        preparedStatement.setByte(24, npc.getAppearance().getPantsTexture());
+        preparedStatement.setByte(25, npc.getAppearance().getShoesTexture());
+        preparedStatement.setInt(26, npc.getAppearance().getHairColor());
+        preparedStatement.setInt(27, npc.getAppearance().getEyeColor());
+        preparedStatement.setInt(28, npc.getAppearance().getSkinColor());
+        preparedStatement.setInt(29, npc.getAppearance().getGlovesColor());
         // TODO: preparedStatement.setInt(28, npc.getScriptId());
 
         return preparedStatement;

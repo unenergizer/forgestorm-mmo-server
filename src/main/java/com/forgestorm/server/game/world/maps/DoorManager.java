@@ -24,11 +24,11 @@ public class DoorManager {
     @Getter
     private final List<DoorInfo> doorOpenList = new ArrayList<>();
 
-    public void playerToggleDoor(Player player, DoorStatus doorStatus, int tileX, int tileY) {
+    public void playerToggleDoor(Player player, DoorStatus doorStatus, int tileX, int tileY, short tileZ) {
         GameWorld gameWorld = player.getGameWorld();
         Location playerLocation = player.getCurrentWorldLocation();
 
-        Tile tile = gameWorld.getTile(LayerDefinition.COLLIDABLES, tileX, tileY);
+        Tile tile = gameWorld.getTile(LayerDefinition.COLLIDABLES, tileX, tileY, tileZ);
         TileImage tileImage = tile.getTileImage();
 
         if (tileImage == null) return;

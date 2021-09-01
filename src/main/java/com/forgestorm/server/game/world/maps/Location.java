@@ -15,17 +15,20 @@ public class Location {
     private String worldName;
     private int x;
     private int y;
+    private short z;
 
-    public Location(String worldName, int x, int y) {
+    public Location(String worldName, int x, int y, short z) {
         this.worldName = worldName;
         this.x = x;
         this.y = y;
+        this.z = z;
     }
 
     public Location(Location location) {
         this.worldName = location.worldName;
         this.x = location.x;
         this.y = location.y;
+        this.z = location.z;
     }
 
     public GameWorld getGameWorld() {
@@ -39,13 +42,14 @@ public class Location {
     public Location add(Location location) {
         checkArgument(location.getWorldName().equals(worldName),
                 "Can't add locations. " + location.getWorldName() + " doesn't equal " + worldName + ".");
-        return new Location(worldName, (this.x + location.getX()), (this.y + location.getY()));
+        return new Location(worldName, (this.x + location.getX()), (this.y + location.getY()), (short) (this.z + location.getZ()));
     }
 
     public void set(Location location) {
         this.worldName = location.worldName;
         this.x = location.x;
         this.y = location.y;
+        this.z = location.z;
     }
 
     public Location add(int x, int y) {
@@ -92,11 +96,12 @@ public class Location {
         if (!otherLocation.getWorldName().equals(worldName)) return false;
         if (otherLocation.getX() != x) return false;
         if (otherLocation.getY() != y) return false;
+        if (otherLocation.getZ() != z) return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "[" + worldName + "] -> [" + x + ", " + y + "]";
+        return "[" + worldName + "] -> [" + x + ", " + y + ", " + z + "]";
     }
 }

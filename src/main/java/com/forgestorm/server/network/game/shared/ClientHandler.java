@@ -84,7 +84,7 @@ public class ClientHandler {
             player.setDatabaseId(characterDataOut.getCharacterId());
 
             // Set the players location
-            Location location = new Location(characterDataOut.getWorldName(), characterDataOut.getWorldX(), characterDataOut.getWorldY());
+            Location location = new Location(characterDataOut.getWorldName(), characterDataOut.getWorldX(), characterDataOut.getWorldY(), characterDataOut.getWorldZ());
             player.setCurrentWorldLocation(location);
             player.setFutureWorldLocation(location);
             player.setFacingDirection(characterDataOut.getFacingDirection());

@@ -20,6 +20,7 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
     private final MoveDirection moveDirection;
     private final int x;
     private final int y;
+    private final short z;
 
     public EntityMovePacketOut(final Player packetReceiver, final MovingEntity movingEntity, final Location attemptLocation) {
         super(Opcodes.ENTITY_MOVE_UPDATE, packetReceiver.getClientHandler());
@@ -30,6 +31,7 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
         this.moveDirection = movingEntity.getFacingDirection();
         this.x = attemptLocation.getX();
         this.y = attemptLocation.getY();
+        this.z = attemptLocation.getZ();
     }
 
     @Override
@@ -40,7 +42,8 @@ public class EntityMovePacketOut extends AbstractServerOutPacket {
         write.writeByte(entityType.getEntityTypeByte());
         write.writeInt(x);
         write.writeInt(y);
+        write.writeShort(z);
 
-        println(getClass(), "EntityName: " + entityName + ", ServerID: " + serverEntityId + ", X: " + x + ", Y: " + y, false, PRINT_DEBUG);
+        println(getClass(), "EntityName: " + entityName + ", ServerID: " + serverEntityId + ", X: " + x + ", Y: " + y + ", Z: " + z, false, PRINT_DEBUG);
     }
 }

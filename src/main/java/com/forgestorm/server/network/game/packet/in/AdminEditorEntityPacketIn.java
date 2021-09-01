@@ -36,6 +36,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         String worldName = clientHandler.readString();
         int worldX = clientHandler.readInt();
         int worldY = clientHandler.readInt();
+        short worldZ = clientHandler.readShort();
 
         // Basic data
         short entityID = clientHandler.readShort();
@@ -185,6 +186,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
                 worldName,
                 worldX,
                 worldY,
+                worldZ,
                 monsterBodyTexture,
                 hairTexture,
                 helmTexture,
@@ -221,11 +223,11 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
 
         if (packetData.entityID != -1) {
             if (packetData.entityType == EntityType.NPC) {
-                entity = (NPC) packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
+                entity = packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
             } else if (packetData.entityType == EntityType.MONSTER) {
-                entity = (Monster) packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
+                entity = packetData.getClientHandler().getPlayer().getGameWorld().getAiEntityController().getEntity(packetData.entityID);
             } else if (packetData.entityType == EntityType.ITEM_STACK) {
-                entity = (ItemStackDrop) packetData.getClientHandler().getPlayer().getGameWorld().getItemStackDropEntityController().getEntity(packetData.entityID);
+                entity = packetData.getClientHandler().getPlayer().getGameWorld().getItemStackDropEntityController().getEntity(packetData.entityID);
             }
         } else {
             if (packetData.entityType == EntityType.NPC) {
@@ -241,8 +243,7 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
         }
 
         // World Data
-        // TODO: REMOVE SHORT CAST!
-        Location spawnLocation = new Location(packetData.worldName, (short) packetData.worldX, (short) packetData.worldY);        // Setup appearance
+        Location spawnLocation = new Location(packetData.worldName, packetData.worldX, packetData.worldY, packetData.worldZ);
 
         // Appearance
         Appearance appearance = new Appearance(entity);
@@ -390,52 +391,53 @@ public class AdminEditorEntityPacketIn implements PacketListener<AdminEditorEnti
     }
 
     @AllArgsConstructor
-    class EntityEditorPacketIn extends PacketData {
+    static class EntityEditorPacketIn extends PacketData {
 
-        private EntityType entityType;
+        private final EntityType entityType;
 
         // Editor data
-        private boolean spawn;
-        private boolean save;
-        private boolean delete;
+        private final boolean spawn;
+        private final boolean save;
+        private final boolean delete;
 
         // Basic data
-        private short entityID;
-        private String name;
-        private FirstInteraction firstInteraction;
-        private String faction;
-        private EntityAlignment entityAlignment;
-        private int health;
-        private int damage;
-        private int expDrop;
-        private int dropTable;
-        private float walkSpeed;
-        private float probStop;
-        private float probWalk;
-        private short shopId;
-        private boolean bankKeeper;
+        private final short entityID;
+        private final String name;
+        private final FirstInteraction firstInteraction;
+        private final String faction;
+        private final EntityAlignment entityAlignment;
+        private final int health;
+        private final int damage;
+        private final int expDrop;
+        private final int dropTable;
+        private final float walkSpeed;
+        private final float probStop;
+        private final float probWalk;
+        private final short shopId;
+        private final boolean bankKeeper;
 
         // World data
-        private String worldName;
-        private int worldX;
-        private int worldY;
+        private final String worldName;
+        private final int worldX;
+        private final int worldY;
+        private final short worldZ;
 
         // Appearance
-        private byte monsterBodyTexture;
-        private byte hairTexture;
-        private byte helmTexture;
-        private byte chestTexture;
-        private byte pantsTexture;
-        private byte shoesTexture;
-        private int hairColor;
-        private int eyesColor;
-        private int skinColor;
-        private int glovesColor;
+        private final byte monsterBodyTexture;
+        private final byte hairTexture;
+        private final byte helmTexture;
+        private final byte chestTexture;
+        private final byte pantsTexture;
+        private final byte shoesTexture;
+        private final int hairColor;
+        private final int eyesColor;
+        private final int skinColor;
+        private final int glovesColor;
 
         // ItemStackDrop
-        private int itemStackId;
-        private int amount;
-        private int respawnTimeMin;
-        private int respawnTimeMax;
+        private final int itemStackId;
+        private final int amount;
+        private final int respawnTimeMin;
+        private final int respawnTimeMax;
     }
 }

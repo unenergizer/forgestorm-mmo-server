@@ -1,5 +1,6 @@
 package com.forgestorm.server.game;
 
+import com.forgestorm.server.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.maps.MoveDirection;
 
@@ -23,12 +24,12 @@ public class PlayerConstants {
     /**
      * First player join spawn location.
      */
-    public static final Location START_SPAWN_LOCATION = new Location("game_start", 0, -1);
+    public static final Location START_SPAWN_LOCATION = new Location("game_start", 0, -1, Floors.GROUND_FLOOR.getWorldZ());
 
     /**
      * Player death spawn location.
      */
-    public static final Location RESPAWN_LOCATION = new Location("game_start", 0, -1);
+    public static final Location RESPAWN_LOCATION = new Location("game_start", 0, -1, Floors.GROUND_FLOOR.getWorldZ());
 
     /**
      * Player Starting health points
