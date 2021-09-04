@@ -31,7 +31,7 @@ public class DatabaseManager implements ManagerStart {
         println(getClass(), "Initializing database...");
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://" + databaseSettings.getIp() + ":" + databaseSettings.getPort() + "/" + databaseSettings.getDatabase() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
+        config.setJdbcUrl("jdbc:mysql://" + databaseSettings.getIp() + ":" + databaseSettings.getPort() + "/" + databaseSettings.getDatabase() + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=" + databaseSettings.isUseSSL());
         config.setUsername(databaseSettings.getUsername());
         config.setPassword(databaseSettings.getPassword());
         config.addDataSourceProperty("cachePrepStmts", "true");

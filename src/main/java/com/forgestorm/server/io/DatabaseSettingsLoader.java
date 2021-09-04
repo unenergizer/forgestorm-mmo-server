@@ -37,8 +37,9 @@ public class DatabaseSettingsLoader extends AsynchronousAssetLoader<DatabaseSett
         String database = (String) root.get("database");
         String username = (String) root.get("username");
         String password = (String) root.get("password");
+        String useSSL = (String) root.get("useSSL");
 
-        databaseSettingsData = new DatabaseSettingsData(IP, port, database, username, password);
+        databaseSettingsData = new DatabaseSettingsData(IP, port, database, username, password, Boolean.parseBoolean(useSSL));
     }
 
     @Override
@@ -53,11 +54,12 @@ public class DatabaseSettingsLoader extends AsynchronousAssetLoader<DatabaseSett
 
     @Getter
     @AllArgsConstructor
-    public class DatabaseSettingsData {
-        private String ip;
-        private int port;
-        private String database;
-        private String username;
-        private String password;
+    public static class DatabaseSettingsData {
+        private final String ip;
+        private final int port;
+        private final String database;
+        private final String username;
+        private final String password;
+        private final boolean useSSL;
     }
 }

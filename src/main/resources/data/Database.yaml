@@ -3,3 +3,4 @@ port: 3306
 database: "unenergi_mmo"
 username: "unenergi_admin"
 password: ";8~bk{H)G_-t"
+useSSL: "true"
