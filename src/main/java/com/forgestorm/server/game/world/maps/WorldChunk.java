@@ -169,7 +169,7 @@ public class WorldChunk {
 
         // Send chunk layers
         for (Floors floor : Floors.values()) {
-            for (Map.Entry<LayerDefinition, Tile[]> layerMap : floorLayers.get(Floors.GROUND_FLOOR).entrySet()) {
+            for (Map.Entry<LayerDefinition, Tile[]> layerMap : floorLayers.get(floor).entrySet()) {
                 LayerDefinition layerDefinition = layerMap.getKey();
                 Tile[] tileImages = layerMap.getValue();
 
