@@ -9,7 +9,6 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
@@ -115,20 +114,24 @@ public class GameWorld {
             json.setOutputType(JsonWriter.OutputType.json);
             json.setWriter(writer);
 
-            // Save Layer
+            // Save Layer and floors
             json.writeObjectStart();
-            for (Map.Entry<LayerDefinition, Tile[]> entrySet : worldChunk.getLayers().entrySet()) {
-                LayerDefinition layerDefinition = entrySet.getKey();
-                Tile[] tiles = entrySet.getValue();
-                StringBuilder ids = new StringBuilder();
-                for (Tile tile : tiles) {
-                    if (tile.getTileImage() == null) {
-                        ids.append("0,");
-                    } else {
-                        ids.append(tile.getTileImage().getImageId()).append(",");
+            for (Floors floor : Floors.values()) {
+                Map<String, String> tileMap = new HashMap<>();
+                for (Map.Entry<LayerDefinition, Tile[]> entrySet : worldChunk.getFloorLayers().get(floor).entrySet()) {
+                    LayerDefinition layerDefinition = entrySet.getKey();
+                    Tile[] tiles = entrySet.getValue();
+                    StringBuilder ids = new StringBuilder();
+                    for (Tile tile : tiles) {
+                        if (tile.getTileImage() == null) {
+                            ids.append("0,");
+                        } else {
+                            ids.append(tile.getTileImage().getImageId()).append(",");
+                        }
                     }
+                    tileMap.put(layerDefinition.getLayerName(), ids.toString());
                 }
-                json.writeValue(layerDefinition.getLayerName(), ids.toString());
+                json.writeValue(Short.toString(floor.getWorldZ()), tileMap, HashMap.class, String.class);
             }
             json.writeObjectEnd();
 
@@ -194,14 +197,14 @@ public class GameWorld {
 //        }
 //    }
 
-    public Tile getTile(LayerDefinition layerDefinition, int worldX, int worldY) {
+    public Tile getTile(LayerDefinition layerDefinition, int worldX, int worldY, short worldZ) {
         WorldChunk worldChunk = findChunk(worldX, worldY);
         if (worldChunk == null) return null;
 
         int localX = worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
-        return worldChunk.getTile(layerDefinition, localX, localY);
+        return worldChunk.getTile(layerDefinition, localX, localY, Floors.getFloor(worldZ));
     }
 
     public Warp getWarp(int entityX, int entityY) {
@@ -214,25 +217,18 @@ public class GameWorld {
         return worldChunk.getWarp(localX, localY);
     }
 
-    public boolean isDoor(int entityX, int entityY) {
-        Tile tile = getTile(LayerDefinition.COLLIDABLES, entityX, entityY);
-        if (tile == null) return false;
-        if (tile.getTileImage() == null) return false;
-        return tile.getTileImage().containsProperty(TilePropertyTypes.DOOR);
-    }
-
     public boolean isTraversable(Location location) {
-        return isTraversable(location.getX(), location.getY());
+        return isTraversable(location.getX(), location.getY(), location.getZ());
     }
 
-    public boolean isTraversable(int entityX, int entityY) {
+    public boolean isTraversable(int entityX, int entityY, short worldZ) {
         WorldChunk worldChunk = findChunk(entityX, entityY);
         if (worldChunk == null) return true;
 
         int localX = entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
-        return worldChunk.isTraversable(localX, localY);
+        return worldChunk.isTraversable(localX, localY, worldZ);
     }
 
     public WorldChunk findChunk(int entityX, int entityY) {
@@ -264,11 +260,11 @@ public class GameWorld {
     }
 
     public Location getLocation(MoveDirection direction) {
-        if (direction == MoveDirection.SOUTH) return new Location(worldName, 0, -1);
-        if (direction == MoveDirection.NORTH) return new Location(worldName, 0, 1);
-        if (direction == MoveDirection.WEST) return new Location(worldName, -1, 0);
-        if (direction == MoveDirection.EAST) return new Location(worldName, 1, 0);
-        if (direction == MoveDirection.NONE) return new Location(worldName, 0, 0);
+        if (direction == MoveDirection.SOUTH) return new Location(worldName, 0, -1, (short) 0);
+        if (direction == MoveDirection.NORTH) return new Location(worldName, 0, 1, (short) 0);
+        if (direction == MoveDirection.WEST) return new Location(worldName, -1, 0, (short) 0);
+        if (direction == MoveDirection.EAST) return new Location(worldName, 1, 0, (short) 0);
+        if (direction == MoveDirection.NONE) return new Location(worldName, 0, 0, (short) 0);
         throw new RuntimeException("Tried to get a location, but direction could not be determined. WorldName: " + worldName + ", MoveDirection: " + direction);
     }
 

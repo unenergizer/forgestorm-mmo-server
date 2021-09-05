@@ -17,7 +17,7 @@ public class WorldBuilder implements ManagerStart {
     private TextureAtlas worldTileImages;
 
     @Setter
-    private LayerDefinition currentLayer = LayerDefinition.ROOF;
+    private LayerDefinition currentLayer = LayerDefinition.WORLD_OBJECTS;
     @Setter
     private int currentTextureId = 0;
 

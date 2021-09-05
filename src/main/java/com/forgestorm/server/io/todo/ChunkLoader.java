@@ -11,10 +11,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
-import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
-import com.forgestorm.server.game.world.maps.Warp;
-import com.forgestorm.server.game.world.maps.WorldChunk;
+import com.forgestorm.server.game.world.maps.*;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.maps.building.WorldBuilder;
 import com.forgestorm.server.game.world.tile.Tile;
@@ -76,45 +73,47 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         WorldChunk chunk = new WorldChunk(worldName, chunkX, chunkY);
 
         // Process Tile Layers
-        for (LayerDefinition layerDefinition : LayerDefinition.values()) {
-            readLayer(layerDefinition, root, chunk);
-        }
-
-        // Process Tile Warps
-        JsonValue warpsArray = root.get("warps");
-        if (warpsArray != null) {
-            for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
-                Warp warp = new Warp(
-                        new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asShort(), jsonWarp.get("toY").asShort()),
-                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
-                );
-                chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+        for (Floors floor : Floors.values()) {
+            for (LayerDefinition layerDefinition : LayerDefinition.values()) {
+                readLayer(floor, layerDefinition, root, chunk);
             }
         }
+
+        // TODO: MOVE WARP LOADING TO ITS OWN FILE AND LOADER!
+        // Process Tile Warps
+//        JsonValue warpsArray = root.get("warps");
+//        if (warpsArray != null) {
+//            for (JsonValue jsonWarp = warpsArray.child; jsonWarp != null; jsonWarp = jsonWarp.next) {
+//                Warp warp = new Warp(
+//                        new Location(jsonWarp.get("toMap").asString(), jsonWarp.get("toX").asInt(), jsonWarp.get("toY").asInt(), jsonWarp.get("toZ").asShort()),
+//                        MoveDirection.valueOf(jsonWarp.get("facingDirection").asString())
+//                );
+//                chunk.addTileWarp(jsonWarp.get("x").asShort(), jsonWarp.get("y").asShort(), warp);
+//            }
+//        }
 
         return chunk;
     }
 
-    private static void readLayer(LayerDefinition layerDefinition, JsonValue root, WorldChunk chunk) {
+    private static void readLayer(Floors floor, LayerDefinition layerDefinition, JsonValue root, WorldChunk chunk) {
 
-        if (root.has(layerDefinition.getLayerName())) {
-            WorldBuilder worldBuilder = ServerMain.getInstance().getWorldBuilder();
-            String layer = root.get(layerDefinition.getLayerName()).asString();
-            String[] imageIds = layer.split(",");
-            for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
-                for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
+        WorldBuilder worldBuilder = ServerMain.getInstance().getWorldBuilder();
+        JsonValue floorRoot = root.get(Short.toString(floor.getWorldZ()));
+        String layer = floorRoot.get(layerDefinition.getLayerName()).asString();
+        String[] imageIds = layer.split(",");
+        for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+            for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
 
-                    println(ChunkLoader.class, "Processing Tile: " + layerDefinition + " - " + localX + "/" + localY, false, PRINT_DEBUG);
-                    // Get the TileImage
-                    int tileId = Integer.parseInt(imageIds[localX + localY * GameConstants.CHUNK_SIZE]);
-                    TileImage tileImage = worldBuilder.getTileImage(tileId);
+                println(ChunkLoader.class, "Processing Tile: " + layerDefinition + ", XYZ: " + localX + "/" + localY + "/" + floor.getWorldZ(), false, PRINT_DEBUG);
+                // Get the TileImage
+                int tileId = Integer.parseInt(imageIds[localX + localY * GameConstants.CHUNK_SIZE]);
+                TileImage tileImage = worldBuilder.getTileImage(tileId);
 
-                    // Set the TileImage to the Tile
-                    if (tileImage != null) {
-                        println(ChunkLoader.class, " -- Setting TileImage: " + tileImage.getFileName(), false, PRINT_DEBUG);
-                        Tile tile = chunk.getTile(layerDefinition, localX, localY);
-                        tile.setTileImage(tileImage);
-                    }
+                // Set the TileImage to the Tile
+                if (tileImage != null) {
+                    println(ChunkLoader.class, " -- Setting TileImage: " + tileImage.getFileName(), false, PRINT_DEBUG);
+                    Tile tile = chunk.getTile(layerDefinition, localX, localY, floor);
+                    tile.setTileImage(tileImage);
                 }
             }
         }

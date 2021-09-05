@@ -28,7 +28,7 @@ public class DoorManager {
         GameWorld gameWorld = player.getGameWorld();
         Location playerLocation = player.getCurrentWorldLocation();
 
-        Tile tile = gameWorld.getTile(LayerDefinition.COLLIDABLES, tileX, tileY, tileZ);
+        Tile tile = gameWorld.getTile(LayerDefinition.WORLD_OBJECTS, tileX, tileY, tileZ);
         TileImage tileImage = tile.getTileImage();
 
         if (tileImage == null) return;

@@ -31,7 +31,7 @@ public class WorldChunk {
     private final short chunkX, chunkY;
 
     @Getter
-    private final Map<LayerDefinition, Tile[]> layers = new HashMap<>();
+    private final Map<Floors, Map<LayerDefinition, Tile[]>> floorLayers = new HashMap<>();
 
     @Getter
     private final Map<WarpLocation, Warp> tileWarps = new HashMap<>();
@@ -59,38 +59,46 @@ public class WorldChunk {
     }
 
     private void initTileLayers() {
+        for (Floors floor : Floors.values()) {
+            Map<LayerDefinition, Tile[]> layers = new HashMap<>();
 
-        for (LayerDefinition layerDefinition : LayerDefinition.values()) {
+            for (LayerDefinition layerDefinition : LayerDefinition.values()) {
 
-            Tile[] tiles = new Tile[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
+                Tile[] tiles = new Tile[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
 
-            // Initialize all tiles
-            for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
-                for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+                // Initialize all tiles
+                for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
+                    for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
 
-                    tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
-                            worldName,
-                            localX + chunkX * GameConstants.CHUNK_SIZE,
-                            localY + chunkY * GameConstants.CHUNK_SIZE);
+                        tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
+                                worldName,
+                                localX + chunkX * GameConstants.CHUNK_SIZE,
+                                localY + chunkY * GameConstants.CHUNK_SIZE,
+                                floor.getWorldZ());
+                    }
                 }
+
+                layers.put(layerDefinition, tiles);
             }
 
-            layers.put(layerDefinition, tiles);
+            floorLayers.put(floor, layers);
         }
     }
 
     public void setChunkFromDisk(WorldChunk chunkFromDisk) {
-        // Copy layers
-        for (Map.Entry<LayerDefinition, Tile[]> entry : chunkFromDisk.getLayers().entrySet()) {
-            LayerDefinition layerDefinition = entry.getKey();
-            Tile[] tiles = entry.getValue();
+        // Copy layers and floors
+        for (Floors floor : Floors.values()) {
+            for (Map.Entry<LayerDefinition, Tile[]> entry : chunkFromDisk.floorLayers.get(floor).entrySet()) {
+                LayerDefinition layerDefinition = entry.getKey();
+                Tile[] tiles = entry.getValue();
 
-            for (Tile tileFromDisk : tiles) {
-                if (tileFromDisk.getTileImage() == null) continue;
-                int localTileX = tileFromDisk.getWorldX() - GameConstants.CHUNK_SIZE * chunkX;
-                int localTileY = tileFromDisk.getWorldY() - GameConstants.CHUNK_SIZE * chunkY;
-                Tile localTile = getTile(layerDefinition, localTileX, localTileY);
-                localTile.setTileImage(tileFromDisk.getTileImage());
+                for (Tile tileFromDisk : tiles) {
+                    if (tileFromDisk.getTileImage() == null) continue;
+                    int localTileX = tileFromDisk.getWorldX() - GameConstants.CHUNK_SIZE * chunkX;
+                    int localTileY = tileFromDisk.getWorldY() - GameConstants.CHUNK_SIZE * chunkY;
+                    Tile localTile = getTile(layerDefinition, localTileX, localTileY, floor);
+                    localTile.setTileImage(tileFromDisk.getTileImage());
+                }
             }
         }
 
@@ -103,23 +111,21 @@ public class WorldChunk {
         }
     }
 
-    public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY) {
-        layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE].setTileImage(tileImage);
+    public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY, Floors floor) {
+        floorLayers.get(floor).get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE].setTileImage(tileImage);
         changedSinceLastSave = true;
     }
 
-    public Tile getTile(LayerDefinition layerDefinition, int localX, int localY) {
-        return layers.get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
+    public Tile getTile(LayerDefinition layerDefinition, int localX, int localY, Floors floor) {
+        return floorLayers.get(floor).get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
     }
 
-    public boolean isTraversable(int localX, int localY) {
-        // We only have collision on two layers. (Removed looping through all tiles)
-        if (!isTraversable(LayerDefinition.COLLIDABLES, localX, localY)) return false;
-        return isTraversable(LayerDefinition.GROUND_DECORATION, localX, localY);
+    public boolean isTraversable(int localX, int localY, short worldZ) {
+        return isTraversable(Floors.getFloor(worldZ), localX, localY);
     }
 
-    private boolean isTraversable(LayerDefinition layerDefinition, int localX, int localY) {
-        Tile[] tiles = layers.get(layerDefinition);
+    private boolean isTraversable(Floors floor, int localX, int localY) {
+        Tile[] tiles = floorLayers.get(floor).get(LayerDefinition.WORLD_OBJECTS);
         Tile tile = tiles[localX + localY * GameConstants.CHUNK_SIZE];
         if (tile == null) return true;
         if (!ServerMain.getInstance().getDoorManager().isDoorwayTraversable(tile)) return false;
@@ -151,7 +157,7 @@ public class WorldChunk {
 
                 if (rand <= 20) {
                     TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(262);
-                    setTileImage(LayerDefinition.COLLIDABLES, tileImage, i, j);
+                    setTileImage(LayerDefinition.WORLD_OBJECTS, tileImage, i, j, Floors.GROUND_FLOOR);
                 }
             }
         }
@@ -162,35 +168,38 @@ public class WorldChunk {
         // The packet must remain under 200 bytes
 
         // Send chunk layers
-        for (Map.Entry<LayerDefinition, Tile[]> layerMap : layers.entrySet()) {
-            LayerDefinition layerDefinition = layerMap.getKey();
-            Tile[] tileImages = layerMap.getValue();
+        for (Floors floor : Floors.values()) {
+            for (Map.Entry<LayerDefinition, Tile[]> layerMap : floorLayers.get(Floors.GROUND_FLOOR).entrySet()) {
+                LayerDefinition layerDefinition = layerMap.getKey();
+                Tile[] tileImages = layerMap.getValue();
 
-            // Construct and send a section
-            byte layerSectionsSent = 0;
-            for (int t = 0; t < tileImages.length / GameConstants.MAX_TILE_SEND; t++) {
-                Tile[] arraySend = new Tile[GameConstants.MAX_TILE_SEND];
+                // Construct and send a section
+                byte layerSectionsSent = 0;
+                for (int t = 0; t < tileImages.length / GameConstants.MAX_TILE_SEND; t++) {
+                    Tile[] arraySend = new Tile[GameConstants.MAX_TILE_SEND];
 
-                // Get the tiles to send
-                int j = 0;
-                for (int i = layerSectionsSent * GameConstants.MAX_TILE_SEND; i < (layerSectionsSent + 1) * GameConstants.MAX_TILE_SEND; i++) {
-                    arraySend[j] = tileImages[i];
-                    j++;
+                    // Get the tiles to send
+                    int j = 0;
+                    for (int i = layerSectionsSent * GameConstants.MAX_TILE_SEND; i < (layerSectionsSent + 1) * GameConstants.MAX_TILE_SEND; i++) {
+                        arraySend[j] = tileImages[i];
+                        j++;
+                    }
+
+                    // Construct packet
+                    new WorldChunkPartPacketOut(
+                            chunkRecipient,
+                            chunkX,
+                            chunkY,
+                            floor,
+                            layerDefinition.getLayerDefinitionByte(),
+                            layerSectionsSent,
+                            arraySend
+                    ).sendPacket();
+
+                    layerSectionsSent++;
                 }
-
-                // Construct packet
-                new WorldChunkPartPacketOut(
-                        chunkRecipient,
-                        chunkX,
-                        chunkY,
-                        layerDefinition.getLayerDefinitionByte(),
-                        layerSectionsSent,
-                        arraySend
-                ).sendPacket();
-
-                layerSectionsSent++;
+                println(getClass(), "Layer: " + layerDefinition.getLayerName() + ", Sections Sent: " + layerSectionsSent, false, PRINT_DEBUG);
             }
-            println(getClass(), "Layer: " + layerDefinition.getLayerName() + ", Sections Sent: " + layerSectionsSent, false, PRINT_DEBUG);
         }
 
         // Send chunk warps
@@ -200,9 +209,11 @@ public class WorldChunk {
                     clearWarps,
                     warp.getFromX(),
                     warp.getFromY(),
+                    warp.getFromZ(),
                     warp.getWarpDestination().getWorldName(),
                     warp.getWarpDestination().getX(),
                     warp.getWarpDestination().getY(),
+                    warp.getWarpDestination().getZ(),
                     warp.getDirectionToFace()).sendPacket();
 
             // Reset only once per chunk send

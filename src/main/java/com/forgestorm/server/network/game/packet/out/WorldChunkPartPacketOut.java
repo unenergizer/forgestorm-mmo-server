@@ -1,6 +1,7 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.server.game.world.maps.Floors;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.network.game.shared.Opcodes;
 
@@ -11,14 +12,16 @@ public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
     private static final boolean PRINT_DEBUG = false;
 
     private final short chunkX, chunkY;
+    private final Floors floor;
     private final byte layerDefinitionByte;
     private final byte sectionsSent;
     private final Tile[] arraySend;
 
-    public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, byte layerDefinitionByte, byte sectionsSent, Tile[] arraySend) {
+    public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, Floors floor, byte layerDefinitionByte, byte sectionsSent, Tile[] arraySend) {
         super(Opcodes.WORLD_CHUNK_LAYER, player.getClientHandler());
         this.chunkX = chunkX;
         this.chunkY = chunkY;
+        this.floor = floor;
         this.layerDefinitionByte = layerDefinitionByte;
         this.sectionsSent = sectionsSent;
         this.arraySend = arraySend;
@@ -32,6 +35,7 @@ public class WorldChunkPartPacketOut extends AbstractServerOutPacket {
         write.writeShort(chunkY);
 
         // Write layer information
+        write.writeShort(floor.getWorldZ());
         write.writeByte(layerDefinitionByte);
         write.writeByte(sectionsSent);
 
