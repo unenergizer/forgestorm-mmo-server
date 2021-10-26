@@ -13,10 +13,7 @@ import com.forgestorm.server.util.RandomUtil;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.forgestorm.server.util.Log.println;
 
@@ -72,6 +69,7 @@ public class WorldChunk {
 
                         tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
                                 worldName,
+                                this,
                                 localX + chunkX * GameConstants.CHUNK_SIZE,
                                 localY + chunkY * GameConstants.CHUNK_SIZE,
                                 floor.getWorldZ());
@@ -132,18 +130,34 @@ public class WorldChunk {
         return !tile.hasCollision();
     }
 
-    public void addTileWarp(int localX, int localY, Warp warp) {
-        addTileWarp(new WarpLocation(localX, localY), warp);
+    public void removeTileWarp(int localX, int localY, short localZ) {
+        for (Iterator<Map.Entry<WarpLocation, Warp>> iterator = tileWarps.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<WarpLocation, Warp> entry = iterator.next();
+            WarpLocation warpLocation = entry.getKey();
+
+            if (warpLocation.getFromX() == localX
+                    && warpLocation.getFromY() == localY
+                    && warpLocation.getFromZ() == localZ) {
+                iterator.remove();
+                return;
+            }
+        }
+    }
+
+    public void addTileWarp(int localX, int localY, short localZ, Warp warp) {
+        addTileWarp(new WarpLocation(localX, localY, localZ), warp);
     }
 
     public void addTileWarp(WarpLocation warpLocation, Warp warp) {
         tileWarps.put(warpLocation, warp);
     }
 
-    Warp getWarp(int localX, int localY) {
+    Warp getWarp(int localX, int localY, short localZ) {
         for (Map.Entry<WarpLocation, Warp> entry : tileWarps.entrySet()) {
             WarpLocation warpLocation = entry.getKey();
-            if (warpLocation.getFromX() == localX && warpLocation.getFromY() == localY)
+            if (warpLocation.getFromX() == localX
+                    && warpLocation.getFromY() == localY
+                    && warpLocation.getFromZ() == localZ)
                 return entry.getValue();
         }
         return null;

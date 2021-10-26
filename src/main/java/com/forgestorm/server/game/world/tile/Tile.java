@@ -1,8 +1,9 @@
 package com.forgestorm.server.game.world.tile;
 
+import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.tile.properties.CollisionBlockProperty;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
+import com.forgestorm.server.game.world.tile.properties.WorldEdit;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -23,11 +24,15 @@ public class Tile {
     private final short worldZ;
 
     @Getter
+    private final WorldChunk worldChunk;
+
+    @Getter
     private TileImage tileImage;
 
-    public Tile(LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
+    public Tile(LayerDefinition layerDefinition, String worldName, WorldChunk worldChunk, int worldX, int worldY, short worldZ) {
         this.layerDefinition = layerDefinition;
         this.worldName = worldName;
+        this.worldChunk = worldChunk;
         this.worldX = worldX;
         this.worldY = worldY;
         this.worldZ = worldZ;
@@ -40,28 +45,32 @@ public class Tile {
         applyTileProperties();
     }
 
-    private void removeTileImage() {
+    public void removeTileImage() {
         removeTileProperties();
         tileImage = null;
     }
 
     private void applyTileProperties() {
         if (tileImage == null) return;
+        if (tileImage.getTileProperties() == null) return;
 
-        // DO COLLISION APPLICATION
-        if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) {
-            CollisionBlockProperty collisionBlockProperty = (CollisionBlockProperty) tileImage.getProperty(TilePropertyTypes.COLLISION_BLOCK);
-            collisionBlockProperty.applyPropertyToWorld(tileImage, layerDefinition, worldName, worldX, worldY, worldZ);
+        // Apply properties to the world
+        for (AbstractTileProperty abstractTileProperty : tileImage.getTileProperties().values()) {
+            if (abstractTileProperty instanceof WorldEdit) {
+                ((WorldEdit) abstractTileProperty).applyPropertyToWorld(worldChunk, tileImage, layerDefinition, worldName, worldX, worldY, worldZ);
+            }
         }
     }
 
     private void removeTileProperties() {
         if (tileImage == null) return;
+        if (tileImage.getTileProperties() == null) return;
 
-        // DO COLLISION REMOVAL
-        if (tileImage.containsProperty(TilePropertyTypes.COLLISION_BLOCK)) {
-            CollisionBlockProperty collisionBlockProperty = (CollisionBlockProperty) tileImage.getProperty(TilePropertyTypes.COLLISION_BLOCK);
-            collisionBlockProperty.removePropertyFromWorld(tileImage, layerDefinition, worldName, worldX, worldY, worldZ);
+        // Remove properties from world
+        for (AbstractTileProperty abstractTileProperty : tileImage.getTileProperties().values()) {
+            if (abstractTileProperty instanceof WorldEdit) {
+                ((WorldEdit) abstractTileProperty).removePropertyFromWorld(worldChunk, tileImage, layerDefinition, worldName, worldX, worldY, worldZ);
+            }
         }
     }
 

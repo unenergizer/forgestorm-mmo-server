@@ -2,6 +2,7 @@ package com.forgestorm.server.game.world.tile.properties;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
+import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
@@ -40,12 +41,12 @@ public class CollisionBlockProperty extends AbstractTileProperty implements Worl
     }
 
     @Override
-    public void applyPropertyToWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
+    public void applyPropertyToWorld(WorldChunk worldChunk, TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
         processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, worldZ, false);
     }
 
     @Override
-    public void removePropertyFromWorld(TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
+    public void removePropertyFromWorld(WorldChunk worldChunk, TileImage tileImage, LayerDefinition layerDefinition, String worldName, int worldX, int worldY, short worldZ) {
         processCollisionTiles(tileImage, layerDefinition, worldName, worldX, worldY, worldZ, true);
     }
 

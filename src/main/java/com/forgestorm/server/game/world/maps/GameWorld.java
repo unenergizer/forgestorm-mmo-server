@@ -207,14 +207,14 @@ public class GameWorld {
         return worldChunk.getTile(layerDefinition, localX, localY, Floors.getFloor(worldZ));
     }
 
-    public Warp getWarp(int entityX, int entityY) {
+    public Warp getWarp(int entityX, int entityY, short entityZ) {
         WorldChunk worldChunk = findChunk(entityX, entityY);
         if (worldChunk == null) return null;
 
         short localX = (short) (entityX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE);
         short localY = (short) (entityY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE);
 
-        return worldChunk.getWarp(localX, localY);
+        return worldChunk.getWarp(localX, localY, entityZ);
     }
 
     public boolean isTraversable(Location location) {
@@ -252,11 +252,11 @@ public class GameWorld {
     }
 
     public Warp getWarpFromLocation(Location location) {
-        return getWarp(location.getX(), location.getY());
+        return getWarp(location.getX(), location.getY(), location.getZ());
     }
 
     public boolean locationHasWarp(Location location) {
-        return getWarp(location.getX(), location.getY()) != null;
+        return getWarp(location.getX(), location.getY(), location.getZ()) != null;
     }
 
     public Location getLocation(MoveDirection direction) {
