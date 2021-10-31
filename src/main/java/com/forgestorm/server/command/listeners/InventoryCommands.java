@@ -64,7 +64,11 @@ public class InventoryCommands {
     public void onGiveItems(CommandSource commandSource, String[] args) {
 
         int itemId = parseItemId(commandSource, args[0]);
-        if (itemId == -1) commandSource.sendMessage("[RED]The item you requested could not be found. ItemID[GRAY]: [YELLOW]" + itemId);
+        if (itemId == -1) {
+            // Item not found
+            commandSource.sendMessage("[RED]The item you requested could not be found.");
+            return;
+        }
         ItemStack itemStack = ServerMain.getInstance().getItemStackManager().makeItemStack(itemId, 0);
         try {
 
