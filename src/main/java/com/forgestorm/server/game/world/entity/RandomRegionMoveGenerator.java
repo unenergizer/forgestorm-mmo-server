@@ -2,7 +2,7 @@ package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 import lombok.Getter;
 import lombok.Setter;
 

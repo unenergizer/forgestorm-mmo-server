@@ -7,6 +7,8 @@ import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.todo.FileManager;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
 import lombok.Getter;
 
 import java.io.File;

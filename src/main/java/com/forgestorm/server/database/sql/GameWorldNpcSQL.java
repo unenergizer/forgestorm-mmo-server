@@ -1,7 +1,7 @@
 package com.forgestorm.server.database.sql;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.game.world.entity.FirstInteraction;
+import com.forgestorm.shared.game.world.entities.FirstInteraction;
 import com.forgestorm.server.game.world.entity.NPC;
 import com.forgestorm.server.game.world.maps.Location;
 

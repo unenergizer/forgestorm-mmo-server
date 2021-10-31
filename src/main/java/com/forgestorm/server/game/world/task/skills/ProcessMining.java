@@ -6,10 +6,10 @@ import com.forgestorm.server.game.rpg.skills.SkillNodeData;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.entity.StationaryEntity;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.maps.ItemStackDropEntityController;
 import com.forgestorm.server.game.world.task.AbstractTask;
-import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOut;
+import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOutOut;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -122,7 +122,7 @@ public class ProcessMining implements AbstractTask {
         appearance.setMonsterBodyTexture(appearanceID);
 
         entity.getGameWorld().getPlayerController()
-                .forAllPlayers(player -> new EntityAppearancePacketOut(player, entity).sendPacket());
+                .forAllPlayers(player -> new EntityAppearancePacketOutOut(player, entity).sendPacket());
 
     }
 }

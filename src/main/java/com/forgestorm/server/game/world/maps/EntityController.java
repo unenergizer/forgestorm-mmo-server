@@ -1,10 +1,10 @@
 package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.game.world.entity.*;
-import com.forgestorm.server.network.game.packet.out.AiEntityDataUpdatePacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityDespawnPacketOut;
-import com.forgestorm.server.network.game.packet.out.EntitySpawnPacketOut;
+import com.forgestorm.server.network.game.packet.out.AiEntityDataUpdatePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityAttributesUpdatePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityDespawnPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntitySpawnPacketOutOut;
 import lombok.Getter;
 
 import java.util.*;
@@ -79,16 +79,16 @@ public abstract class EntityController<T extends Entity> {
 
                     // If the item is available to everyone, send it to them.
                     if (itemStackDrop.isSpawnedForAll()) {
-                        new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                        new EntitySpawnPacketOutOut(packetReceiver, entityToSpawn).sendPacket();
                     } else {
                         // Does this item have an owner? If so, only send them the item.
                         if (packetReceiver == itemStackDrop.getDropOwner()) {
-                            new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                            new EntitySpawnPacketOutOut(packetReceiver, entityToSpawn).sendPacket();
                         }
                     }
                 } else {
                     // Entity to spawn is not an ItemStackDrop
-                    new EntitySpawnPacketOut(packetReceiver, entityToSpawn).sendPacket();
+                    new EntitySpawnPacketOutOut(packetReceiver, entityToSpawn).sendPacket();
                 }
 
                 // Sending additional information for the AI entity.
@@ -96,18 +96,18 @@ public abstract class EntityController<T extends Entity> {
                     if (((AiEntity) entityToSpawn).isBankKeeper()) {
                         // TODO: we could toggle bank access to certain bank tellers depending
                         // TODO: on if the player has the bank teller unlocked.
-                        new AiEntityDataUpdatePacketOut(
+                        new AiEntityDataUpdatePacketOutOut(
                                 packetReceiver,
                                 (AiEntity) entityToSpawn,
-                                AiEntityDataUpdatePacketOut.BANK_KEEPER_INDEX).sendPacket();
+                                AiEntityDataUpdatePacketOutOut.BANK_KEEPER_INDEX).sendPacket();
                     }
                 }
             }
 
             // Send joined player to all online players
             if (entityToSpawn.getEntityType() == EntityType.PLAYER) {
-                new EntitySpawnPacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
-                new EntityAttributesUpdatePacketOut((Player) entityToSpawn, packetReceiver).sendPacket();
+                new EntitySpawnPacketOutOut((Player) entityToSpawn, packetReceiver).sendPacket();
+                new EntityAttributesUpdatePacketOutOut((Player) entityToSpawn, packetReceiver).sendPacket();
             }
         }
     }
@@ -115,7 +115,7 @@ public abstract class EntityController<T extends Entity> {
     void entityDespawn(Entity entityToDespawn) {
         for (Player packetReceiver : gameWorld.getPlayerController().getPlayerList()) {
             if (packetReceiver == entityToDespawn) continue;
-            new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
+            new EntityDespawnPacketOutOut(packetReceiver, entityToDespawn).sendPacket();
         }
     }
 

@@ -2,15 +2,15 @@ package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
-import com.forgestorm.server.game.abilities.Ability;
-import com.forgestorm.server.game.rpg.Attributes;
+import com.forgestorm.shared.game.abilities.Ability;
+import com.forgestorm.shared.game.rpg.Attributes;
 import com.forgestorm.server.game.world.combat.AbstractAbility;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
-import com.forgestorm.server.game.world.maps.Warp;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityDamagePacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityDamagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityHealPacketOutOut;
 import com.forgestorm.server.util.MathUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -110,7 +110,7 @@ public class MovingEntity extends Entity {
         // Ensuring not to exceed the maximum health.
         final int realAmount = amount + currentHealth > maxHealth ? maxHealth - currentHealth : amount;
         getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
-                new EntityHealPacketOut(anyPlayer, this, realAmount).sendPacket());
+                new EntityHealPacketOutOut(anyPlayer, this, realAmount).sendPacket());
         currentHealth += realAmount;
     }
 
@@ -129,19 +129,19 @@ public class MovingEntity extends Entity {
 
         int finalDamage = damage;
         getGameWorld().getPlayerController().forAllPlayers(player ->
-                new EntityDamagePacketOut(player, this, currentHealth, finalDamage).sendPacket());
+                new EntityDamagePacketOutOut(player, this, currentHealth, finalDamage).sendPacket());
         if (this instanceof Player) {
             if (damage <= 0) {
-                new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " tried to hit you but missed.").sendPacket();
+                new ChatMessagePacketOutOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " tried to hit you but missed.").sendPacket();
             } else {
-                new ChatMessagePacketOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
+                new ChatMessagePacketOutOut((Player) this, ChatChannelType.COMBAT, "[RED]" + attackerEntity.getName() + " hit you for " + damage + ".").sendPacket();
             }
         }
         if (attackerEntity instanceof Player) {
             if (damage <= 0) {
-                new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You tried to hit " + getName() + " but missed.").sendPacket();
+                new ChatMessagePacketOutOut((Player) attackerEntity, ChatChannelType.COMBAT, "You tried to hit " + getName() + " but missed.").sendPacket();
             } else {
-                new ChatMessagePacketOut((Player) attackerEntity, ChatChannelType.COMBAT, "You hit " + getName() + " for " + damage + ".").sendPacket();
+                new ChatMessagePacketOutOut((Player) attackerEntity, ChatChannelType.COMBAT, "You hit " + getName() + " for " + damage + ".").sendPacket();
             }
         }
     }

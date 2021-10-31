@@ -4,12 +4,15 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.network.game.packet.out.TileWarpPacketOut;
-import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
-import com.forgestorm.server.util.RandomUtil;
+import com.forgestorm.server.network.game.packet.out.TileWarpPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOutOut;
+import com.forgestorm.shared.game.world.maps.Floors;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.shared.game.world.maps.WarpLocation;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.util.RandomNumberUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -167,7 +170,7 @@ public class WorldChunk {
         for (int i = 0; i < GameConstants.CHUNK_SIZE; i++) {
             for (int j = 0; j < GameConstants.CHUNK_SIZE; j++) {
 
-                int rand = RandomUtil.getNewRandom(0, 100);
+                int rand = RandomNumberUtil.getNewRandom(0, 100);
 
                 if (rand <= 20) {
                     TileImage tileImage = ServerMain.getInstance().getWorldBuilder().getTileImageMap().get(262);
@@ -200,7 +203,7 @@ public class WorldChunk {
                     }
 
                     // Construct packet
-                    new WorldChunkPartPacketOut(
+                    new WorldChunkPartPacketOutOut(
                             chunkRecipient,
                             chunkX,
                             chunkY,
@@ -219,7 +222,7 @@ public class WorldChunk {
         // Send chunk warps
         boolean clearWarps = true;
         for (Warp warp : tileWarps.values()) {
-            new TileWarpPacketOut(chunkRecipient,
+            new TileWarpPacketOutOut(chunkRecipient,
                     clearWarps,
                     warp.getFromX(),
                     warp.getFromY(),

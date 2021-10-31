@@ -1,6 +1,7 @@
 package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.game.rpg.EntityAlignment;
+import com.forgestorm.shared.game.world.entities.FirstInteraction;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -5,6 +5,7 @@ import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.out.*;
+import com.forgestorm.shared.game.world.maps.Warp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -55,7 +56,7 @@ public class PlayerController {
             Player entityToDespawn = playerQuitQueue.remove();
             for (Player packetReceiver : playerList) {
                 if (packetReceiver == entityToDespawn) continue;
-                new EntityDespawnPacketOut(packetReceiver, entityToDespawn).sendPacket();
+                new EntityDespawnPacketOutOut(packetReceiver, entityToDespawn).sendPacket();
             }
         }
     }
@@ -73,7 +74,7 @@ public class PlayerController {
             }
             player.gameWorldRegister(queueData.getWarp());
             playerList.add(player);
-            new InitializeWorldPacketOut(player, queueData.getWarp().getWarpDestination().getWorldName()).sendPacket();
+            new InitializeWorldPacketOutOut(player, queueData.getWarp().getWarpDestination().getWorldName()).sendPacket();
             println(getClass(), "<Player Join> " + player, false, PRINT_DEBUG);
             joinsProcessed++;
         }
@@ -91,15 +92,15 @@ public class PlayerController {
             for (Player packetReceiver : playerList) {
                 // Send all online players, the player that just spawned.
                 if (!packetReceiver.equals(playerWhoJoined)) {
-                    new EntitySpawnPacketOut(packetReceiver, playerWhoJoined).sendPacket();
+                    new EntitySpawnPacketOutOut(packetReceiver, playerWhoJoined).sendPacket();
                 }
 
                 // Send all players to the player who joined (including themselves)
-                new EntitySpawnPacketOut(playerWhoJoined, packetReceiver).sendPacket();
+                new EntitySpawnPacketOutOut(playerWhoJoined, packetReceiver).sendPacket();
             }
 
             // Send the player attributes about themselves
-            new EntityAttributesUpdatePacketOut(playerWhoJoined, playerWhoJoined).sendPacket();
+            new EntityAttributesUpdatePacketOutOut(playerWhoJoined, playerWhoJoined).sendPacket();
 
             // Tell the player about all the mobs currently on the world.
             gameWorld.getAiEntityController().getEntities().forEach(aiEntity -> postPlayerSpawn(playerWhoJoined, aiEntity));
@@ -108,9 +109,9 @@ public class PlayerController {
                 if (aiEntity.isBankKeeper()) {
                     // TODO: we could toggle bank access to certain bank tellers depending
                     // TODO: on if the player has the bank teller unlocked.
-                    new AiEntityDataUpdatePacketOut(
+                    new AiEntityDataUpdatePacketOutOut(
                             playerWhoJoined, aiEntity,
-                            AiEntityDataUpdatePacketOut.BANK_KEEPER_INDEX).sendPacket();
+                            AiEntityDataUpdatePacketOutOut.BANK_KEEPER_INDEX).sendPacket();
                 }
             });
             gameWorld.getStationaryEntityController().getEntities().forEach(stationaryEntity -> postPlayerSpawn(playerWhoJoined, stationaryEntity));
@@ -144,7 +145,7 @@ public class PlayerController {
     }
 
     private void postPlayerSpawn(Player receiver, Entity entityToSpawn) {
-        new EntitySpawnPacketOut(receiver, entityToSpawn).sendPacket();
+        new EntitySpawnPacketOutOut(receiver, entityToSpawn).sendPacket();
     }
 
     public Player findPlayer(short uuid) {

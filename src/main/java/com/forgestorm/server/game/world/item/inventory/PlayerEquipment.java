@@ -1,11 +1,14 @@
 package com.forgestorm.server.game.world.item.inventory;
 
 import com.forgestorm.server.game.PlayerConstants;
-import com.forgestorm.server.game.rpg.Attributes;
+import com.forgestorm.shared.game.rpg.Attributes;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
-import com.forgestorm.server.game.world.item.ItemStackType;
-import com.forgestorm.server.network.game.packet.out.EntityAttributesUpdatePacketOut;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStackType;
+import com.forgestorm.server.network.game.packet.out.EntityAttributesUpdatePacketOutOut;
+import com.forgestorm.shared.game.world.item.inventory.EquipmentSlotTypes;
+import com.forgestorm.shared.game.world.item.inventory.InventoryConstants;
+import com.forgestorm.shared.game.world.item.inventory.InventoryType;
 
 import static com.forgestorm.server.util.Log.println;
 import static java.util.Objects.requireNonNull;
@@ -122,7 +125,7 @@ public class PlayerEquipment extends AbstractInventory {
         // Send attributes packet
         if (sendAttributePacket) {
             println(getClass(), "Sending EntityAttributesUpdatePacketOut...", false, PRINT_DEBUG);
-            new EntityAttributesUpdatePacketOut(inventoryOwner, inventoryOwner).sendPacket();
+            new EntityAttributesUpdatePacketOutOut(inventoryOwner, inventoryOwner).sendPacket();
         }
     }
 

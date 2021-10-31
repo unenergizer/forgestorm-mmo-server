@@ -1,8 +1,8 @@
 package com.forgestorm.server.game;
 
-import com.forgestorm.server.game.world.maps.Floors;
+import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 
 public class PlayerConstants {
 

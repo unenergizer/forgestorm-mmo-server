@@ -6,7 +6,7 @@ import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 
 public class ItemStackDropEntityController extends EntityController<ItemStackDrop> {
 

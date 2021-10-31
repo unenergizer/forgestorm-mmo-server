@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.maps.Location;
 
 import java.sql.Connection;

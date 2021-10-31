@@ -1,11 +1,13 @@
 package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.game.character.CharacterCreatorResponses;
+import com.forgestorm.shared.network.game.CharacterCreatorResponses;
 import com.forgestorm.server.game.character.CharacterManager;
 import com.forgestorm.server.network.game.packet.AllowNullPlayer;
-import com.forgestorm.server.network.game.packet.out.CharacterCreatorPacketOut;
+import com.forgestorm.server.network.game.packet.out.CharacterCreatorPacketOutOut;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import static com.forgestorm.server.util.Log.println;
@@ -49,18 +51,18 @@ public class CharacterCreatorPacketIn implements PacketListener<CharacterCreator
 
         // Check black list of unacceptable names
         if (characterManager.isNameBlacklisted(packetData.characterName)) {
-            new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_BLACKLIST_NAME).sendPacket();
+            new CharacterCreatorPacketOutOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_BLACKLIST_NAME).sendPacket();
             return;
         }
 
         // Character name is not unique, send error response
         if (!characterManager.isNameUnique(packetData.characterName)) {
-            new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_NAME_TAKEN).sendPacket();
+            new CharacterCreatorPacketOutOut(packetData.getClientHandler(), CharacterCreatorResponses.FAIL_NAME_TAKEN).sendPacket();
             return;
         }
 
         // Character name is good, create the character
-        new CharacterCreatorPacketOut(packetData.getClientHandler(), CharacterCreatorResponses.SUCCESS).sendPacket();
+        new CharacterCreatorPacketOutOut(packetData.getClientHandler(), CharacterCreatorResponses.SUCCESS).sendPacket();
         ServerMain.getInstance().getCharacterManager().createCharacter(
                 packetData.getClientHandler(),
                 packetData.characterName,

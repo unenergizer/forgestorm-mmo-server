@@ -4,9 +4,12 @@ import java.util.Map;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.maps.*;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.shared.game.world.maps.Floors;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.shared.game.world.tile.properties.WorldEdit;
 import lombok.Getter;
 import lombok.Setter;
 

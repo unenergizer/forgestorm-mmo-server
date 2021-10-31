@@ -3,6 +3,8 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.game.world.entity.NPC;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.NPC_DIALOGUE)

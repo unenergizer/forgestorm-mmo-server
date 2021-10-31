@@ -5,6 +5,8 @@ import com.forgestorm.server.game.rpg.ShopOpcodes;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;

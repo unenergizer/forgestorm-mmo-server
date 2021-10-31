@@ -1,10 +1,10 @@
 package com.forgestorm.server.network.game;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.io.todo.NetworkSettingsLoader;
+import com.forgestorm.shared.io.NetworkSettingsLoader;
 import com.forgestorm.server.network.AuthenticationManager;
 import com.forgestorm.server.network.NetworkManager;
-import com.forgestorm.server.network.game.packet.out.GameOutputStream;
+import com.forgestorm.shared.network.game.GameOutputStream;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import com.forgestorm.server.network.game.shared.EventBus;
 import lombok.Getter;

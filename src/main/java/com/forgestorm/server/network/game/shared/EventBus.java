@@ -3,6 +3,7 @@ package com.forgestorm.server.network.game.shared;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.packet.AllowNullPlayer;
 import com.forgestorm.server.network.game.packet.in.PacketInCancelable;
+import com.forgestorm.shared.network.game.Opcode;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;

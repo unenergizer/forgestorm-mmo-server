@@ -3,12 +3,14 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.rpg.StationaryTypes;
 import com.forgestorm.server.game.world.entity.*;
-import com.forgestorm.server.game.world.item.ItemStack;
-import com.forgestorm.server.game.world.item.ItemStackType;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStackType;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.item.inventory.PlayerBag;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

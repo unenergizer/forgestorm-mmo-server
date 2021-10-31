@@ -7,7 +7,7 @@ import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.GameWorldProcessor;
 import com.forgestorm.server.game.world.maps.WorldCreator;
 import com.forgestorm.server.io.todo.FileManager;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
 
 import java.io.File;
 
@@ -24,7 +24,7 @@ public class WorldCommands {
 
         // Check to make sure the world name doesn't already exist
         if (gameWorldProcessor.doesGameWorldExist(worldName)) {
-            new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED]World name already been used. Try a different name").sendPacket();
+            new ChatMessagePacketOutOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED]World name already been used. Try a different name").sendPacket();
             return;
         }
 
@@ -37,7 +37,7 @@ public class WorldCommands {
         GameWorld gameWorld = fileManager.getGameWorldData(path).getGameWorld();
         gameWorldProcessor.loadWorld(gameWorld);
 
-        new ChatMessagePacketOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED] THIS NEEDS TO BE REDONE! PLEASE LOOK IT UP AND FIX... ").sendPacket();
+        new ChatMessagePacketOutOut(commandSource.getPlayer(), ChatChannelType.GENERAL, "[RED] THIS NEEDS TO BE REDONE! PLEASE LOOK IT UP AND FIX... ").sendPacket();
     }
 
     @Command(base = "saveworld")

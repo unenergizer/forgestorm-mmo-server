@@ -1,8 +1,10 @@
 package com.forgestorm.server.game.world.item.inventory;
 
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
-import com.forgestorm.server.game.world.item.ItemStackType;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStackType;
+import com.forgestorm.shared.game.world.item.inventory.InventoryConstants;
+import com.forgestorm.shared.game.world.item.inventory.InventoryType;
 
 public class PlayerBag extends AbstractInventory {
 

@@ -1,10 +1,11 @@
 package com.forgestorm.server.game.world.entity;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.game.world.item.ItemStack;
-import com.forgestorm.server.game.world.item.ItemStackType;
-import com.forgestorm.server.game.world.item.WearableItemStack;
-import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOut;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.entities.AppearanceType;
+import com.forgestorm.shared.game.world.item.ItemStackType;
+import com.forgestorm.shared.game.world.item.WearableItemStack;
+import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOutOut;
 import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,14 +62,14 @@ public class Appearance {
         if (sendPacket) {
             println(getClass(), "Sending appearance update!", false, PRINT_DEBUG);
             ServerMain.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
+                    new EntityAppearancePacketOutOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
         }
     }
 
     private void setPlayerBody(WearableItemStack itemStack, AppearanceType appearanceType, byte updateId, boolean sendPacket) {
         println(getClass(), "AppearanceType: " + appearanceType + ", UpdateID: " + updateId + ", SendPacket: " + sendPacket, false, PRINT_DEBUG);
         switch (appearanceType) {
-            case MONSTER_BODY_TEXTURE:
+            case SINGLE_BODY_TEXTURE:
                 monsterBodyTexture = updateId;
                 break;
             case HAIR_TEXTURE:

@@ -1,6 +1,8 @@
 package com.forgestorm.server.game.world.item;
 
 import com.forgestorm.server.game.world.entity.Player;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStackType;
 
 public class ItemStackConsumerManager {
 

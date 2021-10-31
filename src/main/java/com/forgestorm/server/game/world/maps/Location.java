@@ -2,6 +2,7 @@ package com.forgestorm.server.game.world.maps;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.Entity;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 import lombok.Getter;
 import lombok.Setter;
 

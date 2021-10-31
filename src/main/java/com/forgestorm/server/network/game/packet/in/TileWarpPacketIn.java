@@ -4,6 +4,10 @@ import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.maps.*;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import static com.forgestorm.server.util.Log.println;

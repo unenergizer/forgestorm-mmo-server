@@ -2,13 +2,16 @@ package com.forgestorm.server.game.world.tile;
 
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.maps.Tags;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
@@ -27,6 +30,8 @@ public class TileImage {
     @Getter
     @Setter
     private Map<TilePropertyTypes, AbstractTileProperty> tileProperties;
+
+    private List<String> tagsList;
 
     @Getter
     @Setter
@@ -54,6 +59,31 @@ public class TileImage {
                 setCustomTileProperty(entry);
             }
         }
+
+        // Copy Tags List
+        if (tileImage.tagsList != null) {
+            for (String tag : tileImage.tagsList) {
+                addTag(com.forgestorm.shared.game.world.maps.Tags.valueOf(tag));
+            }
+        }
+    }
+
+    public void addTag(com.forgestorm.shared.game.world.maps.Tags tag) {
+        if (tag == com.forgestorm.shared.game.world.maps.Tags.AN_UNUSED_TAG) return;
+        if (tagsList == null) tagsList = new ArrayList<String>();
+        if (containsTag(tag)) return;
+        tagsList.add(tag.name());
+    }
+
+    public boolean containsTag(com.forgestorm.shared.game.world.maps.Tags tag) {
+        if (tagsList == null) return false;
+        for (String s : tagsList) if (s.equals(tag.name())) return true;
+        return false;
+    }
+
+    public void removeTag(Tags tag) {
+        if (tagsList == null) return;
+        tagsList.remove(tag.name());
     }
 
     public boolean containsProperty(TilePropertyTypes tilePropertyType) {

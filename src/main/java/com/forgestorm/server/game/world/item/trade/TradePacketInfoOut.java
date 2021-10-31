@@ -1,6 +1,7 @@
 package com.forgestorm.server.game.world.item.trade;
 
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.trade.TradeStatusOpcode;
 import lombok.Getter;
 
 @Getter

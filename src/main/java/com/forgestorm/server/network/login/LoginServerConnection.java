@@ -2,8 +2,9 @@ package com.forgestorm.server.network.login;
 
 import com.forgestorm.server.database.AuthenticatedUser;
 import com.forgestorm.server.database.sql.XFUserAuthenticateSQL;
-import com.forgestorm.server.io.todo.NetworkSettingsLoader;
+import com.forgestorm.shared.io.NetworkSettingsLoader;
 import com.forgestorm.server.network.NetworkManager;
+import com.forgestorm.shared.network.login.LoginFailReason;
 import lombok.Getter;
 import lombok.Setter;
 

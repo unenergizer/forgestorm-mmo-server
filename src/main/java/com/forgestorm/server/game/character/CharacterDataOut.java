@@ -1,6 +1,6 @@
 package com.forgestorm.server.game.character;
 
-import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;

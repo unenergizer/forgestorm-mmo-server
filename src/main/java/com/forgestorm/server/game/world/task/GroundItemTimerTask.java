@@ -1,9 +1,8 @@
 package com.forgestorm.server.game.world.task;
 
-import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.ItemStackDrop;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.EntitySpawnPacketOut;
+import com.forgestorm.server.network.game.packet.out.EntitySpawnPacketOutOut;
 import com.forgestorm.server.util.ServerTimeUtil;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class GroundItemTimerTask implements AbstractTask {
                 if (!groundItemTimer.itemStackDrop.isSpawnedForAll() && groundItemTimer.timePassed == TIME_TO_SPAWN_TO_ALL) {
                     for (Player player : groundItemTimer.itemStackDrop.getGameWorld().getPlayerController().getPlayerList()) {
                         if (player.equals(groundItemTimer.itemStackDrop.getDropOwner())) continue;
-                        new EntitySpawnPacketOut(player, groundItemTimer.itemStackDrop).sendPacket();
+                        new EntitySpawnPacketOutOut(player, groundItemTimer.itemStackDrop).sendPacket();
                     }
                     groundItemTimer.itemStackDrop.setSpawnedForAll(true);
                 }

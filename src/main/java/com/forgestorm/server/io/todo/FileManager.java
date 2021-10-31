@@ -11,7 +11,8 @@ import com.forgestorm.server.io.DatabaseSettingsLoader;
 import com.forgestorm.server.io.FilePaths;
 import com.forgestorm.server.io.TextureAtlasLoader;
 import com.forgestorm.server.io.atlas.TextureAtlas;
-import com.forgestorm.server.io.type.GameAtlas;
+import com.forgestorm.shared.io.*;
+import com.forgestorm.shared.io.type.GameAtlas;
 import lombok.Getter;
 
 import java.io.File;

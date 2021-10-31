@@ -3,6 +3,7 @@ package com.forgestorm.server.game.world.item;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.io.DropTableLoader;
+import com.forgestorm.shared.game.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Random;

@@ -2,7 +2,7 @@ package com.forgestorm.server.network;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
-import com.forgestorm.server.io.todo.NetworkSettingsLoader;
+import com.forgestorm.shared.io.NetworkSettingsLoader;
 import com.forgestorm.server.network.game.GameServerConnection;
 import com.forgestorm.server.network.game.packet.in.*;
 import com.forgestorm.server.network.game.packet.out.OutputStreamManager;

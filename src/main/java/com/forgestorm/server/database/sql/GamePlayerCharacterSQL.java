@@ -5,7 +5,7 @@ import com.forgestorm.server.game.character.CharacterDataOut;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;

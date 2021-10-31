@@ -8,14 +8,14 @@ import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.game.world.item.inventory.BankActions;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
-import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
+import com.forgestorm.server.network.game.packet.out.BankManagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityMovePacketOutOut;
 import com.forgestorm.server.util.MoveNode;
 import com.forgestorm.server.util.PathFinding;
-import com.forgestorm.server.util.RandomUtil;
+import com.forgestorm.shared.util.RandomNumberUtil;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
@@ -317,19 +317,19 @@ public class MovementUpdateTask implements AbstractTask {
             return;
         }
 
-        MoveDirection attemptDirection1 = directionOptions.get(RandomUtil.getNewRandom(0, 3));
+        MoveDirection attemptDirection1 = directionOptions.get(RandomNumberUtil.getNewRandom(0, 3));
         if (attemptAiTargetMove(currentLocation, targetLocation, gameWorld, attemptDirection1, otherTargetLocations, aiEntity)) {
             return;
         }
 
         directionOptions.removeIf(direction -> direction == attemptDirection1);
-        MoveDirection attemptDirection2 = directionOptions.get(RandomUtil.getNewRandom(0, 2));
+        MoveDirection attemptDirection2 = directionOptions.get(RandomNumberUtil.getNewRandom(0, 2));
         if (attemptAiTargetMove(currentLocation, targetLocation, gameWorld, attemptDirection2, otherTargetLocations, aiEntity)) {
             return;
         }
 
         directionOptions.removeIf(direction -> direction == attemptDirection2);
-        MoveDirection attemptDirection3 = directionOptions.get(RandomUtil.getNewRandom(0, 1));
+        MoveDirection attemptDirection3 = directionOptions.get(RandomNumberUtil.getNewRandom(0, 1));
         if (attemptAiTargetMove(currentLocation, targetLocation, gameWorld, attemptDirection3, otherTargetLocations, aiEntity)) {
             return;
         }
@@ -405,7 +405,7 @@ public class MovementUpdateTask implements AbstractTask {
     private RandomDirectionResult genNewRandomAttemptLocation(List<MoveDirection> directionOptions, MoveDirection previousMove,
                                                               GameWorld gameWorld, Location currentLocation) {
         if (previousMove != MoveDirection.NONE) directionOptions.removeIf(direction -> direction == previousMove);
-        MoveDirection attemptDirection = directionOptions.get(RandomUtil.getNewRandom(0, directionOptions.size() - 1));
+        MoveDirection attemptDirection = directionOptions.get(RandomNumberUtil.getNewRandom(0, directionOptions.size() - 1));
         return new RandomDirectionResult(attemptDirection, currentLocation.add(gameWorld.getLocation(attemptDirection)));
     }
 
@@ -473,7 +473,7 @@ public class MovementUpdateTask implements AbstractTask {
         otherTargetLocations.removeIf(info -> info.tracker.equals(aiEntity));
         List<MoveDirection> directions = new LinkedList<>(Arrays.asList(MoveDirection.EAST, MoveDirection.NORTH, MoveDirection.SOUTH, MoveDirection.WEST));
         directions.removeIf(direction -> direction == excludeDirection);
-        MoveDirection attemptDirection = directions.get(RandomUtil.getNewRandom(0, 2));
+        MoveDirection attemptDirection = directions.get(RandomNumberUtil.getNewRandom(0, 2));
         GameWorld gameWorld = aiEntity.getGameWorld();
         if (gameWorld.isTraversable(aiEntity.getCurrentWorldLocation().add(gameWorld.getLocation(attemptDirection)))) {
             performAiEntityMove(aiEntity, attemptDirection);
@@ -522,18 +522,18 @@ public class MovementUpdateTask implements AbstractTask {
 
         if (!playerIsMoving) {
             if (!player.getCurrentWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
+                new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
                 return false;
             }
         } else {
             if (moveQueueEmpty) {
                 if (!player.getFutureWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
+                    new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             } else {
                 if (!player.getLatestMoveRequests().getLast().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
+                    new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             }
@@ -583,7 +583,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         // Cannot move and have the bank open
         if (player.isBankOpen()) {
-            new BankManagePacketOut(player, BankActions.SERVER_CLOSE).sendPacket();
+            new BankManagePacketOutOut(player, BankActions.SERVER_CLOSE).sendPacket();
             player.setBankOpen(false);
         }
 
@@ -625,7 +625,7 @@ public class MovementUpdateTask implements AbstractTask {
         }
 
         ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
-                new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
+                new EntityMovePacketOutOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
 
     }
 
@@ -651,6 +651,6 @@ public class MovementUpdateTask implements AbstractTask {
         println(getClass(), "FutureLocation: " + aiEntity.getFutureWorldLocation(), false, PRINT_DEBUG);
 
         aiEntity.getGameWorld().getPlayerController().getPlayerList().forEach(player ->
-                new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureWorldLocation()).sendPacket());
+                new EntityMovePacketOutOut(player, aiEntity, aiEntity.getFutureWorldLocation()).sendPacket());
     }
 }

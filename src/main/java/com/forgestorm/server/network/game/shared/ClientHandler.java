@@ -7,13 +7,13 @@ import com.forgestorm.server.database.sql.GamePlayerInventorySQL;
 import com.forgestorm.server.game.character.CharacterDataOut;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
-import com.forgestorm.server.game.world.item.WearableItemStack;
-import com.forgestorm.server.game.world.item.inventory.EquipmentSlotTypes;
+import com.forgestorm.shared.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.WearableItemStack;
+import com.forgestorm.shared.game.world.item.inventory.EquipmentSlotTypes;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.network.game.packet.out.AbstractServerOutPacket;
-import com.forgestorm.server.network.game.packet.out.GameOutputStream;
+import com.forgestorm.server.network.game.packet.out.AbstractPacketOut;
+import com.forgestorm.shared.network.game.GameOutputStream;
 import com.forgestorm.server.util.Log;
 import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
@@ -32,6 +32,7 @@ import java.util.Map;
 @Getter
 public class ClientHandler {
 
+    private final int remoteRevisionNumber;
     private final AuthenticatedUser authenticatedUser;
     private Socket socket;
     private GameOutputStream gameOutputStream;
@@ -49,7 +50,7 @@ public class ClientHandler {
     /**
      * This is used to track the stats of the saving the players game progress.
      */
-    private CharacterSaveProgress characterSaveProgress = new CharacterSaveProgress(this);
+    private final CharacterSaveProgress characterSaveProgress = new CharacterSaveProgress(this);
 
     private final Map<Byte, Player> loadedPlayers = new HashMap<>();
 
@@ -59,6 +60,14 @@ public class ClientHandler {
     private long clientPing = 0;
     @Setter
     private volatile long pingSendTime = 0;
+
+    public ClientHandler(final AuthenticatedUser authenticatedUser, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
+        this.remoteRevisionNumber = ServerMain.getInstance().getVersionMain().getRemoteRevisionNumber();
+        this.authenticatedUser = authenticatedUser;
+        this.socket = socket;
+        this.gameOutputStream = gameOutputStream;
+        this.inputStream = inputStream;
+    }
 
     public void loadAllPlayers(List<CharacterDataOut> characterDataOutList) {
         for (byte i = 0; i < characterDataOutList.size(); i++) {
@@ -165,13 +174,6 @@ public class ClientHandler {
         currentPlayerId = characterId;
     }
 
-    public ClientHandler(final AuthenticatedUser authenticatedUser, final Socket socket, final GameOutputStream gameOutputStream, final DataInputStream inputStream) {
-        this.authenticatedUser = authenticatedUser;
-        this.socket = socket;
-        this.gameOutputStream = gameOutputStream;
-        this.inputStream = inputStream;
-    }
-
     @FunctionalInterface
     private interface Reader {
         Object accept() throws IOException;
@@ -244,8 +246,8 @@ public class ClientHandler {
         return null;
     }
 
-    public int fillCurrentBuffer(AbstractServerOutPacket abstractServerOutPacket) {
-        return gameOutputStream.fillCurrentBuffer(abstractServerOutPacket);
+    public int fillCurrentBuffer(AbstractPacketOut abstractPacketOut) {
+        return gameOutputStream.fillCurrentBuffer(abstractPacketOut);
     }
 
     public void writeBuffers() {

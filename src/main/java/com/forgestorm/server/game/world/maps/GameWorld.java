@@ -7,11 +7,14 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.io.todo.FileManager;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
 import com.forgestorm.server.util.libgdx.Color;
+import com.forgestorm.shared.game.world.maps.Floors;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import lombok.Getter;
 
 import java.io.File;
@@ -79,7 +82,7 @@ public class GameWorld {
             // Send world save message
             // TODO: Filter players by staff status.
             ServerMain.getInstance().getGameManager().forAllPlayers(player ->
-                    new ChatMessagePacketOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
+                    new ChatMessagePacketOutOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
         }
     }
 

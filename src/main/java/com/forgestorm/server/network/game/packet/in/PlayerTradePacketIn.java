@@ -3,8 +3,10 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.trade.TradeManager;
-import com.forgestorm.server.game.world.item.trade.TradeStatusOpcode;
+import com.forgestorm.shared.game.world.item.trade.TradeStatusOpcode;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

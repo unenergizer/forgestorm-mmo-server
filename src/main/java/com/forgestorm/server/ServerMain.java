@@ -79,6 +79,9 @@ public class ServerMain {
     }
 
     private void startServer() {
+        // Client files updater
+        versionMain = new VersionMain();
+
         // Framework
         discordManager = new DiscordManager();
         gameLoop = new GameLoop();
@@ -109,6 +112,7 @@ public class ServerMain {
         discordManager.start();
         println(true);
         println(getClass(), "Starting Server!");
+        versionMain.start();
 
         // Boot io loaders
         worldBuilder.start();
@@ -123,9 +127,6 @@ public class ServerMain {
         commandManager.start();
         networkManager.start();
         gameLoop.start();
-
-        // Client files updater
-        versionMain = new VersionMain();
     }
 
     public void exitServer() {

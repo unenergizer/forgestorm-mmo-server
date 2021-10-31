@@ -5,6 +5,8 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.game.world.task.MovementUpdateTask;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import static com.forgestorm.server.util.Log.println;

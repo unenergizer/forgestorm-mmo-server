@@ -1,5 +1,6 @@
 package com.forgestorm.server.network.login;
 
+import com.forgestorm.shared.network.login.LoginFailReason;
 import lombok.Getter;
 
 import java.util.List;

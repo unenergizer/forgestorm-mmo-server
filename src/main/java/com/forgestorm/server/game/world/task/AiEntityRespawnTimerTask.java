@@ -2,8 +2,8 @@ package com.forgestorm.server.game.world.task;
 
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.AiEntity;
-import com.forgestorm.server.game.world.maps.MoveDirection;
-import com.forgestorm.server.game.world.maps.Warp;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;

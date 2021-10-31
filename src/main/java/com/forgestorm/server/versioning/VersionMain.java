@@ -4,6 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.network.ftp.ChecksumUtil;
 import com.forgestorm.server.network.ftp.FTPUploader;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,6 +23,9 @@ public class VersionMain {
 
     private static final boolean PRINT_DEBUG = false;
 
+    @Getter
+    private int remoteRevisionNumber = -1;
+
     public void beginVersioning() {
         println(getClass(), "(1/3) Begin creating new version of content.");
         new Thread(() -> {
@@ -36,26 +40,29 @@ public class VersionMain {
         }, "VersioningMainUpdater").start();
     }
 
-    private void updateCurrentRevisionNumber() {
+    public void start() {
         // Check remote revision
-        int remoteRevisionNumber = -1;
         try {
             URL url = new URL("https://forgestorm.com/client_files/Revision.txt");
             Scanner scanner = new Scanner(url.openStream());
+            // Store the revision number!
             remoteRevisionNumber = scanner.nextInt();
             scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Increment revision build number
-        remoteRevisionNumber++;
+        println(getClass(), "Current Client File Revision Number: " + remoteRevisionNumber);
+    }
 
+    private void updateCurrentRevisionNumber() {
         File file = new File(ServerMain.getInstance().getFileManager().getClientFilesDirectory() + "/Revision.txt");
         try {
             FileWriter myWriter = new FileWriter(file);
-            myWriter.write(Integer.toString(remoteRevisionNumber));
+            myWriter.write(Integer.toString(remoteRevisionNumber + 1));
             myWriter.close();
+
+            // Store the version number were on for access later
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,6 +106,10 @@ public class VersionMain {
 
         // Finish uploading...
         ftpUploader.disconnect();
+
+        // Increment revision build number
+        remoteRevisionNumber++;
+
         println(getClass(), "(3/3) Uploading finished. Content versioning complete.");
     }
 

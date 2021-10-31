@@ -3,12 +3,12 @@ package com.forgestorm.server.game.world.maps;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.Tile;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.game.world.tile.properties.DoorProperty;
-import com.forgestorm.server.game.world.tile.properties.TilePropertyTypes;
-import com.forgestorm.server.network.game.packet.out.DoorInteractPacketOut;
+import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.server.network.game.packet.out.DoorInteractPacketOutOut;
 import com.forgestorm.server.util.ServerTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +54,7 @@ public class DoorManager {
 
         // Send network packet
         ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                new DoorInteractPacketOut(player, doorStatus, tile).sendPacket());
+                new DoorInteractPacketOutOut(player, doorStatus, tile).sendPacket());
     }
 
     private boolean isTooFarAway(Location playerClientLocation, int x1, int y1) {
@@ -79,7 +79,7 @@ public class DoorManager {
 
         // Let the players know!
         ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
-                new DoorInteractPacketOut(anyPlayer, forceCloseStatus, doorInfo.getTile()).sendPacket()
+                new DoorInteractPacketOutOut(anyPlayer, forceCloseStatus, doorInfo.getTile()).sendPacket()
         );
         iterator.remove();
     }

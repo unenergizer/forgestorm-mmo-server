@@ -2,7 +2,7 @@ package com.forgestorm.server.database.sql;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.network.login.LoginFailReason;
+import com.forgestorm.shared.network.login.LoginFailReason;
 import com.forgestorm.server.network.login.LoginState;
 
 import java.io.IOException;

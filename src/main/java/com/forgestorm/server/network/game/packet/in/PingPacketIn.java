@@ -1,7 +1,9 @@
 package com.forgestorm.server.network.game.packet.in;
 
-import com.forgestorm.server.network.game.packet.out.PingPacketOut;
+import com.forgestorm.server.network.game.packet.out.PingPacketOutOut;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.PING)
@@ -23,7 +25,7 @@ public class PingPacketIn implements PacketListener<PingPacketIn.PingPacket> {
         long ping = packetData.packetReceivedTime - clientHandler.getPingSendTime();
         clientHandler.setClientPing(ping);
 //        println(getClass(), "Account: " + clientHandler.getAuthenticatedUser().getXfAccountName() + ", Ping: " + ping);
-        new PingPacketOut(clientHandler).sendPacket();
+        new PingPacketOutOut(clientHandler).sendPacket();
     }
 
     @AllArgsConstructor

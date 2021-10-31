@@ -6,9 +6,9 @@ import com.forgestorm.server.command.CommandManager;
 import com.forgestorm.server.command.CommandSource;
 import com.forgestorm.server.command.CommandArguments;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackManager;
-import com.forgestorm.server.game.world.item.inventory.InventoryConstants;
+import com.forgestorm.shared.game.world.item.inventory.InventoryConstants;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

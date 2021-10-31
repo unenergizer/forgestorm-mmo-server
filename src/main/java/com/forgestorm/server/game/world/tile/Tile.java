@@ -1,9 +1,9 @@
 package com.forgestorm.server.game.world.tile;
 
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
-import com.forgestorm.server.game.world.tile.properties.WorldEdit;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.tile.properties.WorldEdit;
 import lombok.Getter;
 
 import java.util.ArrayList;

@@ -2,6 +2,8 @@ package com.forgestorm.server.network.game.packet.in;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.CHARACTER_DELETE)

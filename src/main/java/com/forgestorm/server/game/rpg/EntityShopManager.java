@@ -3,7 +3,7 @@ package com.forgestorm.server.game.rpg;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.server.io.EntityShopLoader;
 

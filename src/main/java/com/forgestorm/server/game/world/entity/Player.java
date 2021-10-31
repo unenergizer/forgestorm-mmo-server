@@ -8,15 +8,15 @@ import com.forgestorm.server.game.character.CharacterGenders;
 import com.forgestorm.server.game.character.CharacterRaces;
 import com.forgestorm.server.game.rpg.Reputation;
 import com.forgestorm.server.game.rpg.skills.Skills;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.inventory.*;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
-import com.forgestorm.server.game.world.maps.Warp;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
-import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
-import com.forgestorm.server.network.game.packet.out.MovingEntityTeleportPacketOut;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityHealPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InventoryPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.MovingEntityTeleportPacketOutOut;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -121,16 +121,16 @@ public class Player extends MovingEntity {
             gameWorldRegister(new Warp(teleportLocation, facingDirection));
 
             // Send all players in world the teleport packet
-            getGameWorld().getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOut(player, this, teleportLocation, facingDirection).sendPacket());
+            getGameWorld().getPlayerController().forAllPlayers(player -> new MovingEntityTeleportPacketOutOut(player, this, teleportLocation, facingDirection).sendPacket());
 
             // Send other players info about the reheal (if they are still on the same world)
-            getGameWorld().getPlayerController().forAllPlayers(player -> new EntityHealPacketOut(player, this, getMaxHealth() - getCurrentHealth()).sendPacket());
+            getGameWorld().getPlayerController().forAllPlayers(player -> new EntityHealPacketOutOut(player, this, getMaxHealth() - getCurrentHealth()).sendPacket());
         }
 
         // Reheal Player
         setCurrentHealth(getMaxHealth());
 
-        new ChatMessagePacketOut(this, ChatChannelType.COMBAT, "[RED]You died! Respawning you in graveyard!").sendPacket();
+        new ChatMessagePacketOutOut(this, ChatChannelType.COMBAT, "[RED]You died! Respawning you in graveyard!").sendPacket();
     }
 
     public List<InventorySlot> getAllGoldSlots() {
@@ -148,7 +148,7 @@ public class Player extends MovingEntity {
 
         slot.setItemStack(itemStack);
         if (sendPacket) {
-            new InventoryPacketOut(this, new InventoryActions()
+            new InventoryPacketOutOut(this, new InventoryActions()
                     .set(slot.getInventory().getInventoryType(), slot.getSlotIndex(), itemStack)).sendPacket();
         }
     }

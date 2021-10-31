@@ -6,7 +6,9 @@ import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.util.RandomUtil;
+import com.forgestorm.shared.game.abilities.Ability;
+import com.forgestorm.shared.game.abilities.AbilityType;
+import com.forgestorm.shared.util.RandomNumberUtil;
 
 import java.util.Map;
 
@@ -72,7 +74,7 @@ public class AbilityManager implements ManagerStart {
         setInCombat(casterEntity, targetEntity);
 
         // todo: now do calculations
-        int damageToDeal = RandomUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
+        int damageToDeal = RandomNumberUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
         targetEntity.dealDamage(damageToDeal, casterEntity);
     }
 
@@ -85,7 +87,7 @@ public class AbilityManager implements ManagerStart {
 
             setInCombat(casterEntity, targetEntity);
 
-            int damageToDeal = RandomUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
+            int damageToDeal = RandomNumberUtil.getNewRandom(ability.getDamageMin(), ability.getDamageMax());
             targetEntity.dealDamage(damageToDeal, casterEntity);
         }
     }

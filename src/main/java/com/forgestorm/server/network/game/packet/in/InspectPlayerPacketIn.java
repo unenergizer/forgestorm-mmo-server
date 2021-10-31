@@ -3,9 +3,11 @@ package com.forgestorm.server.network.game.packet.in;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
-import com.forgestorm.server.network.game.packet.out.InspectPlayerPacketOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InspectPlayerPacketOutOut;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -33,10 +35,10 @@ public class InspectPlayerPacketIn implements PacketListener<InspectPlayerPacket
     public void onEvent(InspectPlayerPacket packetData) {
         Player player = ServerMain.getInstance().getGameManager().findPlayer(packetData.entityId);
         if (player != null) {
-            new InspectPlayerPacketOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
+            new InspectPlayerPacketOutOut(packetData.getClientHandler().getPlayer(), player).sendPacket();
             println(getClass(), "Sending inspection data!", false, PRINT_DEBUG);
         } else {
-            new ChatMessagePacketOut(packetData.getClientHandler().getPlayer(), ChatChannelType.GENERAL, "[RED]Could not find player.").sendPacket();
+            new ChatMessagePacketOutOut(packetData.getClientHandler().getPlayer(), ChatChannelType.GENERAL, "[RED]Could not find player.").sendPacket();
             println(getClass(), "NOT sending inspection data!", false, PRINT_DEBUG);
         }
     }

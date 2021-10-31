@@ -7,18 +7,18 @@ import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.UserInterfaceType;
 import com.forgestorm.server.game.world.entity.Appearance;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.item.ItemStack;
+import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.server.network.game.PlayerSessionData;
-import com.forgestorm.server.network.game.packet.out.CharacterMenuLoadPacketOut;
-import com.forgestorm.server.network.game.packet.out.InitClientPrivilegePacketOut;
-import com.forgestorm.server.network.game.packet.out.InitScreenPacketOut;
-import com.forgestorm.server.network.game.packet.out.PingPacketOut;
+import com.forgestorm.server.network.game.packet.out.CharacterMenuLoadPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InitClientPrivilegePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InitScreenPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.PingPacketOutOut;
 import com.forgestorm.server.network.game.shared.ClientHandler;
-import com.forgestorm.server.util.color.EyeColorList;
-import com.forgestorm.server.util.color.HairColorList;
-import com.forgestorm.server.util.color.SkinColorList;
+import com.forgestorm.shared.util.color.EyeColorList;
+import com.forgestorm.shared.util.color.HairColorList;
+import com.forgestorm.shared.util.color.SkinColorList;
 import com.forgestorm.server.util.libgdx.Color;
 
 import java.sql.Connection;
@@ -158,10 +158,10 @@ public class CharacterManager {
         ClientHandler clientHandler = playerSessionData.getClientHandler();
 
         ServerMain.getInstance().getNetworkManager().getOutStreamManager().addClient(clientHandler);
-        new PingPacketOut(clientHandler).sendPacket();
+        new PingPacketOutOut(clientHandler).sendPacket();
 
         // Tell the client its privileges
-        new InitClientPrivilegePacketOut(clientHandler).sendPacket();
+        new InitClientPrivilegePacketOutOut(clientHandler).sendPacket();
 
         // Send player all their characters
         sendToCharacterScreen(playerSessionData.getClientHandler());
@@ -189,7 +189,7 @@ public class CharacterManager {
         clientHandler.setCurrentPlayerId(null);
 
         // Send player to the character select screen
-        new InitScreenPacketOut(clientHandler, UserInterfaceType.CHARACTER_SELECT).sendPacket();
+        new InitScreenPacketOutOut(clientHandler, UserInterfaceType.CHARACTER_SELECT).sendPacket();
 
         // Load all basic character information
         List<CharacterDataOut> characterDataOutList = new GamePlayerCharacterSQL().searchCharacters(clientHandler.getAuthenticatedUser().getDatabaseUserId());
@@ -198,6 +198,6 @@ public class CharacterManager {
         clientHandler.loadAllPlayers(characterDataOutList);
 
         // Send the player all their characters
-        new CharacterMenuLoadPacketOut(clientHandler).sendPacket();
+        new CharacterMenuLoadPacketOutOut(clientHandler).sendPacket();
     }
 }

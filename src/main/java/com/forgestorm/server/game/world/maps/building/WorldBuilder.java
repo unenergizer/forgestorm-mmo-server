@@ -4,7 +4,8 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
 import com.forgestorm.server.game.world.tile.TileImage;
 import com.forgestorm.server.io.atlas.TextureAtlas;
-import com.forgestorm.server.io.type.GameAtlas;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.io.type.GameAtlas;
 import lombok.Getter;
 import lombok.Setter;
 

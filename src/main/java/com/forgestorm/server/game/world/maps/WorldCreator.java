@@ -4,7 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.util.RandomUtil;
+import com.forgestorm.shared.util.RandomNumberUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +40,10 @@ public class WorldCreator {
         json.setOutputType(JsonWriter.OutputType.json);
         json.setWriter(writer);
         json.writeObjectStart();
-        json.writeValue("backgroundRed", RandomUtil.getNewRandom());
-        json.writeValue("backgroundGreen", RandomUtil.getNewRandom());
-        json.writeValue("backgroundBlue", RandomUtil.getNewRandom());
-        json.writeValue("backgroundAlpha", RandomUtil.getNewRandom());
+        json.writeValue("backgroundRed", RandomNumberUtil.getNewRandom());
+        json.writeValue("backgroundGreen", RandomNumberUtil.getNewRandom());
+        json.writeValue("backgroundBlue", RandomNumberUtil.getNewRandom());
+        json.writeValue("backgroundAlpha", RandomNumberUtil.getNewRandom());
         json.writeValue("widthInChunks", chunkWidth);
         json.writeValue("heightInChunks", chunkHeight);
         json.writeObjectEnd();

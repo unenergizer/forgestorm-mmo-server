@@ -5,6 +5,8 @@ import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.MovingEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 @Opcode(getOpcode = Opcodes.ABILITY_REQUEST)

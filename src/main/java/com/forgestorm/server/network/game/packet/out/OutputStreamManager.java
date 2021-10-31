@@ -1,6 +1,7 @@
 package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.network.game.shared.ClientHandler;
+import com.forgestorm.shared.network.game.GameOutputStream;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,18 +15,18 @@ public class OutputStreamManager {
     private static final boolean PRINT_DEBUG = false;
     private static final int MAX_BUFFER_SIZE = 500;
 
-    private final Map<ClientHandler, Queue<AbstractServerOutPacket>> outputContexts = new HashMap<>();
+    private final Map<ClientHandler, Queue<AbstractPacketOut>> outputContexts = new HashMap<>();
 
     public void sendPackets() {
         outputContexts.forEach((clientHandler, serverAbstractOutPackets) -> {
             int bufferOffsetCheck = 0;
-            AbstractServerOutPacket abstractServerOutPacket;
+            AbstractPacketOut abstractPacketOut;
 
-            while ((abstractServerOutPacket = serverAbstractOutPackets.poll()) != null) {
+            while ((abstractPacketOut = serverAbstractOutPackets.poll()) != null) {
 
-                println(getClass(), "PACKET OUT: " + abstractServerOutPacket, false, PRINT_DEBUG);
+                println(getClass(), "PACKET OUT: " + abstractPacketOut, false, PRINT_DEBUG);
 
-                int thisBufferSize = clientHandler.fillCurrentBuffer(abstractServerOutPacket);
+                int thisBufferSize = clientHandler.fillCurrentBuffer(abstractPacketOut);
                 bufferOffsetCheck += thisBufferSize;
 
                 if (bufferOffsetCheck > MAX_BUFFER_SIZE) { // exceeds buffer limit so we should flush what we have written so far
@@ -36,7 +37,7 @@ public class OutputStreamManager {
 
                     bufferOffsetCheck = thisBufferSize;
 
-                    clientHandler.getGameOutputStream().createNewBuffers(abstractServerOutPacket);
+                    clientHandler.getGameOutputStream().createNewBuffers(abstractPacketOut);
                     // This happened to be the last packet so we should add the
                     // to be written. Write and flush it.
                     if (serverAbstractOutPackets.peek() == null) {
@@ -49,15 +50,15 @@ public class OutputStreamManager {
                     GameOutputStream gameOutputStream = clientHandler.getGameOutputStream();
 
                     if (!gameOutputStream.currentBuffersInitialized()) {
-                        gameOutputStream.createNewBuffers(abstractServerOutPacket);
+                        gameOutputStream.createNewBuffers(abstractPacketOut);
                     } else {
 
-                        boolean opcodesMatch = gameOutputStream.doOpcodesMatch(abstractServerOutPacket);
+                        boolean opcodesMatch = gameOutputStream.doOpcodesMatch(abstractPacketOut);
                         if (opcodesMatch) {
                             gameOutputStream.appendBewBuffer();
                         } else {
                             clientHandler.writeBuffers();
-                            gameOutputStream.createNewBuffers(abstractServerOutPacket);
+                            gameOutputStream.createNewBuffers(abstractPacketOut);
                         }
                     }
 
@@ -82,9 +83,9 @@ public class OutputStreamManager {
         println(getClass(), " - Connected clients: " + clientsOnline());
     }
 
-    void addServerOutPacket(AbstractServerOutPacket abstractServerOutPacket) {
-        Queue<AbstractServerOutPacket> clientHandler = outputContexts.get(abstractServerOutPacket.clientHandler);
-        if (clientHandler != null) clientHandler.add(abstractServerOutPacket);
+    void addServerOutPacket(AbstractPacketOut abstractPacketOut) {
+        Queue<AbstractPacketOut> clientHandler = outputContexts.get(abstractPacketOut.clientHandler);
+        if (clientHandler != null) clientHandler.add(abstractPacketOut);
     }
 
     public boolean isAccountOnline(String xfAccountName) {

@@ -1,5 +1,6 @@
 package com.forgestorm.server.game.world.tile.properties;
 
+import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -2,7 +2,7 @@ package com.forgestorm.server.game.rpg.skills;
 
 import com.forgestorm.server.game.rpg.ExperiencePacketInfo;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.SkillExperiencePacketOut;
+import com.forgestorm.server.network.game.packet.out.SkillExperiencePacketOutOut;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;
@@ -38,11 +38,11 @@ public class Skill {
     public void sendExperienceTotal() {
         if (!player.isLoggedInGameWorld()) return;
         println(getClass(), "TotalExp: " + experience + ", SendingTotalExp: true", false, PRINT_DEBUG);
-        new SkillExperiencePacketOut(player, new ExperiencePacketInfo(skillOpcode, experience)).sendPacket();
+        new SkillExperiencePacketOutOut(player, new ExperiencePacketInfo(skillOpcode, experience)).sendPacket();
     }
 
     public void sendExperienceGained(int expGained) {
         if (!player.isLoggedInGameWorld()) return;
-        new SkillExperiencePacketOut(player, new ExperiencePacketInfo(skillOpcode, expGained)).sendPacket();
+        new SkillExperiencePacketOutOut(player, new ExperiencePacketInfo(skillOpcode, expGained)).sendPacket();
     }
 }

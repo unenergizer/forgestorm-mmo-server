@@ -5,6 +5,8 @@ import com.forgestorm.server.game.character.CharacterLogout;
 import com.forgestorm.server.game.character.CharacterManager;
 import com.forgestorm.server.network.game.packet.AllowNullPlayer;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 @AllowNullPlayer

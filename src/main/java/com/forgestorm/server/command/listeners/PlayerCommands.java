@@ -8,10 +8,10 @@ import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.GameWorldProcessor;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.game.world.maps.MoveDirection;
-import com.forgestorm.server.game.world.maps.Warp;
-import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
-import com.forgestorm.server.network.game.packet.out.EntityUpdatePacketOut;
+import com.forgestorm.shared.game.world.maps.MoveDirection;
+import com.forgestorm.shared.game.world.maps.Warp;
+import com.forgestorm.server.network.game.packet.out.EntityHealPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityUpdatePacketOutOut;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -48,7 +48,7 @@ public class PlayerCommands {
 
         final Player sendPlayer = player;
         player.getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
-                new EntityHealPacketOut(anyPlayer, sendPlayer, sendPlayer.getMaxHealth() - sendPlayer.getCurrentHealth()).sendPacket());
+                new EntityHealPacketOutOut(anyPlayer, sendPlayer, sendPlayer.getMaxHealth() - sendPlayer.getCurrentHealth()).sendPacket());
         player.setCurrentHealth(player.getMaxHealth());
     }
 
@@ -169,7 +169,7 @@ public class PlayerCommands {
             commandSource.sendMessage(MessageText.SERVER + playerName + " move speed set to " + player.getMoveSpeed() + " from " + oldMoveSpeed + ".");
 
             player.getGameWorld().getPlayerController().forAllPlayers(anyPlayer ->
-                    new EntityUpdatePacketOut(anyPlayer, player, moveSpeed).sendPacket());
+                    new EntityUpdatePacketOutOut(anyPlayer, player, moveSpeed).sendPacket());
 
         } catch (NumberFormatException e) {
             commandSource.sendMessage(MessageText.SERVER + "Second argument must be a float.");

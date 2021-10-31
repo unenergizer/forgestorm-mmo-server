@@ -5,14 +5,16 @@ import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.game.world.maps.Floors;
+import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
-import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOutOut;
 import com.forgestorm.server.network.game.shared.*;
+import com.forgestorm.shared.network.game.Opcode;
+import com.forgestorm.shared.network.game.Opcodes;
 import lombok.AllArgsConstructor;
 
 import static com.forgestorm.server.util.Log.println;
@@ -52,7 +54,7 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
         WorldChunk worldChunk = gameWorld.findChunk(packetData.tileX, packetData.tileY);
 
         if (worldChunk == null) {
-            new ChatMessagePacketOut(
+            new ChatMessagePacketOutOut(
                     packetData.playerSender,
                     ChatChannelType.GENERAL,
                     MessageText.ERROR + "You cannot place a tile here. Chunk does not exist.").sendPacket();
@@ -67,7 +69,7 @@ public class WorldBuilderPacketIn implements PacketListener<WorldBuilderPacketIn
 
         // For now, just resend the building packet to all (but original playerSender)
         ServerMain.getInstance().getGameManager().sendToAllButPlayer(packetData.playerSender, clientHandler ->
-                new WorldBuilderPacketOut(clientHandler, packetData.layerDefinition, packetData.textureId, packetData.tileX, packetData.tileY, packetData.worldZ).sendPacket());
+                new WorldBuilderPacketOutOut(clientHandler, packetData.layerDefinition, packetData.textureId, packetData.tileX, packetData.tileY, packetData.worldZ).sendPacket());
     }
 
     @AllArgsConstructor

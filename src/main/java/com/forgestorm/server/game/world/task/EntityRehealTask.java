@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.GameWorld;
-import com.forgestorm.server.network.game.packet.out.EntityHealPacketOut;
+import com.forgestorm.server.network.game.packet.out.EntityHealPacketOutOut;
 
 import static com.forgestorm.server.util.Log.println;
 
@@ -28,7 +28,7 @@ public class EntityRehealTask implements AbstractTask {
                         println(getClass(), "Healing player: " + player.getName(), false, DEBUG_PRINT);
                         player.setCurrentHealth(player.getCurrentHealth() + REHEAL_AMOUNT);
                         gameWorld.getPlayerController().forAllPlayers(anyPlayer ->
-                                new EntityHealPacketOut(anyPlayer, player, REHEAL_AMOUNT).sendPacket());
+                                new EntityHealPacketOutOut(anyPlayer, player, REHEAL_AMOUNT).sendPacket());
                     }
                 }
 
@@ -38,7 +38,7 @@ public class EntityRehealTask implements AbstractTask {
                     if (aiEntity.getCurrentHealth() < aiEntity.getMaxHealth()) {
                         aiEntity.setCurrentHealth(aiEntity.getCurrentHealth() + REHEAL_AMOUNT);
                         gameWorld.getPlayerController().forAllPlayers(anyPlayer ->
-                                new EntityHealPacketOut(anyPlayer, aiEntity, REHEAL_AMOUNT).sendPacket());
+                                new EntityHealPacketOutOut(anyPlayer, aiEntity, REHEAL_AMOUNT).sendPacket());
                     }
                 }
             }

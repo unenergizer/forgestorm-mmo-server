@@ -2,6 +2,7 @@ package com.forgestorm.server.game.world.item;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
+import com.forgestorm.shared.game.world.item.ItemStack;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class ItemStackManager implements ManagerStart {
     }
 
     public ItemStack makeItemStack(ItemStack itemStack) {
-        return makeItemStack(itemStack.itemId, itemStack.getAmount());
+        return makeItemStack(itemStack.getItemId(), itemStack.getAmount());
     }
 
     public int getNumberOfItems() {

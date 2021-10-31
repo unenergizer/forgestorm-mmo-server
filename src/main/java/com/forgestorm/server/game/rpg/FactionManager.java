@@ -1,13 +1,13 @@
 package com.forgestorm.server.game.rpg;
 
 import com.forgestorm.server.ServerMain;
-import com.forgestorm.server.io.todo.FactionLoader;
+import com.forgestorm.shared.io.FactionLoader;
 
 import java.util.Map;
 
 public class FactionManager {
 
-    private final Map<Byte, com.forgestorm.server.io.todo.FactionLoader.FactionData> factionDataMap;
+    private final Map<Byte, FactionLoader.FactionData> factionDataMap;
 
     public FactionManager() {
         ServerMain.getInstance().getFileManager().loadFactionData();
