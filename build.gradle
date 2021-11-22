@@ -23,6 +23,10 @@ repositories {
 }
 
 dependencies {
+    // JAX-B dependencies for JDK 9+
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+
     // MySQL related with bcrypt to do XenForo login
     compile 'at.favre.lib:bcrypt:0.9.0'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
@@ -30,7 +34,7 @@ dependencies {
     compile 'com.zaxxer:HikariCP:3.4.5'
 
     // Discord Bot Integration
-    compile ('net.dv8tion:JDA:4.2.0_179') {
+    compile('net.dv8tion:JDA:4.2.0_179') {
         exclude module: 'opus-java' // Remove Audio dependency
     }
 
