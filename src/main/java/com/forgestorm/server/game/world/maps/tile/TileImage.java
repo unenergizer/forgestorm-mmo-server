@@ -1,11 +1,11 @@
-package com.forgestorm.server.game.world.tile;
+package com.forgestorm.server.game.world.maps.tile;
 
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.shared.game.world.maps.Tags;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
-import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.server.game.world.maps.tile.properties.AbstractTileProperty;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 import lombok.Getter;
 import lombok.Setter;
 

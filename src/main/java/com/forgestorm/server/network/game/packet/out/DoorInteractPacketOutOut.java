@@ -2,7 +2,7 @@ package com.forgestorm.server.network.game.packet.out;
 
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.DoorManager;
-import com.forgestorm.server.game.world.tile.Tile;
+import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 

@@ -2,7 +2,7 @@ package com.forgestorm.server.game.world.maps.building;
 
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ManagerStart;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.server.io.atlas.TextureAtlas;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import com.forgestorm.shared.io.type.GameAtlas;

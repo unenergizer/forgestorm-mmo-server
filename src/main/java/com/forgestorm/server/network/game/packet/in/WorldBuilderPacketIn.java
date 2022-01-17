@@ -9,7 +9,7 @@ import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
 import com.forgestorm.server.network.game.packet.out.WorldBuilderPacketOutOut;
 import com.forgestorm.server.network.game.shared.*;

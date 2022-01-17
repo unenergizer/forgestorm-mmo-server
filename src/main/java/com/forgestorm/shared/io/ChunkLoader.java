@@ -14,8 +14,8 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.WorldBuilder;
-import com.forgestorm.server.game.world.tile.Tile;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.maps.tile.Tile;
+import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 
 import lombok.Getter;

@@ -7,7 +7,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
-import com.forgestorm.server.game.world.tile.Tile;
+import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
 import com.forgestorm.server.util.libgdx.Color;

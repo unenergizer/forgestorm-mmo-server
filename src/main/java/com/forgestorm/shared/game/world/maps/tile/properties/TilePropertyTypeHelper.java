@@ -1,6 +1,6 @@
-package com.forgestorm.shared.game.world.tile.properties;
+package com.forgestorm.shared.game.world.maps.tile.properties;
 
-import com.forgestorm.server.game.world.tile.properties.*;
+import com.forgestorm.server.game.world.maps.tile.properties.*;
 
 public class TilePropertyTypeHelper {
     public static AbstractTileProperty getNewAbstractTileProperty(TilePropertyTypes tilePropertyTypes) {

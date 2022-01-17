@@ -7,12 +7,12 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.SynchronousAssetLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.forgestorm.server.game.world.tile.TileImage;
-import com.forgestorm.server.game.world.tile.properties.AbstractTileProperty;
+import com.forgestorm.server.game.world.maps.tile.TileImage;
+import com.forgestorm.server.game.world.maps.tile.properties.AbstractTileProperty;
 import com.forgestorm.shared.game.world.maps.Tags;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
-import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypeHelper;
-import com.forgestorm.shared.game.world.tile.properties.TilePropertyTypes;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypeHelper;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 
 import org.yaml.snakeyaml.Yaml;
 

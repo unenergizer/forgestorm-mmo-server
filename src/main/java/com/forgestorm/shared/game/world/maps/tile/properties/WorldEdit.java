@@ -1,7 +1,7 @@
-package com.forgestorm.shared.game.world.tile.properties;
+package com.forgestorm.shared.game.world.maps.tile.properties;
 
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.game.world.tile.TileImage;
+import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 
 public interface WorldEdit {
