@@ -152,4 +152,10 @@ public class Player extends MovingEntity {
                     .set(slot.getInventory().getInventoryType(), slot.getSlotIndex(), itemStack)).sendPacket();
         }
     }
+
+    public boolean equals(Player player) {
+        return this.clientHandler.getAuthenticatedUser().getXfAccountName().equals(
+                player.getClientHandler().getAuthenticatedUser().getXfAccountName()
+        );
+    }
 }

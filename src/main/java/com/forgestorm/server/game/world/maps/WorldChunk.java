@@ -6,12 +6,14 @@ import com.forgestorm.server.game.world.entity.Entity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.game.world.maps.tile.TileImage;
+import com.forgestorm.server.network.game.packet.out.TileImageStatusesPacketOut;
 import com.forgestorm.server.network.game.packet.out.TileWarpPacketOutOut;
 import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOutOut;
 import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.shared.game.world.maps.Warp;
 import com.forgestorm.shared.game.world.maps.WarpLocation;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 import com.forgestorm.shared.util.RandomNumberUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -184,6 +186,9 @@ public class WorldChunk {
         // First... we don't send chunks. We send layer "parts"
         // The packet must remain under 200 bytes
 
+        // Collect tiles statuses to update (doors, gates, etc)
+        List<Tile> tilesWithStatuses = new ArrayList<>();
+
         // Send chunk layers
         for (Floors floor : Floors.values()) {
             for (Map.Entry<LayerDefinition, Tile[]> layerMap : floorLayers.get(floor).entrySet()) {
@@ -198,7 +203,16 @@ public class WorldChunk {
                     // Get the tiles to send
                     int j = 0;
                     for (int i = layerSectionsSent * GameConstants.MAX_TILE_SEND; i < (layerSectionsSent + 1) * GameConstants.MAX_TILE_SEND; i++) {
-                        arraySend[j] = tileImages[i];
+                        Tile tile = tileImages[i];
+
+                        // Add tile to the array to be sent
+                        arraySend[j] = tile;
+
+                        // Check tile if it has a status
+                        if (tile.getTileImage() != null && tile.getTileImage().containsProperty(TilePropertyTypes.DOOR)) {
+                            tilesWithStatuses.add(tile);
+                        }
+
                         j++;
                     }
 
@@ -217,6 +231,11 @@ public class WorldChunk {
                 }
                 println(getClass(), "Layer: " + layerDefinition.getLayerName() + ", Sections Sent: " + layerSectionsSent, false, PRINT_DEBUG);
             }
+        }
+
+        // Send tile statuses
+        if (!tilesWithStatuses.isEmpty()) {
+            new TileImageStatusesPacketOut(chunkRecipient, tilesWithStatuses).sendPacket();
         }
 
         // Send chunk warps

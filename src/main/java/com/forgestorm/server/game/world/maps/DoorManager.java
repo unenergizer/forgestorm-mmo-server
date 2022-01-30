@@ -54,7 +54,7 @@ public class DoorManager {
 
         // Send network packet
         ServerMain.getInstance().getGameManager().sendToAllButPlayer(player, clientHandler ->
-                new DoorInteractPacketOutOut(player, doorStatus, tile).sendPacket());
+                new DoorInteractPacketOutOut(clientHandler.getPlayer(), doorStatus, tile).sendPacket());
     }
 
     private boolean isTooFarAway(Location playerClientLocation, int x1, int y1) {
