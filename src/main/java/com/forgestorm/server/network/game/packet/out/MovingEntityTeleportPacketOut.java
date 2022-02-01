@@ -10,7 +10,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class MovingEntityTeleportPacketOutOut extends AbstractPacketOut {
+public class MovingEntityTeleportPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -22,7 +22,7 @@ public class MovingEntityTeleportPacketOutOut extends AbstractPacketOut {
     private final short z;
     private final MoveDirection facingDirection;
 
-    public MovingEntityTeleportPacketOutOut(final Player receiver, final MovingEntity teleportedEntity, final Location teleportLocation, final MoveDirection facingDirection) {
+    public MovingEntityTeleportPacketOut(final Player receiver, final MovingEntity teleportedEntity, final Location teleportLocation, final MoveDirection facingDirection) {
         super(Opcodes.PLAYER_TELEPORT, receiver.getClientHandler());
 
         this.serverEntityId = teleportedEntity.getServerEntityId();

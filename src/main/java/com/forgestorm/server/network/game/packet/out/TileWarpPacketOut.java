@@ -5,7 +5,7 @@ import com.forgestorm.shared.game.world.maps.MoveDirection;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class TileWarpPacketOutOut extends AbstractPacketOut {
+public class TileWarpPacketOut extends AbstractPacketOut {
 
     private final boolean clearWarps;
     private final int fromX, fromY;
@@ -15,7 +15,7 @@ public class TileWarpPacketOutOut extends AbstractPacketOut {
     private final short toZ;
     private final MoveDirection facingDirection;
 
-    public TileWarpPacketOutOut(final Player player, boolean clearWarps, int fromX, int fromY, short fromZ, String worldName, int toX, int toY, short toZ, MoveDirection facingDirection) {
+    public TileWarpPacketOut(final Player player, boolean clearWarps, int fromX, int fromY, short fromZ, String worldName, int toX, int toY, short toZ, MoveDirection facingDirection) {
         super(Opcodes.WORLD_CHUNK_WARP, player.getClientHandler());
         this.clearWarps = clearWarps;
         this.fromX = fromX;

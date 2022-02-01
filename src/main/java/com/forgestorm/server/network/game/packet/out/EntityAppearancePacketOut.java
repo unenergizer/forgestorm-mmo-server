@@ -9,7 +9,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class EntityAppearancePacketOutOut extends AbstractPacketOut {
+public class EntityAppearancePacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -29,7 +29,7 @@ public class EntityAppearancePacketOutOut extends AbstractPacketOut {
     private final byte leftHandTexture;
     private final byte rightHandTexture;
 
-    public EntityAppearancePacketOutOut(final Player receiver, final Entity entity) {
+    public EntityAppearancePacketOut(final Player receiver, final Entity entity) {
         super(Opcodes.APPEARANCE, receiver.getClientHandler());
 
         this.serverEntityId = entity.getServerEntityId();

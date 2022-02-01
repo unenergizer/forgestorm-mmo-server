@@ -6,7 +6,7 @@ import com.forgestorm.server.profile.XenforoProfile;
 import com.forgestorm.server.util.Log;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class ProfileRequestPacketOutOut extends AbstractPacketOut {
+public class ProfileRequestPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -17,7 +17,7 @@ public class ProfileRequestPacketOutOut extends AbstractPacketOut {
     private final String gravatarHash;
     private final int reactionScore;
 
-    public ProfileRequestPacketOutOut(final Player player, final XenforoProfile xenforoProfile) {
+    public ProfileRequestPacketOut(final Player player, final XenforoProfile xenforoProfile) {
         super(Opcodes.PROFILE_REQUEST, player.getClientHandler());
 
         this.accountName = xenforoProfile.getAccountName();

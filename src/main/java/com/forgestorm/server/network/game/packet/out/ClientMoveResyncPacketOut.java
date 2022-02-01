@@ -5,12 +5,12 @@ import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class ClientMoveResyncPacketOutOut extends AbstractPacketOut {
+public class ClientMoveResyncPacketOut extends AbstractPacketOut {
 
     private final int syncX, syncY;
     public final short syncZ;
 
-    public ClientMoveResyncPacketOutOut(Player player, Location syncLocation) {
+    public ClientMoveResyncPacketOut(Player player, Location syncLocation) {
         super(Opcodes.CLIENT_MOVE_RESYNC, player.getClientHandler());
 
         syncX = syncLocation.getX();

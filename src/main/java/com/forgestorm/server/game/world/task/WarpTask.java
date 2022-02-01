@@ -5,8 +5,8 @@ import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.inventory.BankActions;
 import com.forgestorm.shared.game.world.maps.Warp;
-import com.forgestorm.server.network.game.packet.out.BankManagePacketOutOut;
-import com.forgestorm.server.network.game.packet.out.MovingEntityTeleportPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
+import com.forgestorm.server.network.game.packet.out.MovingEntityTeleportPacketOut;
 import com.forgestorm.server.util.Log;
 
 public class WarpTask implements AbstractTask {
@@ -30,7 +30,7 @@ public class WarpTask implements AbstractTask {
         Log.println(getClass(), "DRy: " + player.getRealY(), false, PRINT_DEBUG);
 
         if (player.isBankOpen()) {
-            new BankManagePacketOutOut(player, BankActions.SERVER_CLOSE).sendPacket();
+            new BankManagePacketOut(player, BankActions.SERVER_CLOSE).sendPacket();
             player.setBankOpen(false);
         }
 
@@ -44,7 +44,7 @@ public class WarpTask implements AbstractTask {
             player.setWarp(null);
 
             // Send all players in world the teleport packet
-            player.getGameWorld().getPlayerController().forAllPlayers(otherPlayer -> new MovingEntityTeleportPacketOutOut(otherPlayer, player, warp.getWarpDestination(), warp.getDirectionToFace()).sendPacket());
+            player.getGameWorld().getPlayerController().forAllPlayers(otherPlayer -> new MovingEntityTeleportPacketOut(otherPlayer, player, warp.getWarpDestination(), warp.getDirectionToFace()).sendPacket());
         } else {
             // World switch
             ServerMain.getInstance().getGameManager().getGameWorldProcessor().playerSwitchGameWorld(player);

@@ -2,7 +2,7 @@ package com.forgestorm.server.command;
 
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import lombok.Getter;
 
 import static com.forgestorm.server.util.Log.println;
@@ -31,7 +31,7 @@ public class CommandSource {
         if (player == null) {
             println(CommandSource.class, message);
         } else {
-            new ChatMessagePacketOutOut(player, chatChannelType, message).sendPacket();
+            new ChatMessagePacketOut(player, chatChannelType, message).sendPacket();
         }
     }
 }

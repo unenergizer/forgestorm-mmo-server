@@ -7,13 +7,13 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class EntityDespawnPacketOutOut extends AbstractPacketOut {
+public class EntityDespawnPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
     private final short entityId;
     private final byte entityType;
 
-    public EntityDespawnPacketOutOut(final Player receiver, final Entity despawnTarget) {
+    public EntityDespawnPacketOut(final Player receiver, final Entity despawnTarget) {
         super(Opcodes.ENTITY_DESPAWN, receiver.getClientHandler());
 
         entityId = despawnTarget.getServerEntityId();

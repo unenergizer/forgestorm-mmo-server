@@ -6,24 +6,24 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class EntityHealPacketOutOut extends AbstractPacketOut {
+public class EntityUpdatePacketOut extends AbstractPacketOut {
 
     private final short serverEntityId;
     private final EntityType entityType;
-    private final int healthGiven;
+    private final float moveSpeed;
 
-    public EntityHealPacketOutOut(final Player receiver, final MovingEntity healingEntity, final int healthGiven) {
-        super(Opcodes.ENTITY_HEAL_OUT, receiver.getClientHandler());
+    public EntityUpdatePacketOut(final Player player, final MovingEntity updateTarget, float moveSpeed) {
+        super(Opcodes.ENTITY_UPDATE_SPEED, player.getClientHandler());
 
-        this.serverEntityId = healingEntity.getServerEntityId();
-        this.entityType = detectEntityType(healingEntity);
-        this.healthGiven = healthGiven;
+        this.serverEntityId = updateTarget.getServerEntityId();
+        this.entityType = detectEntityType(updateTarget);
+        this.moveSpeed = moveSpeed;
     }
 
     @Override
     public void createPacket(GameOutputStream write) {
         write.writeShort(serverEntityId);
         write.writeByte(entityType.getEntityTypeByte());
-        write.writeInt(healthGiven);
+        write.writeFloat(moveSpeed);
     }
 }

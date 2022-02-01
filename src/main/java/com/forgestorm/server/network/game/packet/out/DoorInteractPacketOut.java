@@ -8,14 +8,14 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class DoorInteractPacketOutOut extends AbstractPacketOut {
+public class DoorInteractPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
     private final DoorManager.DoorStatus doorStatus;
     private final Tile tile;
 
-    public DoorInteractPacketOutOut(final Player player, DoorManager.DoorStatus doorStatus, Tile tile) {
+    public DoorInteractPacketOut(final Player player, DoorManager.DoorStatus doorStatus, Tile tile) {
         super(Opcodes.DOOR_INTERACT, player.getClientHandler());
         this.doorStatus = doorStatus;
         this.tile = tile;

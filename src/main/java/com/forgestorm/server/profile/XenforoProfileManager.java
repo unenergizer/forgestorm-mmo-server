@@ -2,7 +2,7 @@ package com.forgestorm.server.profile;
 
 import com.forgestorm.server.database.sql.XFUserProfileSQL;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.ProfileRequestPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ProfileRequestPacketOut;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,6 @@ public class XenforoProfileManager {
     }
 
     public void sendXenforoProfile(Player profileToGet, Player profileRequester) {
-        new ProfileRequestPacketOutOut(profileRequester, getXenforoProfile(profileToGet)).sendPacket();
+        new ProfileRequestPacketOut(profileRequester, getXenforoProfile(profileToGet)).sendPacket();
     }
 }

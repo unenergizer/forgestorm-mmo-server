@@ -11,14 +11,14 @@ import java.util.List;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class ChatMessagePacketOutOut extends AbstractPacketOut {
+public class ChatMessagePacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
     private final ChatChannelType chatChannelType;
     private final String message;
 
-    public ChatMessagePacketOutOut(final Player player, final ChatChannelType chatChannelType, final String message) {
+    public ChatMessagePacketOut(final Player player, final ChatChannelType chatChannelType, final String message) {
         super(Opcodes.CHAT, player.getClientHandler());
         this.chatChannelType = chatChannelType;
         this.message = message;

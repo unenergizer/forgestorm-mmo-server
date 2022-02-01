@@ -10,14 +10,14 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 import static com.forgestorm.server.util.Log.println;
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class EntitySpawnPacketOutOut extends AbstractPacketOut {
+public class EntitySpawnPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
     private final Entity entityToSpawn;
     private final Player packetReceiver;
     private final AuthenticatedUser authenticatedUser;
 
-    public EntitySpawnPacketOutOut(final Player player, final Entity entityToSpawn) {
+    public EntitySpawnPacketOut(final Player player, final Entity entityToSpawn) {
         super(Opcodes.ENTITY_SPAWN, player.getClientHandler());
         this.entityToSpawn = entityToSpawn;
         packetReceiver = player;

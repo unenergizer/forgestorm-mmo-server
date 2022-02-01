@@ -6,7 +6,7 @@ import com.forgestorm.server.game.world.item.inventory.InventoryActions;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class InventoryPacketOutOut extends AbstractPacketOut {
+public class InventoryPacketOut extends AbstractPacketOut {
 
     private final InventoryActions.ActionType inventoryActionType;
     private final byte slotIndex;
@@ -19,7 +19,7 @@ public class InventoryPacketOutOut extends AbstractPacketOut {
     private int itemStackId;
     private int itemStackAmount;
 
-    public InventoryPacketOutOut(final Player player, final InventoryActions inventoryActions) {
+    public InventoryPacketOut(final Player player, final InventoryActions inventoryActions) {
         super(Opcodes.INVENTORY_UPDATE, player.getClientHandler());
 
         this.inventoryActionType = inventoryActions.getInventoryActionType();

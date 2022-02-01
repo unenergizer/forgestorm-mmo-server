@@ -9,7 +9,7 @@ import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.PlayerConstants;
 import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.io.todo.FileManager;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
 import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.shared.game.world.maps.MoveDirection;
@@ -82,7 +82,7 @@ public class GameWorld {
             // Send world save message
             // TODO: Filter players by staff status.
             ServerMain.getInstance().getGameManager().forAllPlayers(player ->
-                    new ChatMessagePacketOutOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
+                    new ChatMessagePacketOut(player, ChatChannelType.STAFF, "[GREEN] GameWorld " + worldName + " has been saved.").sendPacket());
         }
     }
 

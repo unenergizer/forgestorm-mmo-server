@@ -9,7 +9,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class PlayerTradePacketOutOut extends AbstractPacketOut {
+public class PlayerTradePacketOut extends AbstractPacketOut {
 
     private final TradeStatusOpcode tradeOpcode;
     private final int tradeUUID;
@@ -21,7 +21,7 @@ public class PlayerTradePacketOutOut extends AbstractPacketOut {
     private int itemStackId;
     private int itemStackAmount;
 
-    public PlayerTradePacketOutOut(final Player receiver, final TradePacketInfoOut tradePacketInfoOut) {
+    public PlayerTradePacketOut(final Player receiver, final TradePacketInfoOut tradePacketInfoOut) {
         super(Opcodes.PLAYER_TRADE, receiver.getClientHandler());
 
         this.tradeOpcode = tradePacketInfoOut.getTradeOpcode();

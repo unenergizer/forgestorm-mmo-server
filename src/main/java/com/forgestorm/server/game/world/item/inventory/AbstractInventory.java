@@ -5,7 +5,7 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.server.game.world.item.ItemStackManager;
 import com.forgestorm.shared.game.world.item.ItemStackType;
-import com.forgestorm.server.network.game.packet.out.InventoryPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
 import com.forgestorm.shared.game.world.item.inventory.InventoryType;
 import lombok.Getter;
 
@@ -35,13 +35,13 @@ public abstract class AbstractInventory {
     public void removeItemStack(final byte slotIndex, boolean sendPacket) {
         inventorySlotArray[slotIndex].setItemStack(null);
         if (sendPacket)
-            new InventoryPacketOutOut(inventoryOwner, new InventoryActions().remove(inventoryType, slotIndex)).sendPacket();
+            new InventoryPacketOut(inventoryOwner, new InventoryActions().remove(inventoryType, slotIndex)).sendPacket();
     }
 
     public void setItemStack(final byte slotIndex, final ItemStack itemStack, boolean sendPacket) {
         inventorySlotArray[slotIndex].setItemStack(itemStack);
         if (sendPacket) {
-            new InventoryPacketOutOut(inventoryOwner, new InventoryActions().set(inventoryType, slotIndex, itemStack)).sendPacket();
+            new InventoryPacketOut(inventoryOwner, new InventoryActions().set(inventoryType, slotIndex, itemStack)).sendPacket();
         }
     }
 

@@ -5,7 +5,7 @@ import com.forgestorm.server.game.world.entity.AiEntity;
 import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.item.inventory.BankActions;
 import com.forgestorm.server.game.world.maps.Location;
-import com.forgestorm.server.network.game.packet.out.BankManagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import com.forgestorm.shared.network.game.Opcode;
 import com.forgestorm.shared.network.game.Opcodes;
@@ -38,7 +38,7 @@ public class BankManagePacketIn implements PacketListener<BankManagePacketIn.Ban
                     if (playerLocation.isWithinDistance(aiEntity.getFutureWorldLocation(), GameConstants.MAX_BANK_DISTANCE)) {
 
                         player.setBankOpen(true);
-                        new BankManagePacketOutOut(player, BankActions.SERVER_OPEN).sendPacket();
+                        new BankManagePacketOut(player, BankActions.SERVER_OPEN).sendPacket();
                         break;
                     }
                 }

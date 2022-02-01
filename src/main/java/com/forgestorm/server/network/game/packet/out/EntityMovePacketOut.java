@@ -11,7 +11,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 import static com.forgestorm.server.util.Log.println;
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class EntityMovePacketOutOut extends AbstractPacketOut {
+public class EntityMovePacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -23,7 +23,7 @@ public class EntityMovePacketOutOut extends AbstractPacketOut {
     private final int y;
     private final short z;
 
-    public EntityMovePacketOutOut(final Player packetReceiver, final MovingEntity movingEntity, final Location attemptLocation) {
+    public EntityMovePacketOut(final Player packetReceiver, final MovingEntity movingEntity, final Location attemptLocation) {
         super(Opcodes.ENTITY_MOVE_UPDATE, packetReceiver.getClientHandler());
 
         this.entityName = movingEntity.getName();

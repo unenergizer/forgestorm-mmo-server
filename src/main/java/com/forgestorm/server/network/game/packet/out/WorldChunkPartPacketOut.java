@@ -8,7 +8,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class WorldChunkPartPacketOutOut extends AbstractPacketOut {
+public class WorldChunkPartPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -18,7 +18,7 @@ public class WorldChunkPartPacketOutOut extends AbstractPacketOut {
     private final byte sectionsSent;
     private final Tile[] arraySend;
 
-    public WorldChunkPartPacketOutOut(Player player, short chunkX, short chunkY, Floors floor, byte layerDefinitionByte, byte sectionsSent, Tile[] arraySend) {
+    public WorldChunkPartPacketOut(Player player, short chunkX, short chunkY, Floors floor, byte layerDefinitionByte, byte sectionsSent, Tile[] arraySend) {
         super(Opcodes.WORLD_CHUNK_LAYER, player.getClientHandler());
         this.chunkX = chunkX;
         this.chunkY = chunkY;

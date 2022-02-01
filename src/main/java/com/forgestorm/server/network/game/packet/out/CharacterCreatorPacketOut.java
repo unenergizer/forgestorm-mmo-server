@@ -5,11 +5,11 @@ import com.forgestorm.server.network.game.shared.ClientHandler;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class CharacterCreatorPacketOutOut extends AbstractPacketOut {
+public class CharacterCreatorPacketOut extends AbstractPacketOut {
 
     private final CharacterCreatorResponses characterCreatorResponses;
 
-    public CharacterCreatorPacketOutOut(final ClientHandler clientHandler, CharacterCreatorResponses characterCreatorResponses) {
+    public CharacterCreatorPacketOut(final ClientHandler clientHandler, CharacterCreatorResponses characterCreatorResponses) {
         super(Opcodes.CHARACTER_CREATOR_ERROR, clientHandler);
         this.characterCreatorResponses = characterCreatorResponses;
     }

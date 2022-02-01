@@ -5,7 +5,7 @@ import com.forgestorm.shared.game.world.item.ItemStack;
 import com.forgestorm.shared.game.world.entities.AppearanceType;
 import com.forgestorm.shared.game.world.item.ItemStackType;
 import com.forgestorm.shared.game.world.item.WearableItemStack;
-import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.EntityAppearancePacketOut;
 import com.forgestorm.server.util.libgdx.Color;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,7 +62,7 @@ public class Appearance {
         if (sendPacket) {
             println(getClass(), "Sending appearance update!", false, PRINT_DEBUG);
             ServerMain.getInstance().getGameManager().sendToAllButPlayer((Player) appearanceOwner, clientHandler ->
-                    new EntityAppearancePacketOutOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
+                    new EntityAppearancePacketOut(clientHandler.getPlayer(), appearanceOwner).sendPacket());
         }
     }
 

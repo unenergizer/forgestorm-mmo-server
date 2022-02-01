@@ -8,7 +8,7 @@ import com.forgestorm.shared.game.world.item.ItemStackType;
 import com.forgestorm.server.game.world.item.inventory.*;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.ItemStackDropEntityController;
-import com.forgestorm.server.network.game.packet.out.InventoryPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import com.forgestorm.shared.game.world.item.inventory.*;
 import com.forgestorm.shared.network.game.Opcode;
@@ -168,7 +168,7 @@ public class InventoryPacketIn implements PacketListener<InventoryPacketIn.Inven
 
         itemStackConsumerManager.consumeItem(player, itemStack);
 
-        new InventoryPacketOutOut(player, new InventoryActions().consume(
+        new InventoryPacketOut(player, new InventoryActions().consume(
                 inventoryType,
                 packetData.slotIndex
         )).sendPacket();

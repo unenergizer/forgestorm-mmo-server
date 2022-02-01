@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.command.*;
 import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.MessageText;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -69,7 +69,7 @@ public class ServerCommands {
     @EndlessArguments
     public void serverSay(CommandSource commandSource, String[] args) {
         ServerMain.getInstance().getGameManager().forAllPlayers(anyPlayer ->
-                new ChatMessagePacketOutOut(anyPlayer, ChatChannelType.GENERAL, MessageText.SERVER + String.join(" ", args)).sendPacket());
+                new ChatMessagePacketOut(anyPlayer, ChatChannelType.GENERAL, MessageText.SERVER + String.join(" ", args)).sendPacket());
     }
 
     @Command(base = "createVersion")

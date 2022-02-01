@@ -4,7 +4,7 @@ import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.world.entity.EntityType;
 import com.forgestorm.server.game.world.entity.NPC;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.AiEntityDataUpdatePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.AiEntityDataUpdatePacketOut;
 import lombok.Getter;
 
 import static java.util.Objects.requireNonNull;
@@ -57,6 +57,6 @@ public class Reputation {
         player.getGameWorld().getAiEntityController().getEntities()
                 .stream()
                 .filter(aiEntity -> aiEntity.getEntityType() == EntityType.NPC && ((NPC) aiEntity).getFaction() == faction)
-                .forEach(aiEntity -> new AiEntityDataUpdatePacketOutOut(player, aiEntity, AiEntityDataUpdatePacketOutOut.ALIGNMENT_INDEX).sendPacket());
+                .forEach(aiEntity -> new AiEntityDataUpdatePacketOut(player, aiEntity, AiEntityDataUpdatePacketOut.ALIGNMENT_INDEX).sendPacket());
     }
 }

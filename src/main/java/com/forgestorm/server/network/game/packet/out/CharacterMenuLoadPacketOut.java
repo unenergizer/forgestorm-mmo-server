@@ -11,11 +11,11 @@ import java.util.Map;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class CharacterMenuLoadPacketOutOut extends AbstractPacketOut {
+public class CharacterMenuLoadPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
-    public CharacterMenuLoadPacketOutOut(ClientHandler clientHandler) {
+    public CharacterMenuLoadPacketOut(ClientHandler clientHandler) {
         super(Opcodes.CHARACTERS_MENU_LOAD, clientHandler);
     }
 

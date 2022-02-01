@@ -8,13 +8,13 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class InspectPlayerPacketOutOut extends AbstractPacketOut {
+public class InspectPlayerPacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
     private final Player targetPlayer;
 
-    public InspectPlayerPacketOutOut(final Player player, final Player targetPlayer) {
+    public InspectPlayerPacketOut(final Player player, final Player targetPlayer) {
         super(Opcodes.INSPECT_PLAYER, player.getClientHandler());
         this.targetPlayer = targetPlayer;
     }

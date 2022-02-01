@@ -7,8 +7,8 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.server.network.game.packet.out.TileImageStatusesPacketOut;
-import com.forgestorm.server.network.game.packet.out.TileWarpPacketOutOut;
-import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.TileWarpPacketOut;
+import com.forgestorm.server.network.game.packet.out.WorldChunkPartPacketOut;
 import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.shared.game.world.maps.Warp;
 import com.forgestorm.shared.game.world.maps.WarpLocation;
@@ -217,7 +217,7 @@ public class WorldChunk {
                     }
 
                     // Construct packet
-                    new WorldChunkPartPacketOutOut(
+                    new WorldChunkPartPacketOut(
                             chunkRecipient,
                             chunkX,
                             chunkY,
@@ -241,7 +241,7 @@ public class WorldChunk {
         // Send chunk warps
         boolean clearWarps = true;
         for (Warp warp : tileWarps.values()) {
-            new TileWarpPacketOutOut(chunkRecipient,
+            new TileWarpPacketOut(chunkRecipient,
                     clearWarps,
                     warp.getFromX(),
                     warp.getFromY(),

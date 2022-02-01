@@ -1,7 +1,7 @@
 package com.forgestorm.server.game.world.item.inventory;
 
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.InventoryPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
 import com.forgestorm.shared.game.world.item.inventory.InventoryMoveType;
 import com.forgestorm.shared.game.world.item.inventory.InventoryType;
 
@@ -32,7 +32,7 @@ public class PlayerMoveInventoryEvents {
                     (isBankMove && !inventoryEvent.getPlayer().isBankOpen())) {
 
                 // Sending back a response to the client telling them not to move anything.
-                new InventoryPacketOutOut(inventoryEvent.getPlayer(), new InventoryActions()
+                new InventoryPacketOut(inventoryEvent.getPlayer(), new InventoryActions()
                         .move(
                                 inventoryEvent.getInventoryMoveType().getFromWindow(),
                                 inventoryEvent.getInventoryMoveType().getToWindow(),
@@ -136,7 +136,7 @@ public class PlayerMoveInventoryEvents {
         println(getClass(), "ToIndex: " + inventoryEvent.getToPositionIndex(), false, PRINT_DEBUG);
 
         // Perform client move
-        new InventoryPacketOutOut(player, new InventoryActions().move(
+        new InventoryPacketOut(player, new InventoryActions().move(
                 inventoryEvent.getInventoryMoveType().getFromWindow(),
                 inventoryEvent.getInventoryMoveType().getToWindow(),
                 inventoryEvent.getFromPositionIndex(),

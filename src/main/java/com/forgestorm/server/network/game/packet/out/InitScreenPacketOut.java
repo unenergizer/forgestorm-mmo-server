@@ -5,11 +5,11 @@ import com.forgestorm.server.network.game.shared.ClientHandler;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class InitScreenPacketOutOut extends AbstractPacketOut {
+public class InitScreenPacketOut extends AbstractPacketOut {
 
     private final UserInterfaceType userInterfaceType;
 
-    public InitScreenPacketOutOut(final ClientHandler clientHandler, UserInterfaceType userInterfaceType) {
+    public InitScreenPacketOut(final ClientHandler clientHandler, UserInterfaceType userInterfaceType) {
         super(Opcodes.INIT_SCREEN, clientHandler);
 
         this.userInterfaceType = userInterfaceType;

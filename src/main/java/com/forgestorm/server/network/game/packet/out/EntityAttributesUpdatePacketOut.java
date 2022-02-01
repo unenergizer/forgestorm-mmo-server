@@ -8,7 +8,7 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import static com.forgestorm.server.util.Log.println;
 
-public class EntityAttributesUpdatePacketOutOut extends AbstractPacketOut {
+public class EntityAttributesUpdatePacketOut extends AbstractPacketOut {
 
     private static final boolean PRINT_DEBUG = false;
 
@@ -18,7 +18,7 @@ public class EntityAttributesUpdatePacketOutOut extends AbstractPacketOut {
     private final int armor;
     private final int damage;
 
-    public EntityAttributesUpdatePacketOutOut(final Player receiver, final MovingEntity movingEntity) {
+    public EntityAttributesUpdatePacketOut(final Player receiver, final MovingEntity movingEntity) {
         super(Opcodes.ATTRIBUTES_UPDATE, receiver.getClientHandler());
 
         this.entityName = movingEntity.getName();

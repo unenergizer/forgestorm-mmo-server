@@ -6,14 +6,14 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class EntityDamagePacketOutOut extends AbstractPacketOut {
+public class EntityDamagePacketOut extends AbstractPacketOut {
 
     private final short serverEntityId;
     private final EntityType entityType;
     private final int health;
     private final int damageTaken;
 
-    public EntityDamagePacketOutOut(final Player receiver, final MovingEntity damagedEntity, final int health, final int damageTaken) {
+    public EntityDamagePacketOut(final Player receiver, final MovingEntity damagedEntity, final int health, final int damageTaken) {
         super(Opcodes.ENTITY_DAMAGE_OUT, receiver.getClientHandler());
 
         this.serverEntityId = damagedEntity.getServerEntityId();

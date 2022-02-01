@@ -5,11 +5,11 @@ import com.forgestorm.server.game.world.item.inventory.BankActions;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class BankManagePacketOutOut extends AbstractPacketOut {
+public class BankManagePacketOut extends AbstractPacketOut {
 
     private final BankActions bankAction;
 
-    public BankManagePacketOutOut(final Player player, BankActions bankAction) {
+    public BankManagePacketOut(final Player player, BankActions bankAction) {
         super(Opcodes.BANK_MANAGEMENT, player.getClientHandler());
 
         this.bankAction = bankAction;

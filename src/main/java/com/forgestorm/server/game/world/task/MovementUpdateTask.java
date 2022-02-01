@@ -10,9 +10,9 @@ import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.server.game.world.maps.Location;
 import com.forgestorm.shared.game.world.maps.MoveDirection;
 import com.forgestorm.server.game.world.maps.WorldChunk;
-import com.forgestorm.server.network.game.packet.out.BankManagePacketOutOut;
-import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOutOut;
-import com.forgestorm.server.network.game.packet.out.EntityMovePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.BankManagePacketOut;
+import com.forgestorm.server.network.game.packet.out.ClientMoveResyncPacketOut;
+import com.forgestorm.server.network.game.packet.out.EntityMovePacketOut;
 import com.forgestorm.server.util.MoveNode;
 import com.forgestorm.server.util.PathFinding;
 import com.forgestorm.shared.util.RandomNumberUtil;
@@ -522,18 +522,18 @@ public class MovementUpdateTask implements AbstractTask {
 
         if (!playerIsMoving) {
             if (!player.getCurrentWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
+                new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                 return false;
             }
         } else {
             if (moveQueueEmpty) {
                 if (!player.getFutureWorldLocation().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
+                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             } else {
                 if (!player.getLatestMoveRequests().getLast().isWithinDistance(attemptLocation, (short) 1)) {
-                    new ClientMoveResyncPacketOutOut(player, player.getFutureWorldLocation()).sendPacket();
+                    new ClientMoveResyncPacketOut(player, player.getFutureWorldLocation()).sendPacket();
                     return false;
                 }
             }
@@ -583,7 +583,7 @@ public class MovementUpdateTask implements AbstractTask {
 
         // Cannot move and have the bank open
         if (player.isBankOpen()) {
-            new BankManagePacketOutOut(player, BankActions.SERVER_CLOSE).sendPacket();
+            new BankManagePacketOut(player, BankActions.SERVER_CLOSE).sendPacket();
             player.setBankOpen(false);
         }
 
@@ -625,7 +625,7 @@ public class MovementUpdateTask implements AbstractTask {
         }
 
         ServerMain.getInstance().getGameManager().sendToAll(player, clientHandler ->
-                new EntityMovePacketOutOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
+                new EntityMovePacketOut(clientHandler.getPlayer(), player, attemptLocation).sendPacket());
 
     }
 
@@ -651,6 +651,6 @@ public class MovementUpdateTask implements AbstractTask {
         println(getClass(), "FutureLocation: " + aiEntity.getFutureWorldLocation(), false, PRINT_DEBUG);
 
         aiEntity.getGameWorld().getPlayerController().getPlayerList().forEach(player ->
-                new EntityMovePacketOutOut(player, aiEntity, aiEntity.getFutureWorldLocation()).sendPacket());
+                new EntityMovePacketOut(player, aiEntity, aiEntity.getFutureWorldLocation()).sendPacket());
     }
 }

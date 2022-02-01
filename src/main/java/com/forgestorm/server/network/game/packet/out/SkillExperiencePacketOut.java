@@ -6,12 +6,12 @@ import com.forgestorm.server.game.world.entity.Player;
 import com.forgestorm.shared.network.game.Opcodes;
 import com.forgestorm.shared.network.game.GameOutputStream;
 
-public class SkillExperiencePacketOutOut extends AbstractPacketOut {
+public class SkillExperiencePacketOut extends AbstractPacketOut {
 
     private final SkillOpcodes skillOpcode;
     private final int experienceGained;
 
-    public SkillExperiencePacketOutOut(final Player player, final ExperiencePacketInfo experiencePacketInfo) {
+    public SkillExperiencePacketOut(final Player player, final ExperiencePacketInfo experiencePacketInfo) {
         super(Opcodes.EXPERIENCE, player.getClientHandler());
 
         this.skillOpcode = experiencePacketInfo.getSkillOpcode();

@@ -6,13 +6,13 @@ import com.forgestorm.shared.network.game.GameOutputStream;
 
 import java.util.List;
 
-public class InitClientPrivilegePacketOutOut extends AbstractPacketOut {
+public class InitClientPrivilegePacketOut extends AbstractPacketOut {
 
     private final List<Byte> secondaryGroupIds;
     private final boolean isAdmin;
     private final boolean isModerator;
 
-    public InitClientPrivilegePacketOutOut(final ClientHandler clientHandler) {
+    public InitClientPrivilegePacketOut(final ClientHandler clientHandler) {
         super(Opcodes.INIT_CLIENT_PRIVILEGE, clientHandler);
         this.secondaryGroupIds = clientHandler.getAuthenticatedUser().getSecondaryGroupIds();
         this.isAdmin = clientHandler.getAuthenticatedUser().isAdmin();

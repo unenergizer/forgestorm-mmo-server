@@ -12,9 +12,9 @@ import com.forgestorm.server.game.world.item.inventory.InventorySlot;
 import com.forgestorm.shared.game.world.item.inventory.InventoryType;
 import com.forgestorm.server.game.world.maps.GameWorld;
 import com.forgestorm.shared.game.world.maps.Warp;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
-import com.forgestorm.server.network.game.packet.out.InitScreenPacketOutOut;
-import com.forgestorm.server.network.game.packet.out.InventoryPacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
+import com.forgestorm.server.network.game.packet.out.InitScreenPacketOut;
+import com.forgestorm.server.network.game.packet.out.InventoryPacketOut;
 import com.forgestorm.server.network.game.shared.ClientHandler;
 
 import java.util.Queue;
@@ -67,9 +67,9 @@ public class PlayerProcessor {
     private void playerWorldJoin(Player player) {
         player.setLoggedInGameWorld(true);
 
-        new InitScreenPacketOutOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
-        new ChatMessagePacketOutOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE).sendPacket();
-        new ChatMessagePacketOutOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE_2).sendPacket();
+        new InitScreenPacketOut(player.getClientHandler(), UserInterfaceType.GAME).sendPacket();
+        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE).sendPacket();
+        new ChatMessagePacketOut(player, ChatChannelType.GENERAL, GameConstants.WELCOME_MESSAGE_2).sendPacket();
 
         // Add player to World
         if (player.getGameWorld() == null) {
@@ -78,35 +78,35 @@ public class PlayerProcessor {
             // Instead let's send them to the default spawn.
             player.setCurrentWorldLocation(PlayerConstants.RESPAWN_LOCATION);
             player.setFutureWorldLocation(PlayerConstants.RESPAWN_LOCATION);
-            new ChatMessagePacketOutOut(player, ChatChannelType.GENERAL, MessageText.ERROR + "The world you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
+            new ChatMessagePacketOut(player, ChatChannelType.GENERAL, MessageText.ERROR + "The world you were on could not be loaded. Sending you to the default spawn location.").sendPacket();
         }
         player.getGameWorld().getPlayerController().addPlayer(player, new Warp(player.getCurrentWorldLocation(), player.getFacingDirection()));
 
         // Send player bag ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBag().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOutOut(player, new InventoryActions().set(InventoryType.BAG_1, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.BAG_1, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player bank ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerBank().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOutOut(player, new InventoryActions().set(InventoryType.BANK, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.BANK, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player equipment ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerEquipment().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOutOut(player, new InventoryActions().set(InventoryType.EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.EQUIPMENT, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
         // Send player hot bar ItemStacks
         for (InventorySlot inventorySlot : player.getPlayerHotBar().getInventorySlotArray()) {
             if (inventorySlot.getItemStack() != null) {
-                new InventoryPacketOutOut(player, new InventoryActions().set(InventoryType.HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
+                new InventoryPacketOut(player, new InventoryActions().set(InventoryType.HOT_BAR, inventorySlot.getSlotIndex(), inventorySlot.getItemStack())).sendPacket();
             }
         }
 
@@ -114,7 +114,7 @@ public class PlayerProcessor {
         for (GameWorld worldSearch : gameManager.getGameWorldProcessor().getGameWorlds().values()) {
             for (Player playerSearch : worldSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
-                new ChatMessagePacketOutOut(playerSearch, ChatChannelType.GENERAL, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
+                new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[GREEN]" + player.getName() + " has joined the server.").sendPacket();
             }
         }
 
@@ -152,7 +152,7 @@ public class PlayerProcessor {
         for (GameWorld worldSearch : gameManager.getGameWorldProcessor().getGameWorlds().values()) {
             for (Player playerSearch : worldSearch.getPlayerController().getPlayerList()) {
                 if (playerSearch == player) continue;
-                new ChatMessagePacketOutOut(playerSearch, ChatChannelType.GENERAL, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
+                new ChatMessagePacketOut(playerSearch, ChatChannelType.GENERAL, "[ORANGE]" + player.getName() + " has quit the server.").sendPacket();
             }
         }
 

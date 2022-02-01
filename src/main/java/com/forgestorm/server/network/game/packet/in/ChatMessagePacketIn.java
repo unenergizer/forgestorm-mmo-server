@@ -8,7 +8,7 @@ import com.forgestorm.server.game.ChatChannelType;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.MessageText;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOutOut;
+import com.forgestorm.server.network.game.packet.out.ChatMessagePacketOut;
 import com.forgestorm.server.network.game.shared.*;
 import com.forgestorm.shared.network.game.Opcode;
 import com.forgestorm.shared.network.game.Opcodes;
@@ -92,11 +92,11 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
                 if (packetData.chatChannelType == ChatChannelType.STAFF) {
                     AuthenticatedUser authenticatedReceiver = onlinePlayer.getClientHandler().getAuthenticatedUser();
                     if (authenticatedReceiver.isAdmin() || authenticatedReceiver.isModerator() || authenticatedReceiver.isContentDeveloper()) {
-                        new ChatMessagePacketOutOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
+                        new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
                     }
                 } else {
                     // All other messages
-                    new ChatMessagePacketOutOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
+                    new ChatMessagePacketOut(onlinePlayer, packetData.chatChannelType, stringBuilder.toString()).sendPacket();
                 }
                 println(getClass(), "[" + packetData.chatChannelType + "] " + packetData.getClientHandler().getPlayer().getName() + ": " + packetData.text);
             });
@@ -127,15 +127,15 @@ public class ChatMessagePacketIn implements PacketListener<ChatMessagePacketIn.T
         String commandBase = commandState.getCommandBase();
 
         if (commandType == CommandState.CommandType.NOT_FOUND) {
-            new ChatMessagePacketOutOut(player, packetData.chatChannelType, COMMAND_ERROR + "[WHITE]Unknown Command...").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[WHITE]Unknown Command...").sendPacket();
         } else if (commandType == CommandState.CommandType.SINGE_INCOMPLETE) {
-            new ChatMessagePacketOutOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
-            new ChatMessagePacketOutOut(player, packetData.chatChannelType, " [YELLOW] 1. /" + commandBase + " " + commandState.getIncompleteMessage()).sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, " [YELLOW] 1. /" + commandBase + " " + commandState.getIncompleteMessage()).sendPacket();
         } else if (commandType == CommandState.CommandType.MULTIPLE_INCOMPLETE) {
-            new ChatMessagePacketOutOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
+            new ChatMessagePacketOut(player, packetData.chatChannelType, COMMAND_ERROR + "[GREEN]Suggested alternatives:").sendPacket();
             for (int i = 0; i < commandState.getMultipleIncompleteMessages().length; i++) {
                 String incompleteMsg = commandState.getMultipleIncompleteMessages()[i];
-                new ChatMessagePacketOutOut(player, packetData.chatChannelType, " [YELLOW] " + (i + 1) + ". /" + commandBase + " " + incompleteMsg).sendPacket();
+                new ChatMessagePacketOut(player, packetData.chatChannelType, " [YELLOW] " + (i + 1) + ". /" + commandBase + " " + incompleteMsg).sendPacket();
             }
         } else if (commandType == CommandState.CommandType.INVALID_PERMISSION) {
             return false;
