@@ -5,6 +5,7 @@ import com.forgestorm.server.database.sql.GameWorldItemStackDropSQL;
 import com.forgestorm.server.database.sql.GameWorldMonsterSQL;
 import com.forgestorm.server.database.sql.GameWorldNpcSQL;
 import com.forgestorm.server.game.GameConstants;
+import com.forgestorm.server.game.rpg.EntityAlignment;
 import com.forgestorm.server.game.world.entity.*;
 import com.forgestorm.server.io.todo.FileManager;
 import com.forgestorm.shared.game.world.maps.MoveDirection;
@@ -20,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GameWorldProcessor {
 
     private static final boolean PRINT_DEBUG = true;
+    private static final boolean ENABLE_FUN_STUFF = true;
 
     @Getter
     private final Map<String, GameWorld> gameWorlds = new HashMap<>();
@@ -33,7 +35,43 @@ public class GameWorldProcessor {
     private final Queue<ItemStackDrop> ItemStackDropSpawnQueue = new LinkedList<>();
 
     public void queueAiEntitySpawn(AiEntity aiEntity) {
-        aiEntitySpawnQueue.add(aiEntity);
+
+        // Do a fun spawn
+        if (ENABLE_FUN_STUFF && aiEntity.getName().equalsIgnoreCase("test") && aiEntity instanceof Monster) {
+            for (int i = 0; i < 900; i++) {
+
+                Monster monster = new Monster();
+                monster.setFacingDirection(MoveDirection.SOUTH);
+                monster.setEntityType(EntityType.MONSTER);
+                monster.setAppearance(new Appearance(monster));
+                monster.setDatabaseId(i + 1000);
+
+                // DB STUFF
+                monster.setName(aiEntity.getName() + " " + i);
+                monster.setDefaultSpawnLocation(aiEntity.getDefaultSpawnLocation());
+                monster.setCurrentWorldLocation(aiEntity.getCurrentWorldLocation());
+                monster.setFutureWorldLocation(aiEntity.getFutureWorldLocation());
+                monster.setRegionLocations(aiEntity.getRegionStartX(), aiEntity.getRegionStartY(), aiEntity.getRegionEndX(), aiEntity.getRegionEndY());
+                if (aiEntity.getFirstInteraction() != null) {
+                    monster.setFirstInteraction(aiEntity.getFirstInteraction());
+                }
+                monster.setCurrentHealth(aiEntity.getCurrentHealth());
+                monster.setMaxHealth(aiEntity.getMaxHealth());
+                monster.getAttributes().setDamage(aiEntity.getAttributes().getDamage());
+                monster.setExpDrop(aiEntity.getExpDrop());
+                monster.setDropTable(aiEntity.getDropTable());
+                monster.setMoveSpeed(aiEntity.getMoveSpeed());
+                monster.setMovementInfo(.5f, .9f);
+                monster.setShopId(aiEntity.getShopId());
+                monster.setAlignment(EntityAlignment.NEUTRAL);
+                monster.getAppearance().setMonsterBodyTexture(aiEntity.getAppearance().getMonsterBodyTexture());
+
+                aiEntitySpawnQueue.add(monster);
+            }
+        } else {
+            // Do a normal spawn
+            aiEntitySpawnQueue.add(aiEntity);
+        }
     }
 
     public void queueItemStackDropSpawn(ItemStackDrop itemStackDrop) {
