@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GameWorldProcessor {
 
     private static final boolean PRINT_DEBUG = true;
-    private static final boolean ENABLE_FUN_STUFF = true;
+    private static final boolean ENABLE_FUN_STUFF = false;
 
     @Getter
     private final Map<String, GameWorld> gameWorlds = new HashMap<>();
@@ -38,7 +38,7 @@ public class GameWorldProcessor {
 
         // Do a fun spawn
         if (ENABLE_FUN_STUFF && aiEntity.getName().equalsIgnoreCase("test") && aiEntity instanceof Monster) {
-            for (int i = 0; i < 900; i++) {
+            for (int i = 0; i < 3000; i++) {
 
                 Monster monster = new Monster();
                 monster.setFacingDirection(MoveDirection.SOUTH);
