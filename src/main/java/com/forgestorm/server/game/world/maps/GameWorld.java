@@ -204,14 +204,14 @@ public class GameWorld {
 //        }
 //    }
 
-    public Tile getTile(LayerDefinition layerDefinition, int worldX, int worldY, short worldZ) {
+    public Tile getTile(LayerDefinition layerDefinition, int worldX, int worldY, short worldZ, boolean initFloor) {
         WorldChunk worldChunk = findChunk(worldX, worldY);
         if (worldChunk == null) return null;
 
         int localX = worldX - worldChunk.getChunkX() * GameConstants.CHUNK_SIZE;
         int localY = worldY - worldChunk.getChunkY() * GameConstants.CHUNK_SIZE;
 
-        return worldChunk.getTile(layerDefinition, localX, localY, Floors.getFloor(worldZ));
+        return worldChunk.getTile(layerDefinition, localX, localY, Floors.getFloor(worldZ), initFloor);
     }
 
     public Warp getWarp(int entityX, int entityY, short entityZ) {

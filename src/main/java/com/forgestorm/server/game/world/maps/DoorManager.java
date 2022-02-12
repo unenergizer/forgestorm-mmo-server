@@ -3,13 +3,13 @@ package com.forgestorm.server.game.world.maps;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
 import com.forgestorm.server.game.world.entity.Player;
-import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
 import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.game.world.maps.tile.TileImage;
 import com.forgestorm.server.game.world.maps.tile.properties.DoorProperty;
-import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 import com.forgestorm.server.network.game.packet.out.DoorInteractPacketOut;
 import com.forgestorm.server.util.ServerTimeUtil;
+import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +28,7 @@ public class DoorManager {
         GameWorld gameWorld = player.getGameWorld();
         Location playerLocation = player.getCurrentWorldLocation();
 
-        Tile tile = gameWorld.getTile(LayerDefinition.WORLD_OBJECTS, tileX, tileY, tileZ);
+        Tile tile = gameWorld.getTile(LayerDefinition.WORLD_OBJECTS, tileX, tileY, tileZ, false);
         TileImage tileImage = tile.getTileImage();
 
         if (tileImage == null) return;

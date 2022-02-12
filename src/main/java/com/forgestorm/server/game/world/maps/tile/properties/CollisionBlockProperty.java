@@ -69,7 +69,7 @@ public class CollisionBlockProperty extends AbstractTileProperty implements Worl
                     int tileY = worldY + tilesTall - row - 1;
                     Tile tileParent = ServerMain.getInstance().getGameManager().getGameWorldProcessor()
                             .getGameWorld(worldName)
-                            .getTile(layerDefinition, tileX, tileY, worldZ);
+                            .getTile(layerDefinition, tileX, tileY, worldZ, true);
 
                     if (tileParent == null) continue;
                     if (useEraser) {

@@ -117,7 +117,7 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
                 // Set the TileImage to the Tile
                 if (tileImage != null) {
                     println(ChunkLoader.class, " -- Setting TileImage: " + tileImage.getFileName(), false, PRINT_DEBUG);
-                    Tile tile = chunk.getTile(layerDefinition, localX, localY, floor);
+                    Tile tile = chunk.getTile(layerDefinition, localX, localY, floor, true);
                     tile.setTileImage(tileImage);
                 }
             }

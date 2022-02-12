@@ -127,6 +127,11 @@ public class WorldChunk {
     }
 
     public Tile getTile(LayerDefinition layerDefinition, int localX, int localY, Floors floor) {
+        return getTile(layerDefinition, localX, localY, floor, false);
+    }
+
+    public Tile getTile(LayerDefinition layerDefinition, int localX, int localY, Floors floor, boolean initFloor) {
+        if (initFloor) checkFloorAndInit(floor);
         return floorLayers.get(floor).get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE];
     }
 
