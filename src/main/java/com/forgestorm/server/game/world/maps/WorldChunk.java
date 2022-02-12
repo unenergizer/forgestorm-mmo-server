@@ -49,49 +49,55 @@ public class WorldChunk {
         this.worldName = worldName;
         this.chunkX = chunkX;
         this.chunkY = chunkY;
-        initTileLayers();
+        checkFloorAndInit(Floors.GROUND_FLOOR);
     }
 
     public WorldChunk(String worldName, short chunkX, short chunkY, boolean generateLandscape) {
         this.worldName = worldName;
         this.chunkX = chunkX;
         this.chunkY = chunkY;
-        initTileLayers();
+        checkFloorAndInit(Floors.GROUND_FLOOR);
         if (generateLandscape) generateLandscape();
     }
 
-    private void initTileLayers() {
-        for (Floors floor : Floors.values()) {
-            Map<LayerDefinition, Tile[]> layers = new HashMap<>();
+    private void checkFloorAndInit(Floors floor) {
 
-            for (LayerDefinition layerDefinition : LayerDefinition.values()) {
+        // If this floor exists, do not regenerate
+        if (floorLayers.containsKey(floor)) return;
 
-                Tile[] tiles = new Tile[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
+        Map<LayerDefinition, Tile[]> layers = new HashMap<>();
 
-                // Initialize all tiles
-                for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
-                    for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+        for (LayerDefinition layerDefinition : LayerDefinition.values()) {
 
-                        tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
-                                worldName,
-                                this,
-                                localX + chunkX * GameConstants.CHUNK_SIZE,
-                                localY + chunkY * GameConstants.CHUNK_SIZE,
-                                floor.getWorldZ());
-                    }
+            Tile[] tiles = new Tile[GameConstants.CHUNK_SIZE * GameConstants.CHUNK_SIZE];
+
+            // Initialize all tiles
+            for (int localX = 0; localX < GameConstants.CHUNK_SIZE; localX++) {
+                for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
+
+                    tiles[localX + localY * GameConstants.CHUNK_SIZE] = new Tile(layerDefinition,
+                            worldName,
+                            this,
+                            localX + chunkX * GameConstants.CHUNK_SIZE,
+                            localY + chunkY * GameConstants.CHUNK_SIZE,
+                            floor.getWorldZ());
                 }
-
-                layers.put(layerDefinition, tiles);
             }
 
-            floorLayers.put(floor, layers);
+            layers.put(layerDefinition, tiles);
         }
+
+        floorLayers.put(floor, layers);
     }
 
     public void setChunkFromDisk(WorldChunk chunkFromDisk) {
         // Copy layers and floors
         for (Floors floor : Floors.values()) {
-            for (Map.Entry<LayerDefinition, Tile[]> entry : chunkFromDisk.floorLayers.get(floor).entrySet()) {
+
+            Map<LayerDefinition, Tile[]> layerDefinitionMap = chunkFromDisk.floorLayers.get(floor);
+            if (layerDefinitionMap == null) continue;
+
+            for (Map.Entry<LayerDefinition, Tile[]> entry : layerDefinitionMap.entrySet()) {
                 LayerDefinition layerDefinition = entry.getKey();
                 Tile[] tiles = entry.getValue();
 
@@ -115,6 +121,7 @@ public class WorldChunk {
     }
 
     public void setTileImage(LayerDefinition layerDefinition, TileImage tileImage, int localX, int localY, Floors floor) {
+        checkFloorAndInit(floor);
         floorLayers.get(floor).get(layerDefinition)[localX + localY * GameConstants.CHUNK_SIZE].setTileImage(tileImage);
         changedSinceLastSave = true;
     }
@@ -128,7 +135,11 @@ public class WorldChunk {
     }
 
     private boolean isTraversable(Floors floor, int localX, int localY) {
-        Tile[] tiles = floorLayers.get(floor).get(LayerDefinition.WORLD_OBJECTS);
+
+        Map<LayerDefinition, Tile[]> layerDefinitionMap = floorLayers.get(floor);
+        if (layerDefinitionMap == null) return false;
+
+        Tile[] tiles = layerDefinitionMap.get(LayerDefinition.WORLD_OBJECTS);
         Tile tile = tiles[localX + localY * GameConstants.CHUNK_SIZE];
         if (tile == null) return true;
         if (!ServerMain.getInstance().getDoorManager().isDoorwayTraversable(tile)) return false;
@@ -191,9 +202,13 @@ public class WorldChunk {
 
         // Send chunk layers
         for (Floors floor : Floors.values()) {
-            for (Map.Entry<LayerDefinition, Tile[]> layerMap : floorLayers.get(floor).entrySet()) {
-                LayerDefinition layerDefinition = layerMap.getKey();
-                Tile[] tileImages = layerMap.getValue();
+
+            Map<LayerDefinition, Tile[]> layerDefinitionMap = floorLayers.get(floor);
+            if (layerDefinitionMap == null) continue;
+
+            for (Map.Entry<LayerDefinition, Tile[]> entry : layerDefinitionMap.entrySet()) {
+                LayerDefinition layerDefinition = entry.getKey();
+                Tile[] tileImages = entry.getValue();
 
                 // Construct and send a section
                 byte layerSectionsSent = 0;

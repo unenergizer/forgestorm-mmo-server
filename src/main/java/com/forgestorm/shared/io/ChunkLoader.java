@@ -11,13 +11,12 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.forgestorm.server.ServerMain;
 import com.forgestorm.server.game.GameConstants;
-import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.server.game.world.maps.WorldChunk;
 import com.forgestorm.server.game.world.maps.building.WorldBuilder;
 import com.forgestorm.server.game.world.maps.tile.Tile;
 import com.forgestorm.server.game.world.maps.tile.TileImage;
+import com.forgestorm.shared.game.world.maps.Floors;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,7 +47,6 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
         println(getClass(), "Directory Name: " + file.name(), false, PRINT_DEBUG);
         println(PRINT_DEBUG);
 
-        worldChunkDataWrapper = null;
         worldChunkDataWrapper = new WorldChunkDataWrapper();
         WorldChunk worldChunk = parseChunk(file);
         worldChunkDataWrapper.setWorldChunkFromDisk(worldChunk);
@@ -103,6 +101,9 @@ public class ChunkLoader extends AsynchronousAssetLoader<ChunkLoader.WorldChunkD
 
         WorldBuilder worldBuilder = ServerMain.getInstance().getWorldBuilder();
         JsonValue floorRoot = root.get(Short.toString(floor.getWorldZ()));
+
+        if (floorRoot == null) return; // This floor doesn't exit on this chunk
+
         String layer = floorRoot.get(layerDefinition.getLayerName()).asString();
         String[] imageIds = layer.split(",");
         for (int localY = 0; localY < GameConstants.CHUNK_SIZE; localY++) {
