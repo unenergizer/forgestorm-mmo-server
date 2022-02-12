@@ -121,6 +121,10 @@ public class GameWorld {
             json.writeObjectStart();
             for (Floors floor : Floors.values()) {
                 Map<String, String> tileMap = new HashMap<>();
+
+                Map<LayerDefinition, Tile[]> layerDefinitionMap = worldChunk.getFloorLayers().get(floor);
+                if (layerDefinitionMap == null) continue;
+
                 for (Map.Entry<LayerDefinition, Tile[]> entrySet : worldChunk.getFloorLayers().get(floor).entrySet()) {
                     LayerDefinition layerDefinition = entrySet.getKey();
                     Tile[] tiles = entrySet.getValue();
