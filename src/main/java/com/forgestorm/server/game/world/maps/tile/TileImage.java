@@ -2,9 +2,10 @@ package com.forgestorm.server.game.world.maps.tile;
 
 
 import com.forgestorm.server.ServerMain;
+import com.forgestorm.server.game.world.maps.tile.properties.AbstractTileProperty;
 import com.forgestorm.shared.game.world.maps.Tags;
 import com.forgestorm.shared.game.world.maps.building.LayerDefinition;
-import com.forgestorm.server.game.world.maps.tile.properties.AbstractTileProperty;
+import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypeHelper;
 import com.forgestorm.shared.game.world.maps.tile.properties.TilePropertyTypes;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,10 +54,16 @@ public class TileImage {
         this.fileName = tileImage.getFileName();
         this.layerDefinition = tileImage.getLayerDefinition();
 
-        // Copy tile properties
         if (tileImage.getTileProperties() != null) {
             for (AbstractTileProperty entry : tileImage.getTileProperties().values()) {
-                setCustomTileProperty(entry);
+                boolean stateSpecific = TilePropertyTypeHelper.isPropertyStatefulSpecific(entry.getTilePropertyType());
+
+                // Make sure we create a brand-new tile property here!
+                if (stateSpecific) {
+                    setCustomTileProperty(TilePropertyTypeHelper.getNewAbstractTileProperty(entry.getTilePropertyType()));
+                } else {
+                    setCustomTileProperty(entry);
+                }
             }
         }
 

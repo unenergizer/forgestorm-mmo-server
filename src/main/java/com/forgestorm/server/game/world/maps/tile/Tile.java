@@ -41,7 +41,7 @@ public class Tile {
     public void setTileImage(TileImage tileImage) {
         removeTileImage();
 
-        this.tileImage = tileImage;
+        this.tileImage = new TileImage(tileImage); // Always create a new copy!s
         applyTileProperties();
     }
 

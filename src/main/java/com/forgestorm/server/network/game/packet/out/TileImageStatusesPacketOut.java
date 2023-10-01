@@ -37,6 +37,8 @@ public class TileImageStatusesPacketOut extends AbstractPacketOut {
             to assume every entry has a DoorProperty. */
             TileImage tileImage = tile.getTileImage();
 
+            if (tileImage == null) return;
+
             // Send location
             write.writeInt(tile.getWorldX());
             write.writeInt(tile.getWorldY());
@@ -50,6 +52,9 @@ public class TileImageStatusesPacketOut extends AbstractPacketOut {
 
             // Send status
             DoorProperty doorProperty = (DoorProperty) tileImage.getProperty(TilePropertyTypes.DOOR);
+
+            if (doorProperty == null) return;
+
             DoorManager.DoorStatus doorStatus = doorProperty.getDoorStatus();
             byte ordinal = DoorManager.DoorStatus.getByte(doorProperty.getDoorStatus());
             write.writeByte(ordinal);
